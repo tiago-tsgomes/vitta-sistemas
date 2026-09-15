@@ -16,9 +16,9 @@ jobs:
         uses: SamKirkland/FTP-Deploy-Action@v4.3.5
         with:
           server: ${{ secrets.FTP_SERVER }}
-          username: ${{ secrets.FTP_USERNAME }}
-          password: ${{ secrets.FTP_PASSWORD }}
-          server-dir: ${{ secrets.FTP_SERVER_DIR_APP }}
+          username: ${{ secrets.FTP_USERNAME_APP }}
+          password: ${{ secrets.FTP_PASSWORD_APP }}
+          server-dir: ./
           local-dir: ./
           exclude: |
             **/.git*
@@ -48,9 +48,9 @@ jobs:
         uses: SamKirkland/FTP-Deploy-Action@v4.3.5
         with:
           server: ${{ secrets.FTP_SERVER }}
-          username: ${{ secrets.FTP_USERNAME }}
-          password: ${{ secrets.FTP_PASSWORD }}
-          server-dir: ${{ secrets.FTP_SERVER_DIR_BI }}
+          username: ${{ secrets.FTP_USERNAME_BI }}
+          password: ${{ secrets.FTP_PASSWORD_BI }}
+          server-dir: ./
           local-dir: ./bi/
           exclude: |
             **/.git*
