@@ -29,6 +29,7 @@ jobs:
             **/ios/**
             **/www/**
             **/bi/**
+            **/Site/**
             **/supabase/**
             **/.claude/**
             **/.vscode/**
@@ -36,6 +37,12 @@ jobs:
             **/Recuperados/**
             **/Arquivo.zip
             **/*.md
+            capacitor.config.json
+            package.json
+            package-lock.json
+            serve.sh
+            suporte.html
+            manual-publicacao.html
 
   deploy-bi:
     name: Deploy BI (bi.vittasistemas.com.br)
