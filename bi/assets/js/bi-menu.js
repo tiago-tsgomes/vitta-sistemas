@@ -42,8 +42,9 @@
 
     mount.innerHTML = `
       <div style="width:220px;height:100%;background:#FFFFFF;border-right:1px solid #EFEDF9;display:flex;flex-direction:column;flex-shrink:0;overflow-y:auto;">
-        <div style="display:flex;align-items:center;justify-content:center;padding:26px 20px 22px 20px;">
+        <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;padding:26px 20px 22px 20px;">
           <img src="../img/logo_bi.png" alt="Vitta BI" style="height:35px;width:auto;">
+          <p style="font-size:.6rem;color:#9CA3AF;letter-spacing:.03em;margin:0;">v1.0.1</p>
         </div>
         <div style="height:1px;background:#F1F0F7;margin:2px 20px 14px 20px;"></div>
         <nav style="flex:1;display:flex;flex-direction:column;gap:2px;">${navHtml}</nav>
