@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>Redefinir senha — Vitta Sistemas</title>
+  <link rel="icon" type="image/png" href="../img/favicon.png" />
+
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            vitta: { 50:'#f0fbfd', 100:'#e0f7fa', 400:'#4dd9ed', 500:'#2ABCD4', 600:'#1a96ac', 700:'#127a8c' }
+          },
+          fontFamily: { sans: ['Inter','system-ui','sans-serif'] },
+          boxShadow: { vitta:'0 4px 20px rgba(42,188,212,0.35)', 'vitta-lg':'0 6px 28px rgba(42,188,212,0.45)' }
+        }
+      }
+    }
+  </script>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+
+  <style type="text/tailwindcss">
+    @layer components {
+      .field-input-pw {
+        @apply w-full pl-11 pr-12 py-3 border-[1.5px] border-gray-200 rounded-xl text-sm text-gray-700 bg-white outline-none
+               placeholder:text-gray-400 transition-all duration-200
+               focus:border-vitta-500 focus:shadow-[0_0_0_3px_rgba(42,188,212,0.15)];
+      }
+      .btn-vitta {
+        @apply w-full py-3.5 rounded-xl font-semibold text-sm text-white
+               bg-gradient-to-r from-vitta-500 to-vitta-600
+               shadow-vitta hover:shadow-vitta-lg hover:-translate-y-0.5
+               active:translate-y-0 disabled:opacity-60 disabled:cursor-not-allowed disabled:transform-none
+               transition-all duration-200 flex items-center justify-center gap-2;
+      }
+      .btn-outline-vitta {
+        @apply w-full py-3.5 rounded-xl font-semibold text-sm text-vitta-600
+               border-[1.5px] border-vitta-500 hover:bg-vitta-50
+               transition-all duration-200 flex items-center justify-center gap-2;
+      }
+      .alert-error   { @apply flex items-start gap-2.5 p-3.5 mb-5 rounded-xl text-sm font-medium bg-red-50 text-red-700 border border-red-200; }
+      .alert-success { @apply flex items-start gap-2.5 p-3.5 mb-5 rounded-xl text-sm font-medium bg-green-50 text-green-700 border border-green-200; }
+    }
+  </style>
+</head>
+
+<body class="min-h-screen flex font-sans antialiased bg-white">
+
+  <!-- PAINEL ESQUERDO -->
+  <aside class="hidden lg:flex w-[44%] min-h-screen flex-col items-center justify-center p-14
+                bg-gradient-to-br from-vitta-700 via-vitta-600 to-vitta-400 relative overflow-hidden">
+    <div class="absolute w-[480px] h-[480px] rounded-full bg-white/5 -bottom-40 -right-28 pointer-events-none"></div>
+    <div class="absolute w-[280px] h-[280px] rounded-full bg-white/5 -top-20 -left-20 pointer-events-none"></div>
+
+    <div class="relative z-10 max-w-[340px] text-center">
+      <img src="../img/logo.png" alt="Vitta Sistemas" class="w-56 mx-auto mb-10 brightness-0 invert" />
+      <h2 class="text-[1.45rem] font-bold text-white mb-3 leading-snug">Crie uma nova senha</h2>
+      <p class="text-white/75 text-[0.9rem] leading-relaxed">
+        Escolha uma senha forte para manter sua conta segura. Use letras, números e símbolos.
+      </p>
+
+      <div class="mt-10 flex flex-col gap-4 text-left">
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 rounded-xl bg-white/15 flex items-center justify-center shrink-0">
+            <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+              <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+            </svg>
+          </div>
+          <span class="text-white/90 text-sm">Mínimo de 8 caracteres</span>
+        </div>
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 rounded-xl bg-white/15 flex items-center justify-center shrink-0">
+            <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+              <polyline points="20 6 9 17 4 12"/>
+            </svg>
+          </div>
+          <span class="text-white/90 text-sm">Letras maiúsculas e minúsculas</span>
+        </div>
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 rounded-xl bg-white/15 flex items-center justify-center shrink-0">
+            <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+              <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
+            </svg>
+          </div>
+          <span class="text-white/90 text-sm">Inclua números e símbolos</span>
+        </div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- PAINEL DIREITO -->
+  <main class="flex-1 min-h-screen relative flex items-center justify-center px-6 bg-white overflow-y-auto">
+    <div class="w-full max-w-[420px] py-14">
+
+      <!-- Logo mobile -->
+      <img src="../img/logo.png" alt="Vitta Sistemas" class="lg:hidden w-44 mx-auto mb-10" />
+
+      <!-- Bloco de link inválido (hidden por padrão) -->
+      <div id="reset-invalid" class="hidden text-center py-6">
+        <div class="w-16 h-16 rounded-full bg-red-100 flex items-center justify-center mx-auto mb-5">
+          <svg xmlns="http://www.w3.org/2000/svg" class="w-7 h-7 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/>
+          </svg>
+        </div>
+        <h2 class="text-xl font-bold text-gray-800 mb-2">Link inválido ou expirado</h2>
+        <p class="text-gray-500 text-sm mb-7">Este link de redefinição não é mais válido. Solicite um novo link abaixo.</p>
+        <a href="esqueci-senha.html" class="btn-vitta">
+          <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/>
+          </svg>
+          Solicitar novo link
+        </a>
+      </div>
+
+      <!-- Formulário (visível quando sessão válida) -->
+      <div id="reset-form-wrapper">
+
+        <!-- Ícone -->
+        <div class="w-16 h-16 rounded-full bg-vitta-100 flex items-center justify-center mx-auto mb-7">
+          <svg xmlns="http://www.w3.org/2000/svg" class="w-7 h-7 text-vitta-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 9.9-1"/>
+          </svg>
+        </div>
+
+        <div class="mb-7 text-center">
+          <h1 class="text-[1.85rem] font-extrabold text-gray-800 mb-1.5 tracking-tight">Nova senha</h1>
+          <p class="text-gray-500 text-sm">Defina sua nova senha de acesso ao sistema.</p>
+        </div>
+
+        <div id="reset-alert" role="alert" aria-live="polite"></div>
+
+        <form id="reset-form" novalidate>
+
+          <!-- Nova senha -->
+          <div class="mb-2">
+            <label for="new-password" class="block text-[0.78rem] font-semibold text-gray-500 uppercase tracking-wider mb-1.5">
+              Nova senha
+            </label>
+            <div class="relative">
+              <span class="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none">
+                <svg xmlns="http://www.w3.org/2000/svg" class="w-[18px] h-[18px]" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                  <rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+                </svg>
+              </span>
+              <input type="password" id="new-password" class="field-input-pw" placeholder="Mínimo 8 caracteres" autocomplete="new-password" required />
+              <button type="button" id="toggle-pw1" class="absolute right-3.5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-vitta-500 transition-colors">
+                <svg id="eye1" xmlns="http://www.w3.org/2000/svg" class="w-[18px] h-[18px]" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                  <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>
+                </svg>
+              </button>
+            </div>
+          </div>
+
+          <!-- Barra de força da senha -->
+          <div class="mb-5 px-0.5">
+            <div class="flex gap-1 mb-1">
+              <div id="bar1" class="h-1 flex-1 rounded bg-gray-200 transition-all duration-300"></div>
+              <div id="bar2" class="h-1 flex-1 rounded bg-gray-200 transition-all duration-300"></div>
+              <div id="bar3" class="h-1 flex-1 rounded bg-gray-200 transition-all duration-300"></div>
+              <div id="bar4" class="h-1 flex-1 rounded bg-gray-200 transition-all duration-300"></div>
+            </div>
+            <span id="strength-label" class="text-[0.75rem] text-gray-400"></span>
+          </div>
+
+          <!-- Confirmar senha -->
+          <div class="mb-6">
+            <label for="confirm-password" class="block text-[0.78rem] font-semibold text-gray-500 uppercase tracking-wider mb-1.5">
+              Confirmar nova senha
+            </label>
+            <div class="relative">
+              <span class="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none">
+                <svg xmlns="http://www.w3.org/2000/svg" class="w-[18px] h-[18px]" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                  <rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+                </svg>
+              </span>
+              <input type="password" id="confirm-password" class="field-input-pw" placeholder="Repita a senha" autocomplete="new-password" required />
+              <button type="button" id="toggle-pw2" class="absolute right-3.5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-vitta-500 transition-colors">
+                <svg id="eye2" xmlns="http://www.w3.org/2000/svg" class="w-[18px] h-[18px]" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                  <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>
+                </svg>
+              </button>
+            </div>
+          </div>
+
+          <button type="submit" id="btn-reset" class="btn-vitta mb-3">
+            <svg id="spinner" class="hidden w-4 h-4 animate-spin" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+              <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/>
+              <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/>
+            </svg>
+            <span id="btn-text" class="flex items-center gap-2">
+              <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                <polyline points="20 6 9 17 4 12"/>
+              </svg>
+              Salvar nova senha
+            </span>
+          </button>
+
+          <a href="../index.html" class="btn-outline-vitta">
+            <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+              <line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/>
+            </svg>
+            Voltar para o login
+          </a>
+
+        </form>
+      </div>
+    </div>
+
+    <p class="absolute bottom-4 left-0 right-0 text-center text-[0.72rem] text-gray-300">
+      © <span id="year"></span> Vitta Sistemas. Todos os direitos reservados.
+    </p>
+  </main>
+
+</body>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<script src="../assets/js/config.js?v=2"></script>
+<script>
+  document.getElementById('year').textContent = new Date().getFullYear();
+
+  const isForceMode = new URLSearchParams(window.location.search).get('mode') === 'force';
+
+  /* Modo de troca obrigatória: ajusta textos da UI */
+  if (isForceMode) {
+    document.querySelector('h1').textContent = 'Altere sua senha';
+    document.querySelector('h1').nextElementSibling.textContent =
+      'Por segurança, você precisa definir uma nova senha antes de acessar o sistema.';
+    document.querySelector('aside h2').textContent = 'Troca de senha obrigatória';
+    document.querySelector('aside p').textContent =
+      'Sua conta foi criada com uma senha temporária. Defina uma senha pessoal para continuar.';
+  }
+
+  /* Verifica sessão válida via onAuthStateChange (evita race condition com o hash da URL) */
+  document.getElementById('reset-form-wrapper').classList.add('hidden');
+
+  supabase.auth.onAuthStateChange((event, session) => {
+    if (event === 'PASSWORD_RECOVERY' || (isForceMode && session)) {
+      document.getElementById('reset-invalid').classList.add('hidden');
+      document.getElementById('reset-form-wrapper').classList.remove('hidden');
+    } else if (!session) {
+      document.getElementById('reset-invalid').classList.remove('hidden');
+      document.getElementById('reset-form-wrapper').classList.add('hidden');
+    }
+  });
+
+  /* Toggle visibilidade das senhas */
+  const EYE_OPEN = `<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>`;
+  const EYE_OFF  = `<path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/>`;
+
+  [['toggle-pw1','new-password','eye1'],['toggle-pw2','confirm-password','eye2']].forEach(([btnId, inputId, iconId]) => {
+    document.getElementById(btnId).addEventListener('click', () => {
+      const input = document.getElementById(inputId);
+      const icon  = document.getElementById(iconId);
+      const visible = input.type === 'text';
+      input.type = visible ? 'password' : 'text';
+      icon.innerHTML = visible ? EYE_OPEN : EYE_OFF;
+    });
+  });
+
+  /* Barra de força da senha */
+  const STRENGTH_COLORS = ['', '#EF4444', '#F59E0B', '#84CC16', '#10B981'];
+  const STRENGTH_LABELS = ['', 'Fraca', 'Regular', 'Boa', 'Forte'];
+
+  document.getElementById('new-password').addEventListener('input', function () {
+    const v = this.value;
+    let score = 0;
+    if (v.length >= 8)          score++;
+    if (/[A-Z]/.test(v))        score++;
+    if (/[0-9]/.test(v))        score++;
+    if (/[^A-Za-z0-9]/.test(v)) score++;
+
+    for (let i = 1; i <= 4; i++) {
+      const bar = document.getElementById(`bar${i}`);
+      bar.style.background = i <= score ? STRENGTH_COLORS[score] : '#E5E7EB';
+    }
+    document.getElementById('strength-label').textContent = v.length ? STRENGTH_LABELS[score] : '';
+    document.getElementById('strength-label').style.color = v.length ? STRENGTH_COLORS[score] : '';
+  });
+
+  /* Submit redefinição */
+  document.getElementById('reset-form').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const alertEl = document.getElementById('reset-alert');
+    alertEl.innerHTML = '';
+
+    const password = document.getElementById('new-password').value;
+    const confirm  = document.getElementById('confirm-password').value;
+    const btn      = document.getElementById('btn-reset');
+    const spinner  = document.getElementById('spinner');
+    const btnText  = document.getElementById('btn-text');
+
+    if (password.length < 8) {
+      alertEl.innerHTML = `<div class="alert-error"><span>⚠</span><span>A senha deve ter pelo menos 8 caracteres.</span></div>`;
+      return;
+    }
+    if (password !== confirm) {
+      alertEl.innerHTML = `<div class="alert-error"><span>⚠</span><span>As senhas não coincidem.</span></div>`;
+      return;
+    }
+
+    btn.disabled = true;
+    spinner.classList.remove('hidden');
+    btnText.classList.add('hidden');
+
+    const updateData = { password };
+    if (isForceMode) updateData.data = { force_password_change: false };
+
+    const { error } = await supabase.auth.updateUser(updateData);
+
+    btn.disabled = false;
+    spinner.classList.add('hidden');
+    btnText.classList.remove('hidden');
+
+    if (error) {
+      alertEl.innerHTML = `<div class="alert-error"><span>✕</span><span>Erro ao redefinir senha. O link pode ter expirado. Solicite um novo.</span></div>`;
+      return;
+    }
+
+    alertEl.innerHTML = `<div class="alert-success"><span>✓</span><span>Senha ${isForceMode ? 'definida' : 'redefinida'} com sucesso! Redirecionando para o login...</span></div>`;
+    if (!isForceMode) await supabase.auth.signOut();
+    setTimeout(() => {
+      window.location.href = isForceMode ? 'dashboard.html' : '../index.html';
+    }, 1500);
+  });
+</script>
+</html>

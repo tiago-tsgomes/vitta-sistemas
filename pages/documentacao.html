@@ -1,0 +1,432 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>Documentação — Vitta Sistemas</title>
+  <link rel="icon" type="image/png" href="../img/favicon.png" />
+
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            vitta: { 50:'#f0fbfd', 100:'#e0f7fa', 300:'#80deea', 400:'#4dd9ed', 500:'#2ABCD4', 600:'#1a96ac', 700:'#127a8c' }
+          },
+          fontFamily: { sans: ['Inter','system-ui','sans-serif'] }
+        }
+      }
+    }
+  </script>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+
+  <style>
+    .sidebar-nav::-webkit-scrollbar { width: 3px; }
+    .sidebar-nav::-webkit-scrollbar-thumb { background: rgba(255,255,255,.1); border-radius: 4px; }
+    .doc-content::-webkit-scrollbar { width: 6px; }
+    .doc-content::-webkit-scrollbar-thumb { background: #e5e7eb; border-radius: 4px; }
+    .doc-section { animation: fadeUp .3s ease; }
+    @keyframes fadeUp { from { opacity:0; transform:translateY(6px); } to { opacity:1; transform:translateY(0); } }
+    .nav-item.active { background: rgba(42,188,212,.2); color: #4dd9ed; }
+    .status-dot { width:.6rem; height:.6rem; border-radius:999px; display:inline-block; flex-shrink:0; }
+    .img-slot { border: 2px dashed #d1d5db; border-radius: .875rem; background: #fafafa; padding: 1.5rem; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: .4rem; text-align: center; }
+    .img-slot img { display: none; width: 100%; border-radius: .625rem; }
+    .img-slot.has-img { border-style: solid; border-color: #e5e7eb; background: #fff; padding: .5rem; }
+    .img-slot.has-img .img-slot-empty { display: none; }
+    .img-slot.has-img img { display: block; }
+  </style>
+</head>
+
+<body class="bg-[#F0F2F5] font-sans antialiased">
+<div class="flex min-h-screen">
+
+<!-- SIDEBAR -->
+<aside id="sidebar"
+  class="fixed inset-y-0 left-0 w-[240px] bg-[#111827] flex flex-col z-30
+         -translate-x-full lg:translate-x-0 transition-transform duration-300">
+
+  <div class="flex flex-col items-center justify-center gap-1 py-4 px-5 border-b border-white/10 shrink-0">
+    <img src="../img/logo.png" alt="Vitta Sistemas" class="h-10 w-auto brightness-0 invert" />
+    <p class="text-[0.65rem] text-gray-500 tracking-wide">Documentação</p>
+  </div>
+
+  <nav class="flex-1 overflow-y-auto sidebar-nav py-3">
+
+    <button data-topic="inicio" onclick="showTopic('inicio')"
+      class="nav-item w-full flex items-center gap-3 px-3 py-2.5 mx-2 rounded-xl text-[0.83rem] font-semibold text-gray-400 hover:bg-white/10 hover:text-white transition-colors duration-150 cursor-pointer mb-0.5" style="width:calc(100% - 16px)">
+      <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+      Visão Geral
+    </button>
+
+    <p class="block text-[0.6rem] font-bold text-gray-500 uppercase tracking-widest px-4 pb-1 pt-4">Cadastros</p>
+    <button data-topic="profissionais" onclick="showTopic('profissionais')" class="nav-item w-full flex items-center gap-3 px-3 py-2.5 mx-2 rounded-xl text-[0.83rem] font-medium text-gray-400 hover:bg-white/10 hover:text-white transition-colors duration-150 cursor-pointer mb-0.5" style="width:calc(100% - 16px)">
+      <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M12 2a5 5 0 1 0 0 10 5 5 0 0 0 0-10z"/><path d="M4 21v-1a7 7 0 0 1 14 0v1"/></svg>
+      Profissionais
+    </button>
+    <button data-topic="pacientes" onclick="showTopic('pacientes')" class="nav-item w-full flex items-center gap-3 px-3 py-2.5 mx-2 rounded-xl text-[0.83rem] font-medium text-gray-400 hover:bg-white/10 hover:text-white transition-colors duration-150 cursor-pointer mb-0.5" style="width:calc(100% - 16px)">
+      <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+      Pacientes
+    </button>
+    <button data-topic="usuarios" onclick="showTopic('usuarios')" class="nav-item w-full flex items-center gap-3 px-3 py-2.5 mx-2 rounded-xl text-[0.83rem] font-medium text-gray-400 hover:bg-white/10 hover:text-white transition-colors duration-150 cursor-pointer mb-0.5" style="width:calc(100% - 16px)">
+      <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg>
+      Usuários
+    </button>
+
+    <p class="block text-[0.6rem] font-bold text-gray-500 uppercase tracking-widest px-4 pb-1 pt-4">Agenda &amp; Atendimento</p>
+    <button data-topic="agendamentos" onclick="showTopic('agendamentos')" class="nav-item w-full flex items-center gap-3 px-3 py-2.5 mx-2 rounded-xl text-[0.83rem] font-medium text-gray-400 hover:bg-white/10 hover:text-white transition-colors duration-150 cursor-pointer mb-0.5" style="width:calc(100% - 16px)">
+      <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+      Agendamentos
+    </button>
+    <button data-topic="atendimento" onclick="showTopic('atendimento')" class="nav-item w-full flex items-center gap-3 px-3 py-2.5 mx-2 rounded-xl text-[0.83rem] font-medium text-gray-400 hover:bg-white/10 hover:text-white transition-colors duration-150 cursor-pointer mb-0.5" style="width:calc(100% - 16px)">
+      <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+      Atendimento
+    </button>
+
+    <p class="block text-[0.6rem] font-bold text-gray-500 uppercase tracking-widest px-4 pb-1 pt-4">Documentos</p>
+    <button data-topic="receitas" onclick="showTopic('receitas')" class="nav-item w-full flex items-center gap-3 px-3 py-2.5 mx-2 rounded-xl text-[0.83rem] font-medium text-gray-400 hover:bg-white/10 hover:text-white transition-colors duration-150 cursor-pointer mb-0.5" style="width:calc(100% - 16px)">
+      <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+      Receitas e Documentos
+    </button>
+
+    <p class="block text-[0.6rem] font-bold text-gray-500 uppercase tracking-widest px-4 pb-1 pt-4">Financeiro</p>
+    <button data-topic="financeiro" onclick="showTopic('financeiro')" class="nav-item w-full flex items-center gap-3 px-3 py-2.5 mx-2 rounded-xl text-[0.83rem] font-medium text-gray-400 hover:bg-white/10 hover:text-white transition-colors duration-150 cursor-pointer mb-0.5" style="width:calc(100% - 16px)">
+      <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+      Financeiro
+    </button>
+
+    <p class="block text-[0.6rem] font-bold text-gray-500 uppercase tracking-widest px-4 pb-1 pt-4">Outros Cadastros</p>
+    <button data-topic="outros" onclick="showTopic('outros')" class="nav-item w-full flex items-center gap-3 px-3 py-2.5 mx-2 rounded-xl text-[0.83rem] font-medium text-gray-400 hover:bg-white/10 hover:text-white transition-colors duration-150 cursor-pointer mb-0.5" style="width:calc(100% - 16px)">
+      <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>
+      Serviços, Salas e mais
+    </button>
+
+    <div class="h-4"></div>
+  </nav>
+
+  <div class="shrink-0 border-t border-white/10 p-3">
+    <a href="dashboard.html" class="flex items-center gap-2.5 p-2.5 rounded-xl hover:bg-white/5 cursor-pointer text-gray-400 hover:text-white transition-colors">
+      <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+      <span class="text-[0.8rem] font-medium">Voltar ao sistema</span>
+    </a>
+  </div>
+</aside>
+
+<!-- OVERLAY (mobile) -->
+<div id="overlay" class="hidden fixed inset-0 bg-black/40 z-20 lg:hidden" onclick="toggleSidebar()"></div>
+
+<!-- WRAPPER PRINCIPAL -->
+<div class="flex-1 lg:ml-[240px] flex flex-col min-h-screen">
+
+  <!-- HEADER -->
+  <header class="sticky top-0 z-20 h-16 bg-white border-b border-gray-200 flex items-center px-5 gap-3 shadow-sm">
+    <button onclick="toggleSidebar()" class="lg:hidden p-2 rounded-lg hover:bg-gray-100 text-gray-500">
+      <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+    </button>
+    <div class="flex-1">
+      <h1 id="headerTitle" class="text-[1rem] font-bold text-gray-800 leading-tight">Visão Geral</h1>
+      <p class="text-[0.7rem] text-gray-400 leading-tight">Documentação do Vitta Sistemas</p>
+    </div>
+  </header>
+
+  <!-- CONTEÚDO -->
+  <main class="flex-1 p-5 lg:p-8 doc-content overflow-y-auto">
+    <div class="max-w-3xl mx-auto space-y-6 pb-16">
+
+      <!-- ═══════ VISÃO GERAL ═══════ -->
+      <section id="topic-inicio" class="doc-section">
+        <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 mb-6">
+          <div class="flex items-center gap-3 mb-2">
+            <div class="w-10 h-10 rounded-xl bg-vitta-100 flex items-center justify-center shrink-0">
+              <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-vitta-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+            </div>
+            <h2 class="text-xl font-extrabold text-gray-800">Bem-vindo ao Vitta Sistemas</h2>
+          </div>
+          <p class="text-[0.9rem] text-gray-600 leading-relaxed">
+            O Vitta Sistemas é a plataforma de gestão da clínica: cadastro de pacientes e profissionais, agenda de consultas,
+            atendimento/prontuário, receitas e documentos, e o controle financeiro das cobranças. Esta documentação explica,
+            módulo por módulo, como cada tela funciona e como elas se conectam entre si.
+          </p>
+        </div>
+
+        <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 mb-6">
+          <h3 class="text-[0.95rem] font-bold text-gray-800 mb-3">Perfis de acesso</h3>
+          <div class="grid sm:grid-cols-2 gap-3">
+            <div class="border border-gray-100 rounded-xl p-3.5">
+              <p class="text-[0.82rem] font-bold text-gray-800">Admin Global</p>
+              <p class="text-[0.78rem] text-gray-500 mt-0.5">Acesso a todas as empresas/clínicas cadastradas no sistema.</p>
+            </div>
+            <div class="border border-gray-100 rounded-xl p-3.5">
+              <p class="text-[0.82rem] font-bold text-gray-800">Admin Empresa</p>
+              <p class="text-[0.78rem] text-gray-500 mt-0.5">Acesso total, mas restrito à clínica à qual está vinculado.</p>
+            </div>
+            <div class="border border-gray-100 rounded-xl p-3.5">
+              <p class="text-[0.82rem] font-bold text-gray-800">Secretaria</p>
+              <p class="text-[0.78rem] text-gray-500 mt-0.5">Acesso operacional: agenda, cadastros e financeiro do dia a dia.</p>
+            </div>
+            <div class="border border-gray-100 rounded-xl p-3.5">
+              <p class="text-[0.82rem] font-bold text-gray-800">Profissional</p>
+              <p class="text-[0.78rem] text-gray-500 mt-0.5">Acesso restrito à sua própria agenda, atendimentos e pacientes.</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
+          <h3 class="text-[0.95rem] font-bold text-gray-800 mb-3">O fluxo do dia a dia</h3>
+          <ol class="space-y-2.5 text-[0.85rem] text-gray-600">
+            <li class="flex gap-3"><span class="w-5 h-5 rounded-full bg-vitta-500 text-white text-[0.68rem] font-bold flex items-center justify-center shrink-0 mt-0.5">1</span> Paciente e profissional são cadastrados no sistema.</li>
+            <li class="flex gap-3"><span class="w-5 h-5 rounded-full bg-vitta-500 text-white text-[0.68rem] font-bold flex items-center justify-center shrink-0 mt-0.5">2</span> A consulta é marcada na tela de <strong>Agendamentos</strong>.</li>
+            <li class="flex gap-3"><span class="w-5 h-5 rounded-full bg-vitta-500 text-white text-[0.68rem] font-bold flex items-center justify-center shrink-0 mt-0.5">3</span> No dia, o profissional realiza o <strong>Atendimento</strong> e registra o prontuário.</li>
+            <li class="flex gap-3"><span class="w-5 h-5 rounded-full bg-vitta-500 text-white text-[0.68rem] font-bold flex items-center justify-center shrink-0 mt-0.5">4</span> A consulta é marcada como <strong>Realizada</strong> e enviada para pagamento com o valor cobrado.</li>
+            <li class="flex gap-3"><span class="w-5 h-5 rounded-full bg-vitta-500 text-white text-[0.68rem] font-bold flex items-center justify-center shrink-0 mt-0.5">5</span> O pagamento é registrado no <strong>Financeiro</strong>, que também mostra a projeção de entradas futuras.</li>
+          </ol>
+        </div>
+      </section>
+
+      <!-- ═══════ AGENDAMENTOS ═══════ -->
+      <section id="topic-agendamentos" class="doc-section hidden">
+        <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 mb-6">
+          <div class="flex items-center gap-3 mb-2">
+            <div class="w-10 h-10 rounded-xl bg-vitta-100 flex items-center justify-center shrink-0">
+              <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-vitta-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+            </div>
+            <h2 class="text-xl font-extrabold text-gray-800">Agendamentos</h2>
+          </div>
+          <p class="text-[0.9rem] text-gray-600 leading-relaxed">
+            Calendário central da clínica. É onde as consultas são marcadas, confirmadas, remarcadas e enviadas para pagamento.
+            Fica em <span class="font-mono text-[0.8rem] bg-gray-100 px-1.5 py-0.5 rounded">Agendamentos</span> no menu lateral.
+          </p>
+        </div>
+
+        <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 mb-6">
+          <h3 class="text-[0.95rem] font-bold text-gray-800 mb-3">Visualização e filtros</h3>
+          <p class="text-[0.85rem] text-gray-600 leading-relaxed mb-3">
+            O calendário pode ser visto por dia, semana ou mês. É possível filtrar por profissional, sala, paciente e por status
+            do agendamento. Existe também o modo <strong>Multi-agenda</strong>, que mostra a grade de todos os profissionais/salas
+            lado a lado em um único dia — útil para visualizar a ocupação geral da clínica de uma vez.
+          </p>
+          <div class="img-slot mt-4" data-slot="agd-calendario">
+            <img src="" alt="Calendário de agendamentos com filtros" />
+            <div class="img-slot-empty flex flex-col items-center gap-2">
+              <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6 text-gray-300" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg>
+              <p class="text-[0.78rem] font-semibold text-gray-400">Imagem pendente</p>
+              <p class="text-[0.72rem] text-gray-400 max-w-xs">Print do calendário com os filtros de profissional/sala/status visíveis.</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 mb-6">
+          <h3 class="text-[0.95rem] font-bold text-gray-800 mb-3">Criando um agendamento</h3>
+          <p class="text-[0.85rem] text-gray-600 leading-relaxed mb-3">Ao clicar em um horário vazio ou no botão de novo agendamento, o formulário pede:</p>
+          <ul class="space-y-2 text-[0.85rem] text-gray-600">
+            <li class="flex gap-2"><span class="text-vitta-500 font-bold shrink-0">•</span><span><strong>Paciente</strong> — obrigatório. Ao selecionar, a lista de profissionais é filtrada para mostrar apenas os vinculados a esse paciente.</span></li>
+            <li class="flex gap-2"><span class="text-vitta-500 font-bold shrink-0">•</span><span><strong>Profissional</strong> — carregado automaticamente conforme o paciente escolhido.</span></li>
+            <li class="flex gap-2"><span class="text-vitta-500 font-bold shrink-0">•</span><span><strong>Valor da Consulta (para projeção)</strong> — campo opcional. Serve só para estimar o valor que essa consulta deve gerar no financeiro antes de ela acontecer (veja mais em <button onclick="showTopic('financeiro')" class="text-vitta-600 underline font-medium">Financeiro</button>).</span></li>
+            <li class="flex gap-2"><span class="text-vitta-500 font-bold shrink-0">•</span><span><strong>Início e Fim</strong> — data/hora da consulta.</span></li>
+            <li class="flex gap-2"><span class="text-vitta-500 font-bold shrink-0">•</span><span><strong>Tipo de Consulta</strong> — Presencial (exige sala) ou Online (gera link de videochamada, veja abaixo).</span></li>
+            <li class="flex gap-2"><span class="text-vitta-500 font-bold shrink-0">•</span><span><strong>Sala</strong> — obrigatória apenas quando o tipo é Presencial.</span></li>
+            <li class="flex gap-2"><span class="text-vitta-500 font-bold shrink-0">•</span><span><strong>Observação</strong> — texto livre, opcional.</span></li>
+          </ul>
+          <div class="mt-4 bg-amber-50 border border-amber-200 rounded-xl p-3.5 flex gap-2.5">
+            <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-amber-500 shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M12 9v4"/><path d="M12 17h.01"/><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0Z"/></svg>
+            <p class="text-[0.78rem] text-amber-700">Se o profissional já tiver outro agendamento ou bloqueio de horário no mesmo período, o sistema avisa com <em>"Este profissional já possui um agendamento ou bloqueio neste horário"</em> antes de permitir salvar.</p>
+          </div>
+          <div class="img-slot mt-4" data-slot="agd-form-novo">
+            <img src="" alt="Formulário de novo agendamento" />
+            <div class="img-slot-empty flex flex-col items-center gap-2">
+              <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6 text-gray-300" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg>
+              <p class="text-[0.78rem] font-semibold text-gray-400">Imagem pendente</p>
+              <p class="text-[0.72rem] text-gray-400 max-w-xs">Print do formulário de novo agendamento preenchido (paciente, profissional, data/hora, tipo).</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 mb-6">
+          <h3 class="text-[0.95rem] font-bold text-gray-800 mb-3">Consulta Online e Google Meet</h3>
+          <p class="text-[0.85rem] text-gray-600 leading-relaxed">
+            Quando o tipo é <strong>Online</strong>, a sala não é exigida e o sistema gera automaticamente um link do Google Meet
+            para a consulta, usando a conexão Google configurada na empresa. Se a conexão da empresa com o Google expirou ou foi
+            revogada, aparece um aviso para reconectar antes de conseguir criar consultas online. O link gerado pode ser aberto
+            ou copiado diretamente no formulário do agendamento.
+          </p>
+          <div class="img-slot mt-4" data-slot="agd-google-meet">
+            <img src="" alt="Consulta online com link do Google Meet" />
+            <div class="img-slot-empty flex flex-col items-center gap-2">
+              <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6 text-gray-300" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg>
+              <p class="text-[0.78rem] font-semibold text-gray-400">Imagem pendente</p>
+              <p class="text-[0.72rem] text-gray-400 max-w-xs">Print do agendamento tipo Online mostrando o link do Google Meet gerado.</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 mb-6">
+          <h3 class="text-[0.95rem] font-bold text-gray-800 mb-3">Status do agendamento</h3>
+          <p class="text-[0.85rem] text-gray-600 leading-relaxed mb-3">Cada consulta tem um status, indicado pela cor no calendário:</p>
+          <div class="space-y-2">
+            <div class="flex items-center gap-3 p-2.5 rounded-xl border border-gray-100">
+              <span class="status-dot" style="background:#A9A9A9"></span>
+              <p class="text-[0.83rem] font-semibold text-gray-800 w-28 shrink-0">Agendado</p>
+              <p class="text-[0.78rem] text-gray-500">Consulta marcada, ainda sem confirmação.</p>
+            </div>
+            <div class="flex items-center gap-3 p-2.5 rounded-xl border border-gray-100">
+              <span class="status-dot" style="background:#CD960B"></span>
+              <p class="text-[0.83rem] font-semibold text-gray-800 w-28 shrink-0">Confirmada</p>
+              <p class="text-[0.78rem] text-gray-500">Paciente confirmou presença.</p>
+            </div>
+            <div class="flex items-center gap-3 p-2.5 rounded-xl border border-gray-100">
+              <span class="status-dot" style="background:#6339AC"></span>
+              <p class="text-[0.83rem] font-semibold text-gray-800 w-28 shrink-0">Sem Valor</p>
+              <p class="text-[0.78rem] text-gray-500">Consulta que não gera cobrança (ex: cortesia, retorno gratuito).</p>
+            </div>
+            <div class="flex items-center gap-3 p-2.5 rounded-xl border border-gray-100">
+              <span class="status-dot" style="background:#FF0000"></span>
+              <p class="text-[0.83rem] font-semibold text-gray-800 w-28 shrink-0">Falta</p>
+              <p class="text-[0.78rem] text-gray-500">Paciente não compareceu.</p>
+            </div>
+            <div class="flex items-center gap-3 p-2.5 rounded-xl border border-gray-100">
+              <span class="status-dot" style="background:#2E8B57"></span>
+              <p class="text-[0.83rem] font-semibold text-gray-800 w-28 shrink-0">Realizada</p>
+              <p class="text-[0.78rem] text-gray-500">Consulta aconteceu. É o único status que libera o envio para pagamento.</p>
+            </div>
+            <div class="flex items-center gap-3 p-2.5 rounded-xl border border-gray-100">
+              <span class="status-dot" style="background:#00CED1"></span>
+              <p class="text-[0.83rem] font-semibold text-gray-800 w-28 shrink-0">Feedback</p>
+              <p class="text-[0.78rem] text-gray-500">Consulta encerrada aguardando algum retorno/feedback.</p>
+            </div>
+            <div class="flex items-center gap-3 p-2.5 rounded-xl border border-gray-100">
+              <span class="status-dot" style="background:#0000FF"></span>
+              <p class="text-[0.83rem] font-semibold text-gray-800 w-28 shrink-0">Marcado p/ Pagamento</p>
+              <p class="text-[0.78rem] text-gray-500">Realizada + enviada para pagamento, aparece em azul até o pagamento ser registrado no Financeiro.</p>
+            </div>
+          </div>
+          <div class="img-slot mt-4" data-slot="agd-status-cores">
+            <img src="" alt="Calendário com eventos coloridos por status" />
+            <div class="img-slot-empty flex flex-col items-center gap-2">
+              <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6 text-gray-300" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg>
+              <p class="text-[0.78rem] font-semibold text-gray-400">Imagem pendente</p>
+              <p class="text-[0.72rem] text-gray-400 max-w-xs">Print do calendário mostrando consultas em diferentes status/cores lado a lado.</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 mb-6">
+          <h3 class="text-[0.95rem] font-bold text-gray-800 mb-3">Enviar para pagamento</h3>
+          <p class="text-[0.85rem] text-gray-600 leading-relaxed mb-3">
+            Quando o status é alterado para <strong>Realizada</strong>, aparece a opção <em>"Enviar para Pagamento?"</em>. Ao marcá-la:
+          </p>
+          <ul class="space-y-2 text-[0.85rem] text-gray-600">
+            <li class="flex gap-2"><span class="text-vitta-500 font-bold shrink-0">•</span><span>Um campo <strong>Valor de Consulta</strong> aparece e passa a ser obrigatório — é esse valor, digitado manualmente, que vai para o Financeiro como valor cobrado (não um valor fixo de tabela).</span></li>
+            <li class="flex gap-2"><span class="text-vitta-500 font-bold shrink-0">•</span><span>Se um valor de projeção já tinha sido informado na criação do agendamento, ele é usado para pré-preencher este campo — mas pode ser ajustado antes de salvar.</span></li>
+            <li class="flex gap-2"><span class="text-vitta-500 font-bold shrink-0">•</span><span>A consulta passa a aparecer como pendente de cobrança na tela <strong>Financeiro</strong>.</span></li>
+          </ul>
+          <div class="img-slot mt-4" data-slot="agd-enviar-pagamento">
+            <img src="" alt="Checkbox Enviar para Pagamento e campo Valor de Consulta" />
+            <div class="img-slot-empty flex flex-col items-center gap-2">
+              <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6 text-gray-300" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg>
+              <p class="text-[0.78rem] font-semibold text-gray-400">Imagem pendente</p>
+              <p class="text-[0.72rem] text-gray-400 max-w-xs">Print do status Realizada com "Enviar para Pagamento" marcado e o campo Valor de Consulta visível.</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 mb-6">
+          <h3 class="text-[0.95rem] font-bold text-gray-800 mb-3">Repetir agendamento (recorrência)</h3>
+          <p class="text-[0.85rem] text-gray-600 leading-relaxed mb-3">
+            Ao criar um novo agendamento, é possível marcar <em>"Repetir agendamento"</em> para gerar uma série de consultas recorrentes:
+          </p>
+          <ul class="space-y-2 text-[0.85rem] text-gray-600">
+            <li class="flex gap-2"><span class="text-vitta-500 font-bold shrink-0">•</span><span><strong>Frequência</strong>: semanal, quinzenal ou mensal (mesmo dia do mês).</span></li>
+            <li class="flex gap-2"><span class="text-vitta-500 font-bold shrink-0">•</span><span><strong>Repetir até</strong>: por número de sessões (2 a 52) ou por uma data final.</span></li>
+            <li class="flex gap-2"><span class="text-vitta-500 font-bold shrink-0">•</span><span>O sistema mostra uma <strong>prévia das datas</strong> geradas e verifica automaticamente conflitos de horário com o profissional e a sala — datas em conflito aparecem marcadas e não são criadas.</span></li>
+            <li class="flex gap-2"><span class="text-vitta-500 font-bold shrink-0">•</span><span>Cada data da prévia pode ser desmarcada individualmente antes de salvar a série.</span></li>
+          </ul>
+          <div class="mt-4 bg-vitta-50 border border-vitta-200 rounded-xl p-3.5 flex gap-2.5">
+            <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-vitta-600 shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+            <p class="text-[0.78rem] text-vitta-700">Ao excluir uma consulta que faz parte de uma série, é possível escolher excluir só aquela, aquela e as próximas, ou a série inteira.</p>
+          </div>
+          <div class="img-slot mt-4" data-slot="agd-recorrencia">
+            <img src="" alt="Prévia das datas da recorrência" />
+            <div class="img-slot-empty flex flex-col items-center gap-2">
+              <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6 text-gray-300" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg>
+              <p class="text-[0.78rem] font-semibold text-gray-400">Imagem pendente</p>
+              <p class="text-[0.72rem] text-gray-400 max-w-xs">Print da prévia de datas da recorrência, com alguma data em conflito destacada.</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
+          <h3 class="text-[0.95rem] font-bold text-gray-800 mb-3">Bloqueio de horário</h3>
+          <p class="text-[0.85rem] text-gray-600 leading-relaxed">
+            Reserva um período na agenda de um profissional sem vincular a um paciente — para almoço, férias, reuniões etc.
+            O período bloqueado impede que novos agendamentos sejam criados para aquele profissional no mesmo horário, e também
+            entra na verificação de conflitos da recorrência.
+          </p>
+          <div class="img-slot mt-4" data-slot="agd-bloqueio">
+            <img src="" alt="Modal de bloqueio de horário" />
+            <div class="img-slot-empty flex flex-col items-center gap-2">
+              <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6 text-gray-300" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg>
+              <p class="text-[0.78rem] font-semibold text-gray-400">Imagem pendente</p>
+              <p class="text-[0.72rem] text-gray-400 max-w-xs">Print do modal "Bloquear Horário" preenchido.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ═══════ PLACEHOLDERS ═══════ -->
+      <section id="topic-profissionais" class="doc-section hidden"><div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-10 text-center"><p class="text-gray-400 text-sm">📄 Conteúdo deste módulo ainda não escrito — chegando em breve.</p></div></section>
+      <section id="topic-pacientes" class="doc-section hidden"><div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-10 text-center"><p class="text-gray-400 text-sm">📄 Conteúdo deste módulo ainda não escrito — chegando em breve.</p></div></section>
+      <section id="topic-usuarios" class="doc-section hidden"><div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-10 text-center"><p class="text-gray-400 text-sm">📄 Conteúdo deste módulo ainda não escrito — chegando em breve.</p></div></section>
+      <section id="topic-atendimento" class="doc-section hidden"><div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-10 text-center"><p class="text-gray-400 text-sm">📄 Conteúdo deste módulo ainda não escrito — chegando em breve.</p></div></section>
+      <section id="topic-receitas" class="doc-section hidden"><div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-10 text-center"><p class="text-gray-400 text-sm">📄 Conteúdo deste módulo ainda não escrito — chegando em breve.</p></div></section>
+      <section id="topic-financeiro" class="doc-section hidden"><div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-10 text-center"><p class="text-gray-400 text-sm">📄 Conteúdo deste módulo ainda não escrito — chegando em breve.</p></div></section>
+      <section id="topic-outros" class="doc-section hidden"><div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-10 text-center"><p class="text-gray-400 text-sm">📄 Conteúdo deste módulo ainda não escrito — chegando em breve.</p></div></section>
+
+    </div>
+  </main>
+</div>
+</div>
+
+<script>
+const TOPIC_TITLES = {
+  inicio: 'Visão Geral',
+  profissionais: 'Profissionais',
+  pacientes: 'Pacientes',
+  usuarios: 'Usuários',
+  agendamentos: 'Agendamentos',
+  atendimento: 'Atendimento',
+  receitas: 'Receitas e Documentos',
+  financeiro: 'Financeiro',
+  outros: 'Serviços, Salas e mais'
+};
+
+function showTopic(id) {
+  document.querySelectorAll('.doc-section').forEach(s => s.classList.add('hidden'));
+  document.getElementById('topic-' + id)?.classList.remove('hidden');
+  document.querySelectorAll('.nav-item').forEach(b => b.classList.toggle('active', b.dataset.topic === id));
+  document.getElementById('headerTitle').textContent = TOPIC_TITLES[id] || id;
+  document.getElementById('sidebar').classList.add('-translate-x-full');
+  document.getElementById('overlay').classList.add('hidden');
+  window.scrollTo(0,0);
+  document.querySelector('main').scrollTo(0,0);
+}
+
+function fillImgSlot(slotId, src) {
+  const slot = document.querySelector(`.img-slot[data-slot="${slotId}"]`);
+  if (!slot) return;
+  slot.querySelector('img').src = src;
+  slot.classList.add('has-img');
+}
+
+function toggleSidebar() {
+  const sb = document.getElementById('sidebar'), ov = document.getElementById('overlay');
+  const o = sb.classList.contains('-translate-x-full');
+  sb.classList.toggle('-translate-x-full', !o);
+  ov.classList.toggle('hidden', !o);
+}
+
+showTopic('inicio');
+</script>
+</body>
+</html>

@@ -1,0 +1,1345 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>Planos — Vitta Sistemas</title>
+  <link rel="icon" type="image/png" href="../img/favicon.png" />
+
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            vitta: { 50:'#f0fbfd', 100:'#e0f7fa', 300:'#80deea', 400:'#4dd9ed', 500:'#2ABCD4', 600:'#1a96ac', 700:'#127a8c' }
+          },
+          fontFamily: { sans: ['Inter','system-ui','sans-serif'] }
+        }
+      }
+    }
+  </script>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+
+  <style>
+    .sidebar-nav::-webkit-scrollbar { width:3px; }
+    .sidebar-nav::-webkit-scrollbar-thumb { background:rgba(255,255,255,.1); border-radius:4px; }
+    .submenu { overflow:hidden; max-height:0; opacity:0; transition:max-height .25s ease,opacity .2s ease; }
+    .submenu.open { max-height:500px; opacity:1; }
+    .chevron { transition:transform .25s ease; display:inline-block; }
+    .chevron.open { transform:rotate(180deg); }
+    @keyframes fadeUp { from{opacity:0;transform:translateY(8px)} to{opacity:1;transform:translateY(0)} }
+    .fade-up { animation:fadeUp .35s ease forwards; }
+
+    .modal-overlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,.5); z-index:300;
+                     align-items:flex-start; justify-content:center; padding:24px 16px; overflow-y:auto; }
+    .modal-overlay.open { display:flex; }
+
+    .modal-scroll::-webkit-scrollbar { width:4px; }
+    .modal-scroll::-webkit-scrollbar-thumb { background:#e5e7eb; border-radius:4px; }
+
+    #toast { position:fixed; bottom:24px; right:24px; z-index:999; transition:all .3s ease; }
+    tbody tr { transition:background .15s; }
+    tbody tr:hover { background:#f9fafb; }
+
+    .tab-active   { color:#1a96ac; border-bottom:2px solid #2ABCD4; }
+    .tab-inactive { color:#9ca3af; border-bottom:2px solid transparent; }
+    .tab-inactive:hover { color:#6b7280; }
+  </style>
+</head>
+
+<body class="bg-[#F0F2F5] font-sans antialiased">
+<div class="flex min-h-screen">
+
+<!-- SIDEBAR -->
+<aside id="sidebar"
+  class="fixed inset-y-0 left-0 w-[220px] bg-[#111827] flex flex-col z-30
+         -translate-x-full lg:translate-x-0 transition-transform duration-300">
+
+  <div class="flex flex-col items-center justify-center gap-1 py-4 px-5 border-b border-white/10 shrink-0">
+    <img src="../img/logo.png" alt="Vitta Sistemas" class="h-10 w-auto brightness-0 invert" />
+    <p class="text-[0.6rem] text-gray-500 tracking-wide">v1.2.1</p>
+  </div>
+
+  <nav class="flex-1 overflow-y-auto sidebar-nav py-3">
+    <p class="block text-[0.6rem] font-bold text-gray-500 uppercase tracking-widest px-4 pb-1 pt-3">Principal</p>
+
+    <a href="dashboard.html"
+       class="flex items-center gap-3 px-3 py-2.5 mx-2 rounded-xl text-[0.83rem] font-medium text-gray-400 hover:bg-white/10 hover:text-white transition-colors duration-150 cursor-pointer mb-0.5">
+      <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+        <rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/>
+        <rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/>
+      </svg>
+      Dashboard
+    </a>
+
+    <a href="agendamentos.html" class="flex items-center gap-3 px-3 py-2.5 mx-2 rounded-xl text-[0.83rem] font-medium text-gray-400 hover:bg-white/10 hover:text-white transition-colors duration-150 cursor-pointer mb-0.5">
+      <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+        <rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/>
+      </svg>
+      Agendamentos
+    </a>
+    <a href="consultas.html" class="flex items-center gap-3 px-3 py-2.5 mx-2 rounded-xl text-[0.83rem] font-medium text-gray-400 hover:bg-white/10 hover:text-white transition-colors duration-150 cursor-pointer mb-0.5">
+      <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+        <path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/>
+      </svg>
+      Consultas
+    </a>
+
+    <p class="block text-[0.6rem] font-bold text-gray-500 uppercase tracking-widest px-4 pb-1 pt-4">Cadastros</p>
+
+    <button onclick="toggleMenu('cadastros')"
+            class="w-full flex items-center gap-3 px-3 py-2.5 mx-2 rounded-xl text-[0.83rem] font-medium text-gray-400 hover:bg-white/10 hover:text-white transition-colors duration-150 cursor-pointer mb-0.5" style="width:calc(100% - 16px)">
+      <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+        <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/>
+        <path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+      </svg>
+      Cadastros
+      <svg id="chev-cadastros" class="chevron w-3.5 h-3.5 ml-auto text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+    </button>
+    <div id="sub-cadastros" class="submenu">
+      <a href="pacientes.html" class="flex items-center gap-2 pl-10 pr-3 py-2 mx-2 rounded-xl text-[0.8rem] text-gray-500 hover:bg-white/5 hover:text-gray-300 transition-colors cursor-pointer">Pacientes</a>
+      <a href="profissionais.html" class="flex items-center gap-2 pl-10 pr-3 py-2 mx-2 rounded-xl text-[0.8rem] text-gray-500 hover:bg-white/5 hover:text-gray-300 transition-colors cursor-pointer">Profissionais</a>
+      <a href="usuarios-empresa.html" class="flex items-center gap-2 pl-10 pr-3 py-2 mx-2 rounded-xl text-[0.8rem] text-gray-500 hover:bg-white/5 hover:text-gray-300 transition-colors cursor-pointer">Usuários</a>
+      <div class="hidden" id="menuDocumentosWrap"><a href="documentos.html" class="flex items-center gap-2 pl-10 pr-3 py-2 mx-2 rounded-xl text-[0.8rem] text-gray-500 hover:bg-white/5 hover:text-gray-300 transition-colors cursor-pointer w-full">Documentos</a></div>
+      <a href="leads.html" class="flex items-center gap-2 pl-10 pr-3 py-2 mx-2 rounded-xl text-[0.8rem] text-gray-500 hover:bg-white/5 hover:text-gray-300 transition-colors cursor-pointer">Leads</a>
+    </div>
+
+    <p class="block text-[0.6rem] font-bold text-gray-500 uppercase tracking-widest px-4 pb-1 pt-4">Outros Cadastros</p>
+    <button onclick="toggleMenu('servicos')" class="w-full flex items-center gap-3 px-3 py-2.5 mx-2 rounded-xl text-[0.83rem] font-medium text-gray-400 hover:bg-white/10 hover:text-white transition-colors duration-150 cursor-pointer mb-0.5" style="width:calc(100% - 16px)">
+      <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+        <path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/>
+      </svg>
+      Outros Cadastros
+      <svg id="chev-servicos" class="chevron w-3.5 h-3.5 ml-auto text-gray-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+    </button>
+    <div id="sub-servicos" class="submenu">
+      <a href="servicos.html" class="flex items-center gap-2 pl-10 pr-3 py-2 mx-2 rounded-xl text-[0.8rem] text-gray-500 hover:bg-white/5 hover:text-gray-300 transition-colors cursor-pointer">Serviços</a>
+      <a href="salas.html" class="flex items-center gap-2 pl-10 pr-3 py-2 mx-2 rounded-xl text-[0.8rem] text-gray-500 hover:bg-white/5 hover:text-gray-300 transition-colors cursor-pointer">Salas</a>
+      <a href="especialidades.html" class="flex items-center gap-2 pl-10 pr-3 py-2 mx-2 rounded-xl text-[0.8rem] text-gray-500 hover:bg-white/5 hover:text-gray-300 transition-colors cursor-pointer">Especialidades</a>
+      <a href="grupo.html" class="flex items-center gap-2 pl-10 pr-3 py-2 mx-2 rounded-xl text-[0.8rem] text-gray-500 hover:bg-white/5 hover:text-gray-300 transition-colors cursor-pointer">Grupo</a>
+      <a href="tipospagamento.html" class="flex items-center gap-2 pl-10 pr-3 py-2 mx-2 rounded-xl text-[0.8rem] text-gray-500 hover:bg-white/5 hover:text-gray-300 transition-colors cursor-pointer">Tipos de Pagamento</a>
+      <a href="tiposacompanhamento.html" class="flex items-center gap-2 pl-10 pr-3 py-2 mx-2 rounded-xl text-[0.8rem] text-gray-500 hover:bg-white/5 hover:text-gray-300 transition-colors cursor-pointer">Tipos de Acomp.</a>
+    </div>
+
+    <p class="block text-[0.6rem] font-bold text-gray-500 uppercase tracking-widest px-4 pb-1 pt-4">Financeiro</p>
+    <button onclick="toggleMenu('financeiro')" class="w-full flex items-center gap-3 px-3 py-2.5 mx-2 rounded-xl text-[0.83rem] font-medium text-gray-400 hover:bg-white/10 hover:text-white transition-colors duration-150 cursor-pointer mb-0.5" style="width:calc(100% - 16px)">
+      <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>Financeiro
+      <svg id="chev-financeiro" class="chevron w-3.5 h-3.5 ml-auto text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+    </button>
+    <div id="sub-financeiro" class="submenu">
+      <a href="financeiro.html" class="flex items-center gap-2 pl-10 pr-3 py-2 mx-2 rounded-xl text-[0.8rem] text-gray-500 hover:bg-white/5 hover:text-gray-300 transition-colors cursor-pointer">Lançamentos</a>
+      <a href="relatorios.html" class="flex items-center gap-2 pl-10 pr-3 py-2 mx-2 rounded-xl text-[0.8rem] text-gray-500 hover:bg-white/5 hover:text-gray-300 transition-colors cursor-pointer">Relatórios</a>
+    </div>
+
+    <div id="sectionVittaBI" class="hidden">
+    <p class="block text-[0.6rem] font-bold text-gray-500 uppercase tracking-widest px-4 pb-1 pt-4">Vitta BI</p>
+    <a id="linkVittaBI" href="https://bi.vittasistemas.com.br" target="_blank" rel="noopener"
+       class="flex items-center gap-3 px-3 py-2.5 mx-2 rounded-xl text-[0.83rem] font-medium text-gray-400 hover:bg-white/10 hover:text-white transition-colors duration-150 cursor-pointer mb-0.5">
+      <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+        <path d="M3 3v18h18"/><path d="M18.7 8l-5.3 5.3-3-3L4 16.3"/>
+      </svg>
+      Vitta BI
+      <span class="ml-auto text-[0.55rem] font-bold text-violet-300 bg-violet-500/20 px-1.5 py-0.5 rounded">BI</span>
+    </a>
+    </div>
+
+    <div id="sectionAdmin" class="hidden">
+    <p class="block text-[0.6rem] font-bold text-gray-500 uppercase tracking-widest px-4 pb-1 pt-4">Sistema</p>
+
+    <button onclick="toggleMenu('admin')"
+            class="w-full flex items-center gap-3 px-3 py-2.5 mx-2 rounded-xl text-[0.83rem] font-medium text-vitta-400 bg-vitta-500/10 transition-colors duration-150 cursor-pointer mb-0.5" style="width:calc(100% - 16px)">
+      <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+        <circle cx="12" cy="12" r="3"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14M4.93 4.93a10 10 0 0 0 0 14.14"/>
+      </svg>
+      Administração
+      <svg id="chev-admin" class="chevron open w-3.5 h-3.5 ml-auto text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+    </button>
+    <div id="sub-admin" class="submenu open">
+      <a href="empresas.html" class="flex items-center gap-2 pl-10 pr-3 py-2 mx-2 rounded-xl text-[0.8rem] text-gray-500 hover:bg-white/5 hover:text-gray-300 transition-colors cursor-pointer">Empresas</a>
+      <a href="usuarios.html" class="flex items-center gap-2 pl-10 pr-3 py-2 mx-2 rounded-xl text-[0.8rem] text-gray-500 hover:bg-white/5 hover:text-gray-300 transition-colors cursor-pointer">Usuários Admin</a>
+      <a href="planos.html" class="flex items-center gap-2 pl-10 pr-3 py-2 mx-2 rounded-xl text-[0.8rem] font-semibold text-vitta-400 bg-vitta-500/10 transition-colors cursor-pointer">Planos</a>
+      <a href="dashboard-gerencial.html" class="flex items-center gap-2 pl-10 pr-3 py-2 mx-2 rounded-xl text-[0.8rem] text-gray-500 hover:bg-white/5 hover:text-gray-300 transition-colors cursor-pointer">Dashboard Gerencial</a>
+      <a href="configuracoes.html" class="flex items-center gap-2 pl-10 pr-3 py-2 mx-2 rounded-xl text-[0.8rem] text-gray-500 hover:bg-white/5 hover:text-gray-300 transition-colors cursor-pointer">Configurações</a>
+      <a href="logs.html" class="flex items-center gap-2 pl-10 pr-3 py-2 mx-2 rounded-xl text-[0.8rem] text-gray-500 hover:bg-white/5 hover:text-gray-300 transition-colors cursor-pointer">Log</a>
+    </div>
+    </div>
+
+    <div class="h-4"></div>
+  </nav>
+
+  <div class="shrink-0 border-t border-white/10 p-3">
+    <div class="group flex items-center gap-2.5 p-2.5 rounded-xl hover:bg-white/5 cursor-pointer">
+      <div id="user-avatar" class="w-8 h-8 rounded-full bg-vitta-500 flex items-center justify-center text-white text-xs font-bold shrink-0">A</div>
+      <div class="flex-1 min-w-0">
+        <p id="user-name" class="text-white text-[0.8rem] font-semibold truncate">Usuário</p>
+        <p id="user-role" class="text-gray-500 text-[0.7rem] truncate">Admin Global</p>
+      </div>
+      <button onclick="handleLogout()" title="Sair"
+              class="text-gray-600 hover:text-red-400 transition-colors opacity-0 group-hover:opacity-100">
+        <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+          <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/>
+        </svg>
+      </button>
+    </div>
+  </div>
+</aside>
+
+<!-- OVERLAY mobile -->
+<div id="overlay" class="fixed inset-0 bg-black/50 z-20 hidden lg:hidden" onclick="toggleSidebar()"></div>
+
+<!-- WRAPPER PRINCIPAL -->
+<div class="flex-1 lg:ml-[220px] flex flex-col min-h-screen">
+
+  <!-- HEADER -->
+  <header class="sticky top-0 z-20 h-16 bg-white border-b border-gray-200 flex items-center px-5 gap-3 shadow-sm">
+    <button onclick="toggleSidebar()" class="lg:hidden p-2 rounded-lg hover:bg-gray-100 text-gray-500">
+      <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+        <line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/>
+      </svg>
+    </button>
+    <div class="flex-1">
+      <h1 id="headerTitle" class="text-[1rem] font-bold text-gray-800 leading-tight">Planos</h1>
+      <p id="headerSubtitle" class="text-[0.7rem] text-gray-400 leading-tight">Gestão de Planos · Acesso Master</p>
+    </div>
+    <div class="hidden md:flex items-center gap-2 px-3 py-2 bg-gray-50 border border-gray-200 rounded-xl">
+      <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-vitta-500 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+        <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/>
+      </svg>
+      <span id="empresa-nome" class="hidden"></span>
+    </div>
+    <div id="adminBadge" class="hidden items-center gap-1.5 px-3 py-1.5 bg-amber-50 border border-amber-200 rounded-xl">
+      <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5 text-amber-500 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+        <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
+      </svg>
+      <span class="text-[0.72rem] font-bold text-amber-600">Admin Global</span>
+    </div>
+    <button class="relative p-2.5 rounded-xl hover:bg-gray-100 text-gray-500 transition-colors">
+      <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+        <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/>
+      </svg>
+      <span class="absolute top-1.5 right-1.5 w-2 h-2 bg-red-500 rounded-full border-2 border-white"></span>
+    </button>
+    <div class="flex items-center gap-2.5">
+      <div id="header-avatar" class="w-9 h-9 rounded-full bg-vitta-500 flex items-center justify-center text-white text-sm font-bold shrink-0">A</div>
+      <div class="hidden sm:block">
+        <p id="header-user-name" class="text-[0.8rem] font-semibold text-gray-800 leading-tight">Usuário</p>
+        <p id="header-user-role" class="text-[0.7rem] text-gray-400 leading-tight">Admin Global</p>
+      </div>
+    </div>
+    <button onclick="handleLogout()" class="p-2.5 rounded-xl hover:bg-red-50 text-gray-400 hover:text-red-500 transition-colors" title="Sair">
+      <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+        <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/>
+      </svg>
+    </button>
+  </header>
+
+  <!-- CONTEÚDO -->
+  <main class="flex-1 p-5 lg:p-6 fade-up">
+
+    <!-- ═══════════════════════════════════════════════════════
+         PAYMENT WALL — exibido quando ?motivo= está na URL
+         ═══════════════════════════════════════════════════════ -->
+    <div id="paymentWall" class="hidden max-w-lg mx-auto py-4">
+
+      <!-- Banner do motivo -->
+      <div id="motivoBanner" class="rounded-2xl border border-amber-200 bg-amber-50 p-5 mb-5 flex items-start gap-4">
+        <div id="motivoIconWrap" class="w-12 h-12 rounded-xl bg-amber-100 flex items-center justify-center shrink-0">
+          <svg class="w-6 h-6 text-amber-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
+          </svg>
+        </div>
+        <div class="flex-1">
+          <p class="text-xs font-bold uppercase tracking-widest mb-0.5 text-gray-400">Ação necessária</p>
+          <h2 class="text-lg font-extrabold text-gray-800 mb-1" id="motivoTitle">Período de teste encerrado</h2>
+          <p class="text-sm text-gray-500" id="motivoDesc">Para continuar utilizando o Vitta Sistemas, regularize seu pagamento.</p>
+        </div>
+      </div>
+
+      <!-- Card de pagamento -->
+      <div class="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
+
+        <!-- Loading -->
+        <div id="invoiceLoader" class="flex items-center justify-center py-16 gap-3">
+          <svg class="animate-spin w-5 h-5 text-vitta-500" fill="none" viewBox="0 0 24 24">
+            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/>
+            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/>
+          </svg>
+          <span class="text-sm text-gray-400">Carregando cobrança...</span>
+        </div>
+
+        <!-- Erro -->
+        <div id="invoiceError" class="hidden px-6 py-10 text-center">
+          <div class="w-14 h-14 rounded-full bg-red-50 flex items-center justify-center mx-auto mb-4">
+            <svg class="w-7 h-7 text-red-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+              <circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/>
+            </svg>
+          </div>
+          <h3 class="text-base font-bold text-gray-800 mb-2">Não foi possível carregar o boleto</h3>
+          <p class="text-sm text-gray-500 mb-4" id="invoiceErrorMsg">Entre em contato com o suporte.</p>
+          <button onclick="retryLoadInvoice()"
+                  class="inline-flex items-center gap-2 px-4 py-2 bg-vitta-500 hover:bg-vitta-600 text-white text-sm font-semibold rounded-xl transition-colors">
+            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+              <polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-3.54"/>
+            </svg>
+            Tentar novamente
+          </button>
+        </div>
+
+        <!-- Conteúdo carregado -->
+        <div id="invoiceContent" class="hidden">
+
+          <!-- Cabeçalho: plano + valor -->
+          <div class="px-6 py-4 border-b border-gray-100 flex items-center justify-between gap-4">
+            <div>
+              <p class="text-[0.65rem] font-bold uppercase tracking-widest text-gray-400">Plano</p>
+              <p class="text-lg font-extrabold text-gray-800" id="planNome">—</p>
+            </div>
+            <div class="text-right">
+              <p class="text-[0.65rem] font-bold uppercase tracking-widest text-gray-400">Valor</p>
+              <p class="text-2xl font-extrabold text-vitta-600" id="planValor">—</p>
+              <p class="text-[0.7rem] text-gray-400">por mês</p>
+            </div>
+          </div>
+
+          <!-- Vencimento -->
+          <div class="px-6 py-2.5 bg-amber-50 border-b border-amber-100 flex items-center gap-2">
+            <svg class="w-4 h-4 text-amber-500 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+              <rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/>
+              <line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/>
+            </svg>
+            <span class="text-sm text-amber-800">Vencimento: <strong id="payVencimento">—</strong></span>
+          </div>
+
+          <!-- Tabs -->
+          <div class="flex border-b border-gray-100">
+            <button onclick="switchPayTab('boleto')" id="tab-boleto"
+                    class="flex-1 py-3 text-sm font-semibold transition-colors tab-active">
+              Boleto
+            </button>
+            <button onclick="switchPayTab('pix')" id="tab-pix"
+                    class="flex-1 py-3 text-sm font-semibold transition-colors tab-inactive">
+              PIX
+            </button>
+            <button onclick="switchPayTab('cartao')" id="tab-cartao"
+                    class="flex-1 py-3 text-sm font-semibold transition-colors tab-inactive">
+              Cartão
+            </button>
+          </div>
+
+          <!-- TAB: BOLETO -->
+          <div id="tabContent-boleto" class="p-6">
+            <div class="text-center mb-5">
+              <div class="w-14 h-14 rounded-full bg-blue-50 flex items-center justify-center mx-auto mb-3">
+                <svg class="w-7 h-7 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                  <rect x="2" y="4" width="20" height="16" rx="2"/>
+                  <line x1="6" y1="8" x2="6" y2="16"/><line x1="9" y1="8" x2="9" y2="16"/>
+                  <line x1="12" y1="8" x2="12" y2="16"/><line x1="15" y1="8" x2="15" y2="16"/>
+                  <line x1="18" y1="8" x2="18" y2="16"/>
+                </svg>
+              </div>
+              <p class="text-sm text-gray-500">Pague em qualquer banco, app ou casa lotérica.</p>
+            </div>
+
+            <a id="boletoLink" href="#" target="_blank"
+               class="flex items-center justify-center gap-2 w-full py-3 px-4 bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold rounded-xl transition-colors mb-4">
+              <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/>
+                <polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/>
+              </svg>
+              Abrir Boleto
+            </a>
+
+            <div id="barCodeSection" class="hidden">
+              <p class="text-xs font-bold uppercase tracking-widest text-gray-400 mb-2">Linha Digitável</p>
+              <div class="flex items-center gap-2">
+                <input id="barCodeInput" type="text" readonly
+                       class="flex-1 px-3 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-xs font-mono text-gray-700 outline-none min-w-0">
+                <button onclick="copyField('barCodeInput', this)"
+                        class="px-3 py-2.5 border border-gray-200 rounded-xl text-sm font-semibold text-gray-600 hover:bg-gray-50 transition-colors whitespace-nowrap shrink-0">
+                  Copiar
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- TAB: PIX -->
+          <div id="tabContent-pix" class="hidden p-6">
+            <div id="pixContent">
+              <div class="text-center mb-4">
+                <div class="inline-block p-3 bg-white border-2 border-gray-200 rounded-2xl mb-3 shadow-sm">
+                  <img id="pixQrCodeImg" src="" alt="QR Code PIX" class="w-44 h-44 mx-auto">
+                </div>
+                <p class="text-sm text-gray-500">Escaneie com o app do seu banco.</p>
+              </div>
+              <p class="text-xs font-bold uppercase tracking-widest text-gray-400 mb-2">Pix Copia e Cola</p>
+              <div class="flex items-start gap-2">
+                <textarea id="pixPayloadInput" readonly rows="3"
+                          class="flex-1 px-3 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-xs font-mono text-gray-700 outline-none resize-none"></textarea>
+                <button onclick="copyField('pixPayloadInput', this)"
+                        class="px-3 py-2.5 border border-gray-200 rounded-xl text-sm font-semibold text-gray-600 hover:bg-gray-50 transition-colors whitespace-nowrap shrink-0">
+                  Copiar
+                </button>
+              </div>
+            </div>
+            <div id="pixUnavailable" class="hidden text-center py-4">
+              <p class="text-sm text-gray-500">PIX não disponível para esta cobrança.</p>
+              <p class="text-xs text-gray-400 mt-1">Utilize o Boleto ou o link da fatura.</p>
+            </div>
+          </div>
+
+          <!-- TAB: CARTÃO -->
+          <div id="tabContent-cartao" class="hidden p-6 text-center">
+            <div class="w-14 h-14 rounded-full bg-gray-100 flex items-center justify-center mx-auto mb-4">
+              <svg class="w-7 h-7 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                <rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/>
+              </svg>
+            </div>
+            <h3 class="text-base font-bold text-gray-600 mb-2">Pagamento por Cartão</h3>
+            <p class="text-sm text-gray-400">Disponível em breve.<br>Por enquanto, utilize Boleto ou PIX.</p>
+          </div>
+
+          <!-- Rodapé -->
+          <div class="px-6 py-4 border-t border-gray-100 bg-gray-50 text-center">
+            <p class="text-xs text-gray-400">Após o pagamento, seu acesso é reativado automaticamente em até 1 hora.</p>
+          </div>
+
+        </div><!-- /invoiceContent -->
+      </div><!-- /card -->
+
+      <!-- Suporte -->
+      <p class="text-center text-xs text-gray-400 mt-5">
+        Dúvidas? Entre em contato:
+        <a href="mailto:suporte@vittasistemas.com.br" class="text-vitta-600 font-semibold hover:underline">suporte@vittasistemas.com.br</a>
+      </p>
+
+    </div><!-- /paymentWall -->
+
+    <!-- ═══════════════════════════════════════════════════════
+         CONTEÚDO ADMIN — visível apenas para ADMIN_GLOBAL
+         ═══════════════════════════════════════════════════════ -->
+    <div id="adminContent" class="hidden space-y-5">
+
+      <div class="flex items-start justify-between gap-4 flex-wrap">
+        <div>
+          <p class="text-[0.65rem] font-bold text-vitta-600 uppercase tracking-widest mb-0.5">Sistema · Master</p>
+          <h2 class="text-[1.4rem] font-extrabold text-gray-800 tracking-tight leading-none">Gestão de Planos</h2>
+          <p class="text-[0.8rem] text-gray-400 mt-1">Cadastre os planos disponíveis para as empresas</p>
+        </div>
+        <button onclick="openNewModal()"
+                class="flex items-center gap-2 px-4 py-2.5 bg-vitta-500 hover:bg-vitta-600 text-white text-sm font-semibold rounded-xl shadow-sm transition-colors">
+          <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          Novo Plano
+        </button>
+      </div>
+
+      <!-- Stats -->
+      <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+        <div class="bg-white rounded-2xl p-5 border border-gray-100 shadow-sm">
+          <div class="w-10 h-10 rounded-xl bg-vitta-50 flex items-center justify-center mb-3">
+            <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-vitta-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
+          </div>
+          <p class="text-[1.65rem] font-extrabold text-gray-800 leading-none" id="statTotal">—</p>
+          <p class="text-[0.75rem] text-gray-500 mt-1">Total de Planos</p>
+        </div>
+        <div class="bg-white rounded-2xl p-5 border border-gray-100 shadow-sm">
+          <div class="w-10 h-10 rounded-xl bg-green-50 flex items-center justify-center mb-3">
+            <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+          </div>
+          <p class="text-[1.65rem] font-extrabold text-gray-800 leading-none" id="statAtivos">—</p>
+          <p class="text-[0.75rem] text-gray-500 mt-1">Ativos</p>
+        </div>
+        <div class="bg-white rounded-2xl p-5 border border-gray-100 shadow-sm">
+          <div class="w-10 h-10 rounded-xl bg-red-50 flex items-center justify-center mb-3">
+            <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>
+          </div>
+          <p class="text-[1.65rem] font-extrabold text-gray-800 leading-none" id="statInativos">—</p>
+          <p class="text-[0.75rem] text-gray-500 mt-1">Inativos</p>
+        </div>
+      </div>
+
+      <!-- Filtros -->
+      <div class="bg-white border border-gray-100 rounded-2xl shadow-sm p-4 flex flex-wrap gap-3 items-center">
+        <div class="relative flex-1 min-w-[200px]">
+          <svg class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+          <input id="filterName" type="text" placeholder="Buscar por nome..."
+                 class="w-full pl-9 pr-3 py-2.5 border border-gray-200 rounded-xl text-sm bg-gray-50 outline-none focus:border-vitta-500 focus:bg-white transition-colors">
+        </div>
+        <div class="h-6 w-px bg-gray-200"></div>
+        <label class="flex items-center gap-2.5 cursor-pointer select-none">
+          <div class="relative w-9 h-5">
+            <input type="checkbox" id="toggleInativos" class="sr-only peer">
+            <div class="w-9 h-5 bg-gray-300 peer-checked:bg-vitta-500 rounded-full transition-colors"></div>
+            <div class="absolute top-0.5 left-0.5 w-4 h-4 bg-white rounded-full shadow transition-transform peer-checked:translate-x-4"></div>
+          </div>
+          <span class="text-sm font-medium text-gray-600">Inativos</span>
+        </label>
+        <button onclick="clearFilters()"
+                class="flex items-center gap-1.5 px-3 py-2.5 border border-gray-200 rounded-xl text-sm text-gray-600 hover:bg-gray-50 transition-colors">
+          <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+          Limpar
+        </button>
+      </div>
+
+      <!-- Tabela -->
+      <div class="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
+        <div class="px-5 py-3.5 border-b border-gray-100 text-[0.8rem] text-gray-500" id="tableCount">
+          Exibindo <strong class="text-gray-800">—</strong> plano(s)
+        </div>
+
+        <div id="tableLoader" class="flex items-center justify-center py-16 gap-3">
+          <svg class="animate-spin w-5 h-5 text-vitta-500" fill="none" viewBox="0 0 24 24">
+            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/>
+            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/>
+          </svg>
+          <span class="text-sm text-gray-400">Carregando planos...</span>
+        </div>
+
+        <div id="tableWrap" class="hidden overflow-x-auto">
+          <table class="w-full text-left text-sm">
+            <thead>
+              <tr class="bg-gray-50 border-b border-gray-100">
+                <th class="px-5 py-3 text-[0.7rem] font-bold text-gray-500 uppercase tracking-wider">Nome do Plano</th>
+                <th class="px-4 py-3 text-[0.7rem] font-bold text-gray-500 uppercase tracking-wider">Descrição</th>
+                <th class="px-4 py-3 text-[0.7rem] font-bold text-gray-500 uppercase tracking-wider">Cadastro</th>
+                <th class="px-4 py-3 text-[0.7rem] font-bold text-gray-500 uppercase tracking-wider">Status</th>
+                <th class="px-4 py-3"></th>
+              </tr>
+            </thead>
+            <tbody id="planoBody"></tbody>
+          </table>
+        </div>
+      </div>
+
+    </div><!-- /adminContent -->
+
+  </main>
+</div>
+
+<!-- MODAL: VISUALIZAR -->
+<div class="modal-overlay" id="viewModal">
+  <div class="bg-white rounded-2xl w-full max-w-[520px] shadow-2xl mx-auto my-auto modal-scroll overflow-y-auto max-h-[90vh]">
+
+    <div class="sticky top-0 bg-white flex items-center gap-3 px-6 py-4 border-b border-gray-100 rounded-t-2xl z-10">
+      <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-vitta-500 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
+      <h2 class="text-base font-bold text-gray-800 flex-1">Detalhes do Plano</h2>
+      <button onclick="switchToEdit()" class="flex items-center gap-1.5 px-3 py-1.5 bg-vitta-500 hover:bg-vitta-600 text-white text-xs font-semibold rounded-lg transition-colors">
+        <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+        Editar
+      </button>
+      <button onclick="closeViewModal()" class="w-8 h-8 flex items-center justify-center rounded-full bg-gray-100 hover:bg-gray-200 text-gray-500 transition-colors">
+        <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+
+    <div class="px-6 py-5 space-y-4">
+      <div>
+        <p class="text-[0.65rem] font-bold uppercase tracking-wider text-gray-400 mb-1">Nome do Plano</p>
+        <p class="text-lg font-bold text-gray-800" id="vNome">—</p>
+      </div>
+      <div class="grid grid-cols-2 gap-4">
+        <div>
+          <p class="text-[0.65rem] font-bold uppercase tracking-wider text-gray-400 mb-1">Preço Mensal</p>
+          <p class="text-base font-bold text-vitta-600" id="vPreco">—</p>
+        </div>
+        <div>
+          <p class="text-[0.65rem] font-bold uppercase tracking-wider text-gray-400 mb-1">Máx. Usuários</p>
+          <p class="text-base font-semibold text-gray-800" id="vMaxUsu">—</p>
+        </div>
+      </div>
+      <div>
+        <p class="text-[0.65rem] font-bold uppercase tracking-wider text-gray-400 mb-2">Funcionalidades</p>
+        <div class="flex flex-wrap gap-2">
+          <span id="vBadgeApp" class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[0.72rem] font-semibold border">
+            <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><rect x="5" y="2" width="14" height="20" rx="2"/><line x1="12" y1="18" x2="12.01" y2="18"/></svg>
+            App Mobile
+          </span>
+          <span id="vBadgeIA" class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[0.72rem] font-semibold border">
+            <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M12 2L9.5 9.5 2 12l7.5 2.5L12 22l2.5-7.5L22 12l-7.5-2.5z"/></svg>
+            Inteligência Artificial
+          </span>
+          <span id="vBadgeHibrido" class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[0.72rem] font-semibold border">
+            <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+            Perfil Híbrido
+          </span>
+        </div>
+      </div>
+      <div>
+        <p class="text-[0.65rem] font-bold uppercase tracking-wider text-gray-400 mb-1">Descrição</p>
+        <p class="text-sm text-gray-700 whitespace-pre-wrap" id="vDescr">—</p>
+      </div>
+      <div class="flex gap-6">
+        <div>
+          <p class="text-[0.65rem] font-bold uppercase tracking-wider text-gray-400 mb-1">Status</p>
+          <p class="text-sm font-medium" id="vStatus">—</p>
+        </div>
+        <div>
+          <p class="text-[0.65rem] font-bold uppercase tracking-wider text-gray-400 mb-1">Data de Cadastro</p>
+          <p class="text-sm font-medium text-gray-800" id="vDtcri">—</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="flex justify-end gap-3 px-6 py-4 border-t border-gray-100">
+      <button onclick="closeViewModal()" class="px-4 py-2 border border-gray-200 rounded-xl text-sm font-semibold text-gray-600 hover:bg-gray-50 transition-colors">Fechar</button>
+      <button onclick="switchToEdit()" class="px-4 py-2 bg-vitta-500 hover:bg-vitta-600 text-white text-sm font-semibold rounded-xl transition-colors">Editar Plano</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: FORMULÁRIO -->
+<div class="modal-overlay" id="formModal">
+  <div class="bg-white rounded-2xl w-full max-w-[520px] shadow-2xl mx-auto my-auto">
+
+    <div class="sticky top-0 bg-white flex items-center gap-3 px-6 py-4 border-b border-gray-100 rounded-t-2xl z-10">
+      <span id="formIcon" class="text-xl">📋</span>
+      <div class="flex-1">
+        <h2 id="formTitle" class="text-base font-bold text-gray-800">Novo Plano</h2>
+        <p id="formSubtitle" class="text-xs text-gray-400"></p>
+      </div>
+      <button onclick="closeFormModal()" class="w-8 h-8 flex items-center justify-center rounded-full bg-gray-100 hover:bg-gray-200 text-gray-500 transition-colors">
+        <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+
+    <div class="overflow-y-auto modal-scroll max-h-[72vh]">
+      <input type="hidden" id="fId">
+      <div id="formAlert" class="mx-6 mt-4"></div>
+
+      <div class="px-6 py-5 space-y-4">
+
+        <div class="flex flex-col gap-1.5">
+          <label class="text-xs font-semibold text-gray-600">Nome do Plano <span class="text-red-500">*</span></label>
+          <input id="fNome" type="text" placeholder="Ex: Essencial, Clínica, Pro..." required
+                 class="px-3 py-2.5 border-[1.5px] border-gray-200 rounded-xl text-sm bg-gray-50 outline-none focus:border-vitta-500 focus:bg-white transition-colors">
+        </div>
+
+        <div class="grid grid-cols-2 gap-3">
+          <div class="flex flex-col gap-1.5">
+            <label class="text-xs font-semibold text-gray-600">Preço Mensal (R$)</label>
+            <input id="fPreco" type="number" step="0.01" min="0" placeholder="0,00"
+                   class="px-3 py-2.5 border-[1.5px] border-gray-200 rounded-xl text-sm bg-gray-50 outline-none focus:border-vitta-500 focus:bg-white transition-colors">
+          </div>
+          <div class="flex flex-col gap-1.5">
+            <label class="text-xs font-semibold text-gray-600">Máx. Usuários</label>
+            <input id="fMaxUsu" type="number" min="1" placeholder="Vazio = ilimitado"
+                   class="px-3 py-2.5 border-[1.5px] border-gray-200 rounded-xl text-sm bg-gray-50 outline-none focus:border-vitta-500 focus:bg-white transition-colors">
+            <p class="text-[0.68rem] text-gray-400 -mt-1">Deixe vazio para ilimitado</p>
+          </div>
+        </div>
+
+        <div class="flex flex-col gap-1.5">
+          <label class="text-xs font-semibold text-gray-600">Descrição</label>
+          <textarea id="fDescr" rows="3" placeholder="Descreva os recursos e condições deste plano..."
+                    class="px-3 py-2.5 border-[1.5px] border-gray-200 rounded-xl text-sm bg-gray-50 outline-none focus:border-vitta-500 focus:bg-white transition-colors resize-none"></textarea>
+        </div>
+
+        <div class="border border-gray-100 rounded-xl p-4 space-y-3 bg-gray-50/50">
+          <p class="text-xs font-bold text-gray-500 uppercase tracking-wider mb-1">Funcionalidades do Plano</p>
+
+          <label class="flex items-center gap-2.5 cursor-pointer select-none">
+            <div class="relative w-10 h-6 shrink-0">
+              <input type="checkbox" id="fTemApp" class="sr-only peer">
+              <div class="w-10 h-6 bg-gray-300 peer-checked:bg-vitta-500 rounded-full transition-colors"></div>
+              <div class="absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full shadow transition-transform peer-checked:translate-x-4"></div>
+            </div>
+            <div>
+              <span class="text-sm font-semibold text-gray-700">App Mobile</span>
+              <p class="text-[0.7rem] text-gray-400">Profissionais podem acessar via aplicativo</p>
+            </div>
+          </label>
+
+          <label class="flex items-center gap-2.5 cursor-pointer select-none">
+            <div class="relative w-10 h-6 shrink-0">
+              <input type="checkbox" id="fTemIA" class="sr-only peer">
+              <div class="w-10 h-6 bg-gray-300 peer-checked:bg-violet-500 rounded-full transition-colors"></div>
+              <div class="absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full shadow transition-transform peer-checked:translate-x-4"></div>
+            </div>
+            <div>
+              <span class="text-sm font-semibold text-gray-700">Inteligência Artificial</span>
+              <p class="text-[0.7rem] text-gray-400">Resumo de prontuário e análises com IA</p>
+            </div>
+          </label>
+
+          <label class="flex items-center gap-2.5 cursor-pointer select-none">
+            <div class="relative w-10 h-6 shrink-0">
+              <input type="checkbox" id="fHibrido" class="sr-only peer">
+              <div class="w-10 h-6 bg-gray-300 peer-checked:bg-emerald-500 rounded-full transition-colors"></div>
+              <div class="absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full shadow transition-transform peer-checked:translate-x-4"></div>
+            </div>
+            <div>
+              <span class="text-sm font-semibold text-gray-700">Perfil Híbrido</span>
+              <p class="text-[0.7rem] text-gray-400">Usuário pode ser profissional e secretaria</p>
+            </div>
+          </label>
+        </div>
+
+        <div>
+          <label class="flex items-center gap-2.5 cursor-pointer select-none">
+            <div class="relative w-10 h-6 shrink-0">
+              <input type="checkbox" id="fAtivo" checked class="sr-only peer">
+              <div class="w-10 h-6 bg-gray-300 peer-checked:bg-vitta-500 rounded-full transition-colors"></div>
+              <div class="absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full shadow transition-transform peer-checked:translate-x-4"></div>
+            </div>
+            <span class="text-sm font-semibold text-gray-700">Plano Ativo</span>
+          </label>
+        </div>
+
+      </div>
+    </div>
+
+    <div class="flex justify-end gap-3 px-6 py-4 border-t border-gray-100">
+      <button onclick="closeFormModal()" class="px-4 py-2.5 border border-gray-200 rounded-xl text-sm font-semibold text-gray-600 hover:bg-gray-50 transition-colors">Cancelar</button>
+      <button onclick="savePlano()" id="btnSave"
+              class="flex items-center gap-2 px-5 py-2.5 bg-vitta-500 hover:bg-vitta-600 text-white text-sm font-semibold rounded-xl transition-colors">
+        <svg id="saveSpin" class="hidden animate-spin w-4 h-4" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/></svg>
+        <svg id="saveIcon" xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+        <span id="saveTxt">Salvar</span>
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: ATUALIZAR ASAAS -->
+<div class="modal-overlay" id="asaasModal">
+  <div class="bg-white rounded-2xl w-full max-w-[440px] shadow-2xl mx-auto my-auto p-6">
+    <div class="flex items-start gap-4 mb-5">
+      <div class="w-12 h-12 rounded-xl bg-blue-50 border border-blue-100 flex items-center justify-center shrink-0">
+        <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6 text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+          <rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/>
+        </svg>
+      </div>
+      <div>
+        <h3 class="text-base font-bold text-gray-800 mb-1">Atualizar assinaturas no Asaas?</h3>
+        <p class="text-sm text-gray-500 leading-relaxed">
+          O preço do plano <strong id="asaasModalNome" class="text-gray-700"></strong> foi alterado para
+          <strong id="asaasModalPreco" class="text-vitta-600"></strong>/mês.<br><br>
+          Deseja atualizar também as assinaturas existentes no Asaas para este novo valor?
+        </p>
+      </div>
+    </div>
+
+    <div id="asaasModalResult" class="hidden mb-4 p-3 rounded-xl text-sm font-medium"></div>
+
+    <div class="flex gap-3">
+      <button onclick="closeAsaasModal()"
+              class="flex-1 py-2.5 border border-gray-200 rounded-xl text-sm font-semibold text-gray-600 hover:bg-gray-50 transition-colors">
+        Não, somente novas
+      </button>
+      <button onclick="confirmarAtualizacaoAsaas()" id="btnAsaasConfirm"
+              class="flex-1 flex items-center justify-center gap-2 py-2.5 bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold rounded-xl transition-colors">
+        <svg id="asaasSpin" class="hidden animate-spin w-4 h-4" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/></svg>
+        <span id="asaasConfirmTxt">Sim, atualizar todos</span>
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: CONFIRMAR EXCLUSÃO -->
+<div class="modal-overlay" id="deleteModal">
+  <div class="bg-white rounded-2xl w-full max-w-[400px] shadow-2xl mx-auto my-auto p-6 text-center">
+    <div class="w-14 h-14 rounded-full bg-red-50 flex items-center justify-center mx-auto mb-4">
+      <svg xmlns="http://www.w3.org/2000/svg" class="w-7 h-7 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>
+    </div>
+    <h3 class="text-base font-bold text-gray-800 mb-2" id="deleteTitle">Excluir Plano?</h3>
+    <p class="text-sm text-gray-500 mb-5" id="deleteMsg">Esta ação não pode ser desfeita. Empresas vinculadas a este plano perderão a associação.</p>
+    <div class="flex gap-3">
+      <button onclick="closeDeleteModal()" class="flex-1 py-2.5 border border-gray-200 rounded-xl text-sm font-semibold text-gray-600 hover:bg-gray-50 transition-colors">Cancelar</button>
+      <button onclick="confirmDelete()" id="btnDeleteConfirm"
+              class="flex-1 flex items-center justify-center gap-2 py-2.5 bg-red-500 hover:bg-red-600 text-white text-sm font-semibold rounded-xl transition-colors">
+        <svg id="deleteSpin" class="hidden animate-spin w-4 h-4" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/></svg>
+        <span>Excluir</span>
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Toast -->
+<div id="toast" class="hidden">
+  <div id="toastMsg" class="flex items-center gap-3 px-4 py-3 rounded-xl shadow-lg text-sm font-semibold text-white min-w-[260px]">
+    <span id="toastIcon"></span><span id="toastText"></span>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<script src="../assets/js/config.js?v=2"></script>
+<script src="../assets/js/admin-empresa-context.js?v=1"></script>
+<script src="../assets/js/notifications.js?v=3"></script>
+<script>
+
+const SUPABASE_FUNCTIONS_URL = 'https://ccdeuabmjwgntwssjfgo.supabase.co/functions/v1'
+
+let allPlanos      = []
+let filtered       = []
+let currentViewId  = null
+let deleteTargetId = null
+let _currentToken  = null
+let _asaasPlanoId   = null
+let _asaasNovoPreco = null
+let _asaasNome      = null
+let _originalPreco  = null
+
+/* ── utilitários ── */
+function initials(name) {
+  if (!name) return '?'
+  return name.trim().split(/\s+/).slice(0, 2).map(w => w[0]).join('').toUpperCase()
+}
+function fmtDate(iso) {
+  if (!iso) return '—'
+  return new Date(iso).toLocaleDateString('pt-BR')
+}
+function fmtCurrency(val) {
+  if (val == null) return '—'
+  return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(val)
+}
+
+function showToast(msg, type = 'success') {
+  const el  = document.getElementById('toast')
+  const box = document.getElementById('toastMsg')
+  document.getElementById('toastText').textContent = msg
+  document.getElementById('toastIcon').textContent = type === 'success' ? '✓' : type === 'error' ? '✕' : 'ℹ'
+  box.className = 'flex items-center gap-3 px-4 py-3 rounded-xl shadow-lg text-sm font-semibold text-white min-w-[260px] ' + (
+    type === 'success' ? 'bg-green-600' : type === 'error' ? 'bg-red-500' : 'bg-vitta-600'
+  )
+  el.classList.remove('hidden')
+  setTimeout(() => el.classList.add('hidden'), 3500)
+}
+function showErr(msg) {
+  return '<div class="flex items-start gap-2 bg-red-50 text-red-700 border border-red-200 rounded-xl px-4 py-3 text-sm font-medium mb-1"><span class="shrink-0 mt-0.5">⚠</span><span>' + msg + '</span></div>'
+}
+
+/* ── sidebar ── */
+function toggleMenu(key) {
+  const sub  = document.getElementById('sub-' + key)
+  const chev = document.getElementById('chev-' + key)
+  const open = sub.classList.contains('open')
+  sub.classList.toggle('open', !open)
+  if (chev) chev.classList.toggle('open', !open)
+}
+function toggleSidebar() {
+  const sb   = document.getElementById('sidebar')
+  const ov   = document.getElementById('overlay')
+  const open = sb.classList.contains('-translate-x-full')
+  sb.classList.toggle('-translate-x-full', !open)
+  ov.classList.toggle('hidden', !open)
+}
+
+/* ── auth (ADMIN_GLOBAL) ── */
+async function initAuth() {
+  const { data: { session } } = await supabase.auth.getSession()
+  if (!session) { window.location.href = '../index.html'; return false }
+
+  const u = await getUsuarioAtual('NOME_USU,TIPO_USU,ATIVO_USU,PROF_USU', session)
+
+  if (!u || !u.ATIVO_USU)            { await supabase.auth.signOut(); window.location.href = '../index.html'; return false }
+  if (u.TIPO_USU !== 'ADMIN_GLOBAL') { window.location.href = 'dashboard.html'; return false }
+
+  const nome = u.NOME_USU || session.user.email
+  const ini  = nome.trim() ? initials(nome) : '?'
+  ;['user-name','header-user-name'].forEach(id => document.getElementById(id).textContent = nome)
+  ;['user-role','header-user-role'].forEach(id => document.getElementById(id).textContent = 'Admin Global')
+  ;['user-avatar','header-avatar'].forEach(id => document.getElementById(id).textContent = ini)
+  if (!u.PROF_USU) document.querySelector('a[href="consultas.html"]')?.classList.add('hidden')
+
+  document.getElementById('adminBadge').classList.remove('hidden')
+  document.getElementById('adminBadge').classList.add('sm:flex')
+  document.getElementById('sectionAdmin').classList.remove('hidden')
+  document.getElementById('adminContent').classList.remove('hidden')
+  AdminEmpresaCtx.initSelector('ADMIN_GLOBAL', session.user.id)
+  return true
+}
+async function handleLogout() { await supabase.auth.signOut(); window.location.href = '../index.html' }
+
+/* ════════════════════════════════════════════════
+   PAYMENT WALL
+   ════════════════════════════════════════════════ */
+
+const MOTIVO_CONFIG = {
+  trial_expirado: {
+    title: 'Período de teste encerrado',
+    desc:  'Seus 14 dias gratuitos chegaram ao fim. Regularize o pagamento para continuar usando o sistema.',
+    color: 'amber',
+  },
+  inadimplente: {
+    title: 'Pagamento em atraso',
+    desc:  'Identificamos um pagamento vencido. Quite a fatura para recuperar o acesso completo.',
+    color: 'red',
+  },
+  cancelado: {
+    title: 'Assinatura cancelada',
+    desc:  'Sua assinatura foi encerrada. Entre em contato com o suporte para reativar.',
+    color: 'red',
+  },
+  acesso_expirado: {
+    title: 'Acesso expirado',
+    desc:  'Seu período de acesso expirou. Realize o pagamento para renovar.',
+    color: 'amber',
+  },
+}
+
+async function initPaymentWall(motivo) {
+  document.getElementById('paymentWall').classList.remove('hidden')
+  document.getElementById('headerTitle').textContent    = 'Regularize sua conta'
+  document.getElementById('headerSubtitle').textContent = 'Acesso temporariamente suspenso'
+  document.getElementById('adminBadge').classList.add('hidden')
+
+  const info = MOTIVO_CONFIG[motivo] || MOTIVO_CONFIG.trial_expirado
+  document.getElementById('motivoTitle').textContent = info.title
+  document.getElementById('motivoDesc').textContent  = info.desc
+
+  const banner   = document.getElementById('motivoBanner')
+  const iconWrap = document.getElementById('motivoIconWrap')
+  if (info.color === 'red') {
+    banner.className   = 'rounded-2xl border border-red-200 bg-red-50 p-5 mb-5 flex items-start gap-4'
+    iconWrap.className = 'w-12 h-12 rounded-xl bg-red-100 flex items-center justify-center shrink-0'
+  }
+
+  const { data: { session } } = await supabase.auth.getSession()
+  if (!session) { window.location.replace('../index.html'); return }
+
+  _currentToken = session.access_token
+
+  const meta = session.user.user_metadata || {}
+  const nome = meta.nome_usu || session.user.email || 'Usuário'
+  const ini  = initials(nome)
+  ;['user-name','header-user-name'].forEach(id => { const el = document.getElementById(id); if (el) el.textContent = nome })
+  ;['user-role','header-user-role'].forEach(id => { const el = document.getElementById(id); if (el) el.textContent = meta.tipo_usu || 'Usuário' })
+  ;['user-avatar','header-avatar'].forEach(id => { const el = document.getElementById(id); if (el) el.textContent = ini })
+
+  await loadInvoice()
+}
+
+async function loadInvoice() {
+  document.getElementById('invoiceLoader').classList.remove('hidden')
+  document.getElementById('invoiceError').classList.add('hidden')
+  document.getElementById('invoiceContent').classList.add('hidden')
+
+  try {
+    const res  = await fetch(SUPABASE_FUNCTIONS_URL + '/buscar-fatura', {
+      method:  'POST',
+      headers: {
+        'Content-Type':  'application/json',
+        'Authorization': 'Bearer ' + _currentToken,
+      },
+      body: JSON.stringify({}),
+    })
+    const data = await res.json()
+
+    if (!data.sucesso || !data.payment) throw new Error(data.erro || 'Cobrança não encontrada')
+
+    document.getElementById('invoiceLoader').classList.add('hidden')
+    document.getElementById('invoiceContent').classList.remove('hidden')
+
+    document.getElementById('planNome').textContent  = (data.plano && data.plano.nome)  || 'Plano Vitta'
+    document.getElementById('planValor').textContent = fmtCurrency((data.plano && data.plano.preco) != null ? data.plano.preco : data.payment.valor)
+
+    if (data.payment.vencimento) {
+      const parts = data.payment.vencimento.split('-')
+      document.getElementById('payVencimento').textContent = parts[2] + '/' + parts[1] + '/' + parts[0]
+    }
+
+    const boletoUrl = data.payment.bankSlipUrl || data.payment.invoiceUrl
+    if (boletoUrl) document.getElementById('boletoLink').href = boletoUrl
+
+    if (data.payment.identificationField) {
+      document.getElementById('barCodeInput').value = data.payment.identificationField
+      document.getElementById('barCodeSection').classList.remove('hidden')
+    }
+
+    if (data.pix && data.pix.payload) {
+      document.getElementById('pixPayloadInput').value = data.pix.payload
+      if (data.pix.qrCode) {
+        document.getElementById('pixQrCodeImg').src = 'data:image/png;base64,' + data.pix.qrCode
+      }
+    } else {
+      document.getElementById('pixContent').classList.add('hidden')
+      document.getElementById('pixUnavailable').classList.remove('hidden')
+    }
+
+  } catch (e) {
+    document.getElementById('invoiceLoader').classList.add('hidden')
+    document.getElementById('invoiceError').classList.remove('hidden')
+    document.getElementById('invoiceErrorMsg').textContent = (e && e.message) || 'Erro ao carregar cobrança.'
+  }
+}
+
+function retryLoadInvoice() { loadInvoice() }
+
+function switchPayTab(tab) {
+  ;['boleto', 'pix', 'cartao'].forEach(function(t) {
+    document.getElementById('tabContent-' + t).classList.toggle('hidden', t !== tab)
+    document.getElementById('tab-' + t).className =
+      'flex-1 py-3 text-sm font-semibold transition-colors ' + (t === tab ? 'tab-active' : 'tab-inactive')
+  })
+}
+
+async function copyField(inputId, btn) {
+  const el = document.getElementById(inputId)
+  if (!el) return
+  const original = btn.textContent
+  try {
+    await navigator.clipboard.writeText(el.value)
+  } catch (_) {
+    el.select()
+    document.execCommand('copy')
+  }
+  btn.textContent = 'Copiado!'
+  setTimeout(function() { btn.textContent = original }, 2000)
+  showToast('Copiado para a área de transferência!', 'success')
+}
+
+/* ════════════════════════════════════════════════
+   ADMIN — carregar dados
+   ════════════════════════════════════════════════ */
+async function loadPlanos() {
+  document.getElementById('tableLoader').classList.remove('hidden')
+  document.getElementById('tableWrap').classList.add('hidden')
+
+  const { data, error } = await supabase
+    .from('PLANO')
+    .select('ID_PLANO,NOME_PLANO,DESCR_PLANO,ATIVO_PLANO,DTCRI_PLANO,PRECO_PLANO,MAX_USUARIOS_PLANO,TEM_APP_PLANO,TEM_IA_PLANO,PERFIL_HIBRIDO_PLANO')
+    .order('PRECO_PLANO', { ascending: true, nullsFirst: false })
+
+  if (error) { showToast('Erro ao carregar planos.', 'error'); return }
+  allPlanos = data || []
+  updateStats()
+  applyFilters()
+  document.getElementById('tableLoader').classList.add('hidden')
+  document.getElementById('tableWrap').classList.remove('hidden')
+}
+
+function updateStats() {
+  document.getElementById('statTotal').textContent    = allPlanos.length
+  document.getElementById('statAtivos').textContent   = allPlanos.filter(function(p) { return p.ATIVO_PLANO }).length
+  document.getElementById('statInativos').textContent = allPlanos.filter(function(p) { return !p.ATIVO_PLANO }).length
+}
+
+function applyFilters() {
+  const q        = document.getElementById('filterName').value.trim().toLowerCase()
+  const showInat = document.getElementById('toggleInativos').checked
+
+  filtered = allPlanos.filter(function(p) {
+    if (!showInat && !p.ATIVO_PLANO) return false
+    if (q && !p.NOME_PLANO.toLowerCase().includes(q)) return false
+    return true
+  }).sort(function(a, b) {
+    return (a.PRECO_PLANO ?? Infinity) - (b.PRECO_PLANO ?? Infinity)
+  })
+  renderTable()
+}
+function clearFilters() {
+  document.getElementById('filterName').value = ''
+  document.getElementById('toggleInativos').checked = false
+  applyFilters()
+}
+
+function renderTable() {
+  const tbody = document.getElementById('planoBody')
+  document.getElementById('tableCount').innerHTML =
+    'Exibindo <strong class="text-gray-800">' + filtered.length + '</strong> plano' + (filtered.length !== 1 ? 's' : '')
+
+  if (!filtered.length) {
+    tbody.innerHTML = '<tr><td colspan="5" class="text-center py-14 text-gray-400 text-sm">Nenhum plano encontrado.</td></tr>'
+    return
+  }
+
+  var priceColors = [
+    'bg-emerald-50 text-emerald-700',
+    'bg-sky-50 text-sky-700',
+    'bg-violet-50 text-violet-700',
+    'bg-amber-50 text-amber-700',
+    'bg-rose-50 text-rose-700',
+    'bg-cyan-50 text-cyan-700',
+  ]
+
+  tbody.innerHTML = filtered.map(function(p, idx) {
+    var badgeColor = priceColors[idx % priceColors.length]
+    var precoBadge = p.PRECO_PLANO != null
+      ? '<span class="ml-1 text-[0.72rem] font-bold px-2 py-0.5 rounded-full ' + badgeColor + '">' + fmtCurrency(p.PRECO_PLANO) + '/mês</span>'
+      : ''
+    return '<tr class="border-b border-gray-50">' +
+      '<td class="px-5 py-3.5"><div class="flex items-center gap-3">' +
+        '<div class="w-9 h-9 rounded-xl bg-vitta-50 flex items-center justify-center shrink-0">' +
+          '<svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-vitta-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>' +
+        '</div>' +
+        '<div class="flex items-center flex-wrap gap-1">' +
+          '<span class="text-[0.85rem] font-semibold text-gray-800' + (!p.ATIVO_PLANO ? ' opacity-50' : '') + '">' + p.NOME_PLANO + '</span>' +
+          precoBadge +
+        '</div>' +
+      '</div></td>' +
+      '<td class="px-4 py-3.5 text-[0.82rem] text-gray-500 max-w-[300px]"><span class="line-clamp-2">' + (p.DESCR_PLANO || '—') + '</span></td>' +
+      '<td class="px-4 py-3.5 text-[0.75rem] text-gray-400 whitespace-nowrap">' + fmtDate(p.DTCRI_PLANO) + '</td>' +
+      '<td class="px-4 py-3.5">' + (p.ATIVO_PLANO
+        ? '<span class="inline-flex items-center gap-1 text-[0.72rem] font-semibold bg-green-50 text-green-700 px-2 py-0.5 rounded-full">● Ativo</span>'
+        : '<span class="inline-flex items-center gap-1 text-[0.72rem] font-semibold bg-gray-100 text-gray-500 px-2 py-0.5 rounded-full">● Inativo</span>') +
+      '</td>' +
+      '<td class="px-4 py-3.5"><div class="flex items-center gap-1.5 justify-end">' +
+        '<button onclick="openViewModal(\'' + p.ID_PLANO + '\')" title="Visualizar" class="w-8 h-8 flex items-center justify-center rounded-lg border border-gray-200 hover:border-vitta-400 hover:bg-vitta-50 text-gray-400 hover:text-vitta-600 transition-colors"><svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg></button>' +
+        '<button onclick="openEditModal(\'' + p.ID_PLANO + '\')" title="Editar" class="w-8 h-8 flex items-center justify-center rounded-lg border border-gray-200 hover:border-blue-400 hover:bg-blue-50 text-gray-400 hover:text-blue-600 transition-colors"><svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></button>' +
+        '<button onclick="openDeleteModal(\'' + p.ID_PLANO + '\',\'' + p.NOME_PLANO.replace(/'/g, "\\'") + '\')" title="Excluir" class="w-8 h-8 flex items-center justify-center rounded-lg border border-gray-200 hover:border-red-400 hover:bg-red-50 text-gray-400 hover:text-red-500 transition-colors"><svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/></svg></button>' +
+      '</div></td>' +
+    '</tr>'
+  }).join('')
+}
+
+/* ── modais ── */
+function _badgeOn(id, on) {
+  const el = document.getElementById(id)
+  if (on) {
+    el.className = 'inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[0.72rem] font-semibold border bg-green-50 text-green-700 border-green-200'
+  } else {
+    el.className = 'inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[0.72rem] font-semibold border bg-gray-100 text-gray-400 border-gray-200 line-through'
+  }
+}
+
+function openViewModal(id) {
+  const p = allPlanos.find(function(x) { return x.ID_PLANO === id })
+  if (!p) return
+  currentViewId = id
+  document.getElementById('vNome').textContent  = p.NOME_PLANO
+  document.getElementById('vDescr').textContent = p.DESCR_PLANO || 'Sem descrição'
+  document.getElementById('vDtcri').textContent = fmtDate(p.DTCRI_PLANO)
+  document.getElementById('vPreco').textContent  = p.PRECO_PLANO != null ? fmtCurrency(p.PRECO_PLANO) + '/mês' : '—'
+  document.getElementById('vMaxUsu').textContent = p.MAX_USUARIOS_PLANO != null ? p.MAX_USUARIOS_PLANO + ' usuários' : 'Ilimitado'
+  _badgeOn('vBadgeApp',     !!p.TEM_APP_PLANO)
+  _badgeOn('vBadgeIA',      !!p.TEM_IA_PLANO)
+  _badgeOn('vBadgeHibrido', !!p.PERFIL_HIBRIDO_PLANO)
+  const statusEl = document.getElementById('vStatus')
+  if (p.ATIVO_PLANO) { statusEl.textContent = 'Ativo';   statusEl.className = 'text-sm font-semibold text-green-600' }
+  else               { statusEl.textContent = 'Inativo'; statusEl.className = 'text-sm font-semibold text-gray-400' }
+  document.getElementById('viewModal').classList.add('open')
+}
+function closeViewModal() { document.getElementById('viewModal').classList.remove('open'); currentViewId = null }
+function switchToEdit()   { const id = currentViewId; closeViewModal(); setTimeout(function() { openEditModal(id) }, 60) }
+
+function openNewModal() {
+  resetForm()
+  document.getElementById('formTitle').textContent    = 'Novo Plano'
+  document.getElementById('formSubtitle').textContent = ''
+  document.getElementById('formIcon').textContent     = '📋'
+  document.getElementById('formModal').classList.add('open')
+}
+
+function openEditModal(id) {
+  const p = allPlanos.find(function(x) { return x.ID_PLANO === id })
+  if (!p) return
+  resetForm()
+  _originalPreco = p.PRECO_PLANO != null ? p.PRECO_PLANO : null
+  document.getElementById('fId').value    = p.ID_PLANO
+  document.getElementById('fNome').value  = p.NOME_PLANO  || ''
+  document.getElementById('fDescr').value = p.DESCR_PLANO || ''
+  document.getElementById('fPreco').value  = p.PRECO_PLANO != null ? p.PRECO_PLANO : ''
+  document.getElementById('fMaxUsu').value = p.MAX_USUARIOS_PLANO != null ? p.MAX_USUARIOS_PLANO : ''
+  document.getElementById('fTemApp').checked  = !!p.TEM_APP_PLANO
+  document.getElementById('fTemIA').checked   = !!p.TEM_IA_PLANO
+  document.getElementById('fHibrido').checked = !!p.PERFIL_HIBRIDO_PLANO
+  document.getElementById('fAtivo').checked   = !!p.ATIVO_PLANO
+  document.getElementById('formTitle').textContent    = 'Editar Plano'
+  document.getElementById('formSubtitle').textContent = p.NOME_PLANO
+  document.getElementById('formIcon').textContent     = '✏️'
+  document.getElementById('formModal').classList.add('open')
+}
+
+function closeFormModal() { document.getElementById('formModal').classList.remove('open') }
+
+function resetForm() {
+  document.getElementById('fId').value     = ''
+  document.getElementById('fNome').value   = ''
+  document.getElementById('fDescr').value  = ''
+  document.getElementById('fPreco').value  = ''
+  document.getElementById('fMaxUsu').value = ''
+  document.getElementById('fTemApp').checked  = false
+  document.getElementById('fTemIA').checked   = false
+  document.getElementById('fHibrido').checked = false
+  document.getElementById('fAtivo').checked   = true
+  document.getElementById('formAlert').innerHTML = ''
+}
+
+async function savePlano() {
+  const alertEl = document.getElementById('formAlert')
+  alertEl.innerHTML = ''
+  const nome = document.getElementById('fNome').value.trim()
+  if (!nome) { alertEl.innerHTML = showErr('Informe o nome do plano.'); return }
+
+  setSaveLoading(true)
+  try {
+    const precoVal  = document.getElementById('fPreco').value.trim()
+    const maxUsuVal = document.getElementById('fMaxUsu').value.trim()
+    const payload = {
+      NOME_PLANO:          nome,
+      DESCR_PLANO:         document.getElementById('fDescr').value.trim() || null,
+      PRECO_PLANO:         precoVal  !== '' ? parseFloat(precoVal)  : null,
+      MAX_USUARIOS_PLANO:  maxUsuVal !== '' ? parseInt(maxUsuVal)   : null,
+      TEM_APP_PLANO:       document.getElementById('fTemApp').checked,
+      TEM_IA_PLANO:        document.getElementById('fTemIA').checked,
+      PERFIL_HIBRIDO_PLANO: document.getElementById('fHibrido').checked,
+      ATIVO_PLANO:         document.getElementById('fAtivo').checked,
+    }
+
+    const editId = document.getElementById('fId').value
+    if (editId) {
+      const { error } = await supabase.from('PLANO').update(payload).eq('ID_PLANO', editId)
+      if (error) throw new Error('Erro ao atualizar: ' + error.message)
+    } else {
+      payload.DTCRI_PLANO = new Date().toISOString()
+      const { error } = await supabase.from('PLANO').insert(payload)
+      if (error) throw new Error('Erro ao criar plano: ' + error.message)
+    }
+
+    closeFormModal()
+    showToast(editId ? 'Plano atualizado com sucesso!' : 'Plano cadastrado com sucesso!')
+    await loadPlanos()
+
+    // Se editou e o preço mudou → oferecer atualizar assinaturas no Asaas
+    const novoPreco = payload.PRECO_PLANO
+    if (editId && novoPreco != null && novoPreco !== _originalPreco) {
+      _asaasPlanoId   = editId
+      _asaasNovoPreco = novoPreco
+      _asaasNome      = payload.NOME_PLANO
+      document.getElementById('asaasModalNome').textContent  = payload.NOME_PLANO
+      document.getElementById('asaasModalPreco').textContent = fmtCurrency(novoPreco)
+      document.getElementById('asaasModalResult').classList.add('hidden')
+      document.getElementById('btnAsaasConfirm').disabled    = false
+      document.getElementById('asaasSpin').classList.add('hidden')
+      document.getElementById('asaasConfirmTxt').textContent = 'Sim, atualizar todos'
+      document.getElementById('asaasModal').classList.add('open')
+    }
+  } catch (e) {
+    alertEl.innerHTML = showErr((e && e.message) || 'Erro inesperado. Tente novamente.')
+  } finally {
+    setSaveLoading(false)
+  }
+}
+
+function setSaveLoading(on) {
+  document.getElementById('btnSave').disabled = on
+  document.getElementById('saveSpin').classList.toggle('hidden', !on)
+  document.getElementById('saveIcon').classList.toggle('hidden',  on)
+  document.getElementById('saveTxt').textContent = on ? 'Salvando...' : 'Salvar'
+}
+
+function openDeleteModal(id, nome) {
+  deleteTargetId = id
+  document.getElementById('deleteTitle').textContent = 'Excluir "' + nome + '"?'
+  document.getElementById('deleteModal').classList.add('open')
+}
+function closeDeleteModal() { document.getElementById('deleteModal').classList.remove('open'); deleteTargetId = null }
+
+async function confirmDelete() {
+  if (!deleteTargetId) return
+  document.getElementById('deleteSpin').classList.remove('hidden')
+  document.getElementById('btnDeleteConfirm').disabled = true
+  try {
+    const { error } = await supabase.from('PLANO').delete().eq('ID_PLANO', deleteTargetId)
+    if (error) throw new Error(error.message)
+    closeDeleteModal()
+    showToast('Plano excluído com sucesso.')
+    await loadPlanos()
+  } catch (e) {
+    showToast('Erro ao excluir: ' + (e && e.message), 'error')
+    closeDeleteModal()
+  } finally {
+    document.getElementById('deleteSpin').classList.add('hidden')
+    document.getElementById('btnDeleteConfirm').disabled = false
+  }
+}
+
+/* ════════════════════════════════════════════════
+   ASAAS — atualizar assinaturas existentes
+   ════════════════════════════════════════════════ */
+function closeAsaasModal() {
+  document.getElementById('asaasModal').classList.remove('open')
+  _asaasPlanoId = _asaasNovoPreco = _asaasNome = null
+}
+
+async function confirmarAtualizacaoAsaas() {
+  if (!_asaasPlanoId || _asaasNovoPreco == null) return
+  const btn     = document.getElementById('btnAsaasConfirm')
+  const spin    = document.getElementById('asaasSpin')
+  const txt     = document.getElementById('asaasConfirmTxt')
+  const result  = document.getElementById('asaasModalResult')
+
+  btn.disabled  = true
+  spin.classList.remove('hidden')
+  txt.textContent = 'Atualizando...'
+  result.classList.add('hidden')
+
+  try {
+    const { data: { session } } = await supabase.auth.getSession()
+    const token = session?.access_token
+    if (!token) throw new Error('Sessão expirada.')
+
+    const res  = await fetch(SUPABASE_FUNCTIONS_URL + '/atualizar-assinatura-preco', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
+      body: JSON.stringify({ plano_id: _asaasPlanoId, novo_preco: _asaasNovoPreco }),
+    })
+    const data = await res.json()
+
+    if (!data.sucesso) throw new Error(data.erro || 'Erro ao atualizar no Asaas.')
+
+    const total = data.total || 0
+    const ok    = data.atualizadas || 0
+    const falha = data.falhas || 0
+
+    result.className = 'mb-4 p-3 rounded-xl text-sm font-medium ' + (falha === 0 ? 'bg-green-50 text-green-700 border border-green-200' : 'bg-amber-50 text-amber-700 border border-amber-200')
+    result.textContent = falha === 0
+      ? ok + ' assinatura' + (ok !== 1 ? 's' : '') + ' atualizada' + (ok !== 1 ? 's' : '') + ' com sucesso!'
+      : ok + ' atualizada' + (ok !== 1 ? 's' : '') + ', ' + falha + ' com falha. Verifique o log do Asaas.'
+    result.classList.remove('hidden')
+
+    btn.disabled    = true
+    spin.classList.add('hidden')
+    txt.textContent = 'Concluído'
+
+    if (falha === 0) setTimeout(closeAsaasModal, 2000)
+  } catch (e) {
+    result.className = 'mb-4 p-3 rounded-xl text-sm font-medium bg-red-50 text-red-700 border border-red-200'
+    result.textContent = (e && e.message) || 'Erro inesperado.'
+    result.classList.remove('hidden')
+    btn.disabled    = false
+    spin.classList.add('hidden')
+    txt.textContent = 'Tentar novamente'
+  }
+}
+
+;['viewModal','formModal','deleteModal'].forEach(function(id) {
+  document.getElementById(id).addEventListener('click', function(e) {
+    if (e.target.id === id) {
+      if (id === 'viewModal')   closeViewModal()
+      if (id === 'formModal')   closeFormModal()
+      if (id === 'deleteModal') closeDeleteModal()
+    }
+  })
+})
+
+document.getElementById('filterName').addEventListener('input', applyFilters)
+document.getElementById('toggleInativos').addEventListener('change', applyFilters)
+
+/* ── inicialização ── */
+;(async function() {
+  const motivo = new URLSearchParams(window.location.search).get('motivo')
+  if (motivo) {
+    await initPaymentWall(motivo)
+  } else {
+    const ok = await initAuth()
+    if (ok) await loadPlanos()
+  }
+})()
+
+document.querySelectorAll('#sidebar nav a').forEach(function(link) {
+  link.addEventListener('click', function() {
+    var sb = document.getElementById('sidebar')
+    var ov = document.getElementById('overlay')
+    if (sb && !sb.classList.contains('-translate-x-full')) {
+      sb.classList.add('-translate-x-full')
+      if (ov) ov.classList.add('hidden')
+    }
+  })
+})
+
+</script>
+</body>
+</html>

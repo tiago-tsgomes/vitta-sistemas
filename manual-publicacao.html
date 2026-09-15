@@ -1,0 +1,472 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8"/>
+  <title>Manual de Publicação — Vitta Sistemas</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+    *{box-sizing:border-box;margin:0;padding:0}
+    body{font-family:'Inter',sans-serif;color:#1f2937;background:#fff;font-size:14px;line-height:1.6}
+    .page{max-width:800px;margin:0 auto;padding:48px 48px 64px}
+
+    /* Capa */
+    .cover{text-align:center;padding:60px 0 48px;border-bottom:3px solid #2ABCD4;margin-bottom:48px}
+    .cover .logo-box{display:inline-flex;align-items:center;gap:12px;margin-bottom:24px}
+    .cover .logo-circle{width:52px;height:52px;border-radius:14px;background:#2ABCD4;display:flex;align-items:center;justify-content:center}
+    .cover .logo-circle svg{width:28px;height:28px;color:#fff;stroke:#fff;fill:none;stroke-width:2}
+    .cover .logo-text{font-size:1.5rem;font-weight:800;color:#1f2937}
+    .cover h1{font-size:2rem;font-weight:800;color:#1f2937;margin-bottom:8px}
+    .cover .sub{font-size:1rem;color:#6b7280;margin-bottom:20px}
+    .cover .badge{display:inline-block;background:#e0f7fa;color:#1a96ac;font-size:0.78rem;font-weight:700;padding:4px 14px;border-radius:999px}
+
+    /* Seções */
+    .section{margin-bottom:40px}
+    .section-title{font-size:1.15rem;font-weight:800;color:#1f2937;margin-bottom:16px;display:flex;align-items:center;gap:10px}
+    .section-title .icon{width:32px;height:32px;border-radius:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+    .icon-android{background:#e8f5e9} .icon-ios{background:#e3f2fd} .icon-info{background:#fef9c3} .icon-warn{background:#fef2f2}
+
+    /* Blocos de intro */
+    .intro-box{background:#f0fbfd;border:1px solid #b2ebf2;border-radius:12px;padding:16px 20px;margin-bottom:28px;font-size:0.88rem;color:#0e7490}
+
+    /* Steps */
+    .steps{list-style:none;counter-reset:step}
+    .steps li{counter-increment:step;display:flex;gap:14px;margin-bottom:14px;align-items:flex-start}
+    .steps li::before{content:counter(step);min-width:26px;height:26px;border-radius:50%;background:#2ABCD4;color:#fff;font-size:0.75rem;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px}
+    .steps li .step-body{flex:1}
+    .steps li strong{font-weight:700;color:#111827}
+    .steps li p{color:#4b5563;font-size:0.88rem;margin-top:2px}
+
+    /* Sub-steps (letras) */
+    .substeps{list-style:none;margin-top:8px;padding-left:4px}
+    .substeps li{display:flex;gap:10px;margin-bottom:6px;font-size:0.85rem;color:#374151;align-items:flex-start}
+    .substeps li::before{content:'→';color:#2ABCD4;font-weight:700;flex-shrink:0}
+
+    /* Code / path */
+    code{background:#f3f4f6;color:#be185d;font-size:0.82rem;padding:2px 6px;border-radius:5px;font-family:monospace}
+
+    /* Alert boxes */
+    .alert{border-radius:10px;padding:12px 16px;font-size:0.85rem;margin:16px 0;display:flex;gap:10px;align-items:flex-start}
+    .alert-warn{background:#fffbeb;border:1px solid #fde68a;color:#92400e}
+    .alert-info{background:#eff6ff;border:1px solid #bfdbfe;color:#1e40af}
+    .alert-success{background:#f0fdf4;border:1px solid #bbf7d0;color:#166534}
+    .alert svg{width:18px;height:18px;flex-shrink:0;margin-top:1px}
+
+    /* Tabela de versões */
+    table{width:100%;border-collapse:collapse;font-size:0.87rem;margin-top:12px}
+    th{background:#f9fafb;color:#374151;font-weight:700;padding:10px 14px;text-align:left;border-bottom:2px solid #e5e7eb}
+    td{padding:10px 14px;border-bottom:1px solid #f3f4f6;color:#4b5563}
+    tr:last-child td{border-bottom:none}
+
+    /* Separador de plataforma */
+    .platform-header{display:flex;align-items:center;gap:12px;background:#f9fafb;border:1px solid #e5e7eb;border-radius:12px;padding:14px 18px;margin-bottom:20px}
+    .platform-header .badge-plat{font-size:0.72rem;font-weight:700;padding:3px 10px;border-radius:999px}
+    .badge-android{background:#dcfce7;color:#166534}
+    .badge-ios{background:#dbeafe;color:#1d4ed8}
+    .platform-header h2{font-size:1rem;font-weight:800;color:#111827;margin:0}
+    .platform-header p{font-size:0.78rem;color:#6b7280;margin:0}
+
+    /* Rodapé */
+    .footer{margin-top:56px;padding-top:20px;border-top:1px solid #e5e7eb;text-align:center;font-size:0.78rem;color:#9ca3af}
+
+    /* Checklist de pré-requisitos */
+    .checklist{list-style:none;display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:12px}
+    .checklist li{display:flex;gap:8px;align-items:center;font-size:0.85rem;color:#374151;background:#f9fafb;border:1px solid #e5e7eb;border-radius:8px;padding:8px 12px}
+    .checklist li svg{width:16px;height:16px;color:#2ABCD4;flex-shrink:0;stroke:#2ABCD4;fill:none;stroke-width:2.5}
+
+    /* Print */
+    @media print{
+      body{font-size:12px}
+      .page{padding:24px}
+      .section{page-break-inside:avoid}
+      .platform-header{page-break-before:auto}
+    }
+  </style>
+</head>
+<body>
+<div class="page">
+
+  <!-- CAPA -->
+  <div class="cover">
+    <div class="logo-box">
+      <div class="logo-circle">
+        <svg viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+      </div>
+      <span class="logo-text">Vitta Sistemas</span>
+    </div>
+    <h1>Manual de Publicação</h1>
+    <p class="sub">Guia completo para gerar e publicar novas versões do app nas lojas</p>
+    <span class="badge">Android (Play Store) &nbsp;·&nbsp; iOS (App Store)</span>
+  </div>
+
+  <!-- PRÉ-REQUISITOS -->
+  <div class="section">
+    <div class="section-title">
+      <div class="icon icon-info">
+        <svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="#ca8a04" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+      </div>
+      Pré-requisitos
+    </div>
+    <ul class="checklist">
+      <li>
+        <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+        Android Studio instalado
+      </li>
+      <li>
+        <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+        Xcode instalado (App Store, ~8GB)
+      </li>
+      <li>
+        <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+        Conta Google Play Console
+      </li>
+      <li>
+        <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+        Apple Developer Program ativo
+      </li>
+      <li>
+        <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+        Keystore Android (arquivo .jks)
+      </li>
+      <li>
+        <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+        Certificado "Apple Distribution" no Keychain
+      </li>
+    </ul>
+  </div>
+
+  <!-- ETAPA 0 — ATUALIZAR CÓDIGO -->
+  <div class="section">
+    <div class="section-title">
+      <div class="icon icon-info">
+        <svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="#ca8a04" stroke-width="2"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-3.5"/></svg>
+      </div>
+      Etapa 1 — Atualizar e sincronizar o código
+    </div>
+    <div class="intro-box">
+      Sempre que fizer alterações nos arquivos HTML/JS/CSS, execute estes passos antes de gerar o build.
+    </div>
+    <ol class="steps">
+      <li>
+        <div class="step-body">
+          <strong>Copie os arquivos atualizados para a pasta <code>www/</code></strong>
+          <p>A pasta <code>www/</code> é o que o Capacitor empacota no app. Certifique-se que todas as alterações estão lá.</p>
+        </div>
+      </li>
+      <li>
+        <div class="step-body">
+          <strong>Execute o Capacitor Sync</strong>
+          <p>No terminal, dentro da pasta do projeto:</p>
+          <ul class="substeps" style="margin-top:8px">
+            <li><code>export NVM_DIR="$HOME/.nvm" &amp;&amp; source "$NVM_DIR/nvm.sh"</code></li>
+            <li><code>npx cap sync android</code></li>
+            <li><code>npx cap sync ios</code></li>
+          </ul>
+          <p style="margin-top:6px">Isso copia os arquivos web para os projetos nativos Android e iOS.</p>
+        </div>
+      </li>
+      <li>
+        <div class="step-body">
+          <strong>Incremente a versão do app</strong>
+          <p>A cada nova versão publicada, atualize obrigatoriamente os dois arquivos abaixo:</p>
+          <table style="margin-top:8px">
+            <tr><th>Arquivo</th><th>Campo</th><th>Exemplo</th></tr>
+            <tr><td><code>android/app/build.gradle</code></td><td>versionCode / versionName</td><td>4 / "1.2"</td></tr>
+            <tr><td><code>ios/App/App.xcodeproj/project.pbxproj</code></td><td>CURRENT_PROJECT_VERSION / MARKETING_VERSION</td><td>4 / 1.2</td></tr>
+          </table>
+        </div>
+      </li>
+    </ol>
+    <div class="alert alert-warn">
+      <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+      <span><strong>Importante:</strong> o <code>versionCode</code> no Android e o <code>CURRENT_PROJECT_VERSION</code> no iOS devem ser sempre maiores que a versão anterior. As lojas rejeitam builds com número igual ou menor.</span>
+    </div>
+  </div>
+
+  <!-- ANDROID -->
+  <div class="section">
+    <div class="platform-header">
+      <div>
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:3px">
+          <h2>Android</h2>
+          <span class="badge-plat badge-android">Play Store</span>
+        </div>
+        <p>Gerar AAB assinado e publicar no Google Play Console</p>
+      </div>
+    </div>
+
+    <div class="section-title" style="font-size:0.95rem;margin-bottom:12px">
+      Parte A — Gerar o AAB assinado no Android Studio
+    </div>
+    <ol class="steps">
+      <li>
+        <div class="step-body">
+          <strong>Abra o projeto Android</strong>
+          <p>No Android Studio: <strong>File → Open</strong> → selecione a pasta <code>android/</code> do projeto</p>
+        </div>
+      </li>
+      <li>
+        <div class="step-body">
+          <strong>Acesse o menu de build assinado</strong>
+          <p><strong>Build → Generate Signed Bundle / APK</strong></p>
+        </div>
+      </li>
+      <li>
+        <div class="step-body">
+          <strong>Selecione "Android App Bundle"</strong>
+          <p>O formato AAB (.aab) é obrigatório para novas publicações na Play Store. Clique em <strong>Next</strong>.</p>
+        </div>
+      </li>
+      <li>
+        <div class="step-body">
+          <strong>Informe o Keystore</strong>
+          <ul class="substeps">
+            <li>Clique em <strong>Choose existing...</strong> e selecione o arquivo <code>.jks</code> ou <code>.keystore</code></li>
+            <li>Preencha a <strong>Key store password</strong></li>
+            <li>Selecione o <strong>Key alias</strong> e preencha a <strong>Key password</strong></li>
+            <li>Clique em <strong>Next</strong></li>
+          </ul>
+        </div>
+      </li>
+      <li>
+        <div class="step-body">
+          <strong>Selecione "release" e finalize</strong>
+          <p>Marque <strong>release</strong> como Build Variant e clique em <strong>Finish</strong>.</p>
+          <p>Tempo estimado: <strong>2 a 15 minutos</strong>. Uma notificação aparece ao concluir.</p>
+        </div>
+      </li>
+      <li>
+        <div class="step-body">
+          <strong>Localize o arquivo gerado</strong>
+          <p>Clique em <strong>"locate"</strong> na notificação ou navegue até: <code>android/app/release/app-release.aab</code></p>
+        </div>
+      </li>
+    </ol>
+
+    <div class="section-title" style="font-size:0.95rem;margin-bottom:12px;margin-top:24px">
+      Parte B — Publicar no Google Play Console
+    </div>
+    <ol class="steps">
+      <li>
+        <div class="step-body">
+          <strong>Acesse o Play Console</strong>
+          <p>Abra <strong>play.google.com/console</strong> e selecione o app <strong>Vitta Sistemas</strong></p>
+        </div>
+      </li>
+      <li>
+        <div class="step-body">
+          <strong>Crie uma nova versão</strong>
+          <p>No menu lateral: <strong>Produção → Criar nova versão</strong></p>
+        </div>
+      </li>
+      <li>
+        <div class="step-body">
+          <strong>Faça upload do AAB</strong>
+          <p>Clique em <strong>Adicionar</strong> e selecione o arquivo <code>app-release.aab</code> gerado</p>
+        </div>
+      </li>
+      <li>
+        <div class="step-body">
+          <strong>Preencha as novidades</strong>
+          <p>No campo <strong>"O que há de novo"</strong> descreva as alterações desta versão (ex: "Tela de perfil do usuário e melhorias gerais")</p>
+        </div>
+      </li>
+      <li>
+        <div class="step-body">
+          <strong>Envie para revisão</strong>
+          <p>Clique em <strong>Salvar → Revisar versão → Iniciar lançamento para Produção</strong></p>
+          <p>A revisão leva em geral <strong>algumas horas a 1 dia útil</strong>.</p>
+        </div>
+      </li>
+    </ol>
+  </div>
+
+  <!-- iOS -->
+  <div class="section">
+    <div class="platform-header">
+      <div>
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:3px">
+          <h2>iOS</h2>
+          <span class="badge-plat badge-ios">App Store</span>
+        </div>
+        <p>Gerar Archive e publicar no App Store Connect</p>
+      </div>
+    </div>
+
+    <div class="section-title" style="font-size:0.95rem;margin-bottom:12px">
+      Parte A — Gerar o Archive no Xcode
+    </div>
+    <ol class="steps">
+      <li>
+        <div class="step-body">
+          <strong>Abra o projeto iOS</strong>
+          <p>Abra o arquivo <code>ios/App/App.xcworkspace</code> no Xcode (use sempre o <code>.xcworkspace</code>, nunca o <code>.xcodeproj</code>)</p>
+        </div>
+      </li>
+      <li>
+        <div class="step-body">
+          <strong>Verifique a assinatura</strong>
+          <p>Selecione o target <strong>App</strong> → aba <strong>Signing &amp; Capabilities</strong> → confirme que o <strong>Team</strong> está selecionado com sua conta Apple Developer</p>
+        </div>
+      </li>
+      <li>
+        <div class="step-body">
+          <strong>Selecione o device correto</strong>
+          <p>No seletor de destino (canto superior), selecione <strong>Any iOS Device (arm64)</strong> — nunca um simulador</p>
+        </div>
+      </li>
+      <li>
+        <div class="step-body">
+          <strong>Gere o Archive</strong>
+          <p>Menu <strong>Product → Archive</strong>. Aguarde a compilação (2–10 minutos). O Organizer abrirá automaticamente ao terminar.</p>
+        </div>
+      </li>
+      <li>
+        <div class="step-body">
+          <strong>Distribua o Archive</strong>
+          <ul class="substeps">
+            <li>No Organizer, selecione o build recém-criado</li>
+            <li>Clique em <strong>Distribute App</strong></li>
+            <li>Selecione <strong>App Store Connect</strong> → <strong>Upload</strong></li>
+            <li>Mantenha todas as opções padrão e clique em <strong>Upload</strong></li>
+          </ul>
+        </div>
+      </li>
+    </ol>
+
+    <div class="alert alert-warn" style="margin:16px 0">
+      <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+      <span><strong>Erro "PLA Update":</strong> acesse <strong>developer.apple.com/account</strong>, aceite o novo contrato de licença e aguarde 10 minutos antes de tentar novamente.</span>
+    </div>
+    <div class="alert alert-warn">
+      <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+      <span><strong>Erro "No signing certificate":</strong> no Xcode vá em <strong>Settings → Accounts → Manage Certificates → + → Apple Distribution</strong> para criar o certificado.</span>
+    </div>
+
+    <div class="section-title" style="font-size:0.95rem;margin-bottom:12px;margin-top:24px">
+      Parte B — Publicar no App Store Connect
+    </div>
+    <ol class="steps">
+      <li>
+        <div class="step-body">
+          <strong>Acesse o App Store Connect</strong>
+          <p>Abra <strong>appstoreconnect.apple.com</strong> → <strong>Meus Apps</strong> → selecione <strong>Vitta Sistemas</strong></p>
+        </div>
+      </li>
+      <li>
+        <div class="step-body">
+          <strong>Crie uma nova versão</strong>
+          <p>Clique em <strong>+ Versão ou Plataforma → iOS</strong>, digite o número da versão (ex: <strong>1.2</strong>) e clique em <strong>Criar</strong></p>
+        </div>
+      </li>
+      <li>
+        <div class="step-body">
+          <strong>Preencha "O que há de novo"</strong>
+          <p>Descreva as alterações desta versão para os usuários</p>
+        </div>
+      </li>
+      <li>
+        <div class="step-body">
+          <strong>Adicione o Build</strong>
+          <p>Role até a seção <strong>Build</strong> → clique em <strong>+</strong> → selecione o build enviado pelo Xcode</p>
+          <p>Caso não apareça, aguarde <strong>5–15 minutos</strong> para processar e recarregue a página</p>
+        </div>
+      </li>
+      <li>
+        <div class="step-body">
+          <strong>Envie para revisão</strong>
+          <p>Clique em <strong>Adicionar para Revisão → Enviar para a App Store</strong></p>
+          <p>A Apple leva em média <strong>1 a 3 dias úteis</strong> para revisar.</p>
+        </div>
+      </li>
+    </ol>
+  </div>
+
+  <!-- TABELA DE CONTROLE -->
+  <div class="section">
+    <div class="section-title">
+      <div class="icon icon-info">
+        <svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="#ca8a04" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="9" y1="21" x2="9" y2="9"/></svg>
+      </div>
+      Controle de Versões
+    </div>
+    <table>
+      <tr>
+        <th>Versão</th>
+        <th>Build (versionCode)</th>
+        <th>Data</th>
+        <th>Alterações</th>
+      </tr>
+      <tr>
+        <td>1.0</td>
+        <td>1</td>
+        <td>—</td>
+        <td>Versão inicial</td>
+      </tr>
+      <tr>
+        <td>1.1</td>
+        <td>3</td>
+        <td>—</td>
+        <td>Melhorias gerais</td>
+      </tr>
+      <tr>
+        <td>1.2</td>
+        <td>4</td>
+        <td>Jun/2026</td>
+        <td>Tela de perfil do usuário · Remoção do botão "Criar conta" no app</td>
+      </tr>
+      <tr style="color:#9ca3af">
+        <td>1.3</td>
+        <td>5</td>
+        <td></td>
+        <td></td>
+      </tr>
+      <tr style="color:#9ca3af">
+        <td>1.4</td>
+        <td>6</td>
+        <td></td>
+        <td></td>
+      </tr>
+    </table>
+    <div class="alert alert-info" style="margin-top:16px">
+      <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+      <span>Preencha esta tabela a cada nova versão publicada para manter o histórico organizado.</span>
+    </div>
+  </div>
+
+  <!-- CHECKLIST RÁPIDO -->
+  <div class="section">
+    <div class="section-title">
+      <div class="icon icon-info">
+        <svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="#ca8a04" stroke-width="2"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+      </div>
+      Checklist Rápido — A cada nova versão
+    </div>
+    <table>
+      <tr><th style="width:40px"></th><th>Tarefa</th><th>Plataforma</th></tr>
+      <tr><td>☐</td><td>Atualizar arquivos na pasta <code>www/</code></td><td>Ambas</td></tr>
+      <tr><td>☐</td><td>Rodar <code>npx cap sync android</code></td><td>Android</td></tr>
+      <tr><td>☐</td><td>Rodar <code>npx cap sync ios</code></td><td>iOS</td></tr>
+      <tr><td>☐</td><td>Incrementar <code>versionCode</code> e <code>versionName</code> no <code>build.gradle</code></td><td>Android</td></tr>
+      <tr><td>☐</td><td>Incrementar <code>CURRENT_PROJECT_VERSION</code> e <code>MARKETING_VERSION</code> no Xcode</td><td>iOS</td></tr>
+      <tr><td>☐</td><td>Gerar AAB assinado no Android Studio</td><td>Android</td></tr>
+      <tr><td>☐</td><td>Fazer upload do AAB no Play Console</td><td>Android</td></tr>
+      <tr><td>☐</td><td>Gerar Archive no Xcode (Product → Archive)</td><td>iOS</td></tr>
+      <tr><td>☐</td><td>Fazer upload via Distribute App no Xcode</td><td>iOS</td></tr>
+      <tr><td>☐</td><td>Criar nova versão e submeter para revisão no App Store Connect</td><td>iOS</td></tr>
+      <tr><td>☐</td><td>Atualizar a tabela de controle de versões neste manual</td><td>Ambas</td></tr>
+    </table>
+  </div>
+
+  <div class="footer">
+    Vitta Sistemas &nbsp;·&nbsp; Manual de Publicação &nbsp;·&nbsp; Versão do documento: Jun/2026
+  </div>
+
+</div>
+
+<script>
+  // Abre dialog de impressão automaticamente ao carregar
+  // Remova esta linha se não quiser o dialog automático
+  // window.onload = () => window.print();
+</script>
+</body>
+</html>

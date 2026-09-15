@@ -1,0 +1,58 @@
+name: Deploy Vitta Sistemas
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  deploy-app:
+    name: Deploy sistema (app.vittasistemas.com.br)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Deploy via FTP
+        uses: SamKirkland/FTP-Deploy-Action@v4.3.5
+        with:
+          server: ${{ secrets.FTP_SERVER }}
+          username: ${{ secrets.FTP_USERNAME }}
+          password: ${{ secrets.FTP_PASSWORD }}
+          server-dir: ${{ secrets.FTP_SERVER_DIR_APP }}
+          local-dir: ./
+          exclude: |
+            **/.git*
+            **/.git*/**
+            **/.github/**
+            **/node_modules/**
+            **/android/**
+            **/ios/**
+            **/www/**
+            **/bi/**
+            **/supabase/**
+            **/.claude/**
+            **/.vscode/**
+            **/Documentos/**
+            **/Recuperados/**
+            **/Arquivo.zip
+            **/*.md
+
+  deploy-bi:
+    name: Deploy BI (bi.vittasistemas.com.br)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Deploy via FTP
+        uses: SamKirkland/FTP-Deploy-Action@v4.3.5
+        with:
+          server: ${{ secrets.FTP_SERVER }}
+          username: ${{ secrets.FTP_USERNAME }}
+          password: ${{ secrets.FTP_PASSWORD }}
+          server-dir: ${{ secrets.FTP_SERVER_DIR_BI }}
+          local-dir: ./bi/
+          exclude: |
+            **/.git*
+            **/Arquivo.zip
+            **/*.md

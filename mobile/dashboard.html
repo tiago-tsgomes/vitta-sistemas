@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover"/>
+  <title>Início — Vitta</title>
+  <link rel="icon" type="image/png" href="../img/favicon.png"/>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>tailwind.config={theme:{extend:{colors:{vitta:{50:'#f0fbfd',100:'#e0f7fa',400:'#4dd9ed',500:'#2ABCD4',600:'#1a96ac',700:'#127a8c'}},fontFamily:{sans:['Inter','system-ui','sans-serif']}}}}</script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+  <script src="../assets/js/config.js"></script>
+  <link rel="stylesheet" href="../assets/css/mobile-dark.css"/>
+  <script src="../assets/js/mobile-utils.js"></script>
+  <style>
+    *{-webkit-tap-highlight-color:transparent}
+    body{overscroll-behavior-y:none}
+    ::-webkit-scrollbar{display:none}
+    .safe-top{padding-top:env(safe-area-inset-top)}
+    @keyframes fadeUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+    .fade-up{animation:fadeUp .3s ease forwards}
+  </style>
+</head>
+<body class="bg-[#F0F2F5] font-sans antialiased">
+
+<!-- HEADER -->
+<header class="fixed top-0 left-0 right-0 z-20 bg-white border-b border-gray-100 safe-top">
+  <div class="flex items-center px-4 h-14 gap-3">
+    <img src="../img/logo.png" class="h-7 w-auto"/>
+    <div class="flex-1">
+      <p id="hdr-greeting" class="text-[0.88rem] font-bold text-gray-800 leading-none"></p>
+      <p id="hdr-date" class="text-[0.65rem] text-gray-400 mt-0.5"></p>
+    </div>
+    <button id="btn-dark-toggle" class="w-8 h-8 rounded-xl bg-gray-100 text-gray-500 flex items-center justify-center shrink-0"></button>
+    <button onclick="window.location.href='perfil.html'" class="w-8 h-8 rounded-full bg-vitta-500 flex items-center justify-center text-white text-xs font-bold shrink-0" id="hdr-av">A</button>
+  </div>
+</header>
+
+<!-- MAIN -->
+<main class="pt-14 pb-20 px-4 space-y-4" style="padding-top:calc(56px + env(safe-area-inset-top));padding-bottom:calc(80px + env(safe-area-inset-bottom))">
+
+  <!-- Stats -->
+  <div class="grid grid-cols-3 gap-2.5 fade-up pt-4">
+    <div class="bg-white rounded-2xl p-3 text-center border border-gray-100 shadow-sm">
+      <p id="stat-total" class="text-[1.5rem] font-extrabold text-gray-800 leading-none">—</p>
+      <p class="text-[0.6rem] text-gray-400 mt-1 font-semibold uppercase tracking-wide">Hoje</p>
+    </div>
+    <div class="bg-white rounded-2xl p-3 text-center border border-gray-100 shadow-sm">
+      <p id="stat-conf" class="text-[1.5rem] font-extrabold text-emerald-500 leading-none">—</p>
+      <p class="text-[0.6rem] text-gray-400 mt-1 font-semibold uppercase tracking-wide">Confirm.</p>
+    </div>
+    <div class="bg-white rounded-2xl p-3 text-center border border-gray-100 shadow-sm">
+      <p id="stat-real" class="text-[1.5rem] font-extrabold text-vitta-500 leading-none">—</p>
+      <p class="text-[0.6rem] text-gray-400 mt-1 font-semibold uppercase tracking-wide">Realiz.</p>
+    </div>
+  </div>
+
+  <!-- Próxima consulta -->
+  <div id="card-proxima" class="hidden fade-up">
+    <div class="flex items-center justify-between mb-2 px-1">
+      <p class="text-[0.72rem] font-bold text-gray-500 uppercase tracking-wider">Próxima Consulta</p>
+      <a href="agenda.html" class="text-[0.72rem] font-semibold text-vitta-500">Ver agenda →</a>
+    </div>
+    <div id="proxima-content" class="bg-gradient-to-br from-vitta-500 to-vitta-600 rounded-2xl p-4 shadow-md"></div>
+  </div>
+
+  <!-- Agenda de hoje -->
+  <div class="fade-up">
+    <div class="flex items-center justify-between mb-2 px-1">
+      <p class="text-[0.72rem] font-bold text-gray-500 uppercase tracking-wider">Agenda de Hoje</p>
+      <a href="agenda.html" class="text-[0.72rem] font-semibold text-vitta-500">Ver tudo →</a>
+    </div>
+    <div id="agenda-list" class="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
+      <div id="agenda-skeleton" class="divide-y divide-gray-50">
+        <div class="flex items-center gap-3 px-4 py-3.5"><div class="w-10 h-4 rounded bg-gray-200 shrink-0"></div><div class="w-8 h-8 rounded-xl bg-gray-200 shrink-0"></div><div class="flex-1 space-y-2"><div class="h-3 rounded-full bg-gray-200 w-3/4"></div><div class="h-2.5 rounded-full bg-gray-200 w-1/2"></div></div></div>
+        <div class="flex items-center gap-3 px-4 py-3.5"><div class="w-10 h-4 rounded bg-gray-200 shrink-0"></div><div class="w-8 h-8 rounded-xl bg-gray-200 shrink-0"></div><div class="flex-1 space-y-2"><div class="h-3 rounded-full bg-gray-200 w-2/3"></div><div class="h-2.5 rounded-full bg-gray-200 w-2/5"></div></div></div>
+        <div class="flex items-center gap-3 px-4 py-3.5"><div class="w-10 h-4 rounded bg-gray-200 shrink-0"></div><div class="w-8 h-8 rounded-xl bg-gray-200 shrink-0"></div><div class="flex-1 space-y-2"><div class="h-3 rounded-full bg-gray-200 w-4/5"></div><div class="h-2.5 rounded-full bg-gray-200 w-1/3"></div></div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Aniversariantes do Mês -->
+  <div class="fade-up">
+    <div class="flex items-center justify-between mb-2 px-1">
+      <div class="flex items-center gap-2">
+        <p class="text-[0.72rem] font-bold text-gray-500 uppercase tracking-wider">Aniversariantes do Mês</p>
+        <span id="aniv-badge" class="hidden bg-pink-500 text-white text-[0.6rem] font-bold px-1.5 py-0.5 rounded-full min-w-[18px] text-center"></span>
+      </div>
+      <p id="aniv-mes-label" class="text-[0.65rem] text-gray-400 capitalize"></p>
+    </div>
+    <div id="aniv-list" class="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
+      <div class="flex items-center justify-center gap-2 h-16 text-gray-400 text-sm">
+        <svg class="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"/></svg>
+        Carregando...
+      </div>
+    </div>
+  </div>
+
+  <!-- Acesso rápido -->
+  <div class="grid grid-cols-2 gap-2.5 fade-up">
+    <a href="consultas.html" class="bg-vitta-500 text-white rounded-2xl p-4 flex flex-col gap-2 shadow-sm active:bg-vitta-600 transition-colors">
+      <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+      <p class="text-[0.82rem] font-bold">Iniciar Consulta</p>
+    </a>
+    <a href="pacientes.html" class="bg-white text-gray-700 rounded-2xl p-4 flex flex-col gap-2 border border-gray-100 shadow-sm active:bg-gray-50 transition-colors">
+      <svg class="w-6 h-6 text-vitta-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>
+      <p class="text-[0.82rem] font-bold">Meus Pacientes</p>
+    </a>
+  </div>
+
+</main>
+
+<!-- BOTTOM NAV -->
+<nav class="fixed bottom-0 left-0 right-0 z-20 bg-white border-t border-gray-100" style="padding-bottom:env(safe-area-inset-bottom)">
+  <div class="flex h-16">
+    <a href="dashboard.html" class="nav-tab active flex-1 flex flex-col items-center justify-center gap-0.5 text-vitta-500">
+      <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+      <span class="text-[0.55rem] font-bold">Início</span>
+    </a>
+    <a href="agenda.html" class="flex-1 flex flex-col items-center justify-center gap-0.5 text-gray-400">
+      <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+      <span class="text-[0.55rem] font-semibold">Agenda</span>
+    </a>
+    <a href="consultas.html" class="flex-1 flex flex-col items-center justify-center gap-0.5 text-gray-400">
+      <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+      <span class="text-[0.55rem] font-semibold">Consultas</span>
+    </a>
+    <a href="pacientes.html" class="flex-1 flex flex-col items-center justify-center gap-0.5 text-gray-400">
+      <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>
+      <span class="text-[0.55rem] font-semibold">Pacientes</span>
+    </a>
+    <a href="financeiro.html" class="flex-1 flex flex-col items-center justify-center gap-0.5 text-gray-400">
+      <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+      <span class="text-[0.55rem] font-semibold">Financeiro</span>
+    </a>
+  </div>
+</nav>
+
+<script>
+const AV_COLORS=['bg-blue-500','bg-emerald-500','bg-violet-500','bg-amber-500','bg-rose-500','bg-cyan-500'];
+const STATUS_BADGE={AGENDADO:'bg-blue-100 text-blue-700',CONFIRMADA:'bg-emerald-100 text-emerald-700',REALIZADA:'bg-vitta-100 text-vitta-700',FALTA:'bg-red-100 text-red-700',SEM_VALOR:'bg-amber-100 text-amber-700',FEEDBACK:'bg-pink-100 text-pink-700'};
+const STATUS_LABEL={AGENDADO:'Agendado',CONFIRMADA:'Confirmada',REALIZADA:'Realizada',FALTA:'Falta',SEM_VALOR:'Sem Valor',FEEDBACK:'Feedback'};
+
+function avColor(n){let h=0;for(const c of(n||''))h=(h<<5)-h+c.charCodeAt(0);return AV_COLORS[Math.abs(h)%AV_COLORS.length];}
+function initials(n){return(n||'').split(' ').filter(Boolean).slice(0,2).map(w=>w[0]).join('').toUpperCase();}
+function fmtTime(dt){return new Date(dt).toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'});}
+async function handleLogout(){
+  try { await Capacitor.Plugins.Preferences.remove({ key: 'vitta_session' }); } catch(e) {}
+  await supabase.auth.signOut();
+  window.location.href='../index.html';
+}
+setupDarkToggle();
+
+async function loadAniversariantes(profId, idEmp){
+  const el=document.getElementById('aniv-list');
+  const now=new Date(), curMes=now.getMonth()+1;
+
+  document.getElementById('aniv-mes-label').textContent=now.toLocaleDateString('pt-BR',{month:'long',year:'numeric'});
+
+  // Pacientes vinculados ao profissional
+  const {data:pp}=await supabase.from('PACIENTE_PROFISSIONAL').select('PAC_ID').eq('PROF_ID',profId);
+  const pacIds=(pp||[]).map(r=>r.PAC_ID);
+  if(!pacIds.length){el.innerHTML='<div class="py-6 text-center text-gray-400 text-sm">Nenhum paciente vinculado</div>';return;}
+
+  const {data:pacs}=await supabase.from('PACIENTE')
+    .select('ID_PAC,NOME_PAC,DTNASC_PAC,TEL_PAC')
+    .in('ID_PAC',pacIds).eq('ATIVO_PAC',true).not('DTNASC_PAC','is',null);
+
+  // Filtrar aniversariantes do mês
+  const mesados=(pacs||[])
+    .filter(p=>{const m=parseInt(p.DTNASC_PAC.split('-')[1],10);return m===curMes;})
+    .sort((a,b)=>parseInt(a.DTNASC_PAC.split('-')[2],10)-parseInt(b.DTNASC_PAC.split('-')[2],10));
+
+  const badge=document.getElementById('aniv-badge');
+  badge.textContent=mesados.length||'';
+  badge.classList.toggle('hidden',!mesados.length);
+
+  if(!mesados.length){
+    el.innerHTML='<div class="py-6 text-center text-gray-400 text-sm">Nenhum aniversariante este mês</div>';
+    return;
+  }
+
+  // Semana atual (seg–dom)
+  const dow=now.getDay();
+  const wStart=new Date(now);wStart.setDate(now.getDate()-(dow===0?6:dow-1));wStart.setHours(0,0,0,0);
+  const wEnd=new Date(wStart);wEnd.setDate(wStart.getDate()+6);wEnd.setHours(23,59,59,999);
+
+  el.innerHTML=mesados.map(p=>{
+    const parts=p.DTNASC_PAC.split('-');
+    const dd=parseInt(parts[2],10), mm=parseInt(parts[1],10);
+    const dtBd=new Date(now.getFullYear(),now.getMonth(),dd);
+    const isHoje=dd===now.getDate()&&mm===curMes;
+    const isNesta=dtBd>=wStart&&dtBd<=wEnd;
+    const ini=initials(p.NOME_PAC);
+    return `<a href="prontuario.html?pac=${p.ID_PAC}" class="flex items-center gap-3 px-4 py-3 border-b border-gray-50 last:border-0 active:bg-gray-50 ${isHoje?'bg-pink-50':''}">
+      <div class="w-9 h-9 rounded-full ${isHoje?'bg-pink-400':'bg-pink-100'} flex items-center justify-center shrink-0 text-[0.7rem] font-bold ${isHoje?'text-white':'text-pink-500'}">
+        ${isHoje?'🎂':ini}
+      </div>
+      <div class="flex-1 min-w-0">
+        <p class="text-[0.85rem] font-semibold text-gray-800 truncate">${p.NOME_PAC}${isHoje?' 🎉':''}</p>
+        <p class="text-[0.7rem] text-gray-400">${p.TEL_PAC||''}</p>
+      </div>
+      <div class="shrink-0 text-right">
+        <span class="text-[0.68rem] font-bold text-pink-600 bg-pink-50 px-2 py-0.5 rounded-full">🎂 ${String(dd).padStart(2,'0')}/${String(mm).padStart(2,'0')}</span>
+        ${isNesta&&!isHoje?'<p class="text-[0.6rem] text-pink-400 mt-0.5 text-right">Esta semana</p>':''}
+      </div>
+    </a>`;
+  }).join('');
+}
+
+let _profId, _idEmp;
+
+async function loadDashboard() {
+  if (!_profId) return;
+  const now=new Date();
+  const d0=new Date(now.getFullYear(),now.getMonth(),now.getDate()).toISOString();
+  const d1=new Date(now.getFullYear(),now.getMonth(),now.getDate(),23,59,59,999).toISOString();
+  const {data:agds}=await supabase.from('AGENDAMENTO')
+    .select('ID_AGD,DT_AGD,DT_FIM_AGD,STATUS_AGD,TIPO_AGD,PAC_AGD,PACIENTE!PAC_AGD(NOME_PAC,DTNASC_PAC)')
+    .eq('ID_EMP',_idEmp).eq('PROF_AGD',_profId)
+    .gte('DT_AGD',d0).lte('DT_AGD',d1).order('DT_AGD');
+  const all=agds||[];
+  document.getElementById('stat-total').textContent=all.length;
+  document.getElementById('stat-conf').textContent=all.filter(a=>a.STATUS_AGD==='CONFIRMADA').length;
+  document.getElementById('stat-real').textContent=all.filter(a=>a.STATUS_AGD==='REALIZADA').length;
+  const proxima=all.find(a=>a.STATUS_AGD==='CONFIRMADA'&&new Date(a.DT_AGD)>now);
+  if(proxima){
+    const pac=proxima.PACIENTE||{};
+    document.getElementById('card-proxima').classList.remove('hidden');
+    document.getElementById('proxima-content').innerHTML=`
+      <div class="flex items-center gap-3">
+        <div class="w-11 h-11 rounded-xl bg-white/20 flex items-center justify-center text-white font-bold text-sm shrink-0">${initials(pac.NOME_PAC)}</div>
+        <div class="flex-1 min-w-0">
+          <p class="text-white font-bold text-[0.95rem] truncate">${pac.NOME_PAC||'—'}</p>
+          <p class="text-vitta-100 text-[0.75rem]">${fmtTime(proxima.DT_AGD)} · ${proxima.TIPO_AGD==='ONLINE'?'Online':'Presencial'}</p>
+        </div>
+        <a href="consultas.html" class="shrink-0 bg-white/20 text-white text-[0.72rem] font-bold px-3 py-1.5 rounded-xl active:bg-white/30">Atender</a>
+      </div>`;
+  }
+  const el=document.getElementById('agenda-list');
+  document.getElementById('agenda-skeleton')?.remove();
+  if(!all.length){
+    el.innerHTML='<div class="py-10 text-center text-gray-400 text-sm">Nenhuma consulta hoje</div>';
+  } else {
+    el.innerHTML=all.map(a=>{
+      const pac=a.PACIENTE||{};
+      const bs=STATUS_BADGE[a.STATUS_AGD]||'bg-gray-100 text-gray-600';
+      const bl=STATUS_LABEL[a.STATUS_AGD]||a.STATUS_AGD;
+      return `<div class="flex items-center gap-3 px-4 py-3.5 border-b border-gray-50 last:border-0">
+        <div class="text-[0.78rem] font-bold text-vitta-600 w-10 shrink-0">${fmtTime(a.DT_AGD)}</div>
+        <div class="${avColor(pac.NOME_PAC)} w-8 h-8 rounded-xl flex items-center justify-center text-white text-[0.65rem] font-bold shrink-0">${initials(pac.NOME_PAC)}</div>
+        <div class="flex-1 min-w-0">
+          <p class="text-[0.85rem] font-semibold text-gray-800 truncate">${pac.NOME_PAC||'—'}</p>
+          <p class="text-[0.7rem] text-gray-400">${a.TIPO_AGD==='ONLINE'?'🌐 Online':'🏥 Presencial'}</p>
+        </div>
+        <span class="text-[0.65rem] font-bold ${bs} px-2 py-0.5 rounded-full shrink-0">${bl}</span>
+      </div>`;
+    }).join('');
+  }
+  scheduleAppointmentNotifications(all);
+  loadAniversariantes(_profId, _idEmp);
+}
+
+(async()=>{
+  const {data:{session}}=await supabase.auth.getSession();
+  if(!session){window.location.href='../index.html';return;}
+  const meta=session.user.user_metadata;
+  if(!['PROFISSIONAL','ADMIN_EMPRESA'].includes(meta.tipo_usu)){window.location.href='access-denied.html';return;}
+
+  const u=await getUsuarioAtual('PROF_USU,NOME_USU,ID_EMP',session);
+  if(meta.tipo_usu==='ADMIN_EMPRESA' && !u?.PROF_USU){window.location.href='access-denied.html';return;}
+  _profId=u?.PROF_USU; _idEmp=u?.ID_EMP||meta.id_emp;
+  const nome=u?.NOME_USU||meta.nome_usu||session.user.email;
+  document.getElementById('hdr-av').textContent=initials(nome);
+  document.getElementById('hdr-greeting').textContent='Olá, '+nome.split(' ')[0];
+  document.getElementById('hdr-date').textContent=new Date().toLocaleDateString('pt-BR',{weekday:'long',day:'numeric',month:'long'});
+
+  await loadDashboard();
+  initPullToRefresh(loadDashboard);
+})();
+</script>
+</body>
+</html>

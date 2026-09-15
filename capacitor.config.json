@@ -1,0 +1,15 @@
+{
+  "appId": "com.vittasistemas.app",
+  "appName": "Vitta Sistemas",
+  "webDir": "www",
+  "server": {
+    "url": "https://app.vittasistemas.com.br"
+  },
+  "ios": {
+    "contentInset": "automatic",
+    "allowsLinkPreview": false
+  },
+  "android": {
+    "allowMixedContent": true
+  }
+}

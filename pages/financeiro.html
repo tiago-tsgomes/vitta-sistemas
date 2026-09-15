@@ -1,0 +1,1406 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>Financeiro &mdash; Vitta Sistemas</title>
+  <link rel="icon" type="image/png" href="../img/favicon.png" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: { vitta: { 50:'#f0fbfd',100:'#e0f7fa',300:'#80deea',400:'#4dd9ed',500:'#2ABCD4',600:'#1a96ac',700:'#127a8c' } },
+          fontFamily: { sans: ['Inter','system-ui','sans-serif'] }
+        }
+      }
+    }
+  </script>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+  <script src="../assets/js/config.js?v=2"></script>
+  <script src="../assets/js/access-guard.js?v=2"></script>
+  <script src="../assets/js/admin-empresa-context.js?v=1"></script>
+  <script src="../assets/js/notifications.js?v=3"></script>
+  <style>
+    .sidebar-nav::-webkit-scrollbar{width:3px}
+    .sidebar-nav::-webkit-scrollbar-thumb{background:rgba(255,255,255,.1);border-radius:4px}
+    .submenu{overflow:hidden;max-height:0;opacity:0;transition:max-height .25s ease,opacity .2s ease}
+    .submenu.open{max-height:500px;opacity:1}
+    .chevron{transition:transform .25s ease;display:inline-block}
+    .chevron.open{transform:rotate(180deg)}
+    .modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:300;align-items:flex-start;justify-content:center;padding:24px 16px;overflow-y:auto}
+    .modal-overlay.open{display:flex}
+    #toast{position:fixed;bottom:24px;right:24px;z-index:999;transition:all .3s ease}
+    .tab-btn{border-bottom:2px solid transparent;transition:all .15s}
+    .tab-btn.active{color:#2ABCD4;border-bottom-color:#2ABCD4}
+    .table-scroll::-webkit-scrollbar{height:4px}
+    .table-scroll::-webkit-scrollbar-thumb{background:#e5e7eb;border-radius:4px}
+    tr:hover td{background:#f9fafb}
+    .drop-zone{border:2px dashed #d1d5db;border-radius:12px;transition:all .2s}
+    .drop-zone.dragover{border-color:#2ABCD4;background:#f0fbfd}
+  </style>
+</head>
+
+<body class="bg-[#F0F2F5] font-sans antialiased">
+<div class="flex min-h-screen">
+
+<!-- ===== SIDEBAR ===== -->
+<aside id="sidebar" class="fixed inset-y-0 left-0 w-[220px] bg-[#111827] flex flex-col z-30 -translate-x-full lg:translate-x-0 transition-transform duration-300">
+  <div class="flex flex-col items-center justify-center gap-1 py-4 px-5 border-b border-white/10 shrink-0">
+    <img src="../img/logo.png" alt="Vitta Sistemas" class="h-10 w-auto brightness-0 invert" />
+    <p class="text-[0.6rem] text-gray-500 tracking-wide">v1.2.1</p>
+  </div>
+  <nav class="flex-1 overflow-y-auto sidebar-nav py-3">
+    <p class="block text-[0.6rem] font-bold text-gray-500 uppercase tracking-widest px-4 pb-1 pt-3">Principal</p>
+    <a href="dashboard.html" class="flex items-center gap-3 px-3 py-2.5 mx-2 rounded-xl text-[0.83rem] font-medium text-gray-400 hover:bg-white/10 hover:text-white transition-colors duration-150 mb-0.5">
+      <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>Dashboard
+    </a>
+    <a href="agendamentos.html" class="flex items-center gap-3 px-3 py-2.5 mx-2 rounded-xl text-[0.83rem] font-medium text-gray-400 hover:bg-white/10 hover:text-white transition-colors duration-150 mb-0.5">
+      <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>Agendamentos
+    </a>
+    <a href="consultas.html" class="flex items-center gap-3 px-3 py-2.5 mx-2 rounded-xl text-[0.83rem] font-medium text-gray-400 hover:bg-white/10 hover:text-white transition-colors duration-150 mb-0.5">
+      <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>Consultas
+    </a>
+
+    <p class="block text-[0.6rem] font-bold text-gray-500 uppercase tracking-widest px-4 pb-1 pt-4">Cadastros</p>
+    <button onclick="toggleMenu('cadastros')" class="w-full flex items-center gap-3 px-3 py-2.5 mx-2 rounded-xl text-[0.83rem] font-medium text-gray-400 hover:bg-white/10 hover:text-white transition-colors duration-150 mb-0.5" style="width:calc(100% - 16px)">
+      <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>Cadastros
+      <svg id="chev-cadastros" class="chevron w-3.5 h-3.5 ml-auto text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+    </button>
+    <div id="sub-cadastros" class="submenu">
+      <a href="pacientes.html" class="flex items-center gap-2 pl-10 pr-3 py-2 mx-2 rounded-xl text-[0.8rem] text-gray-500 hover:bg-white/5 hover:text-gray-300 transition-colors cursor-pointer">Pacientes</a>
+      <a href="profissionais.html" class="flex items-center gap-2 pl-10 pr-3 py-2 mx-2 rounded-xl text-[0.8rem] text-gray-500 hover:bg-white/5 hover:text-gray-300 transition-colors cursor-pointer">Profissionais</a>
+      <a href="usuarios-empresa.html" class="flex items-center gap-2 pl-10 pr-3 py-2 mx-2 rounded-xl text-[0.8rem] text-gray-500 hover:bg-white/5 hover:text-gray-300 transition-colors cursor-pointer">Usu&aacute;rios</a>
+      <div class="hidden" id="menuDocumentosWrap"><a href="documentos.html" class="flex items-center gap-2 pl-10 pr-3 py-2 mx-2 rounded-xl text-[0.8rem] text-gray-500 hover:bg-white/5 hover:text-gray-300 transition-colors cursor-pointer w-full">Documentos</a></div>
+      <a href="leads.html" class="flex items-center gap-2 pl-10 pr-3 py-2 mx-2 rounded-xl text-[0.8rem] text-gray-500 hover:bg-white/5 hover:text-gray-300 transition-colors cursor-pointer">Leads</a>
+    </div>
+
+    <p class="block text-[0.6rem] font-bold text-gray-500 uppercase tracking-widest px-4 pb-1 pt-4">Outros Cadastros</p>
+    <button onclick="toggleMenu('servicos')" class="w-full flex items-center gap-3 px-3 py-2.5 mx-2 rounded-xl text-[0.83rem] font-medium text-gray-400 hover:bg-white/10 hover:text-white transition-colors duration-150 cursor-pointer mb-0.5" style="width:calc(100% - 16px)">
+      <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>Outros Cadastros
+      <svg id="chev-servicos" class="chevron w-3.5 h-3.5 ml-auto text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+    </button>
+    <div id="sub-servicos" class="submenu">
+      <a href="servicos.html" class="flex items-center gap-2 pl-10 pr-3 py-2 mx-2 rounded-xl text-[0.8rem] text-gray-500 hover:bg-white/5 hover:text-gray-300 transition-colors cursor-pointer">Serviços</a>
+      <a href="salas.html" class="flex items-center gap-2 pl-10 pr-3 py-2 mx-2 rounded-xl text-[0.8rem] text-gray-500 hover:bg-white/5 hover:text-gray-300 transition-colors cursor-pointer">Salas</a>
+      <a href="especialidades.html" class="flex items-center gap-2 pl-10 pr-3 py-2 mx-2 rounded-xl text-[0.8rem] text-gray-500 hover:bg-white/5 hover:text-gray-300 transition-colors cursor-pointer">Especialidades</a>
+      <a href="grupo.html" class="flex items-center gap-2 pl-10 pr-3 py-2 mx-2 rounded-xl text-[0.8rem] text-gray-500 hover:bg-white/5 hover:text-gray-300 transition-colors cursor-pointer">Grupo</a>
+      <a href="tipospagamento.html" class="flex items-center gap-2 pl-10 pr-3 py-2 mx-2 rounded-xl text-[0.8rem] text-gray-500 hover:bg-white/5 hover:text-gray-300 transition-colors cursor-pointer">Tipos de Pagamento</a>
+      <a href="tiposacompanhamento.html" class="flex items-center gap-2 pl-10 pr-3 py-2 mx-2 rounded-xl text-[0.8rem] text-gray-500 hover:bg-white/5 hover:text-gray-300 transition-colors cursor-pointer">Tipos de Acomp.</a>
+    </div>
+
+    <p class="block text-[0.6rem] font-bold text-gray-500 uppercase tracking-widest px-4 pb-1 pt-4">Financeiro</p>
+    <button onclick="toggleMenu('financeiro')" class="w-full flex items-center gap-3 px-3 py-2.5 mx-2 rounded-xl text-[0.83rem] font-semibold text-vitta-400 bg-vitta-500/10 transition-colors duration-150 cursor-pointer mb-0.5" style="width:calc(100% - 16px)">
+      <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>Financeiro
+      <svg id="chev-financeiro" class="chevron open w-3.5 h-3.5 ml-auto text-vitta-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+    </button>
+    <div id="sub-financeiro" class="submenu open">
+      <a href="financeiro.html" class="flex items-center gap-2 pl-10 pr-3 py-2 mx-2 rounded-xl text-[0.8rem] font-semibold text-vitta-400 bg-vitta-500/10 transition-colors cursor-pointer">Lan&ccedil;amentos</a>
+      <a href="relatorios.html" class="flex items-center gap-2 pl-10 pr-3 py-2 mx-2 rounded-xl text-[0.8rem] text-gray-500 hover:bg-white/5 hover:text-gray-300 transition-colors cursor-pointer">Relat&oacute;rios</a>
+    </div>
+
+
+    <div id="sectionMinhaEmpresa" class="hidden">
+    <p class="block text-[0.6rem] font-bold text-gray-500 uppercase tracking-widest px-4 pb-1 pt-4">Minha Empresa</p>
+    <button onclick="toggleMenu('minhaempresa')" class="w-full flex items-center gap-3 px-3 py-2.5 mx-2 rounded-xl text-[0.83rem] font-medium text-gray-400 hover:bg-white/10 hover:text-white transition-colors duration-150 cursor-pointer mb-0.5" style="width:calc(100% - 16px)">
+      <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>Minha Empresa
+      <svg id="chev-minhaempresa" class="chevron w-3.5 h-3.5 ml-auto text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+    </button>
+    <div id="sub-minhaempresa" class="submenu">
+      <a href="minha-empresa.html" class="flex items-center gap-2 pl-10 pr-3 py-2 mx-2 rounded-xl text-[0.8rem] text-gray-500 hover:bg-white/5 hover:text-gray-300 transition-colors cursor-pointer">Meus Dados</a>
+      <a href="faturas.html" class="flex items-center gap-2 pl-10 pr-3 py-2 mx-2 rounded-xl text-[0.8rem] text-gray-500 hover:bg-white/5 hover:text-gray-300 transition-colors cursor-pointer">Minhas Faturas</a>
+    </div>
+    </div>
+    <div id="sectionVittaBI" class="hidden">
+    <p class="block text-[0.6rem] font-bold text-gray-500 uppercase tracking-widest px-4 pb-1 pt-4">Vitta BI</p>
+    <a id="linkVittaBI" href="https://bi.vittasistemas.com.br" target="_blank" rel="noopener"
+       class="flex items-center gap-3 px-3 py-2.5 mx-2 rounded-xl text-[0.83rem] font-medium text-gray-400 hover:bg-white/10 hover:text-white transition-colors duration-150 cursor-pointer mb-0.5">
+      <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+        <path d="M3 3v18h18"/><path d="M18.7 8l-5.3 5.3-3-3L4 16.3"/>
+      </svg>
+      Vitta BI
+      <span class="ml-auto text-[0.55rem] font-bold text-violet-300 bg-violet-500/20 px-1.5 py-0.5 rounded">BI</span>
+    </a>
+    </div>
+
+    <div id="sectionAdmin" class="hidden">
+    <p class="block text-[0.6rem] font-bold text-gray-500 uppercase tracking-widest px-4 pb-1 pt-4">Sistema</p>
+    <button onclick="toggleMenu('admin')" class="w-full flex items-center gap-3 px-3 py-2.5 mx-2 rounded-xl text-[0.83rem] font-medium text-gray-400 hover:bg-white/10 hover:text-white transition-colors duration-150 mb-0.5" style="width:calc(100% - 16px)">
+      <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14M4.93 4.93a10 10 0 0 0 0 14.14"/></svg>Administra&ccedil;&atilde;o
+      <svg id="chev-admin" class="chevron w-3.5 h-3.5 ml-auto text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+    </button>
+    <div id="sub-admin" class="submenu">
+      <a href="empresas.html" class="flex items-center gap-2 pl-10 pr-3 py-2 mx-2 rounded-xl text-[0.8rem] text-gray-500 hover:bg-white/5 hover:text-gray-300 transition-colors cursor-pointer">Empresas</a>
+      <a href="usuarios.html" class="flex items-center gap-2 pl-10 pr-3 py-2 mx-2 rounded-xl text-[0.8rem] text-gray-500 hover:bg-white/5 hover:text-gray-300 transition-colors cursor-pointer">Usu&aacute;rios Admin</a>
+      <a href="planos.html" class="flex items-center gap-2 pl-10 pr-3 py-2 mx-2 rounded-xl text-[0.8rem] text-gray-500 hover:bg-white/5 hover:text-gray-300 transition-colors cursor-pointer">Planos</a>
+      <a href="configuracoes.html" class="flex items-center gap-2 pl-10 pr-3 py-2 mx-2 rounded-xl text-[0.8rem] text-gray-500 hover:bg-white/5 hover:text-gray-300 transition-colors cursor-pointer">Configura&ccedil;&otilde;es</a>
+      <a href="logs.html" class="flex items-center gap-2 pl-10 pr-3 py-2 mx-2 rounded-xl text-[0.8rem] text-gray-500 hover:bg-white/5 hover:text-gray-300 transition-colors cursor-pointer">Log</a>
+    </div>
+    </div>
+    <div class="h-4"></div>
+  </nav>
+  <div class="shrink-0 border-t border-white/10 p-3">
+    <div class="group flex items-center gap-2.5 p-2.5 rounded-xl hover:bg-white/5 cursor-pointer">
+      <div id="user-avatar" class="w-8 h-8 rounded-full bg-vitta-500 flex items-center justify-center text-white text-xs font-bold shrink-0">A</div>
+      <div class="flex-1 min-w-0">
+        <p id="user-name" class="text-white text-[0.8rem] font-semibold truncate">Usu&aacute;rio</p>
+        <p id="user-role" class="text-gray-500 text-[0.7rem] truncate">Admin</p>
+      </div>
+      <button onclick="handleLogout()" title="Sair" class="text-gray-600 hover:text-red-400 transition-colors opacity-0 group-hover:opacity-100">
+        <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+      </button>
+    </div>
+  </div>
+</aside>
+
+<div id="overlay" class="fixed inset-0 bg-black/50 z-20 hidden lg:hidden" onclick="toggleSidebar()"></div>
+
+<div class="flex-1 lg:ml-[220px] flex flex-col min-h-screen">
+
+  <!-- HEADER -->
+  <header class="sticky top-0 z-20 h-16 bg-white border-b border-gray-200 flex items-center px-5 gap-3 shadow-sm">
+    <button onclick="toggleSidebar()" class="lg:hidden p-2 rounded-lg hover:bg-gray-100 text-gray-500">
+      <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+    </button>
+    <div class="flex-1">
+      <h1 class="text-[1rem] font-bold text-gray-800 leading-tight">Financeiro</h1>
+      <p id="header-date" class="text-[0.7rem] text-gray-400 leading-tight"></p>
+    </div>
+    <div class="hidden md:flex items-center gap-2 px-3 py-2 bg-gray-50 border border-gray-200 rounded-xl">
+      <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-vitta-500 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+      <span id="empresa-nome" class="text-[0.78rem] font-semibold text-gray-700">Cl&iacute;nica</span>
+    </div>
+    <div class="flex items-center gap-2.5">
+      <div id="header-avatar" class="w-9 h-9 rounded-full bg-vitta-500 flex items-center justify-center text-white text-sm font-bold shrink-0">A</div>
+      <div class="hidden sm:block">
+        <p id="header-user-name" class="text-[0.8rem] font-semibold text-gray-800 leading-tight">Usu&aacute;rio</p>
+        <p id="header-user-role" class="text-[0.7rem] text-gray-400 leading-tight">Administrador</p>
+      </div>
+    </div>
+    <button onclick="handleLogout()" class="p-2.5 rounded-xl hover:bg-red-50 text-gray-400 hover:text-red-500 transition-colors" title="Sair">
+      <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+    </button>
+  </header>
+
+  <main class="flex-1 p-5 lg:p-6 flex flex-col gap-5">
+
+    <!-- TAB BAR -->
+    <div class="bg-white rounded-2xl shadow-sm border border-gray-100 flex items-center px-2 pt-1 gap-1">
+      <button id="tb-lancamentos" onclick="switchTab('lancamentos')" class="tab-btn active flex items-center gap-2 px-5 py-3.5 text-[0.85rem] font-semibold text-gray-500">
+        <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+        Lan&ccedil;amentos
+      </button>
+      <button id="tb-dashboard" onclick="switchTab('dashboard')" class="tab-btn flex items-center gap-2 px-5 py-3.5 text-[0.85rem] font-semibold text-gray-500">
+        <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+        Dashboard Financeiro
+      </button>
+    </div>
+
+    <!-- ===== PANE: LANÇAMENTOS ===== -->
+    <div id="pane-lancamentos">
+
+      <!-- Filters -->
+      <div class="bg-white rounded-2xl shadow-sm border border-gray-100 px-4 py-3 flex flex-wrap items-center gap-3">
+        <select id="filterEmpLanc" onchange="applyFilters()" class="hidden py-1.5 px-3 text-[0.8rem] border border-gray-200 rounded-xl outline-none focus:border-vitta-500 bg-white text-gray-700 min-w-[180px]">
+          <option value="">Todas as empresas</option>
+        </select>
+        <select id="filterProfLanc" onchange="applyFilters()" class="py-1.5 px-3 text-[0.8rem] border border-gray-200 rounded-xl outline-none focus:border-vitta-500 bg-white text-gray-700 min-w-[180px]">
+          <option value="">Todos os profissionais</option>
+        </select>
+        <select id="filterStatus" onchange="applyFilters()" class="py-1.5 px-3 text-[0.8rem] border border-gray-200 rounded-xl outline-none focus:border-vitta-500 bg-white text-gray-700">
+          <option value="todos">Todos</option>
+          <option value="pendente">Pendentes</option>
+          <option value="pago">Pagos</option>
+        </select>
+        <select id="filterTipPag" onchange="renderLancamentos()" class="py-1.5 px-3 text-[0.8rem] border border-gray-200 rounded-xl outline-none focus:border-vitta-500 bg-white text-gray-700 min-w-[160px]">
+          <option value="">Todas as formas</option>
+        </select>
+        <div class="relative">
+          <svg xmlns="http://www.w3.org/2000/svg" class="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+          <input type="text" id="filterPacLanc" placeholder="Buscar paciente&hellip;" oninput="renderLancamentos()"
+            class="pl-8 pr-3 py-1.5 text-[0.8rem] border border-gray-200 rounded-xl outline-none focus:border-vitta-500 bg-white text-gray-700 w-48" />
+        </div>
+        <div class="flex items-center gap-2 ml-auto">
+          <input type="date" id="filterDtDe" onchange="applyFilters()" class="py-1.5 px-3 text-[0.8rem] border border-gray-200 rounded-xl outline-none focus:border-vitta-500" />
+          <span class="text-[0.8rem] text-gray-400">até</span>
+          <input type="date" id="filterDtAte" onchange="applyFilters()" class="py-1.5 px-3 text-[0.8rem] border border-gray-200 rounded-xl outline-none focus:border-vitta-500" />
+          <button onclick="clearFiltersLanc()" class="text-[0.75rem] font-semibold text-gray-500 hover:text-vitta-600 transition-colors whitespace-nowrap">Limpar</button>
+        </div>
+      </div>
+
+      <!-- Table -->
+      <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+        <div class="px-5 py-3.5 border-b border-gray-100 flex items-center justify-between">
+          <div>
+            <h3 class="text-[0.9rem] font-bold text-gray-800">Consultas para Pagamento</h3>
+            <p id="lancSummary" class="text-[0.72rem] text-gray-400 mt-0.5"></p>
+          </div>
+          <div id="lancTotals" class="hidden flex items-center gap-4 text-[0.78rem]">
+            <span class="text-gray-500">Pendente: <strong id="vlPendente" class="text-amber-600">R$ 0,00</strong></span>
+            <span class="text-gray-500">Recebido: <strong id="vlRecebido" class="text-emerald-600">R$ 0,00</strong></span>
+          </div>
+        </div>
+        <div class="overflow-x-auto table-scroll">
+          <table class="w-full border-collapse">
+            <thead>
+              <tr class="text-left bg-gray-50">
+                <th class="px-5 py-3 text-[0.72rem] font-bold text-gray-500 uppercase tracking-wider">Data da Consulta</th>
+                <th class="px-5 py-3 text-[0.72rem] font-bold text-gray-500 uppercase tracking-wider">Paciente</th>
+                <th class="px-5 py-3 text-[0.72rem] font-bold text-gray-500 uppercase tracking-wider">Profissional</th>
+                <th class="px-5 py-3 text-[0.72rem] font-bold text-gray-500 uppercase tracking-wider">Valor Servi&ccedil;o</th>
+                <th class="px-5 py-3 text-[0.72rem] font-bold text-gray-500 uppercase tracking-wider">Status</th>
+                <th class="px-5 py-3 text-[0.72rem] font-bold text-gray-500 uppercase tracking-wider">Pago em</th>
+                <th class="px-5 py-3 text-[0.72rem] font-bold text-gray-500 uppercase tracking-wider">Valor Pago</th>
+                <th class="px-5 py-3 text-[0.72rem] font-bold text-gray-500 uppercase tracking-wider">Forma</th>
+                <th class="px-5 py-3 text-[0.72rem] font-bold text-gray-500 uppercase tracking-wider">A&ccedil;&atilde;o</th>
+              </tr>
+            </thead>
+            <tbody id="lancBody" class="divide-y divide-gray-50"></tbody>
+          </table>
+          <div id="lancEmpty" class="hidden py-16 text-center">
+            <svg xmlns="http://www.w3.org/2000/svg" class="w-12 h-12 text-gray-200 mx-auto mb-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+            <p class="text-[0.88rem] font-semibold text-gray-400">Nenhum lan&ccedil;amento encontrado</p>
+            <p class="text-[0.78rem] text-gray-300 mt-1">Consultas marcadas para pagamento aparecer&atilde;o aqui</p>
+          </div>
+        </div>
+      </div>
+    </div><!-- /pane-lancamentos -->
+
+    <!-- ===== PANE: DASHBOARD ===== -->
+    <div id="pane-dashboard" class="hidden flex flex-col gap-5">
+
+      <!-- Period selector -->
+      <div class="bg-white rounded-2xl shadow-sm border border-gray-100 px-4 py-3 flex flex-wrap items-center gap-3">
+        <span class="text-[0.78rem] font-bold text-gray-500">Per&iacute;odo:</span>
+        <div class="flex items-center gap-2">
+          <input type="date" id="dashDtDe" onchange="loadDashboard()" class="py-1.5 px-3 text-[0.8rem] border border-gray-200 rounded-xl outline-none focus:border-vitta-500" />
+          <span class="text-[0.8rem] text-gray-400">at&eacute;</span>
+          <input type="date" id="dashDtAte" onchange="loadDashboard()" class="py-1.5 px-3 text-[0.8rem] border border-gray-200 rounded-xl outline-none focus:border-vitta-500" />
+        </div>
+        <select id="dashEmpFilter" onchange="loadDashboard()" class="hidden py-1.5 px-3 text-[0.8rem] border border-gray-200 rounded-xl outline-none focus:border-vitta-500 bg-white text-gray-700 min-w-[180px]">
+          <option value="">Todas as empresas</option>
+        </select>
+        <select id="dashProfFilter" onchange="loadDashboard()" class="py-1.5 px-3 text-[0.8rem] border border-gray-200 rounded-xl outline-none focus:border-vitta-500 bg-white text-gray-700 min-w-[180px]">
+          <option value="">Todos os profissionais</option>
+        </select>
+      </div>
+
+      <!-- KPI cards -->
+      <div class="relative">
+      <div id="dashLoadingOverlay" class="hidden absolute inset-0 z-20 flex flex-col items-center justify-center gap-3 bg-white/70 backdrop-blur-sm rounded-2xl">
+        <svg xmlns="http://www.w3.org/2000/svg" class="w-10 h-10 text-vitta-500 animate-spin" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/></svg>
+        <p class="text-[0.8rem] font-semibold text-gray-500">Atualizando dados...</p>
+      </div>
+      <div id="kpiGrid" class="grid grid-cols-2 lg:grid-cols-4 gap-4 transition-opacity duration-300">
+        <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-4">
+          <div class="flex items-center gap-3 mb-3">
+            <div class="w-9 h-9 rounded-xl bg-emerald-100 flex items-center justify-center shrink-0">
+              <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-emerald-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>
+            </div>
+            <p class="text-[0.72rem] font-bold text-gray-400 uppercase tracking-wider leading-tight">Recebido</p>
+          </div>
+          <p id="kpi-recebido" class="text-[1.35rem] font-extrabold text-gray-800 leading-none">R$ 0,00</p>
+          <p class="text-[0.68rem] text-gray-400 mt-1">pago no per&iacute;odo</p>
+        </div>
+        <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-4">
+          <div class="flex items-center gap-3 mb-3">
+            <div class="w-9 h-9 rounded-xl bg-rose-100 flex items-center justify-center shrink-0">
+              <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-rose-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><line x1="19" y1="5" x2="5" y2="19"/><circle cx="6.5" cy="6.5" r="2.5"/><circle cx="17.5" cy="17.5" r="2.5"/></svg>
+            </div>
+            <p class="text-[0.72rem] font-bold text-gray-400 uppercase tracking-wider leading-tight">Repasse &agrave; Cl&iacute;nica</p>
+          </div>
+          <p id="kpi-repasse" class="text-[1.35rem] font-extrabold text-gray-800 leading-none">R$ 0,00</p>
+          <p class="text-[0.68rem] text-gray-400 mt-1">% cadastrado por profissional</p>
+        </div>
+        <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-4">
+          <div class="flex items-center gap-3 mb-3">
+            <div class="w-9 h-9 rounded-xl bg-teal-100 flex items-center justify-center shrink-0">
+              <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-teal-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M20 12V8H6a2 2 0 0 1-2-2c0-1.1.9-2 2-2h12v4"/><path d="M4 6v12c0 1.1.9 2 2 2h14v-4"/><path d="M18 12a2 2 0 0 0 0 4h4v-4Z"/></svg>
+            </div>
+            <p class="text-[0.72rem] font-bold text-gray-400 uppercase tracking-wider leading-tight">L&iacute;quido Profissionais</p>
+          </div>
+          <p id="kpi-liquido" class="text-[1.35rem] font-extrabold text-gray-800 leading-none">R$ 0,00</p>
+          <p class="text-[0.68rem] text-gray-400 mt-1">recebido menos repasse</p>
+        </div>
+        <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-4">
+          <div class="flex items-center gap-3 mb-3">
+            <div class="w-9 h-9 rounded-xl bg-vitta-100 flex items-center justify-center shrink-0">
+              <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-vitta-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+            </div>
+            <p class="text-[0.72rem] font-bold text-gray-400 uppercase tracking-wider leading-tight">Consultas Pagas</p>
+          </div>
+          <p id="kpi-pagos" class="text-[1.35rem] font-extrabold text-gray-800 leading-none">0</p>
+          <p class="text-[0.68rem] text-gray-400 mt-1">no per&iacute;odo</p>
+        </div>
+        <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-4">
+          <div class="flex items-center gap-3 mb-3">
+            <div class="w-9 h-9 rounded-xl bg-amber-100 flex items-center justify-center shrink-0">
+              <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-amber-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+            </div>
+            <p class="text-[0.72rem] font-bold text-gray-400 uppercase tracking-wider leading-tight">Pendentes</p>
+          </div>
+          <p id="kpi-pendentes" class="text-[1.35rem] font-extrabold text-gray-800 leading-none">0</p>
+          <p class="text-[0.68rem] text-gray-400 mt-1">aguardando pagamento</p>
+        </div>
+        <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-4">
+          <div class="flex items-center gap-3 mb-3">
+            <div class="w-9 h-9 rounded-xl bg-purple-100 flex items-center justify-center shrink-0">
+              <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-purple-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
+            </div>
+            <p class="text-[0.72rem] font-bold text-gray-400 uppercase tracking-wider leading-tight">Ticket M&eacute;dio</p>
+          </div>
+          <p id="kpi-ticket" class="text-[1.35rem] font-extrabold text-gray-800 leading-none">R$ 0,00</p>
+          <p class="text-[0.68rem] text-gray-400 mt-1">por consulta</p>
+        </div>
+        <div class="bg-gradient-to-br from-vitta-500 to-vitta-700 rounded-2xl shadow-sm p-4 text-white">
+          <div class="flex items-center gap-3 mb-3">
+            <div class="w-9 h-9 rounded-xl bg-white/20 flex items-center justify-center shrink-0">
+              <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+            </div>
+            <p class="text-[0.72rem] font-bold text-white/80 uppercase tracking-wider leading-tight">Proje&ccedil;&atilde;o 30 dias</p>
+          </div>
+          <p id="kpi-proj" class="text-[1.35rem] font-extrabold leading-none">R$ 0,00</p>
+          <p class="text-[0.68rem] text-white/70 mt-1">baseado na agenda futura</p>
+        </div>
+      </div>
+      </div>
+
+      <!-- Chart + Projection -->
+      <div class="grid grid-cols-1 lg:grid-cols-5 gap-4">
+
+        <!-- Revenue chart (3/5) -->
+        <div class="lg:col-span-3 bg-white rounded-2xl shadow-sm border border-gray-100 p-5">
+          <div class="flex items-center justify-between mb-4">
+            <div>
+              <h3 class="text-[0.9rem] font-bold text-gray-800">Entradas Mensais</h3>
+              <p class="text-[0.72rem] text-gray-400">&uacute;ltimos 6 meses</p>
+            </div>
+          </div>
+          <div class="relative" style="height:220px">
+            <canvas id="chartRevenue"></canvas>
+          </div>
+        </div>
+
+        <!-- Pending list (2/5) -->
+        <div class="lg:col-span-2 bg-white rounded-2xl shadow-sm border border-gray-100 p-5 flex flex-col">
+          <h3 class="text-[0.9rem] font-bold text-gray-800 mb-1">Pendentes</h3>
+          <p class="text-[0.72rem] text-gray-400 mb-4">consultas aguardando pagamento</p>
+          <div id="dashPendList" class="flex-1 overflow-y-auto space-y-2 max-h-52"></div>
+          <div id="dashPendEmpty" class="hidden flex-1 flex items-center justify-center">
+            <p class="text-[0.8rem] text-gray-300 text-center">Nenhuma pendente</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Projection table -->
+      <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+        <div class="px-5 py-3.5 border-b border-gray-100 flex items-center justify-between">
+          <div>
+            <h3 class="text-[0.9rem] font-bold text-gray-800">Proje&ccedil;&atilde;o de Entradas</h3>
+            <p class="text-[0.72rem] text-gray-400">Agendado/Confirmado (pr&oacute;ximos 30 dias) e Realizado aguardando pagamento &times; valor previsto</p>
+          </div>
+          <span id="projTotal" class="text-[0.85rem] font-bold text-vitta-600"></span>
+        </div>
+        <div class="overflow-x-auto table-scroll">
+          <table class="w-full border-collapse">
+            <thead>
+              <tr class="text-left bg-gray-50">
+                <th class="px-5 py-3 text-[0.72rem] font-bold text-gray-500 uppercase tracking-wider">Data</th>
+                <th class="px-5 py-3 text-[0.72rem] font-bold text-gray-500 uppercase tracking-wider">Paciente</th>
+                <th class="px-5 py-3 text-[0.72rem] font-bold text-gray-500 uppercase tracking-wider">Profissional</th>
+                <th class="px-5 py-3 text-[0.72rem] font-bold text-gray-500 uppercase tracking-wider">Status</th>
+                <th class="px-5 py-3 text-[0.72rem] font-bold text-gray-500 uppercase tracking-wider text-right">Valor Previsto</th>
+              </tr>
+            </thead>
+            <tbody id="projBody" class="divide-y divide-gray-50"></tbody>
+          </table>
+          <div id="projEmpty" class="hidden py-10 text-center">
+            <p class="text-sm text-gray-400">Nenhum agendamento futuro com valor de servi&ccedil;o definido.</p>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- /pane-dashboard -->
+
+  </main>
+</div><!-- /main area -->
+
+<!-- ===== PAYMENT MODAL ===== -->
+<div id="modalPgto" class="modal-overlay" onclick="if(event.target===this)closeModal()">
+  <div class="bg-white rounded-2xl shadow-xl w-full max-w-md overflow-y-auto max-h-[95vh]" onclick="event.stopPropagation()">
+    <div class="flex items-center justify-between px-6 py-4 border-b border-gray-100">
+      <div>
+        <h2 id="pgtoModalTitle" class="text-[1rem] font-bold text-gray-800">Registrar Pagamento</h2>
+        <p id="modalSubtitle" class="text-[0.72rem] text-gray-400 mt-0.5"></p>
+      </div>
+      <button onclick="closeModal()" class="text-gray-400 hover:text-gray-600 p-1">
+        <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+    <form id="pgtoForm" onsubmit="savePayment(event)" class="px-6 pb-6 pt-4 space-y-4">
+      <input type="hidden" id="fPgtoAgdId" />
+
+      <!-- Patient + date info -->
+      <div class="bg-gray-50 rounded-xl px-4 py-3 space-y-1">
+        <p id="fInfoPac" class="text-[0.85rem] font-semibold text-gray-800"></p>
+        <p id="fInfoData" class="text-[0.75rem] text-gray-500"></p>
+        <p id="fInfoProf" class="text-[0.75rem] text-gray-500"></p>
+      </div>
+
+      <!-- Valor -->
+      <div>
+        <label class="block text-[0.78rem] font-semibold text-gray-600 mb-1">Valor do Pagamento <span class="text-red-500">*</span></label>
+        <div class="relative">
+          <span class="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-gray-400 font-medium">R$</span>
+          <input id="fVlPgto" type="text" inputmode="decimal" autocomplete="off" required placeholder="0,00"
+            class="w-full py-2.5 pl-9 pr-3 text-sm border border-gray-200 rounded-xl outline-none focus:border-vitta-500" />
+        </div>
+      </div>
+
+      <!-- Data e Forma -->
+      <div class="grid grid-cols-2 gap-3">
+        <div>
+          <label class="block text-[0.78rem] font-semibold text-gray-600 mb-1">Data do Pagamento <span class="text-red-500">*</span></label>
+          <input id="fDtPgto" type="date" required class="w-full py-2.5 px-3 text-sm border border-gray-200 rounded-xl outline-none focus:border-vitta-500" />
+        </div>
+        <div>
+          <label class="block text-[0.78rem] font-semibold text-gray-600 mb-1">Forma de Pagamento</label>
+          <select id="fTipPagPgto" onchange="onTipPagChangePgto()" class="w-full py-2.5 px-3 text-sm border border-gray-200 rounded-xl outline-none focus:border-vitta-500 bg-white">
+            <option value="" disabled>Carregando&hellip;</option>
+          </select>
+        </div>
+      </div>
+      <!-- PIX key hint -->
+      <div id="pixKeyHint" class="hidden bg-vitta-50 border border-vitta-200 rounded-xl px-4 py-2.5">
+        <p class="text-[0.68rem] font-bold text-vitta-600 uppercase tracking-wider mb-0.5">Chave PIX do servi&ccedil;o</p>
+        <p id="pixKeyValue" class="text-[0.85rem] font-bold text-vitta-700">—</p>
+      </div>
+
+      <!-- Comprovante -->
+      <div>
+        <label class="block text-[0.78rem] font-semibold text-gray-600 mb-1">Comprovante <span class="text-[0.72rem] text-gray-400 font-normal">(opcional)</span></label>
+
+        <div id="comprovanteExistente" class="hidden items-center gap-3 bg-gray-50 border border-gray-200 rounded-xl px-3 py-2.5 mb-2">
+          <div id="compExIcon" class="w-9 h-9 rounded-lg flex items-center justify-center text-white text-[0.65rem] font-bold shrink-0">PDF</div>
+          <div class="flex-1 min-w-0">
+            <p id="compExNome" class="text-xs font-semibold text-gray-800 truncate"></p>
+            <p class="text-[0.65rem] text-gray-400">Comprovante atual</p>
+          </div>
+          <button type="button" onclick="viewComprovanteAtual()" class="text-[0.72rem] font-semibold text-vitta-600 hover:text-vitta-700 shrink-0">Ver</button>
+          <button type="button" onclick="removerComprovanteAtual()" class="text-gray-400 hover:text-red-500 transition-colors shrink-0">
+            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+          </button>
+        </div>
+
+        <div id="compDropZone" class="drop-zone flex items-center justify-center gap-2 px-3 py-3 cursor-pointer"
+             onclick="document.getElementById('fComprovanteFile').click()"
+             ondragover="onCompDragOver(event)" ondragleave="onCompDragLeave(event)" ondrop="onCompDrop(event)">
+          <svg class="w-5 h-5 text-gray-300 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+          <p class="text-[0.78rem] text-gray-500">Clique ou arraste o arquivo (PDF, JPG, PNG)</p>
+          <input id="fComprovanteFile" type="file" class="hidden" accept=".pdf,.jpg,.jpeg,.png,.gif,.webp"
+                 onchange="onComprovanteSelected(this.files[0])" />
+        </div>
+        <div id="compPreview" class="hidden mt-2 flex items-center gap-3 bg-gray-50 border border-gray-200 rounded-xl px-3 py-2.5">
+          <div id="compIcon" class="w-9 h-9 rounded-lg flex items-center justify-center text-white text-[0.65rem] font-bold shrink-0">PDF</div>
+          <div class="flex-1 min-w-0">
+            <p id="compNome" class="text-xs font-semibold text-gray-800 truncate"></p>
+            <p id="compTamanho" class="text-[0.65rem] text-gray-400"></p>
+          </div>
+          <button type="button" onclick="clearComprovanteFile()" class="text-gray-400 hover:text-red-500 transition-colors shrink-0">
+            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+          </button>
+        </div>
+      </div>
+
+      <!-- Obs -->
+      <div>
+        <label class="block text-[0.78rem] font-semibold text-gray-600 mb-1">Observa&ccedil;&otilde;es <span class="text-[0.72rem] text-gray-400 font-normal">(opcional)</span></label>
+        <textarea id="fObsPgto" rows="2" placeholder="Notas sobre o pagamento&hellip;"
+          class="w-full py-2.5 px-3 text-sm border border-gray-200 rounded-xl outline-none focus:border-vitta-500 resize-none"></textarea>
+      </div>
+
+      <div class="flex gap-3 pt-1">
+        <button type="button" onclick="closeModal()" class="flex-1 py-2.5 border border-gray-200 rounded-xl text-sm font-medium text-gray-600 hover:bg-gray-50 transition-colors">Cancelar</button>
+        <button type="submit" id="btnSavePgto" class="flex-1 py-2.5 bg-emerald-500 text-white rounded-xl text-sm font-semibold hover:bg-emerald-600 transition-colors shadow-sm">Confirmar Pagamento</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- ===== VIEW PAYMENT MODAL ===== -->
+<div id="modalViewPgto" class="modal-overlay" onclick="if(event.target===this)closeViewModal()">
+  <div class="bg-white rounded-2xl shadow-xl w-full max-w-md" onclick="event.stopPropagation()">
+    <div class="flex items-center justify-between px-6 py-4 border-b border-gray-100">
+      <div>
+        <h2 class="text-[1rem] font-bold text-gray-800">Detalhes do Pagamento</h2>
+        <p id="viewSubtitle" class="text-[0.72rem] text-gray-400 mt-0.5"></p>
+      </div>
+      <button onclick="closeViewModal()" class="text-gray-400 hover:text-gray-600 p-1">
+        <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+    <div class="px-6 pb-6 pt-4 space-y-3">
+      <div id="viewPacInfo" class="bg-gray-50 rounded-xl px-4 py-3 space-y-1"></div>
+      <div class="grid grid-cols-2 gap-3">
+        <div class="bg-emerald-50 rounded-xl px-4 py-3">
+          <p class="text-[0.68rem] font-bold text-emerald-600 uppercase tracking-wider mb-1">Valor Pago</p>
+          <p id="viewVlPgto" class="text-[1.1rem] font-extrabold text-emerald-700">—</p>
+        </div>
+        <div class="bg-gray-50 rounded-xl px-4 py-3">
+          <p class="text-[0.68rem] font-bold text-gray-500 uppercase tracking-wider mb-1">Pago em</p>
+          <p id="viewDtPgto" class="text-[0.9rem] font-bold text-gray-700">—</p>
+        </div>
+      </div>
+      <div class="bg-gray-50 rounded-xl px-4 py-3">
+        <p class="text-[0.68rem] font-bold text-gray-500 uppercase tracking-wider mb-1">Forma de Pagamento</p>
+        <p id="viewForma" class="text-[0.9rem] font-semibold text-gray-700">—</p>
+      </div>
+      <div id="viewPixRow" class="hidden bg-vitta-50 border border-vitta-200 rounded-xl px-4 py-3">
+        <p class="text-[0.68rem] font-bold text-vitta-600 uppercase tracking-wider mb-1">Chave PIX</p>
+        <p id="viewPixKey" class="text-[0.9rem] font-semibold text-vitta-700">—</p>
+      </div>
+      <div id="viewCompRow" class="bg-gray-50 rounded-xl px-4 py-3">
+        <p class="text-[0.68rem] font-bold text-gray-500 uppercase tracking-wider mb-1">Comprovante</p>
+        <p id="viewCompVazio" class="hidden text-[0.83rem] text-gray-400 italic">Sem comprovante anexado</p>
+        <div id="viewCompArquivo" class="hidden items-center justify-between gap-3">
+          <button type="button" id="viewComp" onclick="abrirComprovante()" class="text-[0.83rem] font-semibold text-vitta-600 hover:text-vitta-700 underline underline-offset-2 truncate text-left">—</button>
+          <button type="button" onclick="baixarComprovante()" title="Baixar comprovante" class="shrink-0 flex items-center gap-1 text-[0.75rem] font-semibold text-gray-500 hover:text-vitta-600 transition-colors px-2 py-1 border border-gray-200 rounded-lg hover:border-vitta-300">
+            <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+            Baixar
+          </button>
+        </div>
+      </div>
+      <div id="viewObsRow" class="hidden bg-gray-50 rounded-xl px-4 py-3">
+        <p class="text-[0.68rem] font-bold text-gray-500 uppercase tracking-wider mb-1">Observa&ccedil;&otilde;es</p>
+        <p id="viewObs" class="text-[0.83rem] text-gray-600">—</p>
+      </div>
+      <div id="viewEstornadoRow" class="hidden bg-red-50 border border-red-200 rounded-xl px-4 py-3">
+        <p class="text-[0.72rem] font-bold text-red-600 uppercase tracking-wider">&#9888; Pagamento Estornado</p>
+      </div>
+      <div class="flex gap-3 mt-2">
+        <button onclick="closeViewModal()" class="flex-1 py-2 border border-gray-200 rounded-xl text-[0.83rem] font-medium text-gray-600 hover:bg-gray-50 transition-colors">Fechar</button>
+        <button id="btnEditar" onclick="openEditPaymentModal(viewAgdId)" class="flex-1 py-2 bg-vitta-500 text-white rounded-xl text-[0.83rem] font-semibold hover:bg-vitta-600 transition-colors">Editar</button>
+        <button id="btnEstornar" onclick="estornarPagamento()" class="flex-1 py-2 bg-red-500 text-white rounded-xl text-[0.83rem] font-semibold hover:bg-red-600 transition-colors">Estornar</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════ MODAL CONFIRMAÇÃO ESTORNO ══════ -->
+<div id="modalConfirmEstorno" class="modal-overlay" onclick="if(event.target===this)closeConfirmEstorno()">
+  <div class="bg-white rounded-2xl shadow-xl w-full max-w-sm" onclick="event.stopPropagation()">
+    <div class="p-6">
+      <div class="flex items-center gap-4 mb-4">
+        <div class="w-11 h-11 rounded-full bg-red-100 flex items-center justify-center shrink-0">
+          <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M12 9v4"/><path d="M12 17h.01"/><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0Z"/></svg>
+        </div>
+        <div>
+          <h3 class="text-[0.95rem] font-bold text-gray-800">Estornar pagamento</h3>
+          <p class="text-[0.78rem] text-gray-400 mt-0.5">Esta ação não pode ser desfeita.</p>
+        </div>
+      </div>
+      <p class="text-[0.83rem] text-gray-600 mb-5">Tem certeza que deseja estornar este pagamento? A consulta voltará a aparecer como pendente.</p>
+      <div class="flex gap-3">
+        <button onclick="closeConfirmEstorno()" class="flex-1 py-2.5 border border-gray-200 rounded-xl text-sm font-medium text-gray-600 hover:bg-gray-50 transition-colors">Cancelar</button>
+        <button onclick="doEstornarPagamento()" id="btnConfirmEstorno" class="flex-1 py-2.5 bg-red-500 text-white rounded-xl text-sm font-semibold hover:bg-red-600 transition-colors">Estornar</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div id="toast" class="hidden">
+  <div id="toastInner" class="flex items-center gap-3 px-4 py-3 rounded-xl shadow-lg text-sm font-medium text-white min-w-[240px]"></div>
+</div>
+
+
+<script>
+/* ── constants ── */
+const STATUS_COLORS={AGENDADO:'#3B82F6',CONFIRMADA:'#10B981',SEM_VALOR:'#F59E0B',FALTA:'#EF4444',REALIZADA:'#2ABCD4',FEEDBACK:'#EC4899'};
+const STATUS_LABELS={AGENDADO:'Agendado',CONFIRMADA:'Confirmada',SEM_VALOR:'Sem Valor',FALTA:'Falta',REALIZADA:'Realizada',FEEDBACK:'Feedback'};
+const FORMA_LABELS={PIX:'PIX',DINHEIRO:'Dinheiro',CARTAO_DEB:'Déb',CARTAO_CRED:'Créd',TRANSF:'Transf.',OUTROS:'Outros'};
+
+/* ── state ── */
+let currentUserMeta=null, currentProfId=null, allLancamentos=[], allServicos=[], allTipPag=[], revenueChart=null, profPercMap={};
+let pgtoAgdId=null, editingPayment=false;
+let comprovanteFile=null, comprovanteAtual=null, comprovanteRemovido=false;
+
+/* ── helpers ── */
+function toggleMenu(k){const s=document.getElementById('sub-'+k),c=document.getElementById('chev-'+k);const o=s.classList.contains('open');s.classList.toggle('open',!o);if(c)c.classList.toggle('open',!o);}
+function toggleSidebar(){const sb=document.getElementById('sidebar'),ov=document.getElementById('overlay');const o=sb.classList.contains('-translate-x-full');sb.classList.toggle('-translate-x-full',!o);ov.classList.toggle('hidden',!o);}
+async function handleLogout(){await supabase.auth.signOut();window.location.href='../index.html';}
+function showToast(msg,ok=true){const t=document.getElementById('toast'),i=document.getElementById('toastInner');i.textContent=msg;i.className=`flex items-center gap-3 px-4 py-3 rounded-xl shadow-lg text-sm font-medium text-white min-w-[240px] ${ok?'bg-emerald-500':'bg-red-500'}`;t.classList.remove('hidden');setTimeout(()=>t.classList.add('hidden'),3500);}
+function isGlobal(){return currentUserMeta?.tipo_usu==='ADMIN_GLOBAL';}
+function fmtBRL(v){return Number(v||0).toLocaleString('pt-BR',{style:'currency',currency:'BRL'});}
+function formatCurrencyBR(v){return(v===null||v===undefined||v==='')?'':Number(v).toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2});}
+function parseCurrencyBR(str){if(!str)return null;const n=parseFloat(String(str).replace(/\./g,'').replace(',','.'));return isNaN(n)?null:n;}
+document.getElementById('fVlPgto').addEventListener('input',function(){
+  let digits=this.value.replace(/\D/g,'');
+  if(!digits){this.value='';return;}
+  digits=digits.replace(/^0+(?=\d)/,'');
+  while(digits.length<3)digits='0'+digits;
+  const intPart=digits.slice(0,-2).replace(/\B(?=(\d{3})+(?!\d))/g,'.');
+  this.value=`${intPart},${digits.slice(-2)}`;
+});
+function fmtDate(d){if(!d)return'—';const dt=d.includes('T')?new Date(d):new Date(d+'T12:00');return dt.toLocaleDateString('pt-BR');}
+function fmtTime(d){return new Date(d).toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'});}
+function initials(n){return(n||'').split(' ').filter(Boolean).slice(0,2).map(w=>w[0]).join('').toUpperCase();}
+function fmtSize(bytes){if(!bytes)return'';if(bytes<1024)return bytes+' B';if(bytes<1048576)return(bytes/1024).toFixed(0)+' KB';return(bytes/1048576).toFixed(1)+' MB';}
+function fileTypeInfo(nome){
+  const ext=(nome||'').split('.').pop().toUpperCase();
+  const map={PDF:{color:'bg-red-500',label:'PDF'},JPG:{color:'bg-green-500',label:'JPG'},JPEG:{color:'bg-green-500',label:'JPG'},PNG:{color:'bg-blue-500',label:'PNG'},GIF:{color:'bg-blue-400',label:'GIF'},WEBP:{color:'bg-blue-400',label:'WEBP'}};
+  return map[ext]||{color:'bg-gray-500',label:ext.slice(0,4)||'ARQ'};
+}
+
+/* ── auth ── */
+async function initAuth(){
+  document.getElementById('header-date').textContent=new Date().toLocaleDateString('pt-BR',{weekday:'long',year:'numeric',month:'long',day:'numeric'});
+  const {data:{session}}=await supabase.auth.getSession();
+  if(!session){window.location.href='../index.html';return false;}
+  const meta=session.user.user_metadata;
+  currentUserMeta=meta;
+  const LABELS={ADMIN_GLOBAL:'Admin Global',ADMIN_EMPRESA:'Administrador',SECRETARIA:'Secretaria',PROFISSIONAL:'Profissional'};
+  const nome=meta.nome_usu||session.user.email;
+  const ini=initials(nome);
+  const label=LABELS[meta.tipo_usu]||meta.tipo_usu;
+  ['user-name','header-user-name'].forEach(id=>document.getElementById(id).textContent=nome);
+  ['user-role','header-user-role'].forEach(id=>document.getElementById(id).textContent=label);
+  ['user-avatar','header-avatar'].forEach(id=>document.getElementById(id).textContent=ini);
+  if(isGlobal()){
+    document.getElementById('empresa-nome').textContent='Vitta Sistemas';
+    document.getElementById('sectionAdmin').classList.remove('hidden');
+    AdminEmpresaCtx.initSelector('ADMIN_GLOBAL', session.user.id);
+  } else {
+    const {data:emp}=await supabase.from('EMPRESA').select('NOME_EMP').eq('ID_EMP',(meta.ID_EMP || meta.id_emp)).single();
+    document.getElementById('empresa-nome').textContent=emp?.NOME_EMP||'';
+  }
+  if(meta.tipo_usu==='PROFISSIONAL'){
+    const u=await getUsuarioAtual('PROF_USU',session);
+    currentProfId=u?.PROF_USU||null;
+    if(currentProfId) setUserAvatarPhoto(currentProfId);
+    document.querySelector('a[href="profissionais.html"]')?.classList.add('hidden');
+    document.querySelector('a[href="usuarios-empresa.html"]')?.classList.add('hidden');
+    const _ss=document.getElementById('sub-servicos');
+    if(_ss){const _b=_ss.previousElementSibling;_b?.previousElementSibling?.classList.add('hidden');_b?.classList.add('hidden');_ss.classList.add('hidden');}
+  }
+  let temAcessoConsultas = meta.tipo_usu === 'PROFISSIONAL';
+  if(['ADMIN_EMPRESA','ADMIN_GLOBAL'].includes(meta.tipo_usu)){
+    const uOwn=await getUsuarioAtual('PROF_USU',session);
+    temAcessoConsultas=!!(uOwn?.PROF_USU);
+  }
+  if(!temAcessoConsultas)
+    document.querySelector('a[href="consultas.html"]')?.classList.add('hidden');
+  return true;
+}
+
+async function loadEmpresas(){
+  const {data}=await supabase.from('EMPRESA').select('ID_EMP,NOME_EMP').eq('ATIVO_EMP',true).order('NOME_EMP');
+  const opts=(data||[]).map(e=>`<option value="${e.ID_EMP}">${e.NOME_EMP}</option>`).join('');
+  document.getElementById('filterEmpLanc').insertAdjacentHTML('beforeend',opts);
+  document.getElementById('dashEmpFilter').insertAdjacentHTML('beforeend',opts);
+}
+
+async function loadProfissionais(){
+  const idEmp=AdminEmpresaCtx.resolveIdEmp(currentUserMeta?.tipo_usu, currentUserMeta?.ID_EMP || currentUserMeta?.id_emp);
+  let q=supabase.from('PROFISSIONAL').select('ID_PROF,NOME_PROF').eq('ATIVO_PROF',true).order('NOME_PROF');
+  if(idEmp)q=q.eq('ID_EMP',idEmp);
+  const {data}=await q;
+  const opts=(data||[]).map(p=>`<option value="${p.ID_PROF}">${p.NOME_PROF}</option>`).join('');
+  document.getElementById('filterProfLanc').insertAdjacentHTML('beforeend',opts);
+  document.getElementById('dashProfFilter').insertAdjacentHTML('beforeend',opts);
+  if(currentProfId){
+    const selLanc=document.getElementById('filterProfLanc');
+    selLanc.value=currentProfId;selLanc.disabled=true;
+    const selDash=document.getElementById('dashProfFilter');
+    selDash.value=currentProfId;selDash.disabled=true;
+  }
+}
+
+async function loadProfPercentuais(){
+  const idEmp=AdminEmpresaCtx.resolveIdEmp(currentUserMeta?.tipo_usu, currentUserMeta?.ID_EMP || currentUserMeta?.id_emp);
+  let q=supabase.from('PROFISSIONAL').select('ID_PROF,PERC_PROF');
+  if(idEmp)q=q.eq('ID_EMP',idEmp);
+  const {data}=await q;
+  profPercMap={};
+  (data||[]).forEach(p=>{profPercMap[p.ID_PROF]=Number(p.PERC_PROF||0);});
+}
+
+function getValorConsulta(agd, serv){
+  return agd?.VALOR_AGD ?? agd?.VALOR_PREVISTO_AGD ?? serv?.VALOR_1CONS ?? null;
+}
+
+async function loadServicos(){
+  const idEmp=AdminEmpresaCtx.resolveIdEmp(currentUserMeta?.tipo_usu, currentUserMeta?.ID_EMP || currentUserMeta?.id_emp);
+  let q=supabase.from('SERVICO').select('ID_SERV,ID_PROF,ID_TIPPAG,VALOR_1CONS,CHAVE_PIX,TIPPAG(ID_TIPPAG,NOME_TIPPAG,PIX_TIPPAG)').eq('ATIVO_SERV',true);
+  if(idEmp)q=q.eq('ID_EMP',idEmp);
+  const {data}=await q;
+  allServicos=data||[];
+}
+
+async function loadTiposPagamento(){
+  const idEmp=AdminEmpresaCtx.resolveIdEmp(currentUserMeta?.tipo_usu, currentUserMeta?.ID_EMP || currentUserMeta?.id_emp);
+  let q=supabase.from('TIPPAG').select('ID_TIPPAG,NOME_TIPPAG,PIX_TIPPAG').eq('ATIVO_TIPPAG',true).order('NOME_TIPPAG');
+  if(idEmp)q=q.eq('ID_EMP',idEmp);
+  const {data}=await q;
+  allTipPag=data||[];
+  const opts='<option value="">— Selecione —</option>'+allTipPag.map(t=>`<option value="${t.ID_TIPPAG}">${t.NOME_TIPPAG}</option>`).join('');
+  document.getElementById('fTipPagPgto').innerHTML=opts;
+  const selF=document.getElementById('filterTipPag');
+  if(selF)selF.innerHTML='<option value="">Todas as formas</option>'+allTipPag.map(t=>`<option value="${t.ID_TIPPAG}">${t.NOME_TIPPAG}</option>`).join('');
+}
+
+/* ── Lançamentos ── */
+async function loadLancamentos(){
+  const idEmp=AdminEmpresaCtx.resolveIdEmp(currentUserMeta?.tipo_usu, currentUserMeta?.ID_EMP || currentUserMeta?.id_emp);
+  const profFilter=currentProfId||document.getElementById('filterProfLanc').value;
+  const dtDe=document.getElementById('filterDtDe').value;
+  const dtAte=document.getElementById('filterDtAte').value;
+
+  let q=supabase.from('AGENDAMENTO')
+    .select('ID_AGD,DT_AGD,PAC_AGD,PROF_AGD,ID_EMP,VALOR_AGD,PACIENTE!PAC_AGD(NOME_PAC),PROFISSIONAL!PROF_AGD(ID_PROF,NOME_PROF),EMPRESA!ID_EMP(NOME_EMP)')
+    .eq('PGTO_AGD',true)
+    .order('DT_AGD',{ascending:false});
+  if(idEmp)q=q.eq('ID_EMP',idEmp);
+  if(profFilter)q=q.eq('PROF_AGD',profFilter);
+  if(dtDe)q=q.gte('DT_AGD',dtDe+'T00:00:00');
+  if(dtAte)q=q.lte('DT_AGD',dtAte+'T23:59:59');
+  const {data:agds}=await q;
+  const agdList=agds||[];
+
+  /* load payments for these agendamentos */
+  let pagamentos=[];
+  if(agdList.length>0){
+    const ids=agdList.map(a=>a.ID_AGD);
+    const {data:pgtos}=await supabase.from('PAGAMENTO').select('*,TIPPAG(ID_TIPPAG,NOME_TIPPAG,PIX_TIPPAG)').in('ID_AGD',ids);
+    pagamentos=pgtos||[];
+  }
+
+  allLancamentos=agdList.map(a=>({
+    ...a,
+    pagamento:pagamentos.find(p=>p.ID_AGD===a.ID_AGD)||null
+  }));
+
+  renderLancamentos();
+}
+
+function applyFilters(){loadLancamentos();}
+function clearFiltersLanc(){
+  document.getElementById('filterEmpLanc').value='';
+  if(!currentProfId)document.getElementById('filterProfLanc').value='';
+  document.getElementById('filterStatus').value='todos';
+  document.getElementById('filterTipPag').value='';
+  document.getElementById('filterPacLanc').value='';
+  document.getElementById('filterDtDe').value='';
+  document.getElementById('filterDtAte').value='';
+  loadLancamentos();
+}
+
+function renderLancamentos(){
+  const statusFilter=document.getElementById('filterStatus').value;
+  const tipPagFilter=document.getElementById('filterTipPag').value;
+  const pacFilter=document.getElementById('filterPacLanc').value.toLowerCase().trim();
+  let items=allLancamentos;
+  if(statusFilter==='pendente')items=items.filter(a=>!a.pagamento);
+  if(statusFilter==='pago')items=items.filter(a=>!!a.pagamento);
+  if(tipPagFilter)items=items.filter(a=>a.pagamento?.ID_TIPPAG===tipPagFilter);
+  if(pacFilter)items=items.filter(a=>(a.PACIENTE?.NOME_PAC||'').toLowerCase().includes(pacFilter));
+
+  const body=document.getElementById('lancBody');
+  const empty=document.getElementById('lancEmpty');
+
+  let vlPend=0, vlRec=0;
+  allLancamentos.forEach(a=>{
+    const serv=allServicos.find(s=>s.ID_PROF===a.PROF_AGD);
+    if(!a.pagamento||a.pagamento.ESTORNADO_PGTO) vlPend+=Number(getValorConsulta(a,serv)||0);
+    else vlRec+=Number(a.pagamento.VL_PGTO||0);
+  });
+  document.getElementById('vlPendente').textContent=fmtBRL(vlPend);
+  document.getElementById('vlRecebido').textContent=fmtBRL(vlRec);
+  document.getElementById('lancTotals').classList.toggle('hidden', allLancamentos.length===0);
+  document.getElementById('lancSummary').textContent=`${items.length} lançamento(s)`;
+
+  if(!items.length){body.innerHTML='';empty.classList.remove('hidden');return;}
+  empty.classList.add('hidden');
+
+  body.innerHTML=items.map(a=>{
+    const pac=a.PACIENTE?.NOME_PAC||'—';
+    const prof=a.PROFISSIONAL?.NOME_PROF||'—';
+    const serv=allServicos.find(s=>s.ID_PROF===a.PROF_AGD);
+    const valorConsulta=getValorConsulta(a,serv);
+    const vlServ=valorConsulta?fmtBRL(valorConsulta):'—';
+    const isEstornado=!!a.pagamento?.ESTORNADO_PGTO;
+    const isPago=!!a.pagamento&&!isEstornado;
+    const forma=a.pagamento?(a.pagamento.TIPPAG?.NOME_TIPPAG||FORMA_LABELS[a.pagamento.FORMA_PGTO]||'—'):'—';
+    const statusBadge=isEstornado
+      ?`<span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[0.72rem] font-bold bg-red-100 text-red-600">&#8617; Estornado</span>`
+      :isPago
+        ?`<span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[0.72rem] font-bold bg-emerald-100 text-emerald-700">&#10003; Pago</span>`
+        :`<span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[0.72rem] font-bold bg-amber-100 text-amber-700">&#9679; Pendente</span>`;
+    const dtPago=isPago?fmtDate(a.pagamento.DT_PGTO):'—';
+    const vlPago=isPago?fmtBRL(a.pagamento.VL_PGTO):'—';
+    const _btnVer=`<button onclick="viewPayment('${a.ID_AGD}')" class="text-[0.75rem] font-semibold text-gray-500 hover:text-vitta-600 transition-colors px-3 py-1.5 border border-gray-200 rounded-lg hover:border-vitta-300">Ver detalhes</button>`;
+    const acao=currentProfId
+      ?((isPago||isEstornado)?_btnVer:'<span class="text-gray-400 text-[0.75rem]">—</span>')
+      :(isPago||isEstornado)?_btnVer:`<button onclick="openPaymentModal('${a.ID_AGD}')" class="text-[0.75rem] font-semibold text-white bg-emerald-500 hover:bg-emerald-600 transition-colors px-3 py-1.5 rounded-lg shadow-sm">Registrar</button>`;
+    return `<tr class="transition-colors">
+      <td class="px-5 py-3.5">
+        <p class="text-[0.83rem] font-semibold text-gray-800">${fmtDate(a.DT_AGD)}</p>
+        <p class="text-[0.72rem] text-gray-400">${fmtTime(a.DT_AGD)}</p>
+      </td>
+      <td class="px-5 py-3.5 text-[0.83rem] text-gray-700 font-medium">${pac}</td>
+      <td class="px-5 py-3.5 text-[0.83rem] text-gray-600">${prof}</td>
+      <td class="px-5 py-3.5 text-[0.83rem] font-semibold ${valorConsulta?'text-gray-800':'text-gray-400'}">${vlServ}</td>
+      <td class="px-5 py-3.5">${statusBadge}</td>
+      <td class="px-5 py-3.5 text-[0.83rem] text-gray-600">${dtPago}</td>
+      <td class="px-5 py-3.5 text-[0.83rem] font-semibold ${isPago?'text-emerald-700':'text-gray-400'}">${vlPago}</td>
+      <td class="px-5 py-3.5 text-[0.83rem] text-gray-500">${forma}</td>
+      <td class="px-5 py-3.5">${acao}</td>
+    </tr>`;
+  }).join('');
+}
+
+/* ── Payment modal ── */
+function openEditPaymentModal(agdId){
+  const agd=allLancamentos.find(a=>a.ID_AGD===agdId);
+  if(!agd?.pagamento)return;
+  const p=agd.pagamento;
+  const serv=allServicos.find(s=>s.ID_PROF===agd.PROF_AGD);
+  editingPayment=true;
+  pgtoAgdId=agdId;
+  document.getElementById('pgtoModalTitle').textContent='Editar Pagamento';
+  document.getElementById('btnSavePgto').textContent='Salvar Alterações';
+  document.getElementById('fPgtoAgdId').value=agdId;
+  document.getElementById('fInfoPac').textContent=agd.PACIENTE?.NOME_PAC||'—';
+  document.getElementById('fInfoData').textContent='Consulta: '+fmtDate(agd.DT_AGD)+' às '+fmtTime(agd.DT_AGD);
+  document.getElementById('fInfoProf').textContent='Profissional: '+(agd.PROFISSIONAL?.NOME_PROF||'—');
+  document.getElementById('fVlPgto').value=formatCurrencyBR(p.VL_PGTO);
+  document.getElementById('fDtPgto').value=p.DT_PGTO||'';
+  document.getElementById('fTipPagPgto').value=p.ID_TIPPAG||'';
+  document.getElementById('pixKeyValue').textContent=serv?.CHAVE_PIX||'Não informada';
+  onTipPagChangePgto();
+  resetComprovanteField();
+  if(p.COMPROVANTE_PATH){
+    comprovanteAtual={path:p.COMPROVANTE_PATH,nome:p.COMPROVANTE_NOME,tipo:p.COMPROVANTE_TIPO};
+    const info=fileTypeInfo(p.COMPROVANTE_NOME);
+    document.getElementById('compExIcon').textContent=info.label;
+    document.getElementById('compExIcon').className=`w-9 h-9 rounded-lg ${info.color} flex items-center justify-center text-white text-[0.65rem] font-bold shrink-0`;
+    document.getElementById('compExNome').textContent=p.COMPROVANTE_NOME||'Comprovante';
+    document.getElementById('comprovanteExistente').classList.remove('hidden');
+    document.getElementById('comprovanteExistente').classList.add('flex');
+  }
+  document.getElementById('fObsPgto').value=p.OBS_PGTO||'';
+  document.getElementById('modalSubtitle').textContent=(agd.PACIENTE?.NOME_PAC||'')+(getValorConsulta(agd,serv)?' · '+fmtBRL(getValorConsulta(agd,serv)):'');
+  closeViewModal();
+  document.getElementById('modalPgto').classList.add('open');
+}
+
+function openPaymentModal(agdId){
+  editingPayment=false;
+  document.getElementById('pgtoModalTitle').textContent='Registrar Pagamento';
+  document.getElementById('btnSavePgto').textContent='Confirmar Pagamento';
+  pgtoAgdId=agdId;
+  const agd=allLancamentos.find(a=>a.ID_AGD===agdId);
+  if(!agd)return;
+  const serv=allServicos.find(s=>s.ID_PROF===agd.PROF_AGD);
+  document.getElementById('fPgtoAgdId').value=agdId;
+  document.getElementById('fInfoPac').textContent=agd.PACIENTE?.NOME_PAC||'—';
+  document.getElementById('fInfoData').textContent='Consulta: '+fmtDate(agd.DT_AGD)+' às '+fmtTime(agd.DT_AGD);
+  document.getElementById('fInfoProf').textContent='Profissional: '+(agd.PROFISSIONAL?.NOME_PROF||'—');
+  document.getElementById('fVlPgto').value=formatCurrencyBR(getValorConsulta(agd,serv));
+  document.getElementById('fDtPgto').value=new Date().toISOString().split('T')[0];
+  document.getElementById('fTipPagPgto').value=serv?.ID_TIPPAG||'';
+  document.getElementById('pixKeyValue').textContent=serv?.CHAVE_PIX||'Não informada';
+  onTipPagChangePgto();
+  resetComprovanteField();
+  document.getElementById('fObsPgto').value='';
+  document.getElementById('modalSubtitle').textContent=(agd.PACIENTE?.NOME_PAC||'')+(getValorConsulta(agd,serv)?' · '+fmtBRL(getValorConsulta(agd,serv)):'');
+  document.getElementById('modalPgto').classList.add('open');
+}
+
+/* ── Comprovante (arquivo) ── */
+function resetComprovanteField(){
+  comprovanteFile=null;comprovanteAtual=null;comprovanteRemovido=false;
+  document.getElementById('fComprovanteFile').value='';
+  document.getElementById('compPreview').classList.add('hidden');
+  document.getElementById('comprovanteExistente').classList.add('hidden');
+  document.getElementById('comprovanteExistente').classList.remove('flex');
+}
+function onCompDragOver(e){e.preventDefault();document.getElementById('compDropZone').classList.add('dragover');}
+function onCompDragLeave(){document.getElementById('compDropZone').classList.remove('dragover');}
+function onCompDrop(e){e.preventDefault();document.getElementById('compDropZone').classList.remove('dragover');const f=e.dataTransfer.files[0];if(f)onComprovanteSelected(f);}
+function onComprovanteSelected(file){
+  if(!file)return;
+  const maxBytes=10*1024*1024;
+  if(file.size>maxBytes){showToast('Arquivo muito grande. Máximo 10MB.',false);return;}
+  comprovanteFile=file;
+  const info=fileTypeInfo(file.name);
+  const icon=document.getElementById('compIcon');
+  icon.textContent=info.label;
+  icon.className=`w-9 h-9 rounded-lg ${info.color} flex items-center justify-center text-white text-[0.65rem] font-bold shrink-0`;
+  document.getElementById('compNome').textContent=file.name;
+  document.getElementById('compTamanho').textContent=fmtSize(file.size);
+  document.getElementById('compPreview').classList.remove('hidden');
+}
+function clearComprovanteFile(){
+  comprovanteFile=null;
+  document.getElementById('fComprovanteFile').value='';
+  document.getElementById('compPreview').classList.add('hidden');
+}
+function removerComprovanteAtual(){
+  comprovanteAtual=null;comprovanteRemovido=true;
+  document.getElementById('comprovanteExistente').classList.add('hidden');
+  document.getElementById('comprovanteExistente').classList.remove('flex');
+}
+async function viewComprovanteAtual(){
+  if(!comprovanteAtual)return;
+  try{
+    const{data,error}=await supabase.storage.from('comprovantes-pagamento').createSignedUrl(comprovanteAtual.path,300);
+    if(error)throw error;
+    window.open(data.signedUrl,'_blank');
+  }catch(e){showToast('Não foi possível abrir o comprovante.',false);}
+}
+async function abrirComprovante(){
+  const agd=allLancamentos.find(a=>a.ID_AGD===viewAgdId);
+  const path=agd?.pagamento?.COMPROVANTE_PATH;
+  if(!path)return;
+  try{
+    const{data,error}=await supabase.storage.from('comprovantes-pagamento').createSignedUrl(path,300);
+    if(error)throw error;
+    window.open(data.signedUrl,'_blank');
+  }catch(e){showToast('Não foi possível abrir o comprovante.',false);}
+}
+async function baixarComprovante(){
+  const agd=allLancamentos.find(a=>a.ID_AGD===viewAgdId);
+  const p=agd?.pagamento;
+  if(!p?.COMPROVANTE_PATH)return;
+  try{
+    const{data,error}=await supabase.storage.from('comprovantes-pagamento').download(p.COMPROVANTE_PATH);
+    if(error)throw error;
+    const url=URL.createObjectURL(data);
+    const a=document.createElement('a');
+    a.href=url;a.download=p.COMPROVANTE_NOME||'comprovante';a.click();
+    URL.revokeObjectURL(url);
+  }catch(e){showToast('Não foi possível baixar o comprovante.',false);}
+}
+
+function onTipPagChangePgto(){
+  const id=document.getElementById('fTipPagPgto').value;
+  const tip=allTipPag.find(t=>t.ID_TIPPAG===id);
+  document.getElementById('pixKeyHint').classList.toggle('hidden',!tip?.PIX_TIPPAG);
+}
+
+let viewAgdId=null;
+function viewPayment(agdId){
+  viewAgdId=agdId;
+  const agd=allLancamentos.find(a=>a.ID_AGD===agdId);
+  if(!agd?.pagamento)return;
+  const p=agd.pagamento;
+  const serv=allServicos.find(s=>s.ID_PROF===agd.PROF_AGD);
+  document.getElementById('viewSubtitle').textContent=(agd.PACIENTE?.NOME_PAC||'—')+' · '+fmtDate(agd.DT_AGD);
+  document.getElementById('viewPacInfo').innerHTML=
+    `<p class="text-[0.85rem] font-semibold text-gray-800">${agd.PACIENTE?.NOME_PAC||'—'}</p>`+
+    `<p class="text-[0.75rem] text-gray-500">Consulta: ${fmtDate(agd.DT_AGD)} às ${fmtTime(agd.DT_AGD)}</p>`+
+    `<p class="text-[0.75rem] text-gray-500">Profissional: ${agd.PROFISSIONAL?.NOME_PROF||'—'}</p>`;
+  document.getElementById('viewVlPgto').textContent=fmtBRL(p.VL_PGTO);
+  document.getElementById('viewDtPgto').textContent=fmtDate(p.DT_PGTO);
+  const formaText=p.TIPPAG?.NOME_TIPPAG||(p.FORMA_PGTO?FORMA_LABELS[p.FORMA_PGTO]||p.FORMA_PGTO:'Não informada');
+  document.getElementById('viewForma').textContent=formaText;
+  const isPix=p.TIPPAG?.PIX_TIPPAG||(p.FORMA_PGTO==='PIX');
+  document.getElementById('viewPixRow').classList.toggle('hidden',!isPix);
+  document.getElementById('viewPixKey').textContent=serv?.CHAVE_PIX||'Não informada';
+  const temComprovante=!!p.COMPROVANTE_PATH;
+  document.getElementById('viewCompVazio').classList.toggle('hidden',temComprovante);
+  document.getElementById('viewCompArquivo').classList.toggle('hidden',!temComprovante);
+  document.getElementById('viewCompArquivo').classList.toggle('flex',temComprovante);
+  document.getElementById('viewComp').textContent=p.COMPROVANTE_NOME||'Ver comprovante';
+  document.getElementById('viewObsRow').classList.toggle('hidden',!p.OBS_PGTO);
+  document.getElementById('viewObs').textContent=p.OBS_PGTO||'';
+  const estornado=!!p.ESTORNADO_PGTO;
+  document.getElementById('viewEstornadoRow').classList.toggle('hidden',!estornado);
+  document.getElementById('btnEstornar').classList.toggle('hidden',estornado||!!currentProfId);
+  document.getElementById('btnEditar').classList.toggle('hidden',estornado||!!currentProfId);
+  document.getElementById('modalViewPgto').classList.add('open');
+}
+
+function estornarPagamento(){
+  const agd=allLancamentos.find(a=>a.ID_AGD===viewAgdId);
+  if(!agd?.pagamento)return;
+  document.getElementById('modalConfirmEstorno').classList.add('open');
+}
+
+function closeConfirmEstorno(){document.getElementById('modalConfirmEstorno').classList.remove('open');}
+
+async function doEstornarPagamento(){
+  const btn=document.getElementById('btnConfirmEstorno');
+  btn.disabled=true;btn.textContent='Estornando…';
+  const {error}=await supabase.from('PAGAMENTO').update({ESTORNADO_PGTO:true}).eq('ID_AGD',viewAgdId);
+  btn.disabled=false;btn.textContent='Estornar';
+  if(error){showToast(error.message,false);return;}
+  closeConfirmEstorno();
+  showToast('Pagamento estornado com sucesso!');
+  closeViewModal();
+  await loadLancamentos();
+}
+
+function closeModal(){document.getElementById('modalPgto').classList.remove('open');}
+function closeViewModal(){document.getElementById('modalViewPgto').classList.remove('open');}
+
+async function savePayment(ev){
+  ev.preventDefault();
+  const btn=document.getElementById('btnSavePgto');
+  const wasEditing=editingPayment;
+  btn.disabled=true;btn.textContent='Salvando…';
+  const agd=allLancamentos.find(a=>a.ID_AGD===pgtoAgdId);
+  if(!agd){btn.disabled=false;btn.textContent=wasEditing?'Salvar Alterações':'Confirmar Pagamento';return;}
+  const vlPgto=parseCurrencyBR(document.getElementById('fVlPgto').value);
+  if(!vlPgto||vlPgto<=0){showToast('Informe um valor maior que zero',false);btn.disabled=false;btn.textContent=wasEditing?'Salvar Alterações':'Confirmar Pagamento';return;}
+  const fields={
+    VL_PGTO:vlPgto,
+    DT_PGTO:document.getElementById('fDtPgto').value,
+    ID_TIPPAG:document.getElementById('fTipPagPgto').value||null,
+    OBS_PGTO:document.getElementById('fObsPgto').value.trim()||null
+  };
+  const oldPath=wasEditing?(agd.pagamento?.COMPROVANTE_PATH||null):null;
+  try{
+    if(comprovanteFile){
+      const path=`${pgtoAgdId}/${Date.now()}_${comprovanteFile.name.replace(/[^a-zA-Z0-9._-]/g,'_')}`;
+      const {error:upErr}=await supabase.storage.from('comprovantes-pagamento').upload(path,comprovanteFile,{upsert:false});
+      if(upErr)throw new Error('Erro no upload do comprovante: '+upErr.message);
+      fields.COMPROVANTE_PATH=path;
+      fields.COMPROVANTE_NOME=comprovanteFile.name;
+      fields.COMPROVANTE_TIPO=comprovanteFile.type;
+      fields.COMPROVANTE_TAMANHO=comprovanteFile.size;
+    }else if(comprovanteRemovido){
+      fields.COMPROVANTE_PATH=null;
+      fields.COMPROVANTE_NOME=null;
+      fields.COMPROVANTE_TIPO=null;
+      fields.COMPROVANTE_TAMANHO=null;
+    }
+    if(wasEditing){
+      const {error}=await supabase.from('PAGAMENTO').update(fields).eq('ID_AGD',pgtoAgdId);
+      if(error)throw error;
+      showToast('Pagamento atualizado!');
+    }else{
+      const {error}=await supabase.from('PAGAMENTO').insert({...fields,ID_AGD:pgtoAgdId,ID_EMP:agd.ID_EMP,ID_PAC:agd.PAC_AGD,ID_PROF:agd.PROF_AGD});
+      if(error)throw error;
+      showToast('Pagamento registrado com sucesso!');
+    }
+    if(oldPath&&fields.COMPROVANTE_PATH!==undefined&&fields.COMPROVANTE_PATH!==oldPath){
+      await supabase.storage.from('comprovantes-pagamento').remove([oldPath]);
+    }
+    editingPayment=false;
+    closeModal();
+    await loadLancamentos();
+  }catch(err){
+    showToast(err.message||'Erro ao salvar',false);
+  }
+  btn.disabled=false;btn.textContent=wasEditing?'Salvar Alterações':'Confirmar Pagamento';
+}
+
+/* ── Dashboard ── */
+function switchTab(tab){
+  document.getElementById('pane-lancamentos').classList.toggle('hidden',tab!=='lancamentos');
+  document.getElementById('pane-dashboard').classList.toggle('hidden',tab!=='dashboard');
+  document.getElementById('tb-lancamentos').classList.toggle('active',tab==='lancamentos');
+  document.getElementById('tb-dashboard').classList.toggle('active',tab==='dashboard');
+  if(tab==='dashboard')loadDashboard();
+}
+
+function getPeriodRange(){
+  const now=new Date();
+  const de=document.getElementById('dashDtDe').value;
+  const ate=document.getElementById('dashDtAte').value;
+  const start=de||new Date(now.getFullYear(),now.getMonth(),1).toISOString().split('T')[0];
+  const end=ate||now.toISOString().split('T')[0];
+  return{start,end};
+}
+
+/* busca todas as linhas de uma consulta paginando de 1000 em 1000 (limite padrão do PostgREST) */
+async function fetchAllRows(buildQuery, pageSize=1000){
+  let all=[];
+  let from=0;
+  while(true){
+    const {data,error}=await buildQuery().range(from, from+pageSize-1);
+    if(error) throw error;
+    all=all.concat(data||[]);
+    if(!data || data.length<pageSize) break;
+    from+=pageSize;
+  }
+  return all;
+}
+
+function setKpiLoading(loading){
+  const overlay=document.getElementById('dashLoadingOverlay');
+  if(overlay)overlay.classList.toggle('hidden',!loading);
+  const grid=document.getElementById('kpiGrid');
+  if(!grid)return;
+  grid.classList.toggle('opacity-40',loading);
+  grid.classList.toggle('animate-pulse',loading);
+  grid.classList.toggle('pointer-events-none',loading);
+  if(loading){
+    ['kpi-recebido','kpi-repasse','kpi-liquido','kpi-pagos','kpi-pendentes','kpi-ticket','kpi-proj'].forEach(id=>{
+      const el=document.getElementById(id);
+      if(el)el.textContent='—';
+    });
+  }
+}
+
+async function loadDashboard(){
+  setKpiLoading(true);
+  const _loadStart=performance.now();
+  const MIN_LOADING_MS=500;
+  try{
+  const {start,end}=getPeriodRange();
+  const idEmp=AdminEmpresaCtx.resolveIdEmp(currentUserMeta?.tipo_usu, currentUserMeta?.ID_EMP || currentUserMeta?.id_emp);
+  const profId=currentProfId||(document.getElementById('dashProfFilter').value||null);
+
+  /* agendamentos do período selecionado, filtrados por prof/empresa — usado para pendências do período.
+     Mesmo critério de data da aba Lançamentos (data da consulta), para os totais baterem entre as duas abas.
+     paginado: o Supabase limita cada consulta a 1000 linhas e esta lista pode passar disso. */
+  const agdList=await fetchAllRows(()=>{
+    let q=supabase.from('AGENDAMENTO')
+      .select('ID_AGD,DT_AGD,PAC_AGD,PROF_AGD,ID_EMP,VALOR_AGD,PACIENTE!PAC_AGD(NOME_PAC),PROFISSIONAL!PROF_AGD(NOME_PROF)')
+      .eq('PGTO_AGD',true)
+      .gte('DT_AGD',start+'T00:00:00').lte('DT_AGD',end+'T23:59:59');
+    if(idEmp)q=q.eq('ID_EMP',idEmp);
+    if(profId)q=q.eq('PROF_AGD',profId);
+    return q;
+  });
+
+  /* todos os agendamentos (sem filtro de período) — usado só para o gráfico de últimos 6 meses */
+  const agdIdsChart=(await fetchAllRows(()=>{
+    let q=supabase.from('AGENDAMENTO').select('ID_AGD').eq('PGTO_AGD',true);
+    if(idEmp)q=q.eq('ID_EMP',idEmp);
+    if(profId)q=q.eq('PROF_AGD',profId);
+    return q;
+  })).map(a=>a.ID_AGD);
+
+  /* pagamentos recebidos no período — filtrado pela data do pagamento (fluxo de caixa real),
+     não a data da consulta. Um pagamento antecipado de uma consulta futura conta na data em
+     que o dinheiro entrou. Estornos não contam como recebido. */
+  const pList=(await fetchAllRows(()=>{
+    let q=supabase.from('PAGAMENTO')
+      .select('ID_AGD,VL_PGTO,DT_PGTO,ID_EMP,ESTORNADO_PGTO,AGENDAMENTO!inner(PROF_AGD,DT_AGD)')
+      .gte('DT_PGTO',start).lte('DT_PGTO',end);
+    if(idEmp)q=q.eq('ID_EMP',idEmp);
+    if(profId)q=q.eq('AGENDAMENTO.PROF_AGD',profId);
+    return q;
+  })).filter(p=>!p.ESTORNADO_PGTO);
+
+  /* IDs já pagos (todo o período, para contagem de pendentes) — estornados voltam a contar como pendentes,
+     igual à aba Lançamentos. */
+  const paidRecs=await fetchAllRows(()=>{
+    let q=supabase.from('PAGAMENTO').select('ID_AGD,ESTORNADO_PGTO');
+    if(idEmp)q=q.eq('ID_EMP',idEmp);
+    return q;
+  });
+  const paidSet=new Set(paidRecs.filter(p=>!p.ESTORNADO_PGTO).map(p=>p.ID_AGD));
+  const pending=agdList.filter(a=>!paidSet.has(a.ID_AGD));
+
+  /* KPIs */
+  const totalRec=pList.reduce((s,p)=>s+Number(p.VL_PGTO||0),0);
+  const countPago=pList.length;
+  const ticket=countPago?totalRec/countPago:0;
+
+  /* repasse à clínica: % cadastrado no profissional de cada pagamento */
+  const totalRepasse=pList.reduce((s,p)=>{
+    const prof=p.AGENDAMENTO?.PROF_AGD;
+    const perc=profPercMap[prof]||0;
+    return s+Number(p.VL_PGTO||0)*perc/100;
+  },0);
+  const totalLiquido=totalRec-totalRepasse;
+
+  /* projection: agendado/confirmada (próximos 30 dias) + realizada aguardando pagamento (qualquer data) */
+  const today=new Date().toISOString().split('T')[0];
+  const proj30=new Date();proj30.setDate(proj30.getDate()+30);
+  let qF=supabase.from('AGENDAMENTO')
+    .select('ID_AGD,DT_AGD,PAC_AGD,PROF_AGD,STATUS_AGD,VALOR_PREVISTO_AGD,PACIENTE!PAC_AGD(NOME_PAC),PROFISSIONAL!PROF_AGD(NOME_PROF)')
+    .gte('DT_AGD',today+'T00:00:00')
+    .lte('DT_AGD',proj30.toISOString())
+    .in('STATUS_AGD',['AGENDADO','CONFIRMADA'])
+    .order('DT_AGD');
+  if(idEmp)qF=qF.eq('ID_EMP',idEmp);
+  if(profId)qF=qF.eq('PROF_AGD',profId);
+  const {data:futureAgendadas}=await qF;
+
+  let qR=supabase.from('AGENDAMENTO')
+    .select('ID_AGD,DT_AGD,PAC_AGD,PROF_AGD,STATUS_AGD,VALOR_PREVISTO_AGD,PACIENTE!PAC_AGD(NOME_PAC),PROFISSIONAL!PROF_AGD(NOME_PROF)')
+    .eq('STATUS_AGD','REALIZADA')
+    .eq('PGTO_AGD',true)
+    .order('DT_AGD');
+  if(idEmp)qR=qR.eq('ID_EMP',idEmp);
+  if(profId)qR=qR.eq('PROF_AGD',profId);
+  const {data:realizadasRaw}=await qR;
+  const realizadasPendentes=(realizadasRaw||[]).filter(a=>!paidSet.has(a.ID_AGD));
+
+  const futureAgds=[...(futureAgendadas||[]),...realizadasPendentes]
+    .filter(a=>a.VALOR_PREVISTO_AGD!=null)
+    .sort((a,b)=>new Date(a.DT_AGD)-new Date(b.DT_AGD));
+  const projVal=futureAgds.reduce((s,a)=>s+Number(a.VALOR_PREVISTO_AGD||0),0);
+
+  document.getElementById('kpi-recebido').textContent=fmtBRL(totalRec);
+  document.getElementById('kpi-repasse').textContent=fmtBRL(totalRepasse);
+  document.getElementById('kpi-liquido').textContent=fmtBRL(totalLiquido);
+  document.getElementById('kpi-pagos').textContent=countPago;
+  document.getElementById('kpi-pendentes').textContent=pending.length;
+  document.getElementById('kpi-ticket').textContent=fmtBRL(ticket);
+  document.getElementById('kpi-proj').textContent=fmtBRL(projVal);
+
+  buildChart(idEmp,profId,agdIdsChart);
+  renderPendingList(pending);
+  renderProjection(futureAgds||[]);
+  }finally{
+    const elapsed=performance.now()-_loadStart;
+    if(elapsed<MIN_LOADING_MS)await new Promise(r=>setTimeout(r,MIN_LOADING_MS-elapsed));
+    setKpiLoading(false);
+  }
+}
+
+async function buildChart(idEmp,profId,agdIds){
+  /* last 6 months */
+  const months=[];
+  for(let i=5;i>=0;i--){
+    const d=new Date();d.setDate(1);d.setMonth(d.getMonth()-i);
+    const key=`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`;
+    const label=d.toLocaleDateString('pt-BR',{month:'short',year:'2-digit'}).replace('.','');
+    months.push({key,label});
+  }
+  const oldest=months[0].key+'-01';
+  let recs=[];
+  if(!profId||(agdIds&&agdIds.length>0)){
+    let qC=supabase.from('PAGAMENTO').select('VL_PGTO,DT_PGTO').gte('DT_PGTO',oldest);
+    if(profId&&agdIds&&agdIds.length>0){
+      qC=qC.in('ID_AGD',agdIds);
+    } else if(!profId&&idEmp){
+      qC=qC.eq('ID_EMP',idEmp);
+    }
+    const {data}=await qC;
+    recs=data||[];
+  }
+  const chartData=months.map(m=>({
+    label:m.label,
+    value:(recs||[]).filter(r=>r.DT_PGTO?.startsWith(m.key)).reduce((s,r)=>s+Number(r.VL_PGTO||0),0)
+  }));
+  if(revenueChart)revenueChart.destroy();
+  const ctx=document.getElementById('chartRevenue').getContext('2d');
+  revenueChart=new Chart(ctx,{
+    type:'bar',
+    data:{
+      labels:chartData.map(d=>d.label),
+      datasets:[{
+        label:'Recebido (R$)',
+        data:chartData.map(d=>d.value),
+        backgroundColor:'#2ABCD4',
+        borderRadius:8,
+        borderSkipped:false
+      }]
+    },
+    options:{
+      responsive:true,
+      maintainAspectRatio:false,
+      plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>' '+fmtBRL(c.parsed.y)}}},
+      scales:{
+        x:{grid:{display:false},ticks:{font:{size:11}}},
+        y:{beginAtZero:true,grid:{color:'#f3f4f6'},ticks:{callback:v=>'R$ '+Number(v).toLocaleString('pt-BR'),font:{size:11}}}
+      }
+    }
+  });
+}
+
+function renderPendingList(pending){
+  const el=document.getElementById('dashPendList');
+  const emp=document.getElementById('dashPendEmpty');
+  if(!pending.length){el.innerHTML='';emp.classList.remove('hidden');return;}
+  emp.classList.add('hidden');
+  el.innerHTML=pending.slice(0,8).map(a=>{
+    const serv=allServicos.find(s=>s.ID_PROF===a.PROF_AGD);
+    const valorConsulta=getValorConsulta(a,serv);
+    return `<div class="flex items-center gap-3 p-2.5 rounded-xl hover:bg-gray-50 transition-colors">
+      <div class="w-2 h-2 rounded-full bg-amber-400 shrink-0"></div>
+      <div class="flex-1 min-w-0">
+        <p class="text-[0.8rem] font-semibold text-gray-800 truncate">${a.PACIENTE?.NOME_PAC||'—'}</p>
+        <p class="text-[0.7rem] text-gray-400">${fmtDate(a.DT_AGD)} · ${a.PROFISSIONAL?.NOME_PROF||'—'}</p>
+      </div>
+      <span class="text-[0.78rem] font-bold text-amber-600 shrink-0">${valorConsulta?fmtBRL(valorConsulta):'—'}</span>
+    </div>`;
+  }).join('');
+  if(pending.length>8)el.insertAdjacentHTML('beforeend',`<p class="text-center text-[0.72rem] text-gray-400 pt-1">+${pending.length-8} mais…</p>`);
+}
+
+function renderProjection(futureAgds){
+  const body=document.getElementById('projBody');
+  const empty=document.getElementById('projEmpty');
+  const totalProj=futureAgds.reduce((s,a)=>s+Number(a.VALOR_PREVISTO_AGD||0),0);
+  document.getElementById('projTotal').textContent=futureAgds.length?'Total previsto: '+fmtBRL(totalProj):'';
+  if(!futureAgds.length){body.innerHTML='';empty.classList.remove('hidden');return;}
+  empty.classList.add('hidden');
+  body.innerHTML=futureAgds.map(a=>{
+    const color=STATUS_COLORS[a.STATUS_AGD]||'#6b7280';
+    const label=STATUS_LABELS[a.STATUS_AGD]||a.STATUS_AGD;
+    return `<tr class="transition-colors">
+      <td class="px-5 py-3 text-[0.83rem] text-gray-700">${fmtDate(a.DT_AGD)}</td>
+      <td class="px-5 py-3 text-[0.83rem] font-medium text-gray-800">${a.PACIENTE?.NOME_PAC||'—'}</td>
+      <td class="px-5 py-3 text-[0.83rem] text-gray-600">${a.PROFISSIONAL?.NOME_PROF||'—'}</td>
+      <td class="px-5 py-3"><span class="inline-flex px-2 py-0.5 rounded-full text-[0.7rem] font-bold text-white" style="background:${color}">${label}</span></td>
+      <td class="px-5 py-3 text-[0.85rem] font-bold text-vitta-700 text-right">${fmtBRL(a.VALOR_PREVISTO_AGD)}</td>
+    </tr>`;
+  }).join('');
+}
+
+/* ── init ── */
+(async()=>{
+  const ok=await initAuth();
+  if(!ok)return;
+  if(isGlobal() && !AdminEmpresaCtx.get()){
+    AdminEmpresaCtx.renderBloqueio(['main']);
+    return;
+  }
+  await Promise.all([loadProfissionais(),loadServicos(),loadTiposPagamento(),loadProfPercentuais()]);
+  /* default date range: current month */
+  const now=new Date();
+  document.getElementById('filterDtDe').value=`${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-01`;
+  document.getElementById('filterDtAte').value=now.toISOString().split('T')[0];
+  document.getElementById('dashDtDe').value=`${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-01`;
+  document.getElementById('dashDtAte').value=now.toISOString().split('T')[0];
+  await loadLancamentos();
+})();
+
+document.querySelectorAll('#sidebar nav a').forEach(function(link) {
+  link.addEventListener('click', function() {
+    var sb = document.getElementById('sidebar');
+    var ov = document.getElementById('overlay');
+    if (sb && !sb.classList.contains('-translate-x-full')) {
+      sb.classList.add('-translate-x-full');
+      if (ov) ov.classList.add('hidden');
+    }
+  });
+});
+</script>
+<script>
+(async () => {
+  try {
+    const { data: { session } } = await supabase.auth.getSession();
+    if (['ADMIN_EMPRESA'].includes(session?.user?.user_metadata?.tipo_usu)) {
+      const el = document.getElementById('sectionMinhaEmpresa');
+      if (el) el.classList.remove('hidden');
+    }
+  } catch (_) {}
+})();
+</script>
+<script>
+(async () => {
+  try {
+    const { data: { session } } = await supabase.auth.getSession();
+    if (!session) return;
+    const u = await getUsuarioAtual('TIPO_USU,ID_EMP', session);
+    if (u && u.ID_EMP === '22ff26b9-3839-45ed-8a1d-df4a488d3aab' && ['ADMIN_EMPRESA','SECRETARIA'].includes(u.TIPO_USU)) {
+      document.getElementById('menuDocumentosWrap')?.classList.remove('hidden');
+    }
+  } catch (_) {}
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,1678 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>Minha Empresa — Vitta Sistemas</title>
+  <link rel="icon" type="image/png" href="../img/favicon.png" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: { vitta: { 50:'#f0fbfd',100:'#e0f7fa',300:'#80deea',400:'#4dd9ed',500:'#2ABCD4',600:'#1a96ac',700:'#127a8c' } },
+          fontFamily: { sans: ['Inter','system-ui','sans-serif'] }
+        }
+      }
+    }
+  </script>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+  <script src="../assets/js/config.js?v=2"></script>
+  <script src="../assets/js/admin-empresa-context.js?v=1"></script>
+  <script src="../assets/js/notifications.js?v=3"></script>
+  <style>
+    .sidebar-nav::-webkit-scrollbar { width:3px; }
+    .sidebar-nav::-webkit-scrollbar-thumb { background:rgba(255,255,255,.1); border-radius:4px; }
+    .submenu { overflow:hidden; max-height:0; opacity:0; transition:max-height .25s ease,opacity .2s ease; }
+    .submenu.open { max-height:500px; opacity:1; }
+    .chevron { transition:transform .25s ease; display:inline-block; }
+    .chevron.open { transform:rotate(180deg); }
+    @keyframes fadeUp { from{opacity:0;transform:translateY(8px)} to{opacity:1;transform:translateY(0)} }
+    .fade-up { animation:fadeUp .35s ease forwards; }
+    .field-disabled { background:#f9fafb; color:#374151; cursor:default; }
+    #toast { position:fixed; bottom:24px; right:24px; z-index:999; transition:all .3s ease; }
+    .modal-overlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,.5); z-index:300; align-items:flex-start; justify-content:center; padding:24px 16px; overflow-y:auto; }
+    .modal-overlay.open { display:flex; }
+  </style>
+</head>
+
+<body class="bg-[#F0F2F5] font-sans antialiased">
+<div class="flex min-h-screen">
+
+<!-- SIDEBAR -->
+<aside id="sidebar" class="fixed inset-y-0 left-0 w-[220px] bg-[#111827] flex flex-col z-30 -translate-x-full lg:translate-x-0 transition-transform duration-300">
+  <div class="flex flex-col items-center justify-center gap-1 py-4 px-5 border-b border-white/10 shrink-0">
+    <img src="../img/logo.png" alt="Vitta Sistemas" class="h-10 w-auto brightness-0 invert" />
+    <p class="text-[0.6rem] text-gray-500 tracking-wide">v1.2.1</p>
+  </div>
+  <nav class="flex-1 overflow-y-auto sidebar-nav py-3">
+    <p class="block text-[0.6rem] font-bold text-gray-500 uppercase tracking-widest px-4 pb-1 pt-3">Principal</p>
+    <a href="dashboard.html" class="flex items-center gap-3 px-3 py-2.5 mx-2 rounded-xl text-[0.83rem] font-medium text-gray-400 hover:bg-white/10 hover:text-white transition-colors duration-150 mb-0.5">
+      <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>Dashboard
+    </a>
+    <a href="agendamentos.html" class="flex items-center gap-3 px-3 py-2.5 mx-2 rounded-xl text-[0.83rem] font-medium text-gray-400 hover:bg-white/10 hover:text-white transition-colors duration-150 mb-0.5">
+      <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>Agendamentos
+    </a>
+    <a href="consultas.html" class="flex items-center gap-3 px-3 py-2.5 mx-2 rounded-xl text-[0.83rem] font-medium text-gray-400 hover:bg-white/10 hover:text-white transition-colors duration-150 mb-0.5">
+      <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>Consultas
+    </a>
+
+    <p class="block text-[0.6rem] font-bold text-gray-500 uppercase tracking-widest px-4 pb-1 pt-4">Cadastros</p>
+    <button onclick="toggleMenu('cadastros')" class="w-full flex items-center gap-3 px-3 py-2.5 mx-2 rounded-xl text-[0.83rem] font-medium text-gray-400 hover:bg-white/10 hover:text-white transition-colors duration-150 cursor-pointer mb-0.5" style="width:calc(100% - 16px)">
+      <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>Cadastros
+      <svg id="chev-cadastros" class="chevron w-3.5 h-3.5 ml-auto text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+    </button>
+    <div id="sub-cadastros" class="submenu">
+      <a href="pacientes.html" class="flex items-center gap-2 pl-10 pr-3 py-2 mx-2 rounded-xl text-[0.8rem] text-gray-500 hover:bg-white/5 hover:text-gray-300 transition-colors cursor-pointer">Pacientes</a>
+      <a href="profissionais.html" class="flex items-center gap-2 pl-10 pr-3 py-2 mx-2 rounded-xl text-[0.8rem] text-gray-500 hover:bg-white/5 hover:text-gray-300 transition-colors cursor-pointer">Profissionais</a>
+      <a href="usuarios-empresa.html" class="flex items-center gap-2 pl-10 pr-3 py-2 mx-2 rounded-xl text-[0.8rem] text-gray-500 hover:bg-white/5 hover:text-gray-300 transition-colors cursor-pointer">Usu&aacute;rios</a>
+      <div class="hidden" id="menuDocumentosWrap"><a href="documentos.html" class="flex items-center gap-2 pl-10 pr-3 py-2 mx-2 rounded-xl text-[0.8rem] text-gray-500 hover:bg-white/5 hover:text-gray-300 transition-colors cursor-pointer w-full">Documentos</a></div>
+      <a href="leads.html" class="flex items-center gap-2 pl-10 pr-3 py-2 mx-2 rounded-xl text-[0.8rem] text-gray-500 hover:bg-white/5 hover:text-gray-300 transition-colors cursor-pointer">Leads</a>
+    </div>
+
+    <p class="block text-[0.6rem] font-bold text-gray-500 uppercase tracking-widest px-4 pb-1 pt-4">Outros Cadastros</p>
+    <button onclick="toggleMenu('servicos')" class="w-full flex items-center gap-3 px-3 py-2.5 mx-2 rounded-xl text-[0.83rem] font-medium text-gray-400 hover:bg-white/10 hover:text-white transition-colors duration-150 cursor-pointer mb-0.5" style="width:calc(100% - 16px)">
+      <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>Outros Cadastros
+      <svg id="chev-servicos" class="chevron w-3.5 h-3.5 ml-auto text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+    </button>
+    <div id="sub-servicos" class="submenu">
+      <a href="servicos.html" class="flex items-center gap-2 pl-10 pr-3 py-2 mx-2 rounded-xl text-[0.8rem] text-gray-500 hover:bg-white/5 hover:text-gray-300 transition-colors cursor-pointer">Servi&ccedil;os</a>
+      <a href="salas.html" class="flex items-center gap-2 pl-10 pr-3 py-2 mx-2 rounded-xl text-[0.8rem] text-gray-500 hover:bg-white/5 hover:text-gray-300 transition-colors cursor-pointer">Salas</a>
+      <a href="especialidades.html" class="flex items-center gap-2 pl-10 pr-3 py-2 mx-2 rounded-xl text-[0.8rem] text-gray-500 hover:bg-white/5 hover:text-gray-300 transition-colors cursor-pointer">Especialidades</a>
+      <a href="grupo.html" class="flex items-center gap-2 pl-10 pr-3 py-2 mx-2 rounded-xl text-[0.8rem] text-gray-500 hover:bg-white/5 hover:text-gray-300 transition-colors cursor-pointer">Grupo</a>
+      <a href="tipospagamento.html" class="flex items-center gap-2 pl-10 pr-3 py-2 mx-2 rounded-xl text-[0.8rem] text-gray-500 hover:bg-white/5 hover:text-gray-300 transition-colors cursor-pointer">Tipos de Pagamento</a>
+      <a href="tiposacompanhamento.html" class="flex items-center gap-2 pl-10 pr-3 py-2 mx-2 rounded-xl text-[0.8rem] text-gray-500 hover:bg-white/5 hover:text-gray-300 transition-colors cursor-pointer">Tipos de Acomp.</a>
+    </div>
+
+    <p class="block text-[0.6rem] font-bold text-gray-500 uppercase tracking-widest px-4 pb-1 pt-4">Financeiro</p>
+    <button onclick="toggleMenu('financeiro')" class="w-full flex items-center gap-3 px-3 py-2.5 mx-2 rounded-xl text-[0.83rem] font-medium text-gray-400 hover:bg-white/10 hover:text-white transition-colors duration-150 cursor-pointer mb-0.5" style="width:calc(100% - 16px)">
+      <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>Financeiro
+      <svg id="chev-financeiro" class="chevron w-3.5 h-3.5 ml-auto text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+    </button>
+    <div id="sub-financeiro" class="submenu">
+      <a href="financeiro.html" class="flex items-center gap-2 pl-10 pr-3 py-2 mx-2 rounded-xl text-[0.8rem] text-gray-500 hover:bg-white/5 hover:text-gray-300 transition-colors cursor-pointer">Lan&ccedil;amentos</a>
+      <a href="relatorios.html" class="flex items-center gap-2 pl-10 pr-3 py-2 mx-2 rounded-xl text-[0.8rem] text-gray-500 hover:bg-white/5 hover:text-gray-300 transition-colors cursor-pointer">Relat&oacute;rios</a>
+    </div>
+
+    <p class="block text-[0.6rem] font-bold text-gray-500 uppercase tracking-widest px-4 pb-1 pt-4">Minha Empresa</p>
+    <button onclick="toggleMenu('minhaempresa')" class="w-full flex items-center gap-3 px-3 py-2.5 mx-2 rounded-xl text-[0.83rem] font-semibold text-vitta-400 bg-vitta-500/10 transition-colors duration-150 cursor-pointer mb-0.5" style="width:calc(100% - 16px)">
+      <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>Minha Empresa
+      <svg id="chev-minhaempresa" class="chevron open w-3.5 h-3.5 ml-auto text-vitta-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+    </button>
+    <div id="sub-minhaempresa" class="submenu open">
+      <a href="minha-empresa.html" class="flex items-center gap-2 pl-10 pr-3 py-2 mx-2 rounded-xl text-[0.8rem] font-semibold text-vitta-400 bg-vitta-500/10 transition-colors cursor-pointer">Meus Dados</a>
+      <a href="faturas.html" class="flex items-center gap-2 pl-10 pr-3 py-2 mx-2 rounded-xl text-[0.8rem] text-gray-500 hover:bg-white/5 hover:text-gray-300 transition-colors cursor-pointer">Minhas Faturas</a>
+    </div>
+
+    <div id="sectionVittaBI" class="hidden">
+    <p class="block text-[0.6rem] font-bold text-gray-500 uppercase tracking-widest px-4 pb-1 pt-4">Vitta BI</p>
+    <a id="linkVittaBI" href="https://bi.vittasistemas.com.br" target="_blank" rel="noopener"
+       class="flex items-center gap-3 px-3 py-2.5 mx-2 rounded-xl text-[0.83rem] font-medium text-gray-400 hover:bg-white/10 hover:text-white transition-colors duration-150 cursor-pointer mb-0.5">
+      <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+        <path d="M3 3v18h18"/><path d="M18.7 8l-5.3 5.3-3-3L4 16.3"/>
+      </svg>
+      Vitta BI
+      <span class="ml-auto text-[0.55rem] font-bold text-violet-300 bg-violet-500/20 px-1.5 py-0.5 rounded">BI</span>
+    </a>
+    </div>
+
+    <div id="sectionAdmin" class="hidden">
+    <p class="block text-[0.6rem] font-bold text-gray-500 uppercase tracking-widest px-4 pb-1 pt-4">Sistema</p>
+    <button onclick="toggleMenu('admin')" class="w-full flex items-center gap-3 px-3 py-2.5 mx-2 rounded-xl text-[0.83rem] font-medium text-gray-400 hover:bg-white/10 hover:text-white transition-colors duration-150 mb-0.5" style="width:calc(100% - 16px)">
+      <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14M4.93 4.93a10 10 0 0 0 0 14.14"/></svg>Administra&ccedil;&atilde;o
+      <svg id="chev-admin" class="chevron w-3.5 h-3.5 ml-auto text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+    </button>
+    <div id="sub-admin" class="submenu">
+      <a href="empresas.html" class="flex items-center gap-2 pl-10 pr-3 py-2 mx-2 rounded-xl text-[0.8rem] text-gray-500 hover:bg-white/5 hover:text-gray-300 transition-colors cursor-pointer">Empresas</a>
+      <a href="usuarios.html" class="flex items-center gap-2 pl-10 pr-3 py-2 mx-2 rounded-xl text-[0.8rem] text-gray-500 hover:bg-white/5 hover:text-gray-300 transition-colors cursor-pointer">Usu&aacute;rios Admin</a>
+      <a href="planos.html" class="flex items-center gap-2 pl-10 pr-3 py-2 mx-2 rounded-xl text-[0.8rem] text-gray-500 hover:bg-white/5 hover:text-gray-300 transition-colors cursor-pointer">Planos</a>
+      <a href="configuracoes.html" class="flex items-center gap-2 pl-10 pr-3 py-2 mx-2 rounded-xl text-[0.8rem] text-gray-500 hover:bg-white/5 hover:text-gray-300 transition-colors cursor-pointer">Configura&ccedil;&otilde;es</a>
+      <a href="logs.html" class="flex items-center gap-2 pl-10 pr-3 py-2 mx-2 rounded-xl text-[0.8rem] text-gray-500 hover:bg-white/5 hover:text-gray-300 transition-colors cursor-pointer">Log</a>
+    </div>
+    </div>
+    <div class="h-4"></div>
+  </nav>
+  <div class="shrink-0 border-t border-white/10 p-3">
+    <div class="group flex items-center gap-2.5 p-2.5 rounded-xl hover:bg-white/5 cursor-pointer">
+      <div id="user-avatar" class="w-8 h-8 rounded-full bg-vitta-500 flex items-center justify-center text-white text-xs font-bold shrink-0">A</div>
+      <div class="flex-1 min-w-0">
+        <p id="user-name" class="text-white text-[0.8rem] font-semibold truncate">Usu&aacute;rio</p>
+        <p id="user-role" class="text-gray-500 text-[0.7rem] truncate">Admin</p>
+      </div>
+      <button onclick="handleLogout()" title="Sair" class="text-gray-600 hover:text-red-400 transition-colors opacity-0 group-hover:opacity-100">
+        <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+      </button>
+    </div>
+  </div>
+</aside>
+
+<div id="overlay" class="fixed inset-0 bg-black/50 z-20 hidden lg:hidden" onclick="toggleSidebar()"></div>
+
+<div class="flex-1 lg:ml-[220px] flex flex-col min-h-screen">
+
+  <!-- HEADER -->
+  <header class="sticky top-0 z-20 h-16 bg-white border-b border-gray-200 flex items-center px-5 gap-3 shadow-sm">
+    <button onclick="toggleSidebar()" class="lg:hidden p-2 rounded-lg hover:bg-gray-100 text-gray-500">
+      <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+    </button>
+    <div class="flex-1">
+      <h1 class="text-[1rem] font-bold text-gray-800 leading-tight">Minha Empresa</h1>
+      <p id="header-date" class="text-[0.7rem] text-gray-400 leading-tight"></p>
+    </div>
+    <div class="hidden md:flex items-center gap-2 px-3 py-2 bg-gray-50 border border-gray-200 rounded-xl">
+      <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-vitta-500 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+      <span id="empresa-nome" class="text-[0.78rem] font-semibold text-gray-700">Empresa</span>
+    </div>
+    <div class="flex items-center gap-2.5">
+      <div id="header-avatar" class="w-9 h-9 rounded-full bg-vitta-500 flex items-center justify-center text-white text-sm font-bold shrink-0">A</div>
+      <div class="hidden sm:block">
+        <p id="header-user-name" class="text-[0.8rem] font-semibold text-gray-800 leading-tight">Usu&aacute;rio</p>
+        <p id="header-user-role" class="text-[0.7rem] text-gray-400 leading-tight">Administrador</p>
+      </div>
+    </div>
+    <button onclick="handleLogout()" class="p-2.5 rounded-xl hover:bg-red-50 text-gray-400 hover:text-red-500 transition-colors" title="Sair">
+      <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+    </button>
+  </header>
+
+  <main class="flex-1 p-5 lg:p-6 flex flex-col gap-5 fade-up">
+
+    <!-- Page header -->
+    <div>
+      <p class="text-[0.65rem] font-bold text-vitta-600 uppercase tracking-widest mb-0.5">Minha Empresa · Dados</p>
+      <h2 class="text-[1.4rem] font-extrabold text-gray-800 tracking-tight leading-none">Dados da Empresa</h2>
+      <p class="text-[0.8rem] text-gray-400 mt-1">Visualize e edite as informa&ccedil;&otilde;es da sua empresa</p>
+    </div>
+
+    <!-- Card principal -->
+    <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+
+      <!-- Hero -->
+      <div class="flex items-center gap-5 px-6 py-6 border-b border-gray-100 bg-gradient-to-r from-vitta-50 to-white">
+        <div id="logoContainer" class="w-20 h-20 rounded-2xl flex items-center justify-center text-white text-3xl font-bold shrink-0 shadow-sm overflow-hidden bg-gradient-to-br from-vitta-500 to-vitta-700">
+          <span id="logoIniciais">V</span>
+          <img id="logoImg" class="hidden w-full h-full object-cover" src="" alt="" onerror="this.classList.add('hidden');document.getElementById('logoIniciais').classList.remove('hidden');" />
+        </div>
+        <div class="flex-1 min-w-0">
+          <div id="heroNome" class="text-xl font-extrabold text-gray-800 leading-tight">—</div>
+          <div id="heroCnpj" class="text-sm text-gray-500 mt-1 font-mono">—</div>
+          <span id="heroBadge" class="inline-flex items-center gap-1.5 mt-2 px-2.5 py-1 rounded-full text-xs font-semibold bg-emerald-100 text-emerald-700">
+            <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>Ativa
+          </span>
+        </div>
+        <!-- Plano atual + botão mudar -->
+        <div id="heroPlanoBlocoOuter" class="hidden shrink-0 flex flex-col items-end gap-2">
+          <div class="flex flex-col items-end gap-1">
+            <p class="text-[0.62rem] font-bold uppercase tracking-wider text-gray-400">Plano Atual</p>
+            <span id="planoAtualBadge" class="inline-flex items-center gap-1.5 text-xs font-bold bg-rose-100 text-rose-700 border border-rose-200 px-3 py-1.5 rounded-full">—</span>
+          </div>
+          <button onclick="abrirModalMudarPlano()"
+                  class="flex items-center gap-1.5 px-3.5 py-2 bg-vitta-500 hover:bg-vitta-600 text-white text-xs font-semibold rounded-xl transition-colors shadow-sm whitespace-nowrap">
+            <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M7.5 21L3 16.5m0 0L7.5 12M3 16.5h13.5m0-13.5L21 7.5m0 0L16.5 3M21 7.5H7.5"/>
+            </svg>
+            Mudar de Plano
+          </button>
+        </div>
+      </div>
+
+      <!-- Formulário -->
+      <div class="px-6 py-6">
+        <div id="alertMsg" class="mb-4 hidden"></div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
+
+          <div class="sm:col-span-2 flex flex-col gap-1.5">
+            <label class="text-xs font-semibold text-gray-500 uppercase tracking-wider">Nome da Empresa</label>
+            <input id="fNome" type="text" disabled
+                   class="px-3 py-2.5 border border-gray-200 rounded-xl text-sm text-gray-800 field-disabled outline-none focus:border-vitta-500 focus:bg-white transition-colors" />
+          </div>
+
+          <div class="flex flex-col gap-1.5">
+            <label class="text-xs font-semibold text-gray-500 uppercase tracking-wider">CNPJ/CPF</label>
+            <input id="fCnpj" type="text" disabled maxlength="18"
+                   class="px-3 py-2.5 border border-gray-200 rounded-xl text-sm text-gray-800 field-disabled outline-none focus:border-vitta-500 focus:bg-white transition-colors" />
+          </div>
+
+          <div class="flex flex-col gap-1.5">
+            <label class="text-xs font-semibold text-gray-500 uppercase tracking-wider">Telefone</label>
+            <input id="fTel" type="tel" disabled maxlength="15"
+                   class="px-3 py-2.5 border border-gray-200 rounded-xl text-sm text-gray-800 field-disabled outline-none focus:border-vitta-500 focus:bg-white transition-colors" />
+          </div>
+
+          <div class="sm:col-span-2 flex flex-col gap-1.5">
+            <label class="text-xs font-semibold text-gray-500 uppercase tracking-wider">E-mail</label>
+            <input id="fEmail" type="email" disabled
+                   class="px-3 py-2.5 border border-gray-200 rounded-xl text-sm text-gray-800 field-disabled outline-none focus:border-vitta-500 focus:bg-white transition-colors" />
+          </div>
+
+          <!-- Separador Endereço -->
+          <div class="sm:col-span-2">
+            <div class="flex items-center gap-2 pt-1">
+              <div class="h-px flex-1 bg-gray-100"></div>
+              <span class="text-[0.65rem] font-bold uppercase tracking-wider text-gray-400 px-1">Endereço</span>
+              <div class="h-px flex-1 bg-gray-100"></div>
+            </div>
+          </div>
+
+          <div class="flex flex-col gap-1.5">
+            <label class="text-xs font-semibold text-gray-500 uppercase tracking-wider">CEP</label>
+            <div class="flex gap-2">
+              <input id="fCep" type="text" disabled placeholder="00000-000" maxlength="9"
+                     class="flex-1 px-3 py-2.5 border border-gray-200 rounded-xl text-sm text-gray-800 field-disabled outline-none focus:border-vitta-500 focus:bg-white transition-colors" />
+              <button type="button" onclick="buscarCep()" id="btnBuscarCep" disabled
+                      class="px-3 py-2.5 bg-vitta-500 hover:bg-vitta-600 disabled:opacity-40 disabled:cursor-not-allowed text-white text-xs font-semibold rounded-xl transition-colors flex items-center gap-1.5 shrink-0">
+                <svg id="cepSpin" class="hidden animate-spin w-3.5 h-3.5" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/></svg>
+                <span id="cepBtnTxt">Buscar</span>
+              </button>
+            </div>
+          </div>
+
+          <div class="flex flex-col gap-1.5">
+            <label class="text-xs font-semibold text-gray-500 uppercase tracking-wider">UF</label>
+            <input id="fUf" type="text" disabled placeholder="SP" maxlength="2"
+                   class="px-3 py-2.5 border border-gray-200 rounded-xl text-sm text-gray-800 field-disabled outline-none uppercase transition-colors" />
+          </div>
+
+          <div class="sm:col-span-2 flex flex-col gap-1.5">
+            <label class="text-xs font-semibold text-gray-500 uppercase tracking-wider">Logradouro</label>
+            <input id="fLogradouro" type="text" disabled placeholder="Preenchido automaticamente pelo CEP"
+                   class="px-3 py-2.5 border border-gray-200 rounded-xl text-sm text-gray-800 field-disabled outline-none focus:border-vitta-500 focus:bg-white transition-colors" />
+          </div>
+
+          <div class="flex flex-col gap-1.5">
+            <label class="text-xs font-semibold text-gray-500 uppercase tracking-wider">Número</label>
+            <input id="fNumero" type="text" disabled placeholder="123"
+                   class="px-3 py-2.5 border border-gray-200 rounded-xl text-sm text-gray-800 field-disabled outline-none focus:border-vitta-500 focus:bg-white transition-colors" />
+          </div>
+
+          <div class="flex flex-col gap-1.5">
+            <label class="text-xs font-semibold text-gray-500 uppercase tracking-wider">Complemento</label>
+            <input id="fComplemento" type="text" disabled placeholder="Sala, apto..."
+                   class="px-3 py-2.5 border border-gray-200 rounded-xl text-sm text-gray-800 field-disabled outline-none focus:border-vitta-500 focus:bg-white transition-colors" />
+          </div>
+
+          <div class="flex flex-col gap-1.5">
+            <label class="text-xs font-semibold text-gray-500 uppercase tracking-wider">Bairro</label>
+            <input id="fBairro" type="text" disabled placeholder="Preenchido automaticamente"
+                   class="px-3 py-2.5 border border-gray-200 rounded-xl text-sm text-gray-800 field-disabled outline-none focus:border-vitta-500 focus:bg-white transition-colors" />
+          </div>
+
+          <div class="flex flex-col gap-1.5">
+            <label class="text-xs font-semibold text-gray-500 uppercase tracking-wider">Cidade</label>
+            <input id="fCidade" type="text" disabled placeholder="Preenchido automaticamente"
+                   class="px-3 py-2.5 border border-gray-200 rounded-xl text-sm text-gray-800 field-disabled outline-none focus:border-vitta-500 focus:bg-white transition-colors" />
+          </div>
+
+          <div class="sm:col-span-2 flex flex-col gap-1.5">
+            <label class="text-xs font-semibold text-gray-500 uppercase tracking-wider">Logo da Empresa</label>
+            <div class="flex items-center gap-3">
+              <div id="logoPreviewBox" class="w-16 h-16 rounded-xl bg-gradient-to-br from-vitta-500 to-vitta-700 flex items-center justify-center text-white font-bold text-lg overflow-hidden shrink-0 border border-gray-100">
+                <span id="logoPreviewIni">V</span>
+                <img id="logoPreviewImg" class="hidden w-full h-full object-contain bg-white" src="" alt="" />
+              </div>
+              <div class="flex flex-col gap-1.5">
+                <input id="fLogoFile" type="file" accept="image/png,image/jpeg,image/webp" class="hidden" onchange="onLogoSelect(event)" disabled />
+                <div class="flex items-center gap-2">
+                  <button type="button" id="btnSelecionarLogo" disabled
+                          onclick="document.getElementById('fLogoFile').click()"
+                          class="px-3 py-2 border border-gray-200 rounded-xl text-xs font-semibold text-gray-600 hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed transition-colors">
+                    Selecionar imagem
+                  </button>
+                  <button type="button" id="btnRemoverLogo" onclick="removerLogo()"
+                          class="hidden px-3 py-2 border border-red-200 rounded-xl text-xs font-semibold text-red-500 hover:bg-red-50 transition-colors">
+                    Remover
+                  </button>
+                </div>
+                <p class="text-[0.7rem] text-gray-400 leading-relaxed max-w-md">
+                  PNG ou WEBP com fundo transparente (ou branco), formato quadrado, m&iacute;nimo de 300&times;300px, m&aacute;ximo de 2MB.
+                  Essa imagem &eacute; usada no cabe&ccedil;alho do sistema e no PDF de Solicita&ccedil;&atilde;o de Exames.
+                </p>
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Botões de ação -->
+        <div class="flex items-center gap-3 mt-8 pt-6 border-t border-gray-100">
+          <button id="btnEditar" onclick="habilitarEdicao()"
+                  class="flex items-center gap-2 px-5 py-2.5 bg-vitta-500 hover:bg-vitta-600 text-white text-sm font-semibold rounded-xl transition-colors shadow-sm">
+            <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+            Editar Dados
+          </button>
+          <button id="btnCancelar" onclick="cancelarEdicao()" class="hidden px-5 py-2.5 border border-gray-200 rounded-xl text-sm font-semibold text-gray-600 hover:bg-gray-50 transition-colors">
+            Cancelar
+          </button>
+          <button id="btnSalvar" onclick="salvarEmpresa()" class="hidden flex items-center gap-2 px-5 py-2.5 bg-emerald-500 hover:bg-emerald-600 text-white text-sm font-semibold rounded-xl transition-colors shadow-sm">
+            <svg id="saveSpin" class="hidden animate-spin w-4 h-4" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/></svg>
+            <svg id="saveIcon" xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+            <span id="saveTxt">Salvar Altera&ccedil;&otilde;es</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Cancelamento de assinatura -->
+      <div id="cancelamentoSection" class="hidden px-6 pb-5 border-t border-gray-100 pt-5">
+        <div class="flex items-center justify-between">
+          <div>
+            <p class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-0.5">Assinatura</p>
+            <p id="cancelamentoStatus" class="text-sm text-gray-600">—</p>
+          </div>
+          <div class="flex items-center gap-2">
+            <button id="btnReativarAssinatura" onclick="abrirModalReativacao()" class="hidden flex items-center gap-2 px-4 py-2 border border-emerald-300 text-emerald-600 hover:bg-emerald-50 text-sm font-semibold rounded-xl transition-colors">
+              <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5"/></svg>
+              Reativar Assinatura
+            </button>
+            <button id="btnCancelarAssinatura" onclick="abrirModalCancelamento()"
+                    class="flex items-center gap-2 px-4 py-2 border border-red-200 text-red-500 hover:bg-red-50 text-sm font-semibold rounded-xl transition-colors">
+              <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
+              Cancelar Assinatura
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Info rodapé -->
+      <div class="px-6 pb-5 grid grid-cols-1 sm:grid-cols-2 gap-4 border-t border-gray-100 pt-4">
+        <div>
+          <p class="text-[0.65rem] font-bold uppercase tracking-wider text-gray-400 mb-0.5">Data de Cadastro</p>
+          <p id="infoDtcri" class="text-sm text-gray-600">—</p>
+        </div>
+        <div>
+          <p class="text-[0.65rem] font-bold uppercase tracking-wider text-gray-400 mb-0.5">&Uacute;ltima Altera&ccedil;&atilde;o</p>
+          <p id="infoDtalter" class="text-sm text-gray-600">—</p>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Card Google Meet -->
+    <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden px-6 py-6">
+      <div class="flex items-center justify-between gap-4 flex-wrap">
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 rounded-xl flex items-center justify-center shrink-0 shadow-sm" style="background:linear-gradient(135deg,#00ac47 0%,#00832d 35%,#0066da 70%,#2684fc 100%)">
+            <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-white" viewBox="0 0 24 24" fill="currentColor"><path d="M17 10.5V7a1 1 0 0 0-1-1H4a1 1 0 0 0-1 1v10a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-3.5l4 4v-11l-4 4Z"/></svg>
+          </div>
+          <div>
+            <p class="text-[0.65rem] font-bold text-vitta-600 uppercase tracking-widest mb-0.5">Integração</p>
+            <h3 class="text-base font-bold text-gray-800">Google Meet</h3>
+            <p class="text-[0.8rem] text-gray-400 mt-0.5">Conecte a conta Google da sua empresa para gerar links de videochamada nos agendamentos online.</p>
+          </div>
+        </div>
+        <div id="googleMeetStatusBox" class="text-sm text-gray-400 shrink-0">Verificando conexão…</div>
+      </div>
+    </div>
+  </main>
+</div>
+
+<!-- Modal reativação de assinatura -->
+<div id="modalReativacao" class="fixed inset-0 z-50 hidden items-center justify-center p-4" style="background:rgba(0,0,0,0.5)">
+  <div class="bg-white rounded-2xl shadow-2xl w-full max-w-md overflow-hidden">
+
+    <!-- Passo 1: Boas-vindas + escolha do plano -->
+    <div id="reativPasso1">
+      <div class="px-6 pt-8 pb-2 text-center">
+        <div class="text-4xl mb-3">🎉</div>
+        <h3 class="text-lg font-extrabold text-gray-800">Que ótimo ter você de volta!</h3>
+        <p class="text-sm text-gray-500 mt-1">Sua assinatura será reativada imediatamente.</p>
+      </div>
+
+      <div class="px-6 py-4">
+        <p class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-3">Deseja continuar com o mesmo plano?</p>
+
+        <!-- Plano atual -->
+        <div id="reativPlanoAtualCard"
+             class="flex items-center justify-between p-4 border-2 border-vitta-400 bg-vitta-50 rounded-xl mb-3 cursor-pointer"
+             onclick="selecionarPlanoReativ(null)">
+          <div>
+            <p id="reativPlanoAtualNome" class="text-sm font-bold text-gray-800">—</p>
+            <p id="reativPlanoAtualPreco" class="text-xs text-vitta-600 font-semibold mt-0.5">—</p>
+          </div>
+          <div id="reativPlanoAtualCheck" class="w-5 h-5 rounded-full border-2 border-vitta-400 bg-vitta-400 flex items-center justify-center">
+            <svg class="w-3 h-3 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3"><path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5"/></svg>
+          </div>
+        </div>
+
+        <!-- Toggle mudar plano -->
+        <button onclick="toggleMudarPlano()" id="btnToggleMudarPlano"
+                class="w-full text-center text-sm text-vitta-600 font-semibold py-2 hover:underline">
+          Quero mudar de plano ↓
+        </button>
+
+        <!-- Lista de outros planos (oculta inicialmente) -->
+        <div id="outrosPlanos" class="hidden mt-2 flex flex-col gap-2"></div>
+      </div>
+
+      <div class="px-6 pb-6 flex justify-end gap-3">
+        <button onclick="fecharModalReativacao()" class="px-4 py-2.5 border border-gray-200 rounded-xl text-sm font-semibold text-gray-600 hover:bg-gray-50 transition-colors">Cancelar</button>
+        <button onclick="irParaConfirmacaoReativ()" class="px-5 py-2.5 bg-emerald-500 hover:bg-emerald-600 text-white text-sm font-semibold rounded-xl transition-colors">Continuar</button>
+      </div>
+    </div>
+
+    <!-- Passo 2: Confirmação -->
+    <div id="reativPasso2" class="hidden">
+      <div class="px-6 pt-6 pb-4 border-b border-gray-100">
+        <h3 class="text-base font-bold text-gray-800">Confirmar reativação</h3>
+        <p class="text-sm text-gray-500 mt-1">Revise os detalhes antes de confirmar.</p>
+      </div>
+      <div class="px-6 py-5 flex flex-col gap-3">
+        <div class="bg-gray-50 rounded-xl p-4 flex flex-col gap-2.5">
+          <div class="flex justify-between text-sm">
+            <span class="text-gray-500">Plano</span>
+            <span id="confirmReativPlano" class="font-semibold text-gray-800">—</span>
+          </div>
+          <div class="flex justify-between text-sm">
+            <span class="text-gray-500">Valor mensal</span>
+            <span id="confirmReativPreco" class="font-semibold text-vitta-600">—</span>
+          </div>
+          <div class="h-px bg-gray-200"></div>
+          <div class="flex justify-between text-sm">
+            <span class="text-gray-500">Próximo vencimento</span>
+            <span id="confirmReativVenc" class="font-semibold text-gray-800">—</span>
+          </div>
+        </div>
+        <p class="text-xs text-gray-400 leading-relaxed">O boleto será gerado próximo à data de vencimento. Após o pagamento, sua assinatura é renovada automaticamente todo mês na mesma data.</p>
+      </div>
+      <div class="px-6 pb-6 flex justify-end gap-3">
+        <button onclick="voltarReativPasso1()" class="px-4 py-2.5 border border-gray-200 rounded-xl text-sm font-semibold text-gray-600 hover:bg-gray-50 transition-colors">Voltar</button>
+        <button onclick="confirmarReativacao()" id="btnConfirmarReativ"
+                class="flex items-center gap-2 px-5 py-2.5 bg-emerald-500 hover:bg-emerald-600 text-white text-sm font-semibold rounded-xl transition-colors">
+          <svg id="reativSpin" class="hidden animate-spin w-4 h-4" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/></svg>
+          Reativar Assinatura
+        </button>
+      </div>
+    </div>
+
+    <!-- Passo 3: Sucesso -->
+    <div id="reativPasso3" class="hidden px-6 py-10 text-center">
+      <div class="text-5xl mb-4">✅</div>
+      <h3 class="text-lg font-extrabold text-gray-800 mb-2">Assinatura reativada!</h3>
+      <p class="text-sm text-gray-500 leading-relaxed">Seu acesso está garantido.<br>O próximo boleto vencerá em</p>
+      <p id="reativSucessoVenc" class="text-xl font-extrabold text-emerald-600 mt-2">—</p>
+      <p class="text-xs text-gray-400 mt-1">A partir daí, renova automaticamente todo mês na mesma data.</p>
+      <button onclick="fecharModalReativacao()" class="mt-6 px-6 py-2.5 bg-gray-800 hover:bg-gray-700 text-white text-sm font-semibold rounded-xl transition-colors">Fechar</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal cancelamento de assinatura -->
+<div id="modalCancelamento" class="fixed inset-0 z-50 hidden items-center justify-center p-4" style="background:rgba(0,0,0,0.5)">
+  <div class="bg-white rounded-2xl shadow-2xl w-full max-w-md overflow-hidden">
+
+    <!-- Passo 1: Motivo -->
+    <div id="cancelPasso1">
+      <div class="px-6 pt-6 pb-4 border-b border-gray-100">
+        <h3 class="text-base font-bold text-gray-800">Cancelar Assinatura</h3>
+        <p class="text-sm text-gray-500 mt-1">Nos conte o motivo para ajudarmos a melhorar.</p>
+      </div>
+      <div class="px-6 py-5 flex flex-col gap-3">
+        <label class="text-xs font-semibold text-gray-500 uppercase tracking-wider">Motivo do cancelamento *</label>
+        <div class="flex flex-col gap-2" id="motivoOpcoes">
+          <label class="flex items-center gap-3 p-3 border border-gray-200 rounded-xl cursor-pointer hover:bg-gray-50 transition-colors has-[:checked]:border-red-300 has-[:checked]:bg-red-50">
+            <input type="radio" name="motivo" value="Custo muito alto" class="accent-red-500" />
+            <span class="text-sm text-gray-700">Custo muito alto</span>
+          </label>
+          <label class="flex items-center gap-3 p-3 border border-gray-200 rounded-xl cursor-pointer hover:bg-gray-50 transition-colors has-[:checked]:border-red-300 has-[:checked]:bg-red-50">
+            <input type="radio" name="motivo" value="Não uso o sistema com frequência" class="accent-red-500" />
+            <span class="text-sm text-gray-700">Não uso o sistema com frequência</span>
+          </label>
+          <label class="flex items-center gap-3 p-3 border border-gray-200 rounded-xl cursor-pointer hover:bg-gray-50 transition-colors has-[:checked]:border-red-300 has-[:checked]:bg-red-50">
+            <input type="radio" name="motivo" value="Encontrei outra solução" class="accent-red-500" />
+            <span class="text-sm text-gray-700">Encontrei outra solução</span>
+          </label>
+          <label class="flex items-center gap-3 p-3 border border-gray-200 rounded-xl cursor-pointer hover:bg-gray-50 transition-colors has-[:checked]:border-red-300 has-[:checked]:bg-red-50">
+            <input type="radio" name="motivo" value="Estou encerrando a clínica" class="accent-red-500" />
+            <span class="text-sm text-gray-700">Estou encerrando a clínica</span>
+          </label>
+          <label class="flex items-center gap-3 p-3 border border-gray-200 rounded-xl cursor-pointer hover:bg-gray-50 transition-colors has-[:checked]:border-red-300 has-[:checked]:bg-red-50">
+            <input type="radio" name="motivo" value="outro" class="accent-red-500" onchange="document.getElementById('motivoOutroBox').classList.remove('hidden')" />
+            <span class="text-sm text-gray-700">Outro motivo</span>
+          </label>
+          <textarea id="motivoOutroBox" placeholder="Descreva o motivo..." rows="2"
+                    class="hidden w-full px-3 py-2 border border-gray-200 rounded-xl text-sm text-gray-700 outline-none focus:border-red-300 resize-none"></textarea>
+        </div>
+        <p id="motivoErro" class="hidden text-xs text-red-500 font-medium">Selecione ou informe um motivo para continuar.</p>
+      </div>
+      <div class="px-6 pb-6 flex justify-end gap-3">
+        <button onclick="fecharModalCancelamento()" class="px-4 py-2.5 border border-gray-200 rounded-xl text-sm font-semibold text-gray-600 hover:bg-gray-50 transition-colors">Voltar</button>
+        <button onclick="irParaPasso2()" class="px-5 py-2.5 bg-red-500 hover:bg-red-600 text-white text-sm font-semibold rounded-xl transition-colors">Continuar</button>
+      </div>
+    </div>
+
+    <!-- Passo 2: Confirmação -->
+    <div id="cancelPasso2" class="hidden">
+      <div class="px-6 pt-6 pb-4 border-b border-gray-100">
+        <h3 class="text-base font-bold text-gray-800">Tem certeza?</h3>
+        <p class="text-sm text-gray-500 mt-1">Esta ação não pode ser desfeita.</p>
+      </div>
+      <div class="px-6 py-5">
+        <div class="bg-amber-50 border border-amber-200 rounded-xl p-4 flex gap-3">
+          <svg class="w-5 h-5 text-amber-500 shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z"/></svg>
+          <div>
+            <p class="text-sm font-semibold text-amber-800">Ao confirmar o cancelamento:</p>
+            <ul class="mt-1.5 text-sm text-amber-700 space-y-1 list-disc list-inside">
+              <li>Nenhuma nova cobrança será gerada</li>
+              <li>Seu acesso ficará disponível até <strong id="confirmAcessoAte">—</strong></li>
+              <li>Após essa data o sistema será bloqueado</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+      <div class="px-6 pb-6 flex justify-end gap-3">
+        <button onclick="voltarPasso1()" class="px-4 py-2.5 border border-gray-200 rounded-xl text-sm font-semibold text-gray-600 hover:bg-gray-50 transition-colors">Voltar</button>
+        <button onclick="confirmarCancelamento()" id="btnConfirmarCancel"
+                class="flex items-center gap-2 px-5 py-2.5 bg-red-500 hover:bg-red-600 text-white text-sm font-semibold rounded-xl transition-colors">
+          <svg id="cancelSpin" class="hidden animate-spin w-4 h-4" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/></svg>
+          Sim, cancelar assinatura
+        </button>
+      </div>
+    </div>
+
+    <!-- Passo 3: Sucesso -->
+    <div id="cancelPasso3" class="hidden px-6 py-8 text-center">
+      <div class="w-14 h-14 rounded-full bg-emerald-100 border-2 border-emerald-300 flex items-center justify-center mx-auto mb-4">
+        <svg class="w-7 h-7 text-emerald-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5"/></svg>
+      </div>
+      <h3 class="text-base font-bold text-gray-800 mb-2">Cancelamento confirmado</h3>
+      <p class="text-sm text-gray-500 leading-relaxed">Sua assinatura foi cancelada.<br>Você terá acesso ao sistema até</p>
+      <p id="sucessoAcessoAte" class="text-lg font-bold text-gray-800 mt-2">—</p>
+      <p class="text-xs text-gray-400 mt-1">Após essa data o sistema será bloqueado automaticamente.</p>
+      <button onclick="fecharModalCancelamento()" class="mt-5 px-6 py-2.5 bg-gray-800 hover:bg-gray-700 text-white text-sm font-semibold rounded-xl transition-colors">Entendido</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal: Mudar de Plano -->
+<div id="modalMudarPlano" class="fixed inset-0 z-50 hidden items-center justify-center p-4" style="background:rgba(0,0,0,0.5)">
+  <div class="bg-white rounded-2xl shadow-2xl w-full max-w-xl overflow-hidden">
+
+    <!-- Passo 1: Seleção -->
+    <div id="mpPasso1">
+      <div class="px-6 pt-6 pb-4 border-b border-gray-100 flex items-start justify-between">
+        <div>
+          <h3 class="text-base font-bold text-gray-800">Mudar de Plano</h3>
+          <p class="text-sm text-gray-500 mt-0.5">Selecione o plano desejado para sua clínica.</p>
+        </div>
+        <button onclick="fecharModalMudarPlano()" class="p-1.5 rounded-lg hover:bg-gray-100 text-gray-400 hover:text-gray-600 transition-colors">
+          <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
+      </div>
+      <div id="mpPlanosLista" class="px-6 py-5 flex flex-col gap-3 max-h-[55vh] overflow-y-auto">
+        <p class="text-center text-sm text-gray-400 py-4">Carregando planos...</p>
+      </div>
+      <div class="px-6 pb-6 border-t border-gray-100 pt-4 flex justify-end">
+        <button onclick="fecharModalMudarPlano()" class="px-5 py-2.5 border border-gray-200 rounded-xl text-sm font-semibold text-gray-600 hover:bg-gray-50 transition-colors">Cancelar</button>
+      </div>
+    </div>
+
+    <!-- Passo 2: Confirmação -->
+    <div id="mpPasso2" class="hidden">
+      <div class="px-6 pt-6 pb-4 border-b border-gray-100">
+        <h3 class="text-base font-bold text-gray-800">Confirmar mudança de plano</h3>
+      </div>
+      <div class="px-6 py-5 flex flex-col gap-4">
+        <div class="bg-vitta-50 border border-vitta-200 rounded-xl p-4 flex flex-col gap-2.5">
+          <div class="flex justify-between text-sm">
+            <span class="text-gray-500">Plano atual</span>
+            <span id="mpConfirmPlanoAtual" class="font-semibold text-gray-600">—</span>
+          </div>
+          <div class="flex justify-between text-sm">
+            <span class="text-gray-500">Novo plano</span>
+            <span id="mpConfirmNovoPlano" class="font-bold text-vitta-700">—</span>
+          </div>
+          <div class="h-px bg-vitta-100"></div>
+          <div class="flex justify-between text-sm">
+            <span class="text-gray-500">Novo valor mensal</span>
+            <span id="mpConfirmNovoPreco" class="font-extrabold text-vitta-600 text-base">—</span>
+          </div>
+        </div>
+        <div class="bg-amber-50 border border-amber-200 rounded-xl p-4 flex gap-3">
+          <svg class="w-5 h-5 text-amber-500 shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z"/></svg>
+          <p class="text-sm text-amber-700 leading-relaxed">As próximas faturas serão cobradas no novo valor. A mudança de plano entra em vigor imediatamente após a confirmação.</p>
+        </div>
+      </div>
+      <div class="px-6 pb-6 border-t border-gray-100 pt-4 flex justify-end gap-3">
+        <button onclick="voltarMpPasso1()" class="px-4 py-2.5 border border-gray-200 rounded-xl text-sm font-semibold text-gray-600 hover:bg-gray-50 transition-colors">Voltar</button>
+        <button onclick="confirmarMudancaPlano()" id="btnConfirmarMp"
+                class="flex items-center gap-2 px-5 py-2.5 bg-vitta-500 hover:bg-vitta-600 text-white text-sm font-semibold rounded-xl transition-colors">
+          <svg id="mpSpin" class="hidden animate-spin w-4 h-4" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/></svg>
+          <span id="mpConfirmTxt">Sim, mudar de plano</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Passo 3: Sucesso -->
+    <div id="mpPasso3" class="hidden px-6 py-10 text-center">
+      <div class="w-14 h-14 rounded-full bg-emerald-100 border-2 border-emerald-300 flex items-center justify-center mx-auto mb-4">
+        <svg class="w-7 h-7 text-emerald-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5"/></svg>
+      </div>
+      <h3 class="text-base font-bold text-gray-800 mb-2">Plano alterado com sucesso!</h3>
+      <p class="text-sm text-gray-500 leading-relaxed">Sua clínica agora está no plano <strong id="mpSucessoNome" class="text-vitta-700">—</strong>.<br>As próximas faturas refletirão o novo valor.</p>
+      <button onclick="fecharModalMudarPlano()" class="mt-6 px-6 py-2.5 bg-gray-800 hover:bg-gray-700 text-white text-sm font-semibold rounded-xl transition-colors">Fechar</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Desconectar Google Meet -->
+<div id="modalDesconectarGoogle" class="modal-overlay" onclick="if(event.target===this)fecharModalDesconectarGoogle()">
+  <div class="bg-white rounded-2xl shadow-xl w-full max-w-sm" onclick="event.stopPropagation()">
+    <div class="p-6">
+      <div class="flex items-center gap-4 mb-4">
+        <div class="w-11 h-11 rounded-full bg-red-100 flex items-center justify-center shrink-0">
+          <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M12 9v4"/><path d="M12 17h.01"/><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0Z"/></svg>
+        </div>
+        <div>
+          <h3 class="text-[0.95rem] font-bold text-gray-800">Desconectar Google Meet</h3>
+          <p class="text-[0.78rem] text-gray-400 mt-0.5">Esta ação pode ser desfeita reconectando depois.</p>
+        </div>
+      </div>
+      <p class="text-[0.83rem] text-gray-600 mb-5">Novos agendamentos online não poderão gerar links de videochamada até que a conexão seja refeita. Deseja continuar?</p>
+      <div class="flex gap-3">
+        <button onclick="fecharModalDesconectarGoogle()" class="flex-1 py-2.5 border border-gray-200 rounded-xl text-sm font-medium text-gray-600 hover:bg-gray-50 transition-colors">Cancelar</button>
+        <button onclick="confirmarDesconexaoGoogleMeet()" class="flex-1 py-2.5 bg-red-500 text-white rounded-xl text-sm font-semibold hover:bg-red-600 transition-colors">Desconectar</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Toast -->
+<div id="toast" class="hidden">
+  <div id="toastInner" class="flex items-center gap-3 px-4 py-3 rounded-xl shadow-lg text-sm font-medium text-white min-w-[240px]"></div>
+</div>
+
+<script>
+/* ─── Estado ─── */
+let empresaId = null;
+let empresaData = null;
+let modoEdicao = false;
+let currentLogoUrl = null;
+let newLogoFile = null;
+let logoRemovido = false;
+
+/* ─── Helpers ─── */
+function toggleMenu(k) {
+  const s = document.getElementById('sub-' + k);
+  const c = document.getElementById('chev-' + k);
+  const o = s.classList.contains('open');
+  s.classList.toggle('open', !o);
+  if (c) c.classList.toggle('open', !o);
+}
+function toggleSidebar() {
+  const sb = document.getElementById('sidebar');
+  const ov = document.getElementById('overlay');
+  const o = sb.classList.contains('-translate-x-full');
+  sb.classList.toggle('-translate-x-full', !o);
+  ov.classList.toggle('hidden', !o);
+}
+async function handleLogout() {
+  await supabase.auth.signOut();
+  window.location.href = '../index.html';
+}
+function showToast(msg, ok = true) {
+  const t = document.getElementById('toast');
+  const i = document.getElementById('toastInner');
+  i.textContent = msg;
+  i.className = `flex items-center gap-3 px-4 py-3 rounded-xl shadow-lg text-sm font-medium text-white min-w-[240px] ${ok ? 'bg-emerald-500' : 'bg-red-500'}`;
+  t.classList.remove('hidden');
+  setTimeout(() => t.classList.add('hidden'), 3500);
+}
+function fmtDate(d) {
+  if (!d) return '—';
+  const dt = d.includes('T') ? new Date(d) : new Date(d + 'T12:00');
+  return dt.toLocaleDateString('pt-BR', { day: '2-digit', month: 'long', year: 'numeric' });
+}
+function fmtCep(v) {
+  const d = (v || '').replace(/\D/g, '');
+  return d.length === 8 ? d.replace(/(\d{5})(\d{3})/, '$1-$2') : v || '';
+}
+function fmtCnpj(v) {
+  return (v || '').replace(/\D/g, '')
+    .replace(/(\d{2})(\d)/, '$1.$2')
+    .replace(/(\d{3})(\d)/, '$1.$2')
+    .replace(/(\d{3})(\d)/, '$1/$2')
+    .replace(/(\d{4})(\d{1,2})$/, '$1-$2')
+    .substring(0, 18);
+}
+function fmtDoc(v) {
+  const d = (v || '').replace(/\D/g, '');
+  if (d.length === 11)
+    return d.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, '$1.$2.$3-$4');
+  return fmtCnpj(d);
+}
+function fmtTel(v) {
+  const d = (v || '').replace(/\D/g, '');
+  if (d.length === 11) return `(${d.slice(0,2)}) ${d.slice(2,7)}-${d.slice(7)}`;
+  if (d.length === 10) return `(${d.slice(0,2)}) ${d.slice(2,6)}-${d.slice(6)}`;
+  return v || '';
+}
+function initials(n) {
+  return (n || '').trim().split(/\s+/).slice(0, 2).map(w => w[0]).join('').toUpperCase() || 'V';
+}
+function showAlert(msg) {
+  const el = document.getElementById('alertMsg');
+  el.innerHTML = `<div class="flex items-center gap-2 px-4 py-3 bg-red-50 border border-red-200 rounded-xl text-sm text-red-700 font-medium"><svg class="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>${msg}</div>`;
+  el.classList.remove('hidden');
+}
+function hideAlert() {
+  const el = document.getElementById('alertMsg');
+  el.classList.add('hidden');
+  el.innerHTML = '';
+}
+
+/* ─── Campos ─── */
+function setFieldsDisabled(disabled) {
+  ['fNome','fCnpj','fTel','fEmail','fCep','fLogradouro','fNumero','fComplemento','fBairro','fCidade'].forEach(id => {
+    const el = document.getElementById(id);
+    el.disabled = disabled;
+    if (disabled) {
+      el.classList.add('field-disabled');
+      el.classList.remove('bg-white', 'border-gray-300');
+    } else {
+      el.classList.remove('field-disabled');
+      el.classList.add('bg-white', 'border-gray-300');
+    }
+  });
+  // UF é sempre readonly, mas habilita/desabilita visualmente junto
+  const ufEl = document.getElementById('fUf');
+  ufEl.disabled = disabled;
+  if (disabled) ufEl.classList.add('field-disabled');
+  else ufEl.classList.add('field-disabled'); // UF sempre cinza (preenchido pelo CEP)
+
+  const btnCep = document.getElementById('btnBuscarCep');
+  btnCep.disabled = disabled;
+
+  document.getElementById('fLogoFile').disabled = disabled;
+  document.getElementById('btnSelecionarLogo').disabled = disabled;
+  const btnRemover = document.getElementById('btnRemoverLogo');
+  if (disabled || !currentLogoUrl) btnRemover.classList.add('hidden');
+  else btnRemover.classList.remove('hidden');
+}
+
+/* ─── Auth ─── */
+async function initAuth() {
+  document.getElementById('header-date').textContent = new Date().toLocaleDateString('pt-BR', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+  const { data: { session } } = await supabase.auth.getSession();
+  if (!session) { window.location.href = '../index.html'; return false; }
+  const meta = session.user.user_metadata;
+
+  if (!['ADMIN_EMPRESA','ADMIN_GLOBAL'].includes(meta.tipo_usu)) {
+    window.location.href = 'dashboard.html';
+    return false;
+  }
+
+  const LABELS = { ADMIN_GLOBAL: 'Admin Global', ADMIN_EMPRESA: 'Administrador', SECRETARIA: 'Secretaria', PROFISSIONAL: 'Profissional' };
+  const nome = meta.nome_usu || session.user.email;
+  const ini = initials(nome);
+  ['user-name','header-user-name'].forEach(id => document.getElementById(id).textContent = nome);
+  ['user-role','header-user-role'].forEach(id => document.getElementById(id).textContent = LABELS[meta.tipo_usu] || meta.tipo_usu);
+  ['user-avatar','header-avatar'].forEach(id => document.getElementById(id).textContent = ini);
+
+  if (meta.tipo_usu === 'ADMIN_GLOBAL') AdminEmpresaCtx.initSelector('ADMIN_GLOBAL', session.user.id);
+  empresaId = AdminEmpresaCtx.resolveIdEmp(meta.tipo_usu, meta.ID_EMP || meta.id_emp);
+
+  const uOwn = await getUsuarioAtual('PROF_USU', session);
+  if (!uOwn?.PROF_USU)
+    document.querySelector('a[href="consultas.html"]')?.classList.add('hidden');
+  return true;
+}
+
+/* ─── Carregar dados da empresa ─── */
+async function carregarEmpresa() {
+  if (!empresaId) return;
+  const { data, error } = await supabase
+    .from('EMPRESA')
+    .select('ID_EMP,NOME_EMP,CNPJ_EMP,EMAIL_EMP,TEL_EMP,LOGO_EMP,ATIVO_EMP,DTCRI_EMP,DTALTER_EMP,CEP_EMP,LOGRADOURO_EMP,NUMERO_EMP,COMPLEMENTO_EMP,BAIRRO_EMP,CIDADE_EMP,UF_EMP')
+    .eq('ID_EMP', empresaId)
+    .single();
+
+  if (error || !data) {
+    showAlert('Não foi possível carregar os dados da empresa.');
+    return;
+  }
+
+  empresaData = data;
+  document.getElementById('empresa-nome').textContent = data.NOME_EMP || '';
+
+  // Hero
+  document.getElementById('heroNome').textContent = data.NOME_EMP || '—';
+  document.getElementById('heroCnpj').textContent = data.CNPJ_EMP ? fmtDoc(data.CNPJ_EMP) : '—';
+  const badge = document.getElementById('heroBadge');
+  badge.className = `inline-flex items-center gap-1.5 mt-2 px-2.5 py-1 rounded-full text-xs font-semibold ${data.ATIVO_EMP ? 'bg-emerald-100 text-emerald-700' : 'bg-gray-100 text-gray-500'}`;
+  badge.innerHTML = `<span class="w-1.5 h-1.5 rounded-full ${data.ATIVO_EMP ? 'bg-emerald-500' : 'bg-gray-400'}"></span>${data.ATIVO_EMP ? 'Ativa' : 'Inativa'}`;
+
+  // Logo
+  currentLogoUrl = data.LOGO_EMP || null;
+  newLogoFile = null;
+  logoRemovido = false;
+  const ini = initials(data.NOME_EMP);
+  document.getElementById('logoIniciais').textContent = ini;
+  if (data.LOGO_EMP) {
+    const img = document.getElementById('logoImg');
+    img.src = data.LOGO_EMP;
+    img.classList.remove('hidden');
+    document.getElementById('logoIniciais').classList.add('hidden');
+  }
+
+  // Campos
+  document.getElementById('fNome').value       = data.NOME_EMP       || '';
+  document.getElementById('fCnpj').value       = data.CNPJ_EMP       ? fmtDoc(data.CNPJ_EMP) : '';
+  document.getElementById('fTel').value        = data.TEL_EMP        ? fmtTel(data.TEL_EMP)    : '';
+  document.getElementById('fEmail').value      = data.EMAIL_EMP      || '';
+  document.getElementById('fCep').value        = data.CEP_EMP        ? fmtCep(data.CEP_EMP)    : '';
+  document.getElementById('fLogradouro').value = data.LOGRADOURO_EMP || '';
+  document.getElementById('fNumero').value     = data.NUMERO_EMP     || '';
+  document.getElementById('fComplemento').value= data.COMPLEMENTO_EMP|| '';
+  document.getElementById('fBairro').value     = data.BAIRRO_EMP     || '';
+  document.getElementById('fCidade').value     = data.CIDADE_EMP     || '';
+  document.getElementById('fUf').value         = data.UF_EMP         || '';
+
+  // Rodapé
+  document.getElementById('infoDtcri').textContent = fmtDate(data.DTCRI_EMP);
+  document.getElementById('infoDtalter').textContent = fmtDate(data.DTALTER_EMP);
+
+  // Logo preview initial
+  document.getElementById('logoPreviewIni').textContent = ini;
+  if (data.LOGO_EMP) {
+    const pimg = document.getElementById('logoPreviewImg');
+    pimg.src = data.LOGO_EMP;
+    pimg.classList.remove('hidden');
+    document.getElementById('logoPreviewIni').classList.add('hidden');
+  }
+}
+
+/* ─── Busca de CEP (ViaCEP) ─── */
+async function buscarCep() {
+  const cep = document.getElementById('fCep').value.replace(/\D/g, '');
+  if (cep.length !== 8) { showToast('Informe um CEP válido com 8 dígitos.', false); return; }
+
+  const spin = document.getElementById('cepSpin');
+  const btn  = document.getElementById('btnBuscarCep');
+  const txt  = document.getElementById('cepBtnTxt');
+  spin.classList.remove('hidden');
+  btn.disabled = true;
+  txt.textContent = 'Buscando...';
+
+  try {
+    const res  = await fetch(`https://viacep.com.br/ws/${cep}/json/`);
+    const data = await res.json();
+    if (data.erro) { showToast('CEP não encontrado.', false); return; }
+    document.getElementById('fLogradouro').value = data.logradouro || '';
+    document.getElementById('fBairro').value     = data.bairro     || '';
+    document.getElementById('fCidade').value     = data.localidade || '';
+    document.getElementById('fUf').value         = data.uf         || '';
+    document.getElementById('fNumero').focus();
+    showToast('Endereço preenchido com sucesso!');
+  } catch {
+    showToast('Erro ao buscar CEP. Verifique sua conexão.', false);
+  } finally {
+    spin.classList.add('hidden');
+    btn.disabled = false;
+    txt.textContent = 'Buscar';
+  }
+}
+
+/* ─── Máscaras ─── */
+document.addEventListener('DOMContentLoaded', () => {
+  document.getElementById('fCnpj').addEventListener('input', e => {
+    e.target.value = fmtCnpj(e.target.value);
+  });
+  document.getElementById('fTel').addEventListener('input', e => {
+    const d = e.target.value.replace(/\D/g, '').slice(0, 11);
+    if (d.length <= 10) e.target.value = d.replace(/(\d{2})(\d{4})(\d{0,4})/, '($1) $2-$3').replace(/-$/, '');
+    else e.target.value = d.replace(/(\d{2})(\d{5})(\d{0,4})/, '($1) $2-$3').replace(/-$/, '');
+  });
+  document.getElementById('fCep').addEventListener('input', function () {
+    const d = this.value.replace(/\D/g, '');
+    this.value = d.length > 5 ? d.replace(/(\d{5})(\d{0,3})/, '$1-$2') : d;
+    if (d.length === 8) buscarCep();
+  });
+  document.getElementById('fCep').addEventListener('keydown', function (e) {
+    if (e.key === 'Enter') { e.preventDefault(); buscarCep(); }
+  });
+});
+
+/* ─── Logo (upload) ─── */
+function onLogoSelect(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+  if (!file.type.startsWith('image/')) { showToast('Selecione uma imagem válida (PNG, JPG ou WebP).', false); return; }
+  if (file.size > 2 * 1024 * 1024) { showToast('A imagem deve ter no máximo 2MB.', false); return; }
+  newLogoFile = file;
+  logoRemovido = false;
+  const reader = new FileReader();
+  reader.onload = e => showLogoPreview(e.target.result);
+  reader.readAsDataURL(file);
+  document.getElementById('btnRemoverLogo').classList.remove('hidden');
+}
+
+function showLogoPreview(src) {
+  const pimg = document.getElementById('logoPreviewImg');
+  const pini = document.getElementById('logoPreviewIni');
+  pimg.src = src;
+  pimg.classList.remove('hidden');
+  pini.classList.add('hidden');
+}
+
+function removerLogo() {
+  newLogoFile = null;
+  logoRemovido = true;
+  document.getElementById('fLogoFile').value = '';
+  document.getElementById('logoPreviewImg').classList.add('hidden');
+  document.getElementById('logoPreviewIni').classList.remove('hidden');
+  document.getElementById('btnRemoverLogo').classList.add('hidden');
+}
+
+async function uploadLogo() {
+  if (logoRemovido) return null;
+  if (!newLogoFile) return currentLogoUrl;
+  const ext = (newLogoFile.name.split('.').pop() || 'png').toLowerCase();
+  const path = `${empresaId}/logo.${ext}`;
+  const { error } = await supabase.storage
+    .from('empresa-logos')
+    .upload(path, newLogoFile, { upsert: true, contentType: newLogoFile.type });
+  if (error) throw new Error('Erro ao fazer upload da logo: ' + error.message);
+  const { data } = supabase.storage.from('empresa-logos').getPublicUrl(path);
+  return data.publicUrl + '?v=' + Date.now();
+}
+
+/* ─── Edição ─── */
+function habilitarEdicao() {
+  modoEdicao = true;
+  setFieldsDisabled(false);
+  hideAlert();
+  document.getElementById('btnEditar').classList.add('hidden');
+  document.getElementById('btnCancelar').classList.remove('hidden');
+  document.getElementById('btnSalvar').classList.remove('hidden');
+  document.getElementById('fNome').focus();
+}
+
+function cancelarEdicao() {
+  modoEdicao = false;
+  setFieldsDisabled(true);
+  hideAlert();
+  document.getElementById('btnEditar').classList.remove('hidden');
+  document.getElementById('btnCancelar').classList.add('hidden');
+  document.getElementById('btnSalvar').classList.add('hidden');
+  // Restaurar valores originais
+  if (empresaData) {
+    document.getElementById('fNome').value        = empresaData.NOME_EMP        || '';
+    document.getElementById('fCnpj').value        = empresaData.CNPJ_EMP        ? fmtDoc(empresaData.CNPJ_EMP) : '';
+    document.getElementById('fTel').value         = empresaData.TEL_EMP         ? fmtTel(empresaData.TEL_EMP)    : '';
+    document.getElementById('fEmail').value       = empresaData.EMAIL_EMP       || '';
+    document.getElementById('fCep').value         = empresaData.CEP_EMP         ? fmtCep(empresaData.CEP_EMP)    : '';
+    document.getElementById('fLogradouro').value  = empresaData.LOGRADOURO_EMP  || '';
+    document.getElementById('fNumero').value      = empresaData.NUMERO_EMP      || '';
+    document.getElementById('fComplemento').value = empresaData.COMPLEMENTO_EMP || '';
+    document.getElementById('fBairro').value      = empresaData.BAIRRO_EMP      || '';
+    document.getElementById('fCidade').value      = empresaData.CIDADE_EMP      || '';
+    document.getElementById('fUf').value          = empresaData.UF_EMP          || '';
+  }
+  // Restaurar logo original
+  newLogoFile = null;
+  logoRemovido = false;
+  document.getElementById('fLogoFile').value = '';
+  const pimg = document.getElementById('logoPreviewImg');
+  const pini = document.getElementById('logoPreviewIni');
+  if (currentLogoUrl) {
+    pimg.src = currentLogoUrl;
+    pimg.classList.remove('hidden');
+    pini.classList.add('hidden');
+  } else {
+    pimg.classList.add('hidden');
+    pini.classList.remove('hidden');
+  }
+}
+
+/* ─── Salvar ─── */
+async function salvarEmpresa() {
+  hideAlert();
+  const nome = document.getElementById('fNome').value.trim();
+  if (!nome) { showAlert('O nome da empresa é obrigatório.'); document.getElementById('fNome').focus(); return; }
+
+  document.getElementById('btnSalvar').disabled = true;
+  document.getElementById('saveSpin').classList.remove('hidden');
+  document.getElementById('saveIcon').classList.add('hidden');
+  document.getElementById('saveTxt').textContent = 'Salvando...';
+
+  try {
+    const logoUrl = await uploadLogo();
+    const payload = {
+      NOME_EMP:        nome,
+      CNPJ_EMP:        document.getElementById('fCnpj').value.replace(/\D/g, '')           || null,
+      TEL_EMP:         document.getElementById('fTel').value.replace(/\D/g, '')            || null,
+      EMAIL_EMP:       document.getElementById('fEmail').value.trim()                      || null,
+      CEP_EMP:         document.getElementById('fCep').value.replace(/\D/g, '')            || null,
+      LOGRADOURO_EMP:  document.getElementById('fLogradouro').value.trim()                 || null,
+      NUMERO_EMP:      document.getElementById('fNumero').value.trim()                     || null,
+      COMPLEMENTO_EMP: document.getElementById('fComplemento').value.trim()                || null,
+      BAIRRO_EMP:      document.getElementById('fBairro').value.trim()                     || null,
+      CIDADE_EMP:      document.getElementById('fCidade').value.trim()                     || null,
+      UF_EMP:          document.getElementById('fUf').value.trim().toUpperCase()           || null,
+      LOGO_EMP:        logoUrl,
+      DTALTER_EMP:     new Date().toISOString(),
+    };
+
+    const { error } = await supabase.from('EMPRESA').update(payload).eq('ID_EMP', empresaId);
+    if (error) throw new Error(error.message);
+
+    showToast('Dados atualizados com sucesso!');
+    await carregarEmpresa();
+    cancelarEdicao();
+  } catch (e) {
+    showAlert('Erro ao salvar: ' + (e.message || 'Tente novamente.'));
+  } finally {
+    document.getElementById('btnSalvar').disabled = false;
+    document.getElementById('saveSpin').classList.add('hidden');
+    document.getElementById('saveIcon').classList.remove('hidden');
+    document.getElementById('saveTxt').textContent = 'Salvar Alterações';
+  }
+}
+
+/* ─── Assinatura ─── */
+let _acessoAteData   = null;
+let _planoAtualId    = null;
+let _planoAtualNome  = '—';
+let _planoAtualPreco = 0;
+let _planoSelecionadoId   = null;
+let _planoSelecionadoNome = null;
+let _planoSelecionadoPreco = 0;
+let _mudandoPlano = false;
+let _asaasSubId    = null;
+let _novoPlanoId   = null;
+let _novoPlanoNome = null;
+let _novoPlanoPreco = 0;
+
+async function carregarStatusAssinatura() {
+  if (!empresaId) return;
+  const { data: emp } = await supabase
+    .from('EMPRESA')
+    .select('STATUS_EMP, ACESSO_ATE, ASAAS_SUBSCRIPTION_ID, ID_PLANO, ISENTO_COBRANCA, PLANO:ID_PLANO(NOME_PLANO, PRECO_PLANO)')
+    .eq('ID_EMP', empresaId)
+    .single();
+
+  if (!emp) return;
+  _acessoAteData   = emp.ACESSO_ATE;
+  _planoAtualId    = emp.ID_PLANO;
+  _planoAtualNome  = emp.PLANO?.NOME_PLANO  || '—';
+  _planoAtualPreco = emp.PLANO?.PRECO_PLANO || 0;
+  _asaasSubId      = emp.ASAAS_SUBSCRIPTION_ID || null;
+
+  // Mostra plano no hero
+  document.getElementById('heroPlanoBlocoOuter').classList.remove('hidden');
+  document.getElementById('planoAtualBadge').textContent = _planoAtualNome;
+
+  const sec     = document.getElementById('cancelamentoSection');
+  const st      = document.getElementById('cancelamentoStatus');
+  const btnCanc = document.getElementById('btnCancelarAssinatura');
+  const btnReat = document.getElementById('btnReativarAssinatura');
+
+  if (emp.ISENTO_COBRANCA) {
+    document.querySelector('#heroPlanoBlocoOuter button[onclick="abrirModalMudarPlano()"]')?.classList.add('hidden');
+    sec.classList.remove('hidden');
+    st.textContent = 'Isenta de cobrança — acesso liberado sem faturamento';
+    btnCanc.classList.add('hidden');
+    btnReat.classList.add('hidden');
+    return;
+  }
+
+  const statusLabels = {
+    trial:                 'Período de teste',
+    ativo:                 'Assinatura ativa',
+    inadimplente:          'Pagamento em atraso',
+    cancelamento_agendado: 'Cancelamento agendado',
+    cancelado:             'Cancelada',
+  };
+
+  st.textContent = statusLabels[emp.STATUS_EMP] || emp.STATUS_EMP || '—';
+  // ACESSO_ATE é timestamptz (meia-noite UTC) mas representa uma data, não um
+  // instante — passar só "AAAA-MM-DD" para fmtDate evita que fusos negativos
+  // (Brasil = UTC-3) mostrem o dia anterior ao real.
+  if (emp.ACESSO_ATE) st.textContent += ` · acesso até ${fmtDate(emp.ACESSO_ATE.slice(0, 10))}`;
+
+  const podeCancelar  = ['ativo', 'trial'].includes(emp.STATUS_EMP) && emp.ASAAS_SUBSCRIPTION_ID;
+  const podeReativar  = emp.STATUS_EMP === 'cancelamento_agendado';
+
+  if (podeCancelar) {
+    sec.classList.remove('hidden');
+    btnCanc.classList.remove('hidden');
+    btnReat.classList.add('hidden');
+  } else if (podeReativar) {
+    sec.classList.remove('hidden');
+    btnCanc.classList.add('hidden');
+    btnReat.classList.remove('hidden');
+  }
+}
+
+/* ─── Modal reativação ─── */
+async function abrirModalReativacao() {
+  _planoSelecionadoId    = null;
+  _planoSelecionadoNome  = null;
+  _planoSelecionadoPreco = 0;
+  _mudandoPlano          = false;
+
+  // Preenche card do plano atual
+  document.getElementById('reativPlanoAtualNome').textContent  = _planoAtualNome;
+  document.getElementById('reativPlanoAtualPreco').textContent = _planoAtualPreco
+    ? new Intl.NumberFormat('pt-BR',{style:'currency',currency:'BRL'}).format(_planoAtualPreco) + '/mês' : '—';
+
+  document.getElementById('outrosPlanos').classList.add('hidden');
+  document.getElementById('outrosPlanos').innerHTML = '';
+  document.getElementById('btnToggleMudarPlano').textContent = 'Quero mudar de plano ↓';
+
+  mostrarPassoReativ(1);
+  document.getElementById('modalReativacao').classList.remove('hidden');
+  document.getElementById('modalReativacao').classList.add('flex');
+}
+
+function fecharModalReativacao() {
+  document.getElementById('modalReativacao').classList.add('hidden');
+  document.getElementById('modalReativacao').classList.remove('flex');
+}
+
+function mostrarPassoReativ(n) {
+  [1,2,3].forEach(i => {
+    const el = document.getElementById('reativPasso' + i);
+    if (el) el.classList.toggle('hidden', i !== n);
+  });
+}
+
+function voltarReativPasso1() { mostrarPassoReativ(1); }
+
+function selecionarPlanoReativ(planoId, nome, preco) {
+  _planoSelecionadoId    = planoId;
+  _planoSelecionadoNome  = nome;
+  _planoSelecionadoPreco = preco;
+
+  // Destaca card atual
+  const cardAtual = document.getElementById('reativPlanoAtualCard');
+  const checkAtual = document.getElementById('reativPlanoAtualCheck');
+  const selecionouAtual = planoId === null;
+
+  cardAtual.className = `flex items-center justify-between p-4 border-2 rounded-xl mb-3 cursor-pointer ${selecionouAtual ? 'border-vitta-400 bg-vitta-50' : 'border-gray-200 bg-white'}`;
+  checkAtual.className = `w-5 h-5 rounded-full border-2 flex items-center justify-center ${selecionouAtual ? 'border-vitta-400 bg-vitta-400' : 'border-gray-300 bg-white'}`;
+  checkAtual.innerHTML = selecionouAtual
+    ? '<svg class="w-3 h-3 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3"><path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5"/></svg>'
+    : '';
+
+  // Destaca cards dos outros planos
+  document.querySelectorAll('.reativ-plano-card').forEach(card => {
+    const cid = card.dataset.planoId;
+    const isSelected = cid === planoId;
+    card.className = `reativ-plano-card flex items-center justify-between p-4 border-2 rounded-xl cursor-pointer ${isSelected ? 'border-vitta-400 bg-vitta-50' : 'border-gray-200 bg-white hover:border-gray-300'}`;
+    const chk = card.querySelector('.plano-check');
+    if (chk) {
+      chk.className = `plano-check w-5 h-5 rounded-full border-2 flex items-center justify-center ${isSelected ? 'border-vitta-400 bg-vitta-400' : 'border-gray-300 bg-white'}`;
+      chk.innerHTML = isSelected
+        ? '<svg class="w-3 h-3 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3"><path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5"/></svg>'
+        : '';
+    }
+  });
+}
+
+async function toggleMudarPlano() {
+  _mudandoPlano = !_mudandoPlano;
+  const container = document.getElementById('outrosPlanos');
+  const btn = document.getElementById('btnToggleMudarPlano');
+
+  if (!_mudandoPlano) {
+    container.classList.add('hidden');
+    btn.textContent = 'Quero mudar de plano ↓';
+    selecionarPlanoReativ(null);
+    return;
+  }
+
+  btn.textContent = 'Manter plano atual ↑';
+  container.classList.remove('hidden');
+
+  if (container.innerHTML) return; // já carregou
+
+  container.innerHTML = '<p class="text-xs text-gray-400 text-center py-2">Carregando planos...</p>';
+  try {
+    const { data: planos } = await supabase
+      .from('PLANO')
+      .select('ID_PLANO, NOME_PLANO, PRECO_PLANO')
+      .order('PRECO_PLANO');
+
+    const outros = (planos || []).filter(p => p.ID_PLANO !== _planoAtualId);
+    if (!outros.length) {
+      container.innerHTML = '<p class="text-xs text-gray-400 text-center py-2">Nenhum outro plano disponível.</p>';
+      return;
+    }
+
+    container.innerHTML = outros.map(p => {
+      const precoFmt = new Intl.NumberFormat('pt-BR',{style:'currency',currency:'BRL'}).format(p.PRECO_PLANO) + '/mês';
+      return `<div class="reativ-plano-card flex items-center justify-between p-4 border-2 border-gray-200 bg-white rounded-xl cursor-pointer hover:border-gray-300"
+                   data-plano-id="${p.ID_PLANO}"
+                   onclick="selecionarPlanoReativ('${p.ID_PLANO}','${p.NOME_PLANO}',${p.PRECO_PLANO})">
+        <div>
+          <p class="text-sm font-bold text-gray-800">${p.NOME_PLANO}</p>
+          <p class="text-xs text-vitta-600 font-semibold mt-0.5">${precoFmt}</p>
+        </div>
+        <div class="plano-check w-5 h-5 rounded-full border-2 border-gray-300 bg-white flex items-center justify-center"></div>
+      </div>`;
+    }).join('');
+  } catch {
+    container.innerHTML = '<p class="text-xs text-red-400 text-center py-2">Erro ao carregar planos.</p>';
+  }
+}
+
+function irParaConfirmacaoReativ() {
+  const usandoOutro = _mudandoPlano && _planoSelecionadoId;
+  const nome  = usandoOutro ? _planoSelecionadoNome  : _planoAtualNome;
+  const preco = usandoOutro ? _planoSelecionadoPreco : _planoAtualPreco;
+
+  // Calcula próximo vencimento (mesmo cálculo da edge function)
+  let nextDue = '—';
+  if (_acessoAteData) {
+    const ref   = new Date(_acessoAteData); ref.setHours(0,0,0,0);
+    const today = new Date(); today.setHours(0,0,0,0);
+    if (ref >= today) {
+      nextDue = ref.toLocaleDateString('pt-BR', { day:'2-digit', month:'long', year:'numeric' });
+    } else {
+      const day  = ref.getDate();
+      const next = new Date(today); next.setDate(day);
+      if (next <= today) next.setMonth(next.getMonth() + 1);
+      nextDue = next.toLocaleDateString('pt-BR', { day:'2-digit', month:'long', year:'numeric' });
+    }
+  }
+
+  document.getElementById('confirmReativPlano').textContent = nome;
+  document.getElementById('confirmReativPreco').textContent = preco
+    ? new Intl.NumberFormat('pt-BR',{style:'currency',currency:'BRL'}).format(preco) + '/mês' : '—';
+  document.getElementById('confirmReativVenc').textContent = nextDue;
+
+  mostrarPassoReativ(2);
+}
+
+async function confirmarReativacao() {
+  const btn  = document.getElementById('btnConfirmarReativ');
+  const spin = document.getElementById('reativSpin');
+  btn.disabled = true;
+  spin.classList.remove('hidden');
+
+  try {
+    const { data: { session } } = await supabase.auth.getSession();
+    const planoId = (_mudandoPlano && _planoSelecionadoId) ? _planoSelecionadoId : undefined;
+
+    const resp = await fetch(`${SUPABASE_URL}/functions/v1/reativar-assinatura-cliente`, {
+      method:  'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${session.access_token}` },
+      body:    JSON.stringify({ planoId }),
+    });
+    const result = await resp.json();
+    if (!resp.ok) throw new Error(result.erro || 'Erro ao reativar assinatura.');
+
+    // Exibe data formatada no sucesso
+    const vencRaw = result.proximoVencimento; // YYYY-MM-DD
+    let vencFmt = '—';
+    if (vencRaw) {
+      const [y,m,d] = vencRaw.split('-');
+      vencFmt = new Date(`${y}-${m}-${d}T12:00`).toLocaleDateString('pt-BR', { day:'2-digit', month:'long', year:'numeric' });
+    }
+    document.getElementById('reativSucessoVenc').textContent = vencFmt;
+    mostrarPassoReativ(3);
+    await carregarStatusAssinatura();
+  } catch (e) {
+    showToast('Erro: ' + e.message, false);
+    fecharModalReativacao();
+  } finally {
+    btn.disabled = false;
+    spin.classList.add('hidden');
+  }
+}
+
+function abrirModalCancelamento() {
+  document.getElementById('modalCancelamento').classList.remove('hidden');
+  document.getElementById('modalCancelamento').classList.add('flex');
+  mostrarPasso(1);
+}
+
+function fecharModalCancelamento() {
+  document.getElementById('modalCancelamento').classList.add('hidden');
+  document.getElementById('modalCancelamento').classList.remove('flex');
+  document.querySelectorAll('input[name="motivo"]').forEach(r => r.checked = false);
+  document.getElementById('motivoOutroBox').classList.add('hidden');
+  document.getElementById('motivoOutroBox').value = '';
+  document.getElementById('motivoErro').classList.add('hidden');
+}
+
+function mostrarPasso(n) {
+  [1,2,3].forEach(i => {
+    const el = document.getElementById('cancelPasso' + i);
+    if (el) el.classList.toggle('hidden', i !== n);
+  });
+}
+
+function voltarPasso1() { mostrarPasso(1); }
+
+function irParaPasso2() {
+  const selecionado = document.querySelector('input[name="motivo"]:checked');
+  document.getElementById('motivoErro').classList.add('hidden');
+
+  if (!selecionado) {
+    document.getElementById('motivoErro').classList.remove('hidden');
+    return;
+  }
+  if (selecionado.value === 'outro' && !document.getElementById('motivoOutroBox').value.trim()) {
+    document.getElementById('motivoErro').classList.remove('hidden');
+    return;
+  }
+
+  const dataFmt = _acessoAteData
+    ? new Date(_acessoAteData).toLocaleDateString('pt-BR', { day: '2-digit', month: 'long', year: 'numeric' })
+    : 'imediatamente';
+  document.getElementById('confirmAcessoAte').textContent = dataFmt;
+  mostrarPasso(2);
+}
+
+async function confirmarCancelamento() {
+  const selecionado = document.querySelector('input[name="motivo"]:checked');
+  const motivo = selecionado?.value === 'outro'
+    ? document.getElementById('motivoOutroBox').value.trim()
+    : selecionado?.value || '';
+
+  const btn  = document.getElementById('btnConfirmarCancel');
+  const spin = document.getElementById('cancelSpin');
+  btn.disabled = true;
+  spin.classList.remove('hidden');
+
+  try {
+    const { data: { session } } = await supabase.auth.getSession();
+    const resp = await fetch(`${SUPABASE_URL}/functions/v1/solicitar-cancelamento`, {
+      method:  'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${session.access_token}` },
+      body:    JSON.stringify({ motivo }),
+    });
+    const result = await resp.json();
+    if (!resp.ok) throw new Error(result.erro || 'Erro ao cancelar assinatura.');
+
+    const ateData = result.acessoAte || _acessoAteData;
+    const dataFmt = ateData
+      ? new Date(ateData).toLocaleDateString('pt-BR', { day: '2-digit', month: 'long', year: 'numeric' })
+      : 'imediatamente';
+    document.getElementById('sucessoAcessoAte').textContent = dataFmt;
+    mostrarPasso(3);
+    await carregarStatusAssinatura();
+  } catch (e) {
+    showToast('Erro: ' + e.message, false);
+    fecharModalCancelamento();
+  } finally {
+    btn.disabled = false;
+    spin.classList.add('hidden');
+  }
+}
+
+/* ─── Modal: Mudar de Plano ─── */
+function mostrarPassoMp(n) {
+  [1,2,3].forEach(i => {
+    const el = document.getElementById('mpPasso' + i);
+    if (el) el.classList.toggle('hidden', i !== n);
+  });
+}
+
+function featBadge(label, color) {
+  const cls = {
+    blue:    'bg-blue-50 text-blue-700 border-blue-100',
+    violet:  'bg-violet-50 text-violet-700 border-violet-100',
+    emerald: 'bg-emerald-50 text-emerald-700 border-emerald-100',
+    gray:    'bg-gray-50 text-gray-600 border-gray-200',
+  }[color] || 'bg-gray-50 text-gray-600 border-gray-200';
+  return `<span class="inline-flex items-center text-[0.7rem] font-semibold ${cls} border px-2 py-0.5 rounded-full">${label}</span>`;
+}
+
+function renderFeaturesMp(p) {
+  const parts = [];
+  if (p.TEM_APP_PLANO)        parts.push(featBadge('App Mobile', 'blue'));
+  if (p.TEM_IA_PLANO)         parts.push(featBadge('Inteligência Artificial', 'violet'));
+  if (p.PERFIL_HIBRIDO_PLANO) parts.push(featBadge('Perfil Híbrido', 'emerald'));
+  if (p.MAX_USUARIOS_PLANO)   parts.push(featBadge('Até ' + p.MAX_USUARIOS_PLANO + ' usuários', 'gray'));
+  return parts.join('');
+}
+
+async function abrirModalMudarPlano() {
+  _novoPlanoId = null; _novoPlanoNome = null; _novoPlanoPreco = 0;
+  mostrarPassoMp(1);
+  document.getElementById('modalMudarPlano').classList.remove('hidden');
+  document.getElementById('modalMudarPlano').classList.add('flex');
+
+  const lista = document.getElementById('mpPlanosLista');
+  lista.innerHTML = '<p class="text-center text-sm text-gray-400 py-4">Carregando planos...</p>';
+
+  try {
+    const { data: planos } = await supabase
+      .from('PLANO')
+      .select('ID_PLANO,NOME_PLANO,PRECO_PLANO,TEM_APP_PLANO,TEM_IA_PLANO,PERFIL_HIBRIDO_PLANO,MAX_USUARIOS_PLANO')
+      .eq('ATIVO_PLANO', true)
+      .order('PRECO_PLANO');
+
+    const disponiveis = (planos || []).filter(p => p.ID_PLANO !== _planoAtualId);
+
+    if (!disponiveis.length) {
+      lista.innerHTML = '<p class="text-center text-sm text-gray-400 py-4">Nenhum outro plano disponível no momento.</p>';
+      return;
+    }
+
+    lista.innerHTML = disponiveis.map(p => {
+      const precoFmt = new Intl.NumberFormat('pt-BR',{style:'currency',currency:'BRL'}).format(p.PRECO_PLANO || 0);
+      const feats    = renderFeaturesMp(p);
+      const nomeSafe = (p.NOME_PLANO || '').replace(/'/g, "\\'");
+      return `<div class="mp-plano-card border-2 border-gray-200 rounded-xl p-4 cursor-pointer hover:border-vitta-400 hover:bg-vitta-50 transition-all"
+                   data-id="${p.ID_PLANO}"
+                   onclick="selecionarNovoPlano('${p.ID_PLANO}','${nomeSafe}',${p.PRECO_PLANO || 0})">
+        <div class="flex items-start justify-between gap-3">
+          <div class="flex-1">
+            <p class="text-sm font-bold text-gray-800">${p.NOME_PLANO}</p>
+            <p class="text-lg font-extrabold text-vitta-600 mt-0.5">${precoFmt}<span class="text-xs font-medium text-gray-400">/mês</span></p>
+          </div>
+          <div class="mp-card-check w-5 h-5 rounded-full border-2 border-gray-300 bg-white flex items-center justify-center shrink-0 mt-1"></div>
+        </div>
+        ${feats ? `<div class="flex flex-wrap gap-1.5 mt-3">${feats}</div>` : ''}
+      </div>`;
+    }).join('');
+  } catch {
+    lista.innerHTML = '<p class="text-center text-sm text-red-400 py-4">Erro ao carregar planos.</p>';
+  }
+}
+
+function fecharModalMudarPlano() {
+  document.getElementById('modalMudarPlano').classList.add('hidden');
+  document.getElementById('modalMudarPlano').classList.remove('flex');
+}
+
+function voltarMpPasso1() { mostrarPassoMp(1); }
+
+function selecionarNovoPlano(id, nome, preco) {
+  _novoPlanoId   = id;
+  _novoPlanoNome = nome;
+  _novoPlanoPreco = preco;
+
+  // Destaca card selecionado
+  document.querySelectorAll('.mp-plano-card').forEach(card => {
+    const selected = card.dataset.id === id;
+    card.className = `mp-plano-card border-2 rounded-xl p-4 cursor-pointer transition-all ${selected ? 'border-vitta-400 bg-vitta-50' : 'border-gray-200 bg-white hover:border-vitta-400 hover:bg-vitta-50'}`;
+    const chk = card.querySelector('.mp-card-check');
+    if (chk) {
+      chk.className = `mp-card-check w-5 h-5 rounded-full border-2 flex items-center justify-center shrink-0 mt-1 ${selected ? 'border-vitta-400 bg-vitta-400' : 'border-gray-300 bg-white'}`;
+      chk.innerHTML = selected ? '<svg class="w-3 h-3 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3"><path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5"/></svg>' : '';
+    }
+  });
+
+  // Vai para confirmação
+  const precoFmt = new Intl.NumberFormat('pt-BR',{style:'currency',currency:'BRL'}).format(preco);
+  document.getElementById('mpConfirmPlanoAtual').textContent = _planoAtualNome;
+  document.getElementById('mpConfirmNovoPlano').textContent  = nome;
+  document.getElementById('mpConfirmNovoPreco').textContent  = precoFmt + '/mês';
+  document.getElementById('btnConfirmarMp').disabled = false;
+  document.getElementById('mpSpin').classList.add('hidden');
+  document.getElementById('mpConfirmTxt').textContent = 'Sim, mudar de plano';
+  mostrarPassoMp(2);
+}
+
+async function confirmarMudancaPlano() {
+  const btn  = document.getElementById('btnConfirmarMp');
+  const spin = document.getElementById('mpSpin');
+  const txt  = document.getElementById('mpConfirmTxt');
+  btn.disabled = true;
+  spin.classList.remove('hidden');
+  txt.textContent = 'Processando...';
+
+  try {
+    // 1. Atualiza plano no Supabase
+    const { error } = await supabase
+      .from('EMPRESA')
+      .update({ ID_PLANO: _novoPlanoId, DTALTER_EMP: new Date().toISOString() })
+      .eq('ID_EMP', empresaId);
+    if (error) throw new Error('Erro ao atualizar plano: ' + error.message);
+
+    // 2. Atualiza assinatura no Asaas se existir
+    if (_asaasSubId) {
+      try {
+        const { data: { session } } = await supabase.auth.getSession();
+        await fetch(`${SUPABASE_URL}/functions/v1/atualizar-assinatura-empresa`, {
+          method:  'POST',
+          headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${session.access_token}` },
+          body:    JSON.stringify({ empresa_id: empresaId }),
+        });
+      } catch { /* Supabase já atualizado; falha no Asaas não bloqueia */ }
+    }
+
+    // 3. Atualiza estado local e badge
+    _planoAtualId   = _novoPlanoId;
+    _planoAtualNome = _novoPlanoNome;
+    _planoAtualPreco = _novoPlanoPreco;
+    document.getElementById('planoAtualBadge').textContent = _novoPlanoNome;
+
+    // 4. Sucesso
+    document.getElementById('mpSucessoNome').textContent = _novoPlanoNome;
+    mostrarPassoMp(3);
+  } catch (e) {
+    showToast('Erro: ' + (e.message || 'Tente novamente.'), false);
+    fecharModalMudarPlano();
+  } finally {
+    btn.disabled = false;
+    spin.classList.add('hidden');
+    txt.textContent = 'Sim, mudar de plano';
+  }
+}
+
+/* ─── Google Meet ─── */
+function escHtml(s) {
+  return String(s ?? '').replace(/[&<>"']/g, c => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;' }[c]));
+}
+
+async function renderGoogleMeetStatus() {
+  const box = document.getElementById('googleMeetStatusBox');
+  if (!empresaId) { box.innerHTML = '<span class="text-gray-400">—</span>'; return; }
+  box.innerHTML = '<span class="text-gray-400">Verificando conexão…</span>';
+  try {
+    const { data: { session } } = await supabase.auth.getSession();
+    const resp = await fetch(`${SUPABASE_URL}/functions/v1/google-meet-status?id_emp=${encodeURIComponent(empresaId)}`, {
+      headers: { Authorization: `Bearer ${session.access_token}` },
+    });
+    const data = await resp.json();
+    if (resp.ok && data.sucesso && data.status === 'conectado') {
+      box.innerHTML = `<span class="inline-flex items-center gap-1.5 text-emerald-600 font-semibold text-sm">✓ Conectado${data.google_email ? ' ('+escHtml(data.google_email)+')' : ''}</span>
+        <button type="button" onclick="iniciarConexaoGoogleMeet()" class="ml-3 px-3 py-1.5 border border-gray-200 rounded-lg text-xs font-semibold text-gray-600 hover:bg-gray-50 transition-colors">Reconectar</button>
+        <button type="button" onclick="desconectarGoogleMeet()" class="ml-2 px-3 py-1.5 border border-gray-200 rounded-lg text-xs font-semibold text-red-500 hover:bg-red-50 transition-colors">Desconectar</button>`;
+    } else {
+      box.innerHTML = `<span class="text-amber-600 font-semibold text-sm">Não conectado</span>
+        <button type="button" onclick="iniciarConexaoGoogleMeet()" class="ml-3 px-3.5 py-1.5 bg-vitta-500 hover:bg-vitta-600 text-white rounded-lg text-xs font-semibold transition-colors">Conectar</button>`;
+    }
+  } catch (e) {
+    box.innerHTML = '<span class="text-gray-400">Não foi possível verificar a conexão.</span>';
+  }
+}
+
+async function iniciarConexaoGoogleMeet() {
+  if (!empresaId) return;
+  try {
+    const { data: { session } } = await supabase.auth.getSession();
+    const resp = await fetch(`${SUPABASE_URL}/functions/v1/google-oauth-start`, {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${session.access_token}`, 'Content-Type': 'application/json' },
+      body: JSON.stringify({ id_emp: empresaId }),
+    });
+    const data = await resp.json();
+    if (!resp.ok || !data.sucesso) { showToast(data.erro || 'Não foi possível iniciar a conexão com o Google.', false); return; }
+
+    const popup = window.open(data.url, 'googleMeetConnect', 'width=520,height=650');
+    if (!popup) { showToast('Permita pop-ups para conectar o Google Meet.', false); return; }
+
+    const poll = setInterval(() => {
+      if (popup.closed) {
+        clearInterval(poll);
+        renderGoogleMeetStatus();
+      }
+    }, 800);
+  } catch (e) {
+    showToast('Erro ao iniciar conexão com o Google: ' + e.message, false);
+  }
+}
+
+function desconectarGoogleMeet() {
+  if (!empresaId) return;
+  document.getElementById('modalDesconectarGoogle').classList.add('open');
+}
+function fecharModalDesconectarGoogle() {
+  document.getElementById('modalDesconectarGoogle').classList.remove('open');
+}
+async function confirmarDesconexaoGoogleMeet() {
+  fecharModalDesconectarGoogle();
+  try {
+    const { data: { session } } = await supabase.auth.getSession();
+    const resp = await fetch(`${SUPABASE_URL}/functions/v1/google-oauth-disconnect`, {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${session.access_token}`, 'Content-Type': 'application/json' },
+      body: JSON.stringify({ id_emp: empresaId }),
+    });
+    const data = await resp.json();
+    if (!resp.ok || !data.sucesso) { showToast(data.erro || 'Não foi possível desconectar o Google Meet.', false); return; }
+    showToast('Google Meet desconectado.');
+    await renderGoogleMeetStatus();
+  } catch (e) {
+    showToast('Erro ao desconectar o Google Meet: ' + e.message, false);
+  }
+}
+
+/* ─── Init ─── */
+(async () => {
+  const ok = await initAuth();
+  if (!ok) return;
+  if (!empresaId) {
+    AdminEmpresaCtx.renderBloqueio(['main']);
+    return;
+  }
+  await carregarEmpresa();
+  await carregarStatusAssinatura();
+  await renderGoogleMeetStatus();
+
+  const params = new URLSearchParams(window.location.search);
+  const googleMeetResult = params.get('google_meet');
+  if (googleMeetResult) {
+    showToast(googleMeetResult === 'conectado' ? 'Google Meet conectado com sucesso!' : 'Não foi possível conectar o Google Meet. Tente novamente.', googleMeetResult === 'conectado');
+    params.delete('google_meet');
+    params.delete('motivo');
+    const newQuery = params.toString();
+    window.history.replaceState({}, '', window.location.pathname + (newQuery ? '?' + newQuery : ''));
+    if (window.opener) setTimeout(() => window.close(), 1200);
+  }
+})();
+</script>
+<script>
+(async () => {
+  try {
+    const { data: { session } } = await supabase.auth.getSession();
+    if (!session) return;
+    const u = await getUsuarioAtual('TIPO_USU,ID_EMP', session);
+    if (u && u.ID_EMP === '22ff26b9-3839-45ed-8a1d-df4a488d3aab' && ['ADMIN_EMPRESA','SECRETARIA'].includes(u.TIPO_USU)) {
+      document.getElementById('menuDocumentosWrap')?.classList.remove('hidden');
+    }
+  } catch (_) {}
+})();
+</script>
+</body>
+</html>

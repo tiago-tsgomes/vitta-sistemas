@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Suporte — Vitta Sistemas</title>
+  <meta name="description" content="Central de suporte do Vitta Sistemas. Fale com a gente por WhatsApp, e-mail ou pelo formulário de contato." />
+  <link rel="icon" type="image/png" href="img/favicon.png" />
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            vitta: {
+              50:  '#f0fbfd',
+              100: '#e0f7fa',
+              200: '#b2ebf5',
+              400: '#4dd9ed',
+              500: '#2ABCD4',
+              600: '#1a96ac',
+              700: '#127a8c',
+              800: '#0d5f6e',
+              900: '#094a57',
+            }
+          },
+          fontFamily: {
+            sans: ['Inter', 'system-ui', 'sans-serif'],
+          },
+        }
+      }
+    }
+  </script>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet" />
+
+  <style>
+    html { scroll-behavior: smooth; }
+    body { font-family: 'Inter', system-ui, sans-serif; }
+    .gradient-hero {
+      background: linear-gradient(135deg, #1a96ac 0%, #2ABCD4 45%, #3ecfe5 100%);
+    }
+    .btn-primary {
+      background: linear-gradient(135deg, #2ABCD4, #1a96ac);
+      transition: all 0.3s;
+      box-shadow: 0 4px 20px rgba(42,188,212,0.35);
+    }
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 28px rgba(42,188,212,0.5);
+    }
+    .btn-primary:disabled {
+      opacity: 0.6;
+      transform: none;
+      cursor: not-allowed;
+    }
+  </style>
+</head>
+<body class="bg-gray-50 text-gray-800">
+
+<!-- Nav -->
+<nav class="bg-vitta-900">
+  <div class="max-w-5xl mx-auto px-6 py-4 flex items-center justify-between">
+    <a href="https://www.vittasistemas.com.br/" class="flex items-center">
+      <img src="img/logo_branca.png" alt="Vitta Sistemas" class="h-11" onerror="this.src='img/logo.png';this.classList.add('brightness-0','invert')" />
+    </a>
+    <a href="https://www.vittasistemas.com.br/" class="text-white/70 hover:text-white text-sm font-medium transition-colors">
+      ← Voltar ao site
+    </a>
+  </div>
+</nav>
+
+<!-- Hero -->
+<section class="gradient-hero py-16 md:py-20">
+  <div class="max-w-5xl mx-auto px-6 text-center">
+    <span class="inline-block bg-white/15 text-white text-xs font-bold uppercase tracking-widest px-4 py-2 rounded-full mb-6 border border-white/20">
+      Central de Suporte
+    </span>
+    <h1 class="text-3xl md:text-5xl font-black text-white mb-5 leading-tight">
+      Como podemos te ajudar?
+    </h1>
+    <p class="text-white/80 text-base md:text-lg max-w-2xl mx-auto leading-relaxed">
+      Nossa equipe está pronta para responder suas dúvidas sobre o Vitta Sistemas. Escolha o canal que preferir.
+    </p>
+  </div>
+</section>
+
+<!-- Contato -->
+<section class="py-16 md:py-20">
+  <div class="max-w-5xl mx-auto px-6">
+    <div class="grid md:grid-cols-2 gap-16 items-start">
+
+      <!-- Canais -->
+      <div>
+        <h2 class="text-2xl font-black text-gray-900 mb-6">Fale com a gente</h2>
+
+        <div class="space-y-4">
+          <!-- WhatsApp -->
+          <a href="https://wa.me/5548984096109" target="_blank" rel="noopener"
+             class="flex items-center gap-4 bg-white border-2 border-green-200 rounded-2xl p-5 hover:border-green-400 hover:shadow-md transition-all group">
+            <div class="w-14 h-14 rounded-2xl bg-green-500 flex items-center justify-center shrink-0">
+              <svg class="w-8 h-8 text-white" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/>
+              </svg>
+            </div>
+            <div class="flex-1">
+              <p class="font-bold text-gray-800 text-base">WhatsApp</p>
+              <p class="text-green-500 font-semibold text-sm">(48) 98409-6109</p>
+              <p class="text-gray-400 text-xs mt-0.5">Atendimento em horário comercial</p>
+            </div>
+            <svg class="w-5 h-5 text-gray-300 group-hover:text-green-400 transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+              <polyline points="9 18 15 12 9 6"/>
+            </svg>
+          </a>
+
+          <!-- Email -->
+          <a href="mailto:contato@vittasistemas.com.br"
+             class="flex items-center gap-4 bg-white border border-gray-200 rounded-2xl p-5 hover:border-vitta-300 hover:shadow-md transition-all group">
+            <div class="w-14 h-14 rounded-2xl bg-vitta-50 border border-vitta-200 flex items-center justify-center shrink-0">
+              <svg class="w-7 h-7 text-vitta-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+                <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/>
+              </svg>
+            </div>
+            <div class="flex-1">
+              <p class="font-bold text-gray-800 text-base">E-mail</p>
+              <p class="text-vitta-500 font-semibold text-sm">contato@vittasistemas.com.br</p>
+              <p class="text-gray-400 text-xs mt-0.5">Respondemos em até 24h</p>
+            </div>
+          </a>
+        </div>
+
+        <div class="mt-8 bg-white border border-gray-100 rounded-2xl p-6">
+          <h3 class="text-sm font-bold text-gray-800 mb-2">Dúvidas frequentes</h3>
+          <p class="text-gray-500 text-sm leading-relaxed">
+            Problemas para acessar sua conta, dúvidas sobre planos ou sobre como usar o sistema?
+            Envie uma mensagem por qualquer um dos canais acima que nossa equipe te responde o quanto antes.
+          </p>
+        </div>
+      </div>
+
+      <!-- Formulário -->
+      <div>
+        <div class="bg-white rounded-3xl p-8 shadow-sm border border-gray-100">
+          <h3 class="text-xl font-black text-gray-900 mb-1">Envie uma mensagem</h3>
+          <p class="text-gray-400 text-sm mb-7">Preencha o formulário abaixo que retornaremos por e-mail.</p>
+
+          <form id="support-form" class="space-y-5">
+            <div>
+              <label class="block text-xs font-bold text-gray-500 uppercase tracking-widest mb-1.5">Nome <span class="text-red-400">*</span></label>
+              <input id="sf-nome" type="text" placeholder="Seu nome" required
+                class="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm text-gray-800 placeholder-gray-300 focus:outline-none focus:border-vitta-400 focus:ring-2 focus:ring-vitta-100 transition-all" />
+            </div>
+
+            <div>
+              <label class="block text-xs font-bold text-gray-500 uppercase tracking-widest mb-1.5">E-mail para retorno <span class="text-red-400">*</span></label>
+              <input id="sf-email" type="email" placeholder="seu@email.com" required
+                class="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm text-gray-800 placeholder-gray-300 focus:outline-none focus:border-vitta-400 focus:ring-2 focus:ring-vitta-100 transition-all" />
+            </div>
+
+            <div>
+              <label class="block text-xs font-bold text-gray-500 uppercase tracking-widest mb-1.5">Assunto</label>
+              <select id="sf-assunto"
+                class="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm text-gray-700 focus:outline-none focus:border-vitta-400 focus:ring-2 focus:ring-vitta-100 transition-all bg-white appearance-none cursor-pointer">
+                <option>Dúvida sobre o sistema</option>
+                <option>Problema técnico / bug</option>
+                <option>Dúvida sobre plano ou cobrança</option>
+                <option>Acesso à conta</option>
+                <option>Outro assunto</option>
+              </select>
+            </div>
+
+            <div>
+              <label class="block text-xs font-bold text-gray-500 uppercase tracking-widest mb-1.5">Mensagem <span class="text-red-400">*</span></label>
+              <textarea id="sf-mensagem" rows="5" required placeholder="Descreva como podemos te ajudar..."
+                class="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm text-gray-800 placeholder-gray-300 focus:outline-none focus:border-vitta-400 focus:ring-2 focus:ring-vitta-100 transition-all resize-none"></textarea>
+            </div>
+
+            <button id="sf-submit" type="submit"
+              class="w-full btn-primary flex items-center justify-center gap-2.5 px-6 py-4 rounded-2xl text-white font-bold text-sm">
+              <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                <line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/>
+              </svg>
+              Enviar Mensagem
+            </button>
+
+            <p id="sf-status" class="hidden text-center text-sm font-medium"></p>
+          </form>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- Footer -->
+<footer class="bg-vitta-900 text-white py-10">
+  <div class="max-w-5xl mx-auto px-6 flex flex-col md:flex-row items-center justify-between gap-4">
+    <p class="text-white/40 text-sm">© <span id="footer-year"></span> Vitta Sistemas. Todos os direitos reservados.</p>
+    <a href="https://www.vittasistemas.com.br/" class="text-white/50 hover:text-white text-sm transition-colors">vittasistemas.com.br</a>
+  </div>
+</footer>
+
+<script>
+  document.getElementById('footer-year').textContent = new Date().getFullYear();
+
+  const supabaseClient = window.supabase.createClient(
+    'https://ccdeuabmjwgntwssjfgo.supabase.co',
+    'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNjZGV1YWJtandnbnR3c3NqZmdvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg2NzM1MjcsImV4cCI6MjA5NDI0OTUyN30.6I2TjAzyIuoKxA1Q-lbM6ibMLVo1_CtEmEjfbjBvlUs'
+  );
+
+  document.getElementById('support-form').addEventListener('submit', async function(e) {
+    e.preventDefault();
+
+    const nome = document.getElementById('sf-nome').value.trim();
+    const email = document.getElementById('sf-email').value.trim();
+    const assunto = document.getElementById('sf-assunto').value;
+    const mensagem = document.getElementById('sf-mensagem').value.trim();
+    const statusEl = document.getElementById('sf-status');
+    const btn = document.getElementById('sf-submit');
+
+    if (!nome || !email || !mensagem) return;
+
+    btn.disabled = true;
+    statusEl.classList.add('hidden');
+
+    try {
+      const { error } = await supabaseClient.from('SUPORTE_MENSAGEM').insert({
+        NOME: nome,
+        EMAIL: email,
+        ASSUNTO: assunto,
+        MENSAGEM: mensagem,
+      });
+
+      statusEl.classList.remove('hidden');
+      if (error) {
+        console.error('Erro ao enviar mensagem de suporte:', error);
+        statusEl.textContent = 'Não foi possível enviar agora. Tente novamente ou fale pelo WhatsApp/e-mail acima.';
+        statusEl.classList.remove('text-vitta-600');
+        statusEl.classList.add('text-red-500');
+        return;
+      }
+
+      statusEl.textContent = 'Mensagem enviada com sucesso! Nossa equipe foi notificada e entrará em contato em até 24 horas.';
+      statusEl.classList.remove('text-red-500');
+      statusEl.classList.add('text-vitta-600');
+      document.getElementById('support-form').reset();
+    } catch (e) {
+      console.error('Falha ao conectar com o servidor:', e);
+      statusEl.classList.remove('hidden');
+      statusEl.textContent = 'Não foi possível enviar agora. Tente novamente ou fale pelo WhatsApp/e-mail acima.';
+      statusEl.classList.remove('text-vitta-600');
+      statusEl.classList.add('text-red-500');
+    } finally {
+      btn.disabled = false;
+    }
+  });
+</script>
+
+</body>
+</html>

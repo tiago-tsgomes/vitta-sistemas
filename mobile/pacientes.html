@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover"/>
+  <title>Pacientes — Vitta</title>
+  <link rel="icon" type="image/png" href="../img/favicon.png"/>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>tailwind.config={theme:{extend:{colors:{vitta:{50:'#f0fbfd',100:'#e0f7fa',500:'#2ABCD4',600:'#1a96ac'}},fontFamily:{sans:['Inter','system-ui','sans-serif']}}}}</script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+  <script src="../assets/js/config.js"></script>
+  <link rel="stylesheet" href="../assets/css/mobile-dark.css"/>
+  <script src="../assets/js/mobile-utils.js"></script>
+  <style>
+    *{-webkit-tap-highlight-color:transparent}
+    body{overscroll-behavior-y:none}
+    ::-webkit-scrollbar{display:none}
+    .safe-top{padding-top:env(safe-area-inset-top)}
+    @keyframes fadeUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+    .fade-up{animation:fadeUp .25s ease forwards}
+  </style>
+</head>
+<body class="bg-[#F0F2F5] font-sans antialiased">
+
+<!-- HEADER -->
+<header class="fixed top-0 left-0 right-0 z-20 bg-white border-b border-gray-100 safe-top">
+  <div class="h-14 flex items-center px-4 gap-3">
+    <h1 class="text-[1rem] font-bold text-gray-800 flex-1">Meus Pacientes</h1>
+    <button id="hdr-av" onclick="window.location.href='perfil.html'" class="w-8 h-8 rounded-full bg-vitta-500 flex items-center justify-center text-white text-xs font-bold">A</button>
+  </div>
+  <!-- Search bar -->
+  <div class="px-4 pb-3">
+    <div class="relative">
+      <svg class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+      <input id="search-input" type="text" placeholder="Buscar paciente…" oninput="filterList()"
+        class="w-full pl-10 pr-4 py-2.5 text-sm border border-gray-200 rounded-2xl outline-none focus:border-vitta-500 bg-gray-50"/>
+    </div>
+  </div>
+</header>
+
+<!-- MAIN -->
+<main style="padding-top:calc(104px + env(safe-area-inset-top));padding-bottom:calc(80px + env(safe-area-inset-bottom))" class="px-4 py-2 min-h-screen">
+  <div id="pac-list">
+    <div id="pac-skeleton">
+      <div class="flex items-center gap-3 bg-white rounded-2xl border border-gray-100 shadow-sm p-4 mb-2"><div class="w-11 h-11 rounded-2xl bg-gray-200 shrink-0"></div><div class="flex-1 space-y-2"><div class="h-3.5 rounded-full bg-gray-200 w-3/4"></div><div class="h-3 rounded-full bg-gray-200 w-1/2"></div></div></div>
+      <div class="flex items-center gap-3 bg-white rounded-2xl border border-gray-100 shadow-sm p-4 mb-2"><div class="w-11 h-11 rounded-2xl bg-gray-200 shrink-0"></div><div class="flex-1 space-y-2"><div class="h-3.5 rounded-full bg-gray-200 w-2/3"></div><div class="h-3 rounded-full bg-gray-200 w-2/5"></div></div></div>
+      <div class="flex items-center gap-3 bg-white rounded-2xl border border-gray-100 shadow-sm p-4 mb-2"><div class="w-11 h-11 rounded-2xl bg-gray-200 shrink-0"></div><div class="flex-1 space-y-2"><div class="h-3.5 rounded-full bg-gray-200 w-4/5"></div><div class="h-3 rounded-full bg-gray-200 w-1/3"></div></div></div>
+      <div class="flex items-center gap-3 bg-white rounded-2xl border border-gray-100 shadow-sm p-4 mb-2"><div class="w-11 h-11 rounded-2xl bg-gray-200 shrink-0"></div><div class="flex-1 space-y-2"><div class="h-3.5 rounded-full bg-gray-200 w-1/2"></div><div class="h-3 rounded-full bg-gray-200 w-3/5"></div></div></div>
+    </div>
+  </div>
+</main>
+
+<!-- BOTTOM NAV -->
+<nav class="fixed bottom-0 left-0 right-0 z-20 bg-white border-t border-gray-100" style="padding-bottom:env(safe-area-inset-bottom)">
+  <div class="flex h-16">
+    <a href="dashboard.html" class="flex-1 flex flex-col items-center justify-center gap-0.5 text-gray-400">
+      <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+      <span class="text-[0.55rem] font-semibold">Início</span>
+    </a>
+    <a href="agenda.html" class="flex-1 flex flex-col items-center justify-center gap-0.5 text-gray-400">
+      <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+      <span class="text-[0.55rem] font-semibold">Agenda</span>
+    </a>
+    <a href="consultas.html" class="flex-1 flex flex-col items-center justify-center gap-0.5 text-gray-400">
+      <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+      <span class="text-[0.55rem] font-semibold">Consultas</span>
+    </a>
+    <a href="pacientes.html" class="flex-1 flex flex-col items-center justify-center gap-0.5 text-vitta-500">
+      <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>
+      <span class="text-[0.55rem] font-bold">Pacientes</span>
+    </a>
+    <a href="financeiro.html" class="flex-1 flex flex-col items-center justify-center gap-0.5 text-gray-400">
+      <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+      <span class="text-[0.55rem] font-semibold">Financeiro</span>
+    </a>
+  </div>
+</nav>
+
+<script>
+const AV_COLORS=['bg-blue-500','bg-emerald-500','bg-violet-500','bg-amber-500','bg-rose-500','bg-cyan-500'];
+let allPacs=[];
+
+function avColor(n){let h=0;for(const c of(n||''))h=(h<<5)-h+c.charCodeAt(0);return AV_COLORS[Math.abs(h)%AV_COLORS.length];}
+function initials(n){return(n||'').split(' ').filter(Boolean).slice(0,2).map(w=>w[0]).join('').toUpperCase();}
+function calcAge(d){if(!d)return null;const dt=new Date(d),n=new Date();let a=n.getFullYear()-dt.getFullYear();if(n<new Date(n.getFullYear(),dt.getMonth(),dt.getDate()))a--;return a;}
+function fmtDate(d){if(!d)return'—';const s=d.split('T')[0];const[y,m,day]=s.split('-');const dt=new Date(+y,+m-1,+day);return dt.toLocaleDateString('pt-BR',{day:'2-digit',month:'short',year:'numeric'});}
+async function handleLogout(){
+  try { await Capacitor.Plugins.Preferences.remove({ key: 'vitta_session' }); } catch(e) {}
+  await supabase.auth.signOut();
+  window.location.href='../index.html';
+}
+
+function filterList(){
+  const q=document.getElementById('search-input').value.toLowerCase().trim();
+  const filtered=q?allPacs.filter(p=>(p.NOME_PAC||'').toLowerCase().includes(q)):allPacs;
+  renderList(filtered);
+}
+
+function renderList(list){
+  document.getElementById('pac-skeleton')?.remove();
+  const el=document.getElementById('pac-list');
+  if(!list.length){
+    el.innerHTML='<div class="py-16 text-center text-gray-400 text-sm">Nenhum paciente encontrado</div>';
+    return;
+  }
+  el.innerHTML=list.map((p,i)=>{
+    const age=calcAge(p.DTNASC_PAC);
+    const lastCons=p.lastCons?fmtDate(p.lastCons):'Sem consultas';
+    return `<a href="paciente-perfil.html?pac=${p.ID_PAC}" class="flex items-center gap-3 bg-white rounded-2xl border border-gray-100 shadow-sm p-4 mb-2 fade-up active:bg-gray-50" style="animation-delay:${i*0.03}s">
+      <div class="${avColor(p.NOME_PAC)} w-11 h-11 rounded-2xl flex items-center justify-center text-white font-bold text-sm shrink-0">${initials(p.NOME_PAC)}</div>
+      <div class="flex-1 min-w-0">
+        <p class="text-[0.9rem] font-semibold text-gray-800 truncate">${p.NOME_PAC}</p>
+        <p class="text-[0.72rem] text-gray-400 mt-0.5">${age?age+' anos · ':''}Última consulta: ${lastCons}</p>
+      </div>
+      <div class="shrink-0 flex flex-col items-end gap-1">
+        ${p.FREQ_PAC?`<span class="text-[0.62rem] font-bold bg-vitta-50 text-vitta-700 px-2 py-0.5 rounded-full">${p.FREQ_PAC}</span>`:''}
+        <svg class="w-4 h-4 text-gray-300" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg>
+      </div>
+    </a>`;
+  }).join('');
+}
+
+(async()=>{
+  const {data:{session}}=await supabase.auth.getSession();
+  if(!session){window.location.href='../index.html';return;}
+  const meta=session.user.user_metadata;
+  if(!['PROFISSIONAL','ADMIN_EMPRESA'].includes(meta.tipo_usu)){window.location.href='access-denied.html';return;}
+  const u=await getUsuarioAtual('PROF_USU,NOME_USU,ID_EMP',session);
+  if(meta.tipo_usu==='ADMIN_EMPRESA' && !u?.PROF_USU){window.location.href='access-denied.html';return;}
+  const profId=u?.PROF_USU, idEmp=u?.ID_EMP||meta.id_emp;
+  document.getElementById('hdr-av').textContent=initials(u?.NOME_USU||meta.nome_usu||session.user.email);
+
+  // Get patients linked to this professional
+  const {data:links}=await supabase.from('PACIENTE_PROFISSIONAL').select('PAC_ID').eq('PROF_ID',profId);
+  const pacIds=(links||[]).map(r=>r.PAC_ID);
+  if(!pacIds.length){document.getElementById('pac-list').innerHTML='<div class="py-16 text-center text-gray-400 text-sm">Nenhum paciente vinculado</div>';return;}
+
+  const {data:pacs}=await supabase.from('PACIENTE')
+    .select('ID_PAC,NOME_PAC,DTNASC_PAC,FREQ_PAC,TEL_PAC')
+    .in('ID_PAC',pacIds).eq('ATIVO_PAC',true).order('NOME_PAC');
+
+  // Get last consultation per patient
+  const {data:cons}=await supabase.from('AGENDAMENTO')
+    .select('PAC_AGD,DT_AGD')
+    .eq('STATUS_AGD','REALIZADA').in('PAC_AGD',pacIds).eq('PROF_AGD',profId)
+    .order('DT_AGD',{ascending:false});
+
+  const lastConsMap={};
+  (cons||[]).forEach(c=>{if(!lastConsMap[c.PAC_AGD])lastConsMap[c.PAC_AGD]=c.DT_AGD;});
+
+  allPacs=(pacs||[]).map(p=>({...p,lastCons:lastConsMap[p.ID_PAC]||null}));
+  renderList(allPacs);
+  initPullToRefresh(async()=>{location.reload();});
+})();
+</script>
+</body>
+</html>

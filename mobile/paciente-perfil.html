@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover"/>
+  <title>Perfil do Paciente — Vitta</title>
+  <link rel="icon" type="image/png" href="../img/favicon.png"/>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>tailwind.config={theme:{extend:{colors:{vitta:{50:'#f0fbfd',100:'#e0f7fa',500:'#2ABCD4',600:'#1a96ac',700:'#127a8c'}},fontFamily:{sans:['Inter','system-ui','sans-serif']}}}}</script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+  <script src="../assets/js/config.js"></script>
+  <link rel="stylesheet" href="../assets/css/mobile-dark.css"/>
+  <script src="../assets/js/mobile-utils.js"></script>
+  <style>
+    *{-webkit-tap-highlight-color:transparent}
+    body{overscroll-behavior-y:none}
+    ::-webkit-scrollbar{display:none}
+    .safe-top{padding-top:env(safe-area-inset-top)}
+    @keyframes fadeUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+    .fade-up{animation:fadeUp .25s ease forwards}
+  </style>
+</head>
+<body class="bg-[#F0F2F5] font-sans antialiased">
+
+<!-- HEADER -->
+<header class="fixed top-0 left-0 right-0 z-20 bg-white border-b border-gray-100 safe-top">
+  <div class="h-14 flex items-center px-4 gap-3">
+    <a href="pacientes.html" class="p-1.5 rounded-xl bg-gray-100 text-gray-500 shrink-0">
+      <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><polyline points="15 18 9 12 15 6"/></svg>
+    </a>
+    <div class="flex-1 min-w-0">
+      <h1 class="text-[0.95rem] font-bold text-gray-800 truncate">Dados do Paciente</h1>
+      <p class="text-[0.65rem] text-gray-400">Cadastro</p>
+    </div>
+    <button id="hdr-av" onclick="window.location.href='perfil.html'" class="w-8 h-8 rounded-full bg-vitta-500 flex items-center justify-center text-white text-xs font-bold shrink-0">A</button>
+  </div>
+</header>
+
+<!-- Loading -->
+<div id="loading-state" style="padding-top:calc(56px + env(safe-area-inset-top));padding-bottom:calc(80px + env(safe-area-inset-bottom))" class="flex items-center justify-center gap-2 min-h-screen text-gray-400 text-sm">
+  <svg class="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"/></svg>
+  Carregando...
+</div>
+
+<!-- MAIN -->
+<main id="main-content" class="hidden" style="padding-top:calc(56px + env(safe-area-inset-top));padding-bottom:calc(100px + env(safe-area-inset-bottom))">
+  <div class="px-4 py-4 space-y-3">
+
+    <!-- Card avatar + nome -->
+    <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-5 fade-up flex items-center gap-4">
+      <div id="pac-av" class="w-16 h-16 rounded-2xl bg-vitta-500 flex items-center justify-center text-white text-xl font-bold shrink-0">?</div>
+      <div class="flex-1 min-w-0">
+        <h2 id="pac-nome" class="text-[1.05rem] font-extrabold text-gray-800 truncate"></h2>
+        <p id="pac-idade" class="text-[0.75rem] text-gray-500 mt-0.5"></p>
+        <p id="pac-freq" class="text-[0.7rem] text-vitta-600 font-semibold mt-0.5"></p>
+      </div>
+    </div>
+
+    <!-- Dados pessoais -->
+    <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-4 fade-up" style="animation-delay:.04s">
+      <p class="text-[0.65rem] font-bold text-gray-400 uppercase tracking-wider mb-3">Dados Pessoais</p>
+      <div class="space-y-3">
+        <div id="row-cpf"    class="hidden"><p class="text-[0.65rem] text-gray-400">CPF</p><p id="val-cpf"    class="text-[0.88rem] font-semibold text-gray-700"></p></div>
+        <div id="row-nasc"   class="hidden"><p class="text-[0.65rem] text-gray-400">Data de nascimento</p><p id="val-nasc"   class="text-[0.88rem] font-semibold text-gray-700"></p></div>
+        <div id="row-sexo"   class="hidden"><p class="text-[0.65rem] text-gray-400">Sexo</p><p id="val-sexo"   class="text-[0.88rem] font-semibold text-gray-700"></p></div>
+        <div id="row-tel"    class="hidden"><p class="text-[0.65rem] text-gray-400">Telefone</p><p id="val-tel"    class="text-[0.88rem] font-semibold text-gray-700"></p></div>
+        <div id="row-email"  class="hidden"><p class="text-[0.65rem] text-gray-400">E-mail</p><p id="val-email"  class="text-[0.88rem] font-semibold text-gray-700 break-all"></p></div>
+        <div id="row-resp"   class="hidden"><p class="text-[0.65rem] text-gray-400">Responsável</p><p id="val-resp"   class="text-[0.88rem] font-semibold text-gray-700"></p></div>
+      </div>
+    </div>
+
+    <!-- Endereço -->
+    <div id="card-endereco" class="hidden bg-white rounded-2xl border border-gray-100 shadow-sm p-4 fade-up" style="animation-delay:.07s">
+      <p class="text-[0.65rem] font-bold text-gray-400 uppercase tracking-wider mb-3">Endereço</p>
+      <div class="space-y-3">
+        <div id="row-cep"    class="hidden"><p class="text-[0.65rem] text-gray-400">CEP</p><p id="val-cep"    class="text-[0.88rem] font-semibold text-gray-700"></p></div>
+        <div id="row-bairro" class="hidden"><p class="text-[0.65rem] text-gray-400">Bairro</p><p id="val-bairro" class="text-[0.88rem] font-semibold text-gray-700"></p></div>
+        <div id="row-cidade" class="hidden"><p class="text-[0.65rem] text-gray-400">Cidade / UF</p><p id="val-cidade" class="text-[0.88rem] font-semibold text-gray-700"></p></div>
+      </div>
+    </div>
+
+    <!-- Observações -->
+    <div id="card-obs" class="hidden bg-white rounded-2xl border border-gray-100 shadow-sm p-4 fade-up" style="animation-delay:.1s">
+      <p class="text-[0.65rem] font-bold text-gray-400 uppercase tracking-wider mb-2">Observações</p>
+      <p id="val-obs" class="text-[0.85rem] text-gray-600 leading-relaxed"></p>
+    </div>
+
+  </div>
+</main>
+
+<!-- BOTÃO FIXO: IR PARA PRONTUÁRIO -->
+<div id="btn-bar" class="hidden fixed bottom-0 left-0 right-0 z-20 bg-white border-t border-gray-100 px-4 pt-3" style="padding-bottom:calc(12px + env(safe-area-inset-bottom))">
+  <a id="btn-prontuario" href="#"
+    class="flex items-center justify-center gap-2 w-full py-4 bg-vitta-500 text-white rounded-2xl font-bold text-sm shadow-sm active:bg-vitta-600 transition-colors">
+    <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+      <path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+    </svg>
+    Ir para Prontuário
+  </a>
+</div>
+
+<script>
+  const params = new URLSearchParams(location.search);
+  const pacId  = params.get('pac');
+
+  const AV_COLORS = ['bg-vitta-500','bg-emerald-500','bg-violet-500','bg-amber-500','bg-rose-500','bg-sky-500'];
+  function avColor(name){ return AV_COLORS[(name||'').charCodeAt(0)%AV_COLORS.length]; }
+  function initials(name){ return (name||'?').split(' ').filter(Boolean).slice(0,2).map(w=>w[0].toUpperCase()).join(''); }
+
+  function calcAge(dt){
+    if(!dt) return null;
+    const b=new Date(dt), n=new Date();
+    let a=n.getFullYear()-b.getFullYear();
+    if(n.getMonth()<b.getMonth()||(n.getMonth()===b.getMonth()&&n.getDate()<b.getDate())) a--;
+    return a;
+  }
+
+  function fmtDate(dt){
+    if(!dt) return '';
+    const [y,m,d]=(dt.split('T')[0]).split('-');
+    return `${d}/${m}/${y}`;
+  }
+
+  function setRow(rowId, valId, value){
+    if(!value) return;
+    document.getElementById(valId).textContent = value;
+    document.getElementById(rowId).classList.remove('hidden');
+  }
+
+  function show(id){ document.getElementById(id)?.classList.remove('hidden'); }
+
+  async function handleLogout(){
+    try { await Capacitor.Plugins.Preferences.remove({ key: 'vitta_session' }); } catch(e) {}
+    await supabase.auth.signOut();
+    window.location.href='../index.html';
+  }
+
+  (async()=>{
+    const {data:{session}} = await supabase.auth.getSession();
+    if(!session){ window.location.href='../index.html'; return; }
+    const meta = session.user.user_metadata;
+    if(!['PROFISSIONAL','ADMIN_EMPRESA'].includes(meta.tipo_usu)){ window.location.href='access-denied.html'; return; }
+
+    const u = await getUsuarioAtual('NOME_USU,PROF_USU', session);
+    if(meta.tipo_usu==='ADMIN_EMPRESA' && !u?.PROF_USU){ window.location.href='access-denied.html'; return; }
+    document.getElementById('hdr-av').textContent = initials(u?.NOME_USU || meta.nome_usu || session.user.email);
+
+    if(!pacId){
+      document.getElementById('loading-state').innerHTML='<p class="text-red-400 text-sm">Paciente não identificado.</p>';
+      return;
+    }
+
+    const {data:p, error:pErr} = await supabase.from('PACIENTE')
+      .select('*')
+      .eq('ID_PAC', pacId)
+      .maybeSingle();
+
+    if(pErr || !p){
+      document.getElementById('loading-state').innerHTML=`<p class="text-red-400 text-sm px-8 text-center">Erro ao carregar paciente.<br/><span class="text-xs text-gray-400">${pErr?.message||'Sem dados'} (id: ${pacId})</span></p>`;
+      return;
+    }
+
+    // Avatar
+    const av = document.getElementById('pac-av');
+    av.textContent = initials(p.NOME_PAC);
+    av.className = `w-16 h-16 rounded-2xl ${avColor(p.NOME_PAC)} flex items-center justify-center text-white text-xl font-bold shrink-0`;
+
+    // Nome e idade
+    document.getElementById('pac-nome').textContent = p.NOME_PAC || '';
+    const age = calcAge(p.DTNASC_PAC);
+    document.getElementById('pac-idade').textContent = age ? `${age} anos` : '';
+    if(p.FREQ_PAC){ document.getElementById('pac-freq').textContent = p.FREQ_PAC; }
+
+    // Dados pessoais
+    setRow('row-cpf',   'val-cpf',   p.CPF_PAC);
+    setRow('row-nasc',  'val-nasc',  fmtDate(p.DTNASC_PAC));
+    setRow('row-sexo',  'val-sexo',  p.SEXO_PAC);
+    setRow('row-tel',   'val-tel',   p.TEL_PAC);
+    setRow('row-email', 'val-email', p.EMAIL_PAC);
+    setRow('row-resp',  'val-resp',  p.RESP_PAC);
+
+    // Endereço
+    const temEndereco = p.CEP_PAC || p.BAIRRO_PAC || p.CIDADE_PAC;
+    if(temEndereco){
+      show('card-endereco');
+      setRow('row-cep',    'val-cep',    p.CEP_PAC);
+      setRow('row-bairro', 'val-bairro', p.BAIRRO_PAC);
+      const cidadeUf = [p.CIDADE_PAC, p.UF_PAC].filter(Boolean).join(' / ');
+      setRow('row-cidade', 'val-cidade', cidadeUf);
+    }
+
+    // Observações
+    if(p.OBS_PAC){
+      document.getElementById('val-obs').textContent = p.OBS_PAC;
+      show('card-obs');
+    }
+
+    // Botão prontuário
+    document.getElementById('btn-prontuario').href = `prontuario.html?pac=${pacId}`;
+
+    // Exibe tudo
+    document.getElementById('loading-state').classList.add('hidden');
+    show('main-content');
+    show('btn-bar');
+  })();
+</script>
+</body>
+</html>

@@ -1,0 +1,26 @@
+# ============================================================
+# Cache Control — Vitta Sistemas
+# ============================================================
+
+# HTML: nunca cachear — browser sempre busca versão atualizada
+<FilesMatch "\.(html|htm)$">
+    <IfModule mod_headers.c>
+        Header set Cache-Control "no-cache, no-store, must-revalidate"
+        Header set Pragma "no-cache"
+        Header set Expires "0"
+    </IfModule>
+</FilesMatch>
+
+# JavaScript e CSS: cache de 7 dias (controlado por ?v= nos links)
+<FilesMatch "\.(js|css)$">
+    <IfModule mod_headers.c>
+        Header set Cache-Control "public, max-age=604800"
+    </IfModule>
+</FilesMatch>
+
+# Imagens e fontes: cache de 30 dias
+<FilesMatch "\.(jpg|jpeg|png|gif|ico|svg|webp|woff|woff2|ttf)$">
+    <IfModule mod_headers.c>
+        Header set Cache-Control "public, max-age=2592000"
+    </IfModule>
+</FilesMatch>

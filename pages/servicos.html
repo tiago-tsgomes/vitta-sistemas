@@ -1,0 +1,850 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>Servi&ccedil;os &mdash; Vitta Sistemas</title>
+  <link rel="icon" type="image/png" href="../img/favicon.png" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: { vitta: { 50:'#f0fbfd',100:'#e0f7fa',300:'#80deea',400:'#4dd9ed',500:'#2ABCD4',600:'#1a96ac',700:'#127a8c' } },
+          fontFamily: { sans: ['Inter','system-ui','sans-serif'] }
+        }
+      }
+    }
+  </script>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+  <script src="../assets/js/config.js?v=2"></script>
+  <script src="../assets/js/access-guard.js?v=2"></script>
+  <script src="../assets/js/admin-empresa-context.js?v=1"></script>
+  <script src="../assets/js/notifications.js?v=3"></script>
+  <style>
+    .sidebar-nav::-webkit-scrollbar { width:3px; }
+    .sidebar-nav::-webkit-scrollbar-thumb { background:rgba(255,255,255,.1); border-radius:4px; }
+    .submenu { overflow:hidden; max-height:0; opacity:0; transition:max-height .25s ease,opacity .2s ease; }
+    .submenu.open { max-height:500px; opacity:1; }
+    .chevron { transition:transform .25s ease; display:inline-block; }
+    .chevron.open { transform:rotate(180deg); }
+    @keyframes fadeUp { from{opacity:0;transform:translateY(8px)} to{opacity:1;transform:translateY(0)} }
+    .fade-up { animation:fadeUp .35s ease forwards; }
+    .modal-overlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,.5); z-index:300; align-items:flex-start; justify-content:center; padding:24px 16px; overflow-y:auto; }
+    .modal-overlay.open { display:flex; }
+    .modal-scroll::-webkit-scrollbar { width:4px; }
+    .modal-scroll::-webkit-scrollbar-thumb { background:#e5e7eb; border-radius:4px; }
+    #toast { position:fixed; bottom:24px; right:24px; z-index:999; transition:all .3s ease; }
+    tbody tr { transition:background .15s; }
+    tbody tr:hover { background:#f9fafb; }
+    tbody tr.selected { background:#f0fbfd; }
+    .detail-panel { transition: all .25s ease; }
+  </style>
+</head>
+
+<body class="bg-[#F0F2F5] font-sans antialiased">
+<div class="flex min-h-screen">
+
+<!-- ====== SIDEBAR ====== -->
+<aside id="sidebar" class="fixed inset-y-0 left-0 w-[220px] bg-[#111827] flex flex-col z-30 -translate-x-full lg:translate-x-0 transition-transform duration-300">
+  <div class="flex flex-col items-center justify-center gap-1 py-4 px-5 border-b border-white/10 shrink-0">
+    <img src="../img/logo.png" alt="Vitta Sistemas" class="h-10 w-auto brightness-0 invert" />
+    <p class="text-[0.6rem] text-gray-500 tracking-wide">v1.2.1</p>
+  </div>
+  <nav class="flex-1 overflow-y-auto sidebar-nav py-3">
+    <p class="block text-[0.6rem] font-bold text-gray-500 uppercase tracking-widest px-4 pb-1 pt-3">Principal</p>
+    <a href="dashboard.html" class="flex items-center gap-3 px-3 py-2.5 mx-2 rounded-xl text-[0.83rem] font-medium text-gray-400 hover:bg-white/10 hover:text-white transition-colors duration-150 mb-0.5">
+      <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>Dashboard
+    </a>
+    <a href="agendamentos.html" class="flex items-center gap-3 px-3 py-2.5 mx-2 rounded-xl text-[0.83rem] font-medium text-gray-400 hover:bg-white/10 hover:text-white transition-colors duration-150 mb-0.5">
+      <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>Agendamentos
+    </a>
+    <a href="consultas.html" class="flex items-center gap-3 px-3 py-2.5 mx-2 rounded-xl text-[0.83rem] font-medium text-gray-400 hover:bg-white/10 hover:text-white transition-colors duration-150 mb-0.5">
+      <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>Consultas
+    </a>
+
+    <p class="block text-[0.6rem] font-bold text-gray-500 uppercase tracking-widest px-4 pb-1 pt-4">Cadastros</p>
+    <button onclick="toggleMenu('cadastros')" class="w-full flex items-center gap-3 px-3 py-2.5 mx-2 rounded-xl text-[0.83rem] font-medium text-gray-400 hover:bg-white/10 hover:text-white transition-colors duration-150 mb-0.5" style="width:calc(100% - 16px)">
+      <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>Cadastros
+      <svg id="chev-cadastros" class="chevron w-3.5 h-3.5 ml-auto text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+    </button>
+    <div id="sub-cadastros" class="submenu">
+      <a href="pacientes.html" class="flex items-center gap-2 pl-10 pr-3 py-2 mx-2 rounded-xl text-[0.8rem] text-gray-500 hover:bg-white/5 hover:text-gray-300 transition-colors cursor-pointer">Pacientes</a>
+      <a href="profissionais.html" class="flex items-center gap-2 pl-10 pr-3 py-2 mx-2 rounded-xl text-[0.8rem] text-gray-500 hover:bg-white/5 hover:text-gray-300 transition-colors cursor-pointer">Profissionais</a>
+      <a href="usuarios-empresa.html" class="flex items-center gap-2 pl-10 pr-3 py-2 mx-2 rounded-xl text-[0.8rem] text-gray-500 hover:bg-white/5 hover:text-gray-300 transition-colors cursor-pointer">Usu&aacute;rios</a>
+      <div class="hidden" id="menuDocumentosWrap"><a href="documentos.html" class="flex items-center gap-2 pl-10 pr-3 py-2 mx-2 rounded-xl text-[0.8rem] text-gray-500 hover:bg-white/5 hover:text-gray-300 transition-colors cursor-pointer w-full">Documentos</a></div>
+      <a href="leads.html" class="flex items-center gap-2 pl-10 pr-3 py-2 mx-2 rounded-xl text-[0.8rem] text-gray-500 hover:bg-white/5 hover:text-gray-300 transition-colors cursor-pointer">Leads</a>
+    </div>
+
+    <p class="block text-[0.6rem] font-bold text-gray-500 uppercase tracking-widest px-4 pb-1 pt-4">Outros Cadastros</p>
+    <button onclick="toggleMenu('servicos')" class="w-full flex items-center gap-3 px-3 py-2.5 mx-2 rounded-xl text-[0.83rem] font-medium text-vitta-400 bg-vitta-500/10 transition-colors duration-150 cursor-pointer mb-0.5" style="width:calc(100% - 16px)">
+      <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>Outros Cadastros
+      <svg id="chev-servicos" class="chevron open w-3.5 h-3.5 ml-auto text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+    </button>
+    <div id="sub-servicos" class="submenu open">
+      <a href="servicos.html" class="flex items-center gap-2 pl-10 pr-3 py-2 mx-2 rounded-xl text-[0.8rem] font-semibold text-vitta-400 bg-vitta-500/10 transition-colors cursor-pointer">Serviços</a>
+      <a href="salas.html" class="flex items-center gap-2 pl-10 pr-3 py-2 mx-2 rounded-xl text-[0.8rem] text-gray-500 hover:bg-white/5 hover:text-gray-300 transition-colors cursor-pointer">Salas</a>
+      <a href="especialidades.html" class="flex items-center gap-2 pl-10 pr-3 py-2 mx-2 rounded-xl text-[0.8rem] text-gray-500 hover:bg-white/5 hover:text-gray-300 transition-colors cursor-pointer">Especialidades</a>
+      <a href="grupo.html" class="flex items-center gap-2 pl-10 pr-3 py-2 mx-2 rounded-xl text-[0.8rem] text-gray-500 hover:bg-white/5 hover:text-gray-300 transition-colors cursor-pointer">Grupo</a>
+      <a href="tipospagamento.html" class="flex items-center gap-2 pl-10 pr-3 py-2 mx-2 rounded-xl text-[0.8rem] text-gray-500 hover:bg-white/5 hover:text-gray-300 transition-colors cursor-pointer">Tipos de Pagamento</a>
+      <a href="tiposacompanhamento.html" class="flex items-center gap-2 pl-10 pr-3 py-2 mx-2 rounded-xl text-[0.8rem] text-gray-500 hover:bg-white/5 hover:text-gray-300 transition-colors cursor-pointer">Tipos de Acomp.</a>
+    </div>
+
+    <p class="block text-[0.6rem] font-bold text-gray-500 uppercase tracking-widest px-4 pb-1 pt-4">Financeiro</p>
+    <button onclick="toggleMenu('financeiro')" class="w-full flex items-center gap-3 px-3 py-2.5 mx-2 rounded-xl text-[0.83rem] font-medium text-gray-400 hover:bg-white/10 hover:text-white transition-colors duration-150 cursor-pointer mb-0.5" style="width:calc(100% - 16px)">
+      <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>Financeiro
+      <svg id="chev-financeiro" class="chevron w-3.5 h-3.5 ml-auto text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+    </button>
+    <div id="sub-financeiro" class="submenu">
+      <a href="financeiro.html" class="flex items-center gap-2 pl-10 pr-3 py-2 mx-2 rounded-xl text-[0.8rem] text-gray-500 hover:bg-white/5 hover:text-gray-300 transition-colors cursor-pointer">Lan&ccedil;amentos</a>
+      <a href="relatorios.html" class="flex items-center gap-2 pl-10 pr-3 py-2 mx-2 rounded-xl text-[0.8rem] text-gray-500 hover:bg-white/5 hover:text-gray-300 transition-colors cursor-pointer">Relat&oacute;rios</a>
+    </div>
+
+
+    <div id="sectionMinhaEmpresa" class="hidden">
+    <p class="block text-[0.6rem] font-bold text-gray-500 uppercase tracking-widest px-4 pb-1 pt-4">Minha Empresa</p>
+    <button onclick="toggleMenu('minhaempresa')" class="w-full flex items-center gap-3 px-3 py-2.5 mx-2 rounded-xl text-[0.83rem] font-medium text-gray-400 hover:bg-white/10 hover:text-white transition-colors duration-150 cursor-pointer mb-0.5" style="width:calc(100% - 16px)">
+      <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>Minha Empresa
+      <svg id="chev-minhaempresa" class="chevron w-3.5 h-3.5 ml-auto text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+    </button>
+    <div id="sub-minhaempresa" class="submenu">
+      <a href="minha-empresa.html" class="flex items-center gap-2 pl-10 pr-3 py-2 mx-2 rounded-xl text-[0.8rem] text-gray-500 hover:bg-white/5 hover:text-gray-300 transition-colors cursor-pointer">Meus Dados</a>
+      <a href="faturas.html" class="flex items-center gap-2 pl-10 pr-3 py-2 mx-2 rounded-xl text-[0.8rem] text-gray-500 hover:bg-white/5 hover:text-gray-300 transition-colors cursor-pointer">Minhas Faturas</a>
+    </div>
+    </div>
+    <div id="sectionVittaBI" class="hidden">
+    <p class="block text-[0.6rem] font-bold text-gray-500 uppercase tracking-widest px-4 pb-1 pt-4">Vitta BI</p>
+    <a id="linkVittaBI" href="https://bi.vittasistemas.com.br" target="_blank" rel="noopener"
+       class="flex items-center gap-3 px-3 py-2.5 mx-2 rounded-xl text-[0.83rem] font-medium text-gray-400 hover:bg-white/10 hover:text-white transition-colors duration-150 cursor-pointer mb-0.5">
+      <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+        <path d="M3 3v18h18"/><path d="M18.7 8l-5.3 5.3-3-3L4 16.3"/>
+      </svg>
+      Vitta BI
+      <span class="ml-auto text-[0.55rem] font-bold text-violet-300 bg-violet-500/20 px-1.5 py-0.5 rounded">BI</span>
+    </a>
+    </div>
+
+    <div id="sectionAdmin" class="hidden">
+    <p class="block text-[0.6rem] font-bold text-gray-500 uppercase tracking-widest px-4 pb-1 pt-4">Sistema</p>
+    <button onclick="toggleMenu('admin')" class="w-full flex items-center gap-3 px-3 py-2.5 mx-2 rounded-xl text-[0.83rem] font-medium text-gray-400 hover:bg-white/10 hover:text-white transition-colors duration-150 mb-0.5" style="width:calc(100% - 16px)">
+      <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14M4.93 4.93a10 10 0 0 0 0 14.14"/></svg>Administra&ccedil;&atilde;o
+      <svg id="chev-admin" class="chevron w-3.5 h-3.5 ml-auto text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+    </button>
+    <div id="sub-admin" class="submenu">
+      <a href="empresas.html" class="flex items-center gap-2 pl-10 pr-3 py-2 mx-2 rounded-xl text-[0.8rem] text-gray-500 hover:bg-white/5 hover:text-gray-300 transition-colors cursor-pointer">Empresas</a>
+      <a href="usuarios.html" class="flex items-center gap-2 pl-10 pr-3 py-2 mx-2 rounded-xl text-[0.8rem] text-gray-500 hover:bg-white/5 hover:text-gray-300 transition-colors cursor-pointer">Usu&aacute;rios Admin</a>
+      <a href="planos.html" class="flex items-center gap-2 pl-10 pr-3 py-2 mx-2 rounded-xl text-[0.8rem] text-gray-500 hover:bg-white/5 hover:text-gray-300 transition-colors cursor-pointer">Planos</a>
+      <a href="configuracoes.html" class="flex items-center gap-2 pl-10 pr-3 py-2 mx-2 rounded-xl text-[0.8rem] text-gray-500 hover:bg-white/5 hover:text-gray-300 transition-colors cursor-pointer">Configura&ccedil;&otilde;es</a>
+      <a href="logs.html" class="flex items-center gap-2 pl-10 pr-3 py-2 mx-2 rounded-xl text-[0.8rem] text-gray-500 hover:bg-white/5 hover:text-gray-300 transition-colors cursor-pointer">Log</a>
+    </div>
+    </div>
+    <div class="h-4"></div>
+  </nav>
+  <div class="shrink-0 border-t border-white/10 p-3">
+    <div class="group flex items-center gap-2.5 p-2.5 rounded-xl hover:bg-white/5 cursor-pointer">
+      <div id="user-avatar" class="w-8 h-8 rounded-full bg-vitta-500 flex items-center justify-center text-white text-xs font-bold shrink-0">A</div>
+      <div class="flex-1 min-w-0">
+        <p id="user-name" class="text-white text-[0.8rem] font-semibold truncate">Usu&aacute;rio</p>
+        <p id="user-role" class="text-gray-500 text-[0.7rem] truncate">Admin</p>
+      </div>
+      <button onclick="handleLogout()" title="Sair" class="text-gray-600 hover:text-red-400 transition-colors opacity-0 group-hover:opacity-100">
+        <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+      </button>
+    </div>
+  </div>
+</aside>
+
+<div id="overlay" class="fixed inset-0 bg-black/50 z-20 hidden lg:hidden" onclick="toggleSidebar()"></div>
+
+<div class="flex-1 lg:ml-[220px] flex flex-col min-h-screen">
+  <header class="sticky top-0 z-20 h-16 bg-white border-b border-gray-200 flex items-center px-5 gap-3 shadow-sm">
+    <button onclick="toggleSidebar()" class="lg:hidden p-2 rounded-lg hover:bg-gray-100 text-gray-500">
+      <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+        <line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/>
+      </svg>
+    </button>
+    <div class="flex-1">
+      <h1 class="text-[1rem] font-bold text-gray-800 leading-tight">Servi&ccedil;os, Valores e Profissionais</h1>
+      <p id="header-date" class="text-[0.7rem] text-gray-400 leading-tight">Gest&atilde;o de servi&ccedil;os</p>
+    </div>
+    <div class="hidden md:flex items-center gap-2 px-3 py-2 bg-gray-50 border border-gray-200 rounded-xl">
+      <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-vitta-500 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+        <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/>
+      </svg>
+      <span id="empresa-nome" class="text-[0.78rem] font-semibold text-gray-700">Cl&iacute;nica</span>
+    </div>
+    <button class="relative p-2.5 rounded-xl hover:bg-gray-100 text-gray-500 transition-colors">
+      <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+        <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/>
+      </svg>
+      <span class="absolute top-1.5 right-1.5 w-2 h-2 bg-red-500 rounded-full border-2 border-white"></span>
+    </button>
+    <div class="flex items-center gap-2.5">
+      <div id="header-avatar" class="w-9 h-9 rounded-full bg-vitta-500 flex items-center justify-center text-white text-sm font-bold shrink-0">A</div>
+      <div class="hidden sm:block">
+        <p id="header-user-name" class="text-[0.8rem] font-semibold text-gray-800 leading-tight">Usu&aacute;rio</p>
+        <p id="header-user-role" class="text-[0.7rem] text-gray-400 leading-tight">Administrador</p>
+      </div>
+    </div>
+    <button onclick="handleLogout()" class="p-2.5 rounded-xl hover:bg-red-50 text-gray-400 hover:text-red-500 transition-colors" title="Sair">
+      <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+        <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/>
+      </svg>
+    </button>
+  </header>
+
+  <main class="flex-1 p-5 lg:p-6">
+
+    <!-- FILTROS -->
+    <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-4 mb-4">
+      <div class="flex flex-wrap gap-3 items-center">
+        <select id="filterEspec" onchange="applyFilters()" class="py-2.5 px-3 text-sm border border-gray-200 rounded-xl outline-none focus:border-vitta-500 bg-white min-w-[180px]">
+          <option value="">Especialidade</option>
+        </select>
+        <select id="filterEmpAdmin" onchange="applyFilters()" class="hidden py-2.5 px-3 text-sm border border-gray-200 rounded-xl outline-none focus:border-vitta-500 bg-white min-w-[180px]">
+          <option value="">Todas as empresas</option>
+        </select>
+        <div class="relative flex-1 min-w-[180px]">
+          <svg xmlns="http://www.w3.org/2000/svg" class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+          <input id="filterSearch" type="text" placeholder="Pesquisar profissional&hellip;" oninput="applyFilters()"
+            class="w-full pl-9 pr-3 py-2.5 text-sm border border-gray-200 rounded-xl outline-none focus:border-vitta-500 focus:ring-2 focus:ring-vitta-500/20" />
+        </div>
+        <button onclick="clearFilters()" class="px-4 py-2.5 border border-gray-200 text-sm font-medium text-gray-600 rounded-xl hover:bg-gray-50 transition-colors whitespace-nowrap">Limpar Filtros</button>
+        <button onclick="openFormModal()" class="flex items-center gap-2 px-4 py-2.5 bg-vitta-500 text-white text-sm font-semibold rounded-xl shadow-sm hover:bg-vitta-600 transition-colors whitespace-nowrap">
+          <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          Novo Servi&ccedil;o
+        </button>
+      </div>
+    </div>
+
+    <!-- CONTENT: table + detail panel -->
+    <div class="flex gap-4 items-start">
+
+      <!-- TABELA -->
+      <div id="tableSection" class="flex-1 min-w-0 bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+        <div class="flex items-center justify-between px-5 py-3.5 border-b border-gray-100">
+          <p id="tableCount" class="text-sm text-gray-500">Carregando&hellip;</p>
+        </div>
+        <div id="tableLoader" class="py-16 flex items-center justify-center gap-3 text-gray-400">
+          <svg class="w-5 h-5 animate-spin" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/>
+            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"/>
+          </svg>
+          <span class="text-sm">Carregando servi&ccedil;os&hellip;</span>
+        </div>
+        <div id="tableWrap" class="hidden overflow-x-auto">
+          <table class="w-full text-sm">
+            <thead>
+              <tr class="border-b border-gray-100 bg-gray-50 text-[0.72rem] font-semibold text-gray-500 uppercase tracking-wider">
+                <th class="px-5 py-3 text-left">Nome Profissional</th>
+                <th class="px-5 py-3 text-left">Especialidade</th>
+                <th class="px-5 py-3 text-left">Valor 1&ordm; Consulta</th>
+                <th class="px-5 py-3 text-left">Tipo de Pagamento</th>
+                <th id="colEmp" class="px-5 py-3 text-left hidden">Empresa</th>
+                <th class="px-5 py-3 text-right">A&ccedil;&otilde;es</th>
+              </tr>
+            </thead>
+            <tbody id="servBody"></tbody>
+          </table>
+        </div>
+        <div id="tableEmpty" class="hidden py-16 text-center">
+          <svg xmlns="http://www.w3.org/2000/svg" class="w-10 h-10 text-gray-300 mx-auto mb-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="1"/><line x1="9" y1="12" x2="15" y2="12"/><line x1="9" y1="16" x2="12" y2="16"/></svg>
+          <p class="text-gray-400 text-sm">Nenhum servi&ccedil;o cadastrado</p>
+          <button onclick="openFormModal()" class="mt-3 text-vitta-600 hover:text-vitta-700 text-sm font-medium">+ Novo Servi&ccedil;o</button>
+        </div>
+      </div>
+
+      <!-- DETAIL PANEL -->
+      <div id="detailPanel" class="hidden w-72 shrink-0 bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden detail-panel">
+        <div class="flex items-center justify-between px-5 py-3.5 border-b border-gray-100 bg-gray-50">
+          <p class="text-[0.72rem] font-bold text-gray-500 uppercase tracking-wider">Detalhes</p>
+          <button onclick="closeDetailPanel()" class="text-gray-400 hover:text-gray-600 transition-colors">
+            <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+          </button>
+        </div>
+        <div class="p-5">
+          <!-- avatar + nome -->
+          <div class="flex items-center gap-3 mb-5">
+            <div id="dtAvatar" class="w-12 h-12 rounded-full bg-vitta-500 flex items-center justify-center text-white text-lg font-bold shrink-0">A</div>
+            <div>
+              <p id="dtNome" class="font-bold text-gray-800 text-[0.92rem] leading-snug"></p>
+              <p id="dtEspec" class="text-[0.75rem] text-vitta-600 font-medium"></p>
+            </div>
+          </div>
+          <!-- info rows -->
+          <div class="space-y-3.5">
+            <div id="dtCpfRow" class="hidden">
+              <p class="text-[0.7rem] font-bold text-gray-400 uppercase tracking-wider mb-0.5">CPF</p>
+              <p id="dtCpf" class="text-sm text-gray-700"></p>
+            </div>
+            <div id="dtNascRow" class="hidden">
+              <p class="text-[0.7rem] font-bold text-gray-400 uppercase tracking-wider mb-0.5">Data de Nascimento</p>
+              <p id="dtNasc" class="text-sm text-gray-700"></p>
+            </div>
+            <div id="dtEmailRow" class="hidden">
+              <p class="text-[0.7rem] font-bold text-gray-400 uppercase tracking-wider mb-0.5">E-mail</p>
+              <p id="dtEmail" class="text-sm text-gray-700 break-all"></p>
+            </div>
+            <div id="dtTelRow" class="hidden">
+              <p class="text-[0.7rem] font-bold text-gray-400 uppercase tracking-wider mb-0.5">Telefone</p>
+              <p id="dtTel" class="text-sm text-gray-700"></p>
+            </div>
+            <div id="dtTipPagRow" class="hidden">
+              <p class="text-[0.7rem] font-bold text-gray-400 uppercase tracking-wider mb-0.5">Tipo de Pagamento</p>
+              <p id="dtTipPag" class="text-sm text-gray-700"></p>
+            </div>
+            <div id="dtPixRow" class="hidden">
+              <p class="text-[0.7rem] font-bold text-gray-400 uppercase tracking-wider mb-0.5">Chave PIX</p>
+              <p id="dtPix" class="text-sm text-gray-700 break-all"></p>
+            </div>
+            <div id="dtAcompRow" class="hidden">
+              <p class="text-[0.7rem] font-bold text-gray-400 uppercase tracking-wider mb-0.5">Acompanhamento</p>
+              <p id="dtAcomp" class="text-sm text-gray-700"></p>
+            </div>
+            <div id="dtObsRow" class="hidden">
+              <p class="text-[0.7rem] font-bold text-gray-400 uppercase tracking-wider mb-0.5">Observa&ccedil;&atilde;o</p>
+              <p id="dtObs" class="text-sm text-gray-600 leading-relaxed"></p>
+            </div>
+          </div>
+          <!-- actions -->
+          <div class="flex gap-2 mt-5 pt-4 border-t border-gray-100">
+            <button id="dtBtnEdit" onclick="editFromDetail()" class="flex-1 py-2 bg-vitta-500 text-white text-xs font-semibold rounded-xl hover:bg-vitta-600 transition-colors">Editar</button>
+            <button id="dtBtnDelete" onclick="deleteFromDetail()" class="flex-1 py-2 border border-red-200 text-red-500 text-xs font-semibold rounded-xl hover:bg-red-50 transition-colors">Excluir</button>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </main>
+</div>
+
+<!-- ====== MODAL FORM ====== -->
+<div id="modalForm" class="modal-overlay" onclick="if(event.target===this)closeFormModal()">
+  <div class="bg-white rounded-2xl shadow-xl w-full max-w-lg modal-scroll overflow-y-auto max-h-[90vh]" onclick="event.stopPropagation()">
+    <div class="flex items-center justify-between px-6 py-4 border-b border-gray-100">
+      <div>
+        <h2 id="formTitle" class="text-[1rem] font-bold text-gray-800">Novo Servi&ccedil;o</h2>
+        <p id="formSubtitle" class="text-[0.72rem] text-gray-400">Preencha os dados do servi&ccedil;o</p>
+      </div>
+      <button onclick="closeFormModal()" class="text-gray-400 hover:text-gray-600 transition-colors p-1">
+        <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+    <form id="servForm" onsubmit="saveServico(event)" class="p-6 space-y-4">
+      <input type="hidden" id="fId" />
+      <!-- Empresa (ADMIN_GLOBAL only) -->
+      <div id="rowEmpresa" class="hidden">
+        <label class="block text-[0.78rem] font-semibold text-gray-600 mb-1">Empresa <span class="text-red-500">*</span></label>
+        <select id="fEmpresa" onchange="onEmpresaChange()" class="w-full py-2.5 px-3 text-sm border border-gray-200 rounded-xl outline-none focus:border-vitta-500 bg-white">
+          <option value="">Selecione a empresa&hellip;</option>
+        </select>
+      </div>
+      <!-- Profissional -->
+      <div>
+        <label class="block text-[0.78rem] font-semibold text-gray-600 mb-1">Profissional <span class="text-red-500">*</span></label>
+        <select id="fProf" onchange="onProfChange()" class="w-full py-2.5 px-3 text-sm border border-gray-200 rounded-xl outline-none focus:border-vitta-500 bg-white">
+          <option value="">Selecione o profissional&hellip;</option>
+        </select>
+      </div>
+      <!-- Especialidade (read-only display) -->
+      <div>
+        <label class="block text-[0.78rem] font-semibold text-gray-600 mb-1">Especialidade</label>
+        <input id="fEspecDisplay" type="text" readonly placeholder="Auto-preenchida pelo profissional"
+          class="w-full py-2.5 px-3 text-sm border border-gray-100 rounded-xl bg-gray-50 text-gray-500 cursor-default" />
+      </div>
+      <!-- Valor 1ª Consulta -->
+      <div>
+        <label class="block text-[0.78rem] font-semibold text-gray-600 mb-1">Valor 1&ordm; Consulta</label>
+        <div class="relative">
+          <span class="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-gray-400 pointer-events-none">R$</span>
+          <input id="fValor1Cons" type="number" min="0" step="0.01" placeholder="0,00"
+            class="w-full pl-9 pr-3 py-2.5 text-sm border border-gray-200 rounded-xl outline-none focus:border-vitta-500 focus:ring-2 focus:ring-vitta-500/20" />
+        </div>
+      </div>
+      <!-- Tipo de Pagamento -->
+      <div>
+        <label class="block text-[0.78rem] font-semibold text-gray-600 mb-1">Tipo de Pagamento</label>
+        <select id="fTipPag" onchange="onTipPagChange()" class="w-full py-2.5 px-3 text-sm border border-gray-200 rounded-xl outline-none focus:border-vitta-500 bg-white">
+          <option value="">Selecione o tipo de pagamento&hellip;</option>
+        </select>
+      </div>
+      <!-- Chave PIX (exibida só quando o tipo for PIX) -->
+      <div id="rowChavePix" class="hidden">
+        <label class="block text-[0.78rem] font-semibold text-gray-600 mb-1">Chave PIX</label>
+        <input id="fChavePix" type="text" maxlength="255" placeholder="CPF, e-mail, telefone&hellip;"
+          class="w-full py-2.5 px-3 text-sm border border-gray-200 rounded-xl outline-none focus:border-vitta-500 focus:ring-2 focus:ring-vitta-500/20" />
+      </div>
+      <!-- Acompanhamento -->
+      <div>
+        <label class="block text-[0.78rem] font-semibold text-gray-600 mb-1">Tipo de Acompanhamento</label>
+        <div class="grid grid-cols-2 gap-3">
+          <select id="fTipAcom" class="py-2.5 px-3 text-sm border border-gray-200 rounded-xl outline-none focus:border-vitta-500 bg-white">
+            <option value="">Selecione&hellip;</option>
+          </select>
+          <div class="relative">
+            <span class="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-gray-400 pointer-events-none">R$</span>
+            <input id="fValorAcomp" type="number" min="0" step="0.01" placeholder="0,00"
+              class="w-full pl-9 pr-3 py-2.5 text-sm border border-gray-200 rounded-xl outline-none focus:border-vitta-500 focus:ring-2 focus:ring-vitta-500/20" />
+          </div>
+        </div>
+      </div>
+      <!-- Observação -->
+      <div>
+        <label class="block text-[0.78rem] font-semibold text-gray-600 mb-1">Observa&ccedil;&atilde;o</label>
+        <textarea id="fObs" rows="3" maxlength="1000" placeholder="Informa&ccedil;&otilde;es adicionais sobre o servi&ccedil;o&hellip;"
+          class="w-full py-2.5 px-3 text-sm border border-gray-200 rounded-xl outline-none focus:border-vitta-500 focus:ring-2 focus:ring-vitta-500/20 resize-none"></textarea>
+      </div>
+      <!-- Botões -->
+      <div class="flex gap-3 pt-2">
+        <button type="button" onclick="closeFormModal()" class="flex-1 py-2.5 border border-gray-200 rounded-xl text-sm font-medium text-gray-600 hover:bg-gray-50 transition-colors">Cancelar</button>
+        <button type="submit" id="btnSave" class="flex-1 py-2.5 bg-vitta-500 text-white rounded-xl text-sm font-semibold hover:bg-vitta-600 transition-colors">Salvar</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- ====== MODAL DELETE ====== -->
+<div id="modalDelete" class="modal-overlay" onclick="if(event.target===this)closeDeleteModal()">
+  <div class="bg-white rounded-2xl shadow-xl w-full max-w-sm p-6" onclick="event.stopPropagation()">
+    <h3 class="text-[1rem] font-bold text-gray-800 mb-2">Excluir Servi&ccedil;o</h3>
+    <p id="deleteMsg" class="text-sm text-gray-500 mb-6">Tem certeza que deseja excluir este servi&ccedil;o?</p>
+    <div class="flex gap-3">
+      <button onclick="closeDeleteModal()" class="flex-1 py-2.5 border border-gray-200 rounded-xl text-sm font-medium text-gray-600 hover:bg-gray-50">Cancelar</button>
+      <button onclick="confirmDelete()" class="flex-1 py-2.5 bg-red-500 hover:bg-red-600 rounded-xl text-sm font-semibold text-white">Excluir</button>
+    </div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div id="toast" class="hidden">
+  <div id="toastInner" class="flex items-center gap-3 px-4 py-3 rounded-xl shadow-lg text-sm font-medium text-white min-w-[240px]"></div>
+</div>
+
+<script>
+let allServicos = [], filtered = [], editId = null, deleteTargetId = null;
+let allProfis = [], allEspec = [], allTipPag = [], allTipAcom = [], empresas = [];
+let currentUserMeta = null, currentEmpId = null, isGlobal = false;
+let selectedServId = null;
+
+function toggleMenu(k) {
+  const s=document.getElementById('sub-'+k), c=document.getElementById('chev-'+k);
+  const o=s.classList.contains('open');
+  s.classList.toggle('open',!o); if(c)c.classList.toggle('open',!o);
+}
+function toggleSidebar() {
+  const sb=document.getElementById('sidebar'), ov=document.getElementById('overlay');
+  const o=sb.classList.contains('-translate-x-full');
+  sb.classList.toggle('-translate-x-full',!o); ov.classList.toggle('hidden',!o);
+}
+async function handleLogout() { await supabase.auth.signOut(); window.location.href='../index.html'; }
+
+function showToast(msg, ok=true) {
+  const t=document.getElementById('toast'), i=document.getElementById('toastInner');
+  i.textContent=msg; i.className=`flex items-center gap-3 px-4 py-3 rounded-xl shadow-lg text-sm font-medium text-white min-w-[240px] ${ok?'bg-emerald-500':'bg-red-500'}`;
+  t.classList.remove('hidden'); setTimeout(()=>t.classList.add('hidden'),3500);
+}
+
+function fmtBRL(v) {
+  if (v==null || v==='' || isNaN(v)) return '—';
+  return 'R$ ' + Number(v).toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2});
+}
+function fmtCPF(v) {
+  if (!v) return '—';
+  const d = v.replace(/\D/g,'');
+  if (d.length===11) return d.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/,'$1.$2.$3-$4');
+  return v;
+}
+function fmtDate(v) {
+  if (!v) return '—';
+  const [y,m,d] = v.split('-');
+  return `${d}/${m}/${y}`;
+}
+function fmtTel(v) {
+  if (!v) return '—';
+  const d = v.replace(/\D/g,'');
+  if (d.length===11) return d.replace(/(\d{2})(\d{5})(\d{4})/,'($1) $2-$3');
+  if (d.length===10) return d.replace(/(\d{2})(\d{4})(\d{4})/,'($1) $2-$3');
+  return v;
+}
+
+async function initAuth() {
+  document.getElementById('header-date').textContent = 'Servicos e valores — ' + new Date().toLocaleDateString('pt-BR',{weekday:'long',year:'numeric',month:'long',day:'numeric'});
+  const { data:{ session } } = await supabase.auth.getSession();
+  if (!session) { window.location.href='../index.html'; return false; }
+  const meta = session.user.user_metadata;
+  currentUserMeta = meta;
+  isGlobal = meta.tipo_usu === 'ADMIN_GLOBAL';
+  if (!['ADMIN_EMPRESA','ADMIN_GLOBAL','SECRETARIA'].includes(meta.tipo_usu)) { window.location.href='dashboard.html'; return false; }
+  const TIPO_LABELS = {'ADMIN_GLOBAL':'Admin Global','ADMIN_EMPRESA':'Administrador','SECRETARIA':'Secretaria','PROFISSIONAL':'Profissional'};
+  const label = TIPO_LABELS[meta.tipo_usu] || meta.tipo_usu;
+  const nome = meta.nome_usu || session.user.email;
+  const ini = nome.split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase();
+  ['user-name','header-user-name'].forEach(id=>document.getElementById(id).textContent=nome);
+  ['user-role','header-user-role'].forEach(id=>document.getElementById(id).textContent=label);
+  ['user-avatar','header-avatar'].forEach(id=>document.getElementById(id).textContent=ini);
+
+  if (isGlobal) {
+    document.getElementById('empresa-nome').textContent='Vitta Sistemas';
+    document.getElementById('sectionAdmin').classList.remove('hidden');
+    AdminEmpresaCtx.initSelector('ADMIN_GLOBAL', session.user.id);
+    currentEmpId = AdminEmpresaCtx.resolveIdEmp('ADMIN_GLOBAL', null);
+  } else {
+    const u = await getUsuarioAtual('ID_EMP,EMPRESA(NOME_EMP)', session);
+    currentEmpId = u?.ID_EMP || (meta.ID_EMP || meta.id_emp) || null;
+    document.getElementById('empresa-nome').textContent = u?.EMPRESA?.NOME_EMP || '';
+  }
+  let temAcessoConsultas = meta.tipo_usu === 'PROFISSIONAL';
+  if (['ADMIN_EMPRESA','ADMIN_GLOBAL'].includes(meta.tipo_usu)) {
+    const uOwn = await getUsuarioAtual('PROF_USU', session);
+    temAcessoConsultas = !!(uOwn?.PROF_USU);
+  }
+  if (!temAcessoConsultas)
+    document.querySelector('a[href="consultas.html"]')?.classList.add('hidden');
+  return true;
+}
+
+async function loadEmpresas() {
+  const { data } = await supabase.from('EMPRESA').select('ID_EMP,NOME_EMP').eq('ATIVO_EMP',true).order('NOME_EMP');
+  empresas = data || [];
+  const selF = document.getElementById('filterEmpAdmin');
+  const selE = document.getElementById('fEmpresa');
+  empresas.forEach(e => {
+    selF.insertAdjacentHTML('beforeend',`<option value="${e.ID_EMP}">${e.NOME_EMP}</option>`);
+    selE.insertAdjacentHTML('beforeend',`<option value="${e.ID_EMP}">${e.NOME_EMP}</option>`);
+  });
+}
+
+async function loadEspecialidades() {
+  let q = supabase.from('ESPECIALIDADE').select('ID_ESPEC,NOME_ESPEC').eq('ATIVO_ESPEC',true).order('NOME_ESPEC');
+  if (currentEmpId) q = q.eq('ID_EMP', currentEmpId);
+  const { data } = await q;
+  allEspec = data || [];
+  const sel = document.getElementById('filterEspec');
+  allEspec.forEach(e => sel.insertAdjacentHTML('beforeend',`<option value="${e.ID_ESPEC}">${e.NOME_ESPEC}</option>`));
+}
+
+async function loadProfissionais(empId) {
+  let q = supabase.from('PROFISSIONAL')
+    .select('ID_PROF,NOME_PROF,EMAIL_PROF,TEL_PROF,CPF_PROF,DTNASC_PROF,ESPECIAL_PROF,ID_ESPEC,ESPECIALIDADE(NOME_ESPEC)')
+    .eq('ATIVO_PROF',true).order('NOME_PROF');
+  if (empId) q = q.eq('ID_EMP', empId);
+  else if (currentEmpId) q = q.eq('ID_EMP', currentEmpId);
+  const { data } = await q;
+  allProfis = data || [];
+  const sel = document.getElementById('fProf');
+  sel.innerHTML = '<option value="">Selecione o profissional&hellip;</option>';
+  allProfis.forEach(p => sel.insertAdjacentHTML('beforeend',`<option value="${p.ID_PROF}">${p.NOME_PROF}</option>`));
+}
+
+function onEmpresaChange() {
+  const empId = document.getElementById('fEmpresa').value || null;
+  loadProfissionais(empId);
+  loadTiposPagamento(empId);
+  loadTiposAcompanhamento(empId);
+  document.getElementById('fProf').value = '';
+  document.getElementById('fEspecDisplay').value = '';
+}
+
+function onProfChange() {
+  const profId = document.getElementById('fProf').value;
+  const prof = allProfis.find(p => p.ID_PROF === profId);
+  document.getElementById('fEspecDisplay').value = prof?.ESPECIALIDADE?.NOME_ESPEC || prof?.ESPECIAL_PROF || '';
+}
+
+async function loadTiposPagamento(empId) {
+  let q = supabase.from('TIPPAG').select('ID_TIPPAG,NOME_TIPPAG,PIX_TIPPAG').eq('ATIVO_TIPPAG',true).order('NOME_TIPPAG');
+  if (empId) q = q.eq('ID_EMP', empId);
+  else if (currentEmpId) q = q.eq('ID_EMP', currentEmpId);
+  const { data } = await q;
+  allTipPag = data || [];
+  const sel = document.getElementById('fTipPag');
+  sel.innerHTML = '<option value="">Selecione o tipo de pagamento&hellip;</option>';
+  allTipPag.forEach(t => sel.insertAdjacentHTML('beforeend',`<option value="${t.ID_TIPPAG}">${t.NOME_TIPPAG}</option>`));
+}
+
+async function loadTiposAcompanhamento(empId) {
+  let q = supabase.from('TIPACOM').select('ID_TIPACOM,NOME_TIPACOM').eq('ATIVO_TIPACOM',true).order('NOME_TIPACOM');
+  if (empId) q = q.eq('ID_EMP', empId);
+  else if (currentEmpId) q = q.eq('ID_EMP', currentEmpId);
+  const { data } = await q;
+  allTipAcom = data || [];
+  const sel = document.getElementById('fTipAcom');
+  sel.innerHTML = '<option value="">Selecione&hellip;</option>';
+  allTipAcom.forEach(t => sel.insertAdjacentHTML('beforeend',`<option value="${t.ID_TIPACOM}">${t.NOME_TIPACOM}</option>`));
+}
+
+function onTipPagChange() {
+  const tipId = document.getElementById('fTipPag').value;
+  const tip = allTipPag.find(t => t.ID_TIPPAG === tipId);
+  const isPix = tip?.PIX_TIPPAG === true;
+  document.getElementById('rowChavePix').classList.toggle('hidden', !isPix);
+  if (!isPix) document.getElementById('fChavePix').value = '';
+}
+
+async function loadServicos() {
+  let q = supabase.from('SERVICO')
+    .select('ID_SERV,ID_EMP,ID_PROF,ID_TIPPAG,ID_TIPACOM,VALOR_1CONS,CHAVE_PIX,VALOR_ACOMP,OBS_SERV,ATIVO_SERV,DTCRI_SERV,EMPRESA(NOME_EMP),PROFISSIONAL(ID_PROF,NOME_PROF,EMAIL_PROF,TEL_PROF,CPF_PROF,DTNASC_PROF,ESPECIAL_PROF,ESPECIALIDADE(NOME_ESPEC)),TIPPAG(ID_TIPPAG,NOME_TIPPAG,PIX_TIPPAG),TIPACOM(ID_TIPACOM,NOME_TIPACOM)')
+    .order('DTCRI_SERV',{ascending:false});
+  if (currentEmpId) q = q.eq('ID_EMP', currentEmpId);
+  const { data, error } = await q;
+  if (error) { showToast('Erro ao carregar serviços', false); return; }
+  allServicos = data || [];
+  document.getElementById('tableLoader').classList.add('hidden');
+  document.getElementById('tableWrap').classList.remove('hidden');
+  applyFilters();
+}
+
+function applyFilters() {
+  const q      = document.getElementById('filterSearch').value.trim().toLowerCase();
+  const especId= document.getElementById('filterEspec').value;
+  const empId  = document.getElementById('filterEmpAdmin').value;
+  filtered = allServicos.filter(s => {
+    if (empId && s.ID_EMP !== empId) return false;
+    if (especId && s.PROFISSIONAL?.ESPECIALIDADE?.ID_ESPEC !== especId && s.PROFISSIONAL?.ID_ESPEC !== especId) return false;
+    if (q && !s.PROFISSIONAL?.NOME_PROF?.toLowerCase().includes(q)) return false;
+    return true;
+  });
+  renderTable();
+}
+
+function clearFilters() {
+  document.getElementById('filterSearch').value = '';
+  document.getElementById('filterEspec').value  = '';
+  document.getElementById('filterEmpAdmin').value = '';
+  applyFilters();
+}
+
+function renderTable() {
+  const tbody = document.getElementById('servBody');
+  document.getElementById('tableCount').innerHTML = `Exibindo <strong class="text-gray-800">${filtered.length}</strong> servi&ccedil;o${filtered.length!==1?'s':''}`;
+  if (!filtered.length) {
+    document.getElementById('tableWrap').classList.add('hidden');
+    document.getElementById('tableEmpty').classList.remove('hidden');
+    return;
+  }
+  document.getElementById('tableWrap').classList.remove('hidden');
+  document.getElementById('tableEmpty').classList.add('hidden');
+  tbody.innerHTML = filtered.map(s => {
+    const prof = s.PROFISSIONAL;
+    const espec = prof?.ESPECIALIDADE?.NOME_ESPEC || prof?.ESPECIAL_PROF || '&mdash;';
+    const isSelected = s.ID_SERV === selectedServId;
+    return `
+    <tr class="border-b border-gray-50 fade-up cursor-pointer ${isSelected?'selected':''}" onclick="openDetailPanel('${s.ID_SERV}')">
+      <td class="px-5 py-3.5 font-semibold text-gray-800">${prof?.NOME_PROF || '&mdash;'}</td>
+      <td class="px-5 py-3.5 text-gray-500 text-[0.82rem]">${espec}</td>
+      <td class="px-5 py-3.5 text-gray-700">${fmtBRL(s.VALOR_1CONS)}</td>
+      <td class="px-5 py-3.5 text-gray-500 text-[0.82rem]">${s.TIPPAG?.NOME_TIPPAG||'&mdash;'}</td>
+      <td class="px-5 py-3.5 text-right">
+        <div class="flex items-center justify-end gap-1">
+          <button onclick="event.stopPropagation();openDetailPanel('${s.ID_SERV}')" title="Ver detalhes" class="p-1.5 rounded-lg text-gray-400 hover:text-vitta-600 hover:bg-vitta-50 transition-colors">
+            <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
+          </button>
+          <button onclick="event.stopPropagation();openEditModal('${s.ID_SERV}')" title="Editar" class="p-1.5 rounded-lg text-gray-400 hover:text-vitta-600 hover:bg-vitta-50 transition-colors">
+            <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+          </button>
+          <button onclick="event.stopPropagation();openDeleteModal('${s.ID_SERV}','${(prof?.NOME_PROF||'').replace(/'/g,"\\'")}' )" title="Excluir" class="p-1.5 rounded-lg text-gray-400 hover:text-red-500 hover:bg-red-50 transition-colors">
+            <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>
+          </button>
+        </div>
+      </td>
+    </tr>`;
+  }).join('');
+}
+
+function openDetailPanel(id) {
+  const s = allServicos.find(x => x.ID_SERV === id);
+  if (!s) return;
+  selectedServId = id;
+  const prof = s.PROFISSIONAL;
+  const espec = prof?.ESPECIALIDADE?.NOME_ESPEC || prof?.ESPECIAL_PROF || '';
+  const ini = (prof?.NOME_PROF||'?').split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase();
+
+  document.getElementById('dtAvatar').textContent = ini;
+  document.getElementById('dtNome').textContent   = prof?.NOME_PROF || '—';
+  document.getElementById('dtEspec').textContent  = espec;
+
+  function setRow(rowId, valId, val) {
+    const has = val && val !== '—';
+    document.getElementById(rowId).classList.toggle('hidden', !has);
+    if (has) document.getElementById(valId).textContent = val;
+  }
+  setRow('dtCpfRow',   'dtCpf',   fmtCPF(prof?.CPF_PROF));
+  setRow('dtNascRow',  'dtNasc',  fmtDate(prof?.DTNASC_PROF));
+  setRow('dtEmailRow', 'dtEmail', prof?.EMAIL_PROF || '');
+  setRow('dtTelRow',   'dtTel',   fmtTel(prof?.TEL_PROF));
+  setRow('dtTipPagRow','dtTipPag', s.TIPPAG?.NOME_TIPPAG || '');
+  setRow('dtPixRow',   'dtPix',   s.TIPPAG?.PIX_TIPPAG ? (s.CHAVE_PIX || '') : '');
+
+  const tipacomNome = s.TIPACOM?.NOME_TIPACOM || '';
+  const acompText = tipacomNome
+    ? (tipacomNome + (s.VALOR_ACOMP != null ? ' — ' + fmtBRL(s.VALOR_ACOMP) : ''))
+    : '';
+  setRow('dtAcompRow', 'dtAcomp', acompText);
+  setRow('dtObsRow',   'dtObs',   s.OBS_SERV || '');
+
+  document.getElementById('detailPanel').classList.remove('hidden');
+  renderTable();
+}
+
+function closeDetailPanel() {
+  selectedServId = null;
+  document.getElementById('detailPanel').classList.add('hidden');
+  renderTable();
+}
+
+function editFromDetail() {
+  if (selectedServId) openEditModal(selectedServId);
+}
+function deleteFromDetail() {
+  const s = allServicos.find(x => x.ID_SERV === selectedServId);
+  if (s) openDeleteModal(s.ID_SERV, s.PROFISSIONAL?.NOME_PROF || '');
+}
+
+function openFormModal() {
+  editId = null;
+  document.getElementById('formTitle').textContent    = 'Novo Serviço';
+  document.getElementById('formSubtitle').textContent = 'Preencha os dados do serviço';
+  document.getElementById('fId').value        = '';
+  document.getElementById('fProf').value      = '';
+  document.getElementById('fEspecDisplay').value = '';
+  document.getElementById('fValor1Cons').value  = '';
+  document.getElementById('fTipPag').value      = '';
+  document.getElementById('fChavePix').value    = '';
+  document.getElementById('rowChavePix').classList.add('hidden');
+  document.getElementById('fTipAcom').value     = '';
+  document.getElementById('fValorAcomp').value  = '';
+  document.getElementById('fObs').value         = '';
+  document.getElementById('modalForm').classList.add('open');
+}
+
+async function openEditModal(id) {
+  const s = allServicos.find(x => x.ID_SERV === id);
+  if (!s) return;
+  editId = id;
+  const prof = s.PROFISSIONAL;
+  document.getElementById('formTitle').textContent    = 'Editar Serviço';
+  document.getElementById('formSubtitle').textContent = `Editando: ${prof?.NOME_PROF || ''}`;
+  document.getElementById('fId').value          = s.ID_SERV;
+  document.getElementById('fValor1Cons').value  = s.VALOR_1CONS ?? '';
+  document.getElementById('fChavePix').value    = s.CHAVE_PIX || '';
+  document.getElementById('fTipoAcomp').value   = s.TIPO_ACOMP || '';
+  document.getElementById('fValorAcomp').value  = s.VALOR_ACOMP ?? '';
+  document.getElementById('fObs').value         = s.OBS_SERV || '';
+  document.getElementById('fProf').value = s.ID_PROF || '';
+  document.getElementById('fEspecDisplay').value = prof?.ESPECIALIDADE?.NOME_ESPEC || prof?.ESPECIAL_PROF || '';
+  document.getElementById('fTipPag').value  = s.ID_TIPPAG || '';
+  onTipPagChange();
+  document.getElementById('fChavePix').value = s.CHAVE_PIX || '';
+  document.getElementById('fTipAcom').value  = s.ID_TIPACOM || '';
+  document.getElementById('fValorAcomp').value = s.VALOR_ACOMP ?? '';
+  document.getElementById('modalForm').classList.add('open');
+}
+
+function closeFormModal() { document.getElementById('modalForm').classList.remove('open'); }
+
+async function saveServico(ev) {
+  ev.preventDefault();
+  const btn = document.getElementById('btnSave');
+  btn.disabled=true; btn.textContent='Salvando…';
+
+  const profId = document.getElementById('fProf').value;
+  if (!profId) { showToast('Selecione o profissional', false); btn.disabled=false; btn.textContent='Salvar'; return; }
+
+  const empId = currentEmpId;
+  if (!empId) { showToast('Selecione a empresa', false); btn.disabled=false; btn.textContent='Salvar'; return; }
+  const payload = {
+    ID_EMP:    empId,
+    ID_PROF:   profId,
+    ID_TIPPAG:  document.getElementById('fTipPag').value || null,
+    ID_TIPACOM: document.getElementById('fTipAcom').value || null,
+    VALOR_1CONS: document.getElementById('fValor1Cons').value !== '' ? parseFloat(document.getElementById('fValor1Cons').value) : null,
+    CHAVE_PIX:   document.getElementById('fChavePix').value.trim() || null,
+    VALOR_ACOMP: document.getElementById('fValorAcomp').value !== '' ? parseFloat(document.getElementById('fValorAcomp').value) : null,
+    OBS_SERV:    document.getElementById('fObs').value.trim() || null,
+  };
+  try {
+    if (!editId) {
+      const { error } = await supabase.from('SERVICO').insert(payload);
+      if (error) throw error;
+      showToast('Serviço cadastrado com sucesso!');
+    } else {
+      const { error } = await supabase.from('SERVICO').update(payload).eq('ID_SERV', editId);
+      if (error) throw error;
+      showToast('Serviço atualizado!');
+    }
+    closeFormModal();
+    closeDetailPanel();
+    await loadServicos();
+  } catch(err) {
+    showToast(err.message || 'Erro ao salvar', false);
+  }
+  btn.disabled=false; btn.textContent='Salvar';
+}
+
+function openDeleteModal(id, nomeProf) {
+  deleteTargetId = id;
+  document.getElementById('deleteMsg').textContent = `Excluir o serviço de "${nomeProf}"? Esta ação não pode ser desfeita.`;
+  document.getElementById('modalDelete').classList.add('open');
+}
+function closeDeleteModal() { document.getElementById('modalDelete').classList.remove('open'); }
+
+async function confirmDelete() {
+  const { error } = await supabase.from('SERVICO').delete().eq('ID_SERV', deleteTargetId);
+  if (error) { showToast(error.message, false); return; }
+  showToast('Serviço excluído!');
+  closeDeleteModal();
+  if (selectedServId === deleteTargetId) closeDetailPanel();
+  await loadServicos();
+}
+
+(async () => {
+  const ok = await initAuth();
+  if (!ok) return;
+  if (isGlobal && !AdminEmpresaCtx.get()) {
+    AdminEmpresaCtx.renderBloqueio(['main']);
+    return;
+  }
+  await Promise.all([loadEmpresas(), loadEspecialidades()]);
+  await Promise.all([loadProfissionais(null), loadTiposPagamento(null), loadTiposAcompanhamento(null)]);
+  await loadServicos();
+})();
+
+document.querySelectorAll('#sidebar nav a').forEach(function(link) {
+  link.addEventListener('click', function() {
+    var sb = document.getElementById('sidebar');
+    var ov = document.getElementById('overlay');
+    if (sb && !sb.classList.contains('-translate-x-full')) {
+      sb.classList.add('-translate-x-full');
+      if (ov) ov.classList.add('hidden');
+    }
+  });
+});
+</script>
+<script>
+(async () => {
+  try {
+    const { data: { session } } = await supabase.auth.getSession();
+    if (['ADMIN_EMPRESA'].includes(session?.user?.user_metadata?.tipo_usu)) {
+      const el = document.getElementById('sectionMinhaEmpresa');
+      if (el) el.classList.remove('hidden');
+    }
+  } catch (_) {}
+})();
+</script>
+<script>
+(async () => {
+  try {
+    const { data: { session } } = await supabase.auth.getSession();
+    if (!session) return;
+    const u = await getUsuarioAtual('TIPO_USU,ID_EMP', session);
+    if (u && u.ID_EMP === '22ff26b9-3839-45ed-8a1d-df4a488d3aab' && ['ADMIN_EMPRESA','SECRETARIA'].includes(u.TIPO_USU)) {
+      document.getElementById('menuDocumentosWrap')?.classList.remove('hidden');
+    }
+  } catch (_) {}
+})();
+</script>
+</body>
+</html>

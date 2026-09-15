@@ -1,0 +1,791 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>Configura&ccedil;&otilde;es &mdash; Vitta Sistemas</title>
+  <link rel="icon" type="image/png" href="../img/favicon.png" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: { vitta: { 50:'#f0fbfd',100:'#e0f7fa',300:'#80deea',400:'#4dd9ed',500:'#2ABCD4',600:'#1a96ac',700:'#127a8c' } },
+          fontFamily: { sans: ['Inter','system-ui','sans-serif'] }
+        }
+      }
+    }
+  </script>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+  <script src="../assets/js/config.js?v=2"></script>
+  <script src="../assets/js/admin-empresa-context.js?v=1"></script>
+  <script src="../assets/js/access-guard.js?v=2"></script>
+  <script src="../assets/js/notifications.js?v=3"></script>
+  <style>
+    .sidebar-nav::-webkit-scrollbar { width:3px; }
+    .sidebar-nav::-webkit-scrollbar-thumb { background:rgba(255,255,255,.1); border-radius:4px; }
+    .submenu { overflow:hidden; max-height:0; opacity:0; transition:max-height .25s ease,opacity .2s ease; }
+    .submenu.open { max-height:500px; opacity:1; }
+    .chevron { transition:transform .25s ease; display:inline-block; }
+    .chevron.open { transform:rotate(180deg); }
+    .block-body { overflow:hidden; transition:max-height .3s ease, opacity .25s ease; max-height:0; opacity:0; }
+    .block-body.open { max-height:2000px; opacity:1; }
+    @keyframes fadeUp { from{opacity:0;transform:translateY(8px)} to{opacity:1;transform:translateY(0)} }
+    .fade-up { animation:fadeUp .35s ease forwards; }
+  </style>
+</head>
+
+<body class="bg-[#F0F2F5] font-sans antialiased">
+<div class="flex min-h-screen">
+
+<!-- ====== SIDEBAR ====== -->
+<aside id="sidebar" class="fixed inset-y-0 left-0 w-[220px] bg-[#111827] flex flex-col z-30 -translate-x-full lg:translate-x-0 transition-transform duration-300">
+  <div class="flex flex-col items-center justify-center gap-1 py-4 px-5 border-b border-white/10 shrink-0">
+    <img src="../img/logo.png" alt="Vitta Sistemas" class="h-10 w-auto brightness-0 invert" />
+    <p class="text-[0.6rem] text-gray-500 tracking-wide">v1.2.1</p>
+  </div>
+  <nav class="flex-1 overflow-y-auto sidebar-nav py-3">
+    <p class="block text-[0.6rem] font-bold text-gray-500 uppercase tracking-widest px-4 pb-1 pt-3">Principal</p>
+    <a href="dashboard.html" class="flex items-center gap-3 px-3 py-2.5 mx-2 rounded-xl text-[0.83rem] font-medium text-gray-400 hover:bg-white/10 hover:text-white transition-colors duration-150 mb-0.5">
+      <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>Dashboard
+    </a>
+    <a href="agendamentos.html" class="flex items-center gap-3 px-3 py-2.5 mx-2 rounded-xl text-[0.83rem] font-medium text-gray-400 hover:bg-white/10 hover:text-white transition-colors duration-150 mb-0.5">
+      <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>Agendamentos
+    </a>
+    <a href="consultas.html" class="flex items-center gap-3 px-3 py-2.5 mx-2 rounded-xl text-[0.83rem] font-medium text-gray-400 hover:bg-white/10 hover:text-white transition-colors duration-150 mb-0.5">
+      <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>Consultas
+    </a>
+
+    <p class="block text-[0.6rem] font-bold text-gray-500 uppercase tracking-widest px-4 pb-1 pt-4">Cadastros</p>
+    <button onclick="toggleMenu('cadastros')" class="w-full flex items-center gap-3 px-3 py-2.5 mx-2 rounded-xl text-[0.83rem] font-medium text-gray-400 hover:bg-white/10 hover:text-white transition-colors duration-150 mb-0.5" style="width:calc(100% - 16px)">
+      <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>Cadastros
+      <svg id="chev-cadastros" class="chevron w-3.5 h-3.5 ml-auto text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+    </button>
+    <div id="sub-cadastros" class="submenu">
+      <a href="pacientes.html" class="flex items-center gap-2 pl-10 pr-3 py-2 mx-2 rounded-xl text-[0.8rem] text-gray-500 hover:bg-white/5 hover:text-gray-300 transition-colors cursor-pointer">Pacientes</a>
+      <a href="profissionais.html" class="flex items-center gap-2 pl-10 pr-3 py-2 mx-2 rounded-xl text-[0.8rem] text-gray-500 hover:bg-white/5 hover:text-gray-300 transition-colors cursor-pointer">Profissionais</a>
+      <a href="usuarios-empresa.html" class="flex items-center gap-2 pl-10 pr-3 py-2 mx-2 rounded-xl text-[0.8rem] text-gray-500 hover:bg-white/5 hover:text-gray-300 transition-colors cursor-pointer">Usu&aacute;rios</a>
+      <div class="hidden" id="menuDocumentosWrap"><a href="documentos.html" class="flex items-center gap-2 pl-10 pr-3 py-2 mx-2 rounded-xl text-[0.8rem] text-gray-500 hover:bg-white/5 hover:text-gray-300 transition-colors cursor-pointer w-full">Documentos</a></div>
+      <a href="leads.html" class="flex items-center gap-2 pl-10 pr-3 py-2 mx-2 rounded-xl text-[0.8rem] text-gray-500 hover:bg-white/5 hover:text-gray-300 transition-colors cursor-pointer">Leads</a>
+    </div>
+
+    <p class="block text-[0.6rem] font-bold text-gray-500 uppercase tracking-widest px-4 pb-1 pt-4">Outros Cadastros</p>
+    <button onclick="toggleMenu('servicos')" class="w-full flex items-center gap-3 px-3 py-2.5 mx-2 rounded-xl text-[0.83rem] font-medium text-gray-400 hover:bg-white/10 hover:text-white transition-colors duration-150 cursor-pointer mb-0.5" style="width:calc(100% - 16px)">
+      <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>Outros Cadastros
+      <svg id="chev-servicos" class="chevron w-3.5 h-3.5 ml-auto text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+    </button>
+    <div id="sub-servicos" class="submenu">
+      <a href="servicos.html" class="flex items-center gap-2 pl-10 pr-3 py-2 mx-2 rounded-xl text-[0.8rem] text-gray-500 hover:bg-white/5 hover:text-gray-300 transition-colors cursor-pointer">Servi&ccedil;os</a>
+      <a href="salas.html" class="flex items-center gap-2 pl-10 pr-3 py-2 mx-2 rounded-xl text-[0.8rem] text-gray-500 hover:bg-white/5 hover:text-gray-300 transition-colors cursor-pointer">Salas</a>
+      <a href="especialidades.html" class="flex items-center gap-2 pl-10 pr-3 py-2 mx-2 rounded-xl text-[0.8rem] text-gray-500 hover:bg-white/5 hover:text-gray-300 transition-colors cursor-pointer">Especialidades</a>
+      <a href="grupo.html" class="flex items-center gap-2 pl-10 pr-3 py-2 mx-2 rounded-xl text-[0.8rem] text-gray-500 hover:bg-white/5 hover:text-gray-300 transition-colors cursor-pointer">Grupo</a>
+      <a href="tipospagamento.html" class="flex items-center gap-2 pl-10 pr-3 py-2 mx-2 rounded-xl text-[0.8rem] text-gray-500 hover:bg-white/5 hover:text-gray-300 transition-colors cursor-pointer">Tipos de Pagamento</a>
+      <a href="tiposacompanhamento.html" class="flex items-center gap-2 pl-10 pr-3 py-2 mx-2 rounded-xl text-[0.8rem] text-gray-500 hover:bg-white/5 hover:text-gray-300 transition-colors cursor-pointer">Tipos de Acomp.</a>
+    </div>
+
+    <p class="block text-[0.6rem] font-bold text-gray-500 uppercase tracking-widest px-4 pb-1 pt-4">Financeiro</p>
+    <button onclick="toggleMenu('financeiro')" class="w-full flex items-center gap-3 px-3 py-2.5 mx-2 rounded-xl text-[0.83rem] font-medium text-gray-400 hover:bg-white/10 hover:text-white transition-colors duration-150 cursor-pointer mb-0.5" style="width:calc(100% - 16px)">
+      <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>Financeiro
+      <svg id="chev-financeiro" class="chevron w-3.5 h-3.5 ml-auto text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+    </button>
+    <div id="sub-financeiro" class="submenu">
+      <a href="financeiro.html" class="flex items-center gap-2 pl-10 pr-3 py-2 mx-2 rounded-xl text-[0.8rem] text-gray-500 hover:bg-white/5 hover:text-gray-300 transition-colors cursor-pointer">Lan&ccedil;amentos</a>
+      <a href="relatorios.html" class="flex items-center gap-2 pl-10 pr-3 py-2 mx-2 rounded-xl text-[0.8rem] text-gray-500 hover:bg-white/5 hover:text-gray-300 transition-colors cursor-pointer">Relat&oacute;rios</a>
+    </div>
+
+
+    <div id="sectionMinhaEmpresa" class="hidden">
+    <p class="block text-[0.6rem] font-bold text-gray-500 uppercase tracking-widest px-4 pb-1 pt-4">Minha Empresa</p>
+    <button onclick="toggleMenu('minhaempresa')" class="w-full flex items-center gap-3 px-3 py-2.5 mx-2 rounded-xl text-[0.83rem] font-medium text-gray-400 hover:bg-white/10 hover:text-white transition-colors duration-150 cursor-pointer mb-0.5" style="width:calc(100% - 16px)">
+      <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>Minha Empresa
+      <svg id="chev-minhaempresa" class="chevron w-3.5 h-3.5 ml-auto text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+    </button>
+    <div id="sub-minhaempresa" class="submenu">
+      <a href="minha-empresa.html" class="flex items-center gap-2 pl-10 pr-3 py-2 mx-2 rounded-xl text-[0.8rem] text-gray-500 hover:bg-white/5 hover:text-gray-300 transition-colors cursor-pointer">Meus Dados</a>
+      <a href="faturas.html" class="flex items-center gap-2 pl-10 pr-3 py-2 mx-2 rounded-xl text-[0.8rem] text-gray-500 hover:bg-white/5 hover:text-gray-300 transition-colors cursor-pointer">Minhas Faturas</a>
+    </div>
+    </div>
+    <div id="sectionVittaBI" class="hidden">
+    <p class="block text-[0.6rem] font-bold text-gray-500 uppercase tracking-widest px-4 pb-1 pt-4">Vitta BI</p>
+    <a id="linkVittaBI" href="https://bi.vittasistemas.com.br" target="_blank" rel="noopener"
+       class="flex items-center gap-3 px-3 py-2.5 mx-2 rounded-xl text-[0.83rem] font-medium text-gray-400 hover:bg-white/10 hover:text-white transition-colors duration-150 cursor-pointer mb-0.5">
+      <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+        <path d="M3 3v18h18"/><path d="M18.7 8l-5.3 5.3-3-3L4 16.3"/>
+      </svg>
+      Vitta BI
+      <span class="ml-auto text-[0.55rem] font-bold text-violet-300 bg-violet-500/20 px-1.5 py-0.5 rounded">BI</span>
+    </a>
+    </div>
+
+    <div id="sectionAdmin" class="hidden">
+    <p class="block text-[0.6rem] font-bold text-gray-500 uppercase tracking-widest px-4 pb-1 pt-4">Sistema</p>
+    <button onclick="toggleMenu('admin')" class="w-full flex items-center gap-3 px-3 py-2.5 mx-2 rounded-xl text-[0.83rem] font-medium text-vitta-400 bg-vitta-500/10 transition-colors duration-150 mb-0.5" style="width:calc(100% - 16px)">
+      <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14M4.93 4.93a10 10 0 0 0 0 14.14"/></svg>Administra&ccedil;&atilde;o
+      <svg id="chev-admin" class="chevron open w-3.5 h-3.5 ml-auto text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+    </button>
+    <div id="sub-admin" class="submenu open">
+      <a href="empresas.html" class="flex items-center gap-2 pl-10 pr-3 py-2 mx-2 rounded-xl text-[0.8rem] text-gray-500 hover:bg-white/5 hover:text-gray-300 transition-colors cursor-pointer">Empresas</a>
+      <a href="usuarios.html" class="flex items-center gap-2 pl-10 pr-3 py-2 mx-2 rounded-xl text-[0.8rem] text-gray-500 hover:bg-white/5 hover:text-gray-300 transition-colors cursor-pointer">Usu&aacute;rios Admin</a>
+      <a href="planos.html" class="flex items-center gap-2 pl-10 pr-3 py-2 mx-2 rounded-xl text-[0.8rem] text-gray-500 hover:bg-white/5 hover:text-gray-300 transition-colors cursor-pointer">Planos</a>
+      <a href="dashboard-gerencial.html" class="flex items-center gap-2 pl-10 pr-3 py-2 mx-2 rounded-xl text-[0.8rem] text-gray-500 hover:bg-white/5 hover:text-gray-300 transition-colors cursor-pointer">Dashboard Gerencial</a>
+      <a href="configuracoes.html" class="flex items-center gap-2 pl-10 pr-3 py-2 mx-2 rounded-xl text-[0.8rem] font-semibold text-vitta-400 bg-vitta-500/10 transition-colors cursor-pointer">Configura&ccedil;&otilde;es</a>
+      <a href="logs.html" class="flex items-center gap-2 pl-10 pr-3 py-2 mx-2 rounded-xl text-[0.8rem] text-gray-500 hover:bg-white/5 hover:text-gray-300 transition-colors cursor-pointer">Log</a>
+    </div>
+    </div>
+    <div class="h-4"></div>
+  </nav>
+  <div class="shrink-0 border-t border-white/10 p-3">
+    <div class="group flex items-center gap-2.5 p-2.5 rounded-xl hover:bg-white/5 cursor-pointer">
+      <div id="user-avatar" class="w-8 h-8 rounded-full bg-vitta-500 flex items-center justify-center text-white text-xs font-bold shrink-0">A</div>
+      <div class="flex-1 min-w-0">
+        <p id="user-name" class="text-white text-[0.8rem] font-semibold truncate">Usu&aacute;rio</p>
+        <p id="user-role" class="text-gray-500 text-[0.7rem] truncate">Admin</p>
+      </div>
+      <button onclick="handleLogout()" title="Sair" class="text-gray-600 hover:text-red-400 transition-colors opacity-0 group-hover:opacity-100">
+        <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+      </button>
+    </div>
+  </div>
+</aside>
+
+<div id="overlay" class="fixed inset-0 bg-black/50 z-20 hidden lg:hidden" onclick="toggleSidebar()"></div>
+
+<div class="flex-1 lg:ml-[220px] flex flex-col min-h-screen">
+  <header class="sticky top-0 z-20 h-16 bg-white border-b border-gray-200 flex items-center px-5 gap-3 shadow-sm">
+    <button onclick="toggleSidebar()" class="lg:hidden p-2 rounded-lg hover:bg-gray-100 text-gray-500">
+      <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+        <line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/>
+      </svg>
+    </button>
+    <div class="flex-1">
+      <h1 class="text-[1rem] font-bold text-gray-800 leading-tight">Configura&ccedil;&otilde;es do Sistema</h1>
+      <p id="header-date" class="text-[0.7rem] text-gray-400 leading-tight">Par&acirc;metros gerais do sistema</p>
+    </div>
+    <div class="hidden md:flex items-center gap-2 px-3 py-2 bg-gray-50 border border-gray-200 rounded-xl">
+      <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-vitta-500 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+        <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/>
+      </svg>
+      <span id="empresa-nome" class="text-[0.78rem] font-semibold text-gray-700">Cl&iacute;nica</span>
+    </div>
+    <div class="flex items-center gap-2.5">
+      <div id="header-avatar" class="w-9 h-9 rounded-full bg-vitta-500 flex items-center justify-center text-white text-sm font-bold shrink-0">A</div>
+      <div class="hidden sm:block">
+        <p id="header-user-name" class="text-[0.8rem] font-semibold text-gray-800 leading-tight">Usu&aacute;rio</p>
+        <p id="header-user-role" class="text-[0.7rem] text-gray-400 leading-tight">Administrador</p>
+      </div>
+    </div>
+    <button onclick="handleLogout()" class="p-2.5 rounded-xl hover:bg-red-50 text-gray-400 hover:text-red-500 transition-colors" title="Sair">
+      <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+        <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/>
+      </svg>
+    </button>
+  </header>
+
+  <main class="flex-1 p-5 lg:p-6">
+
+    <!-- Conteúdo principal (ADMIN_GLOBAL) -->
+    <div id="mainContent" class="hidden max-w-3xl mx-auto fade-up space-y-4">
+
+      <!-- Aviso de plano sem IA -->
+      <div class="vitta-ai-noplan-msg bg-amber-50 border border-amber-200 rounded-2xl px-6 py-5 flex items-start gap-4">
+        <div class="w-10 h-10 rounded-xl bg-amber-100 border border-amber-200 flex items-center justify-center shrink-0 mt-0.5">
+          <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-amber-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M12 2L9.5 9.5 2 12l7.5 2.5L12 22l2.5-7.5L22 12l-7.5-2.5z"/>
+          </svg>
+        </div>
+        <div>
+          <p class="text-[0.9rem] font-bold text-amber-800 mb-1">Funcionalidades de IA não disponíveis</p>
+          <p class="text-[0.8rem] text-amber-700 leading-relaxed">O plano atual da sua clínica não inclui acesso às funcionalidades de Inteligência Artificial. Faça upgrade do plano para habilitar análise de prontuários e insights financeiros com IA.</p>
+        </div>
+      </div>
+
+      <!-- ═══════════════════════════════════════
+           BLOCO: Resumo Prontuário
+      ════════════════════════════════════════ -->
+      <div class="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden vitta-ai-feature">
+
+        <!-- Cabeçalho clicável -->
+        <button onclick="toggleBlock('resumo')" class="w-full flex items-center gap-3 px-6 py-4 text-left hover:bg-gray-50/80 transition-colors">
+          <div class="w-9 h-9 rounded-xl bg-violet-50 border border-violet-100 flex items-center justify-center shrink-0">
+            <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-violet-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+              <path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2"/>
+              <rect x="9" y="3" width="6" height="4" rx="1.5"/>
+              <line x1="9" y1="12" x2="15" y2="12"/><line x1="9" y1="16" x2="13" y2="16"/>
+            </svg>
+          </div>
+          <div class="flex-1 min-w-0">
+            <h2 class="text-[0.92rem] font-bold text-gray-800">Resumo Prontu&aacute;rio</h2>
+            <p class="text-[0.72rem] text-gray-400 mt-0.5">IA para resumo do hist&oacute;rico cl&iacute;nico do paciente</p>
+          </div>
+          <div id="ai-status-resumo" class="flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[0.7rem] font-semibold bg-gray-100 text-gray-400 border border-gray-200 shrink-0">
+            <span class="w-1.5 h-1.5 rounded-full bg-gray-300"></span>&nbsp;N&atilde;o configurado
+          </div>
+          <svg id="block-chevron-resumo" class="chevron open w-4 h-4 text-gray-400 shrink-0 ml-2" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+            <polyline points="6 9 12 15 18 9"/>
+          </svg>
+        </button>
+
+        <!-- Corpo do bloco -->
+        <div id="block-content-resumo" class="block-body open">
+          <div class="px-6 pb-6 pt-4 border-t border-gray-100 space-y-4">
+
+            <!-- Provedor + Modelo -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div>
+                <label class="block text-[0.78rem] font-semibold text-gray-600 mb-1.5">Provedor de IA</label>
+                <select id="sel-provider-resumo" onchange="onProviderChange('resumo')"
+                  class="w-full py-2.5 px-3.5 text-sm border border-gray-200 rounded-xl outline-none focus:border-violet-400 focus:ring-2 focus:ring-violet-100 bg-white text-gray-700">
+                  <option value="CLAUDE">Claude (Anthropic)</option>
+                  <option value="OPENAI">OpenAI (ChatGPT)</option>
+                  <option value="GEMINI">Google Gemini</option>
+                  <option value="META">Meta Llama (via Groq)</option>
+                </select>
+              </div>
+              <div>
+                <label class="block text-[0.78rem] font-semibold text-gray-600 mb-1.5">Modelo</label>
+                <select id="sel-model-resumo"
+                  class="w-full py-2.5 px-3.5 text-sm border border-gray-200 rounded-xl outline-none focus:border-violet-400 focus:ring-2 focus:ring-violet-100 bg-white text-gray-700">
+                </select>
+              </div>
+            </div>
+
+            <!-- Chave da API -->
+            <div>
+              <label id="lbl-api-key-resumo" class="block text-[0.78rem] font-semibold text-gray-600 mb-1.5">Chave da API</label>
+              <div class="relative">
+                <input id="inp-api-key-resumo" type="password" placeholder="sk-ant-api03-…"
+                  class="w-full py-2.5 px-3.5 pr-10 text-sm border border-gray-200 rounded-xl outline-none focus:border-violet-400 focus:ring-2 focus:ring-violet-100 font-mono text-gray-700"/>
+                <button type="button" onclick="toggleKeyVisibility('resumo')" class="absolute right-2.5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors" title="Mostrar/ocultar">
+                  <svg id="eye-icon-resumo" xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>
+                  </svg>
+                </button>
+              </div>
+              <p id="lbl-key-hint-resumo" class="text-[0.7rem] text-gray-400 mt-1.5"></p>
+            </div>
+
+            <!-- Botões -->
+            <div class="flex items-center gap-3">
+              <button type="button" onclick="testConnection('resumo')" class="flex items-center gap-1.5 px-4 py-2 border border-gray-200 rounded-xl text-[0.82rem] font-semibold text-gray-600 hover:bg-gray-50 transition-colors">
+                <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+                Testar Conex&atilde;o
+              </button>
+              <button type="button" onclick="saveAiConfig('resumo')" class="flex-1 py-2 bg-violet-500 text-white rounded-xl text-[0.82rem] font-semibold hover:bg-violet-600 transition-colors shadow-sm">
+                Salvar Configura&ccedil;&otilde;es
+              </button>
+            </div>
+            <div id="api-test-result-resumo" class="hidden"></div>
+
+            <!-- Seção de Prompts -->
+            <div class="border-t border-gray-100 pt-4">
+              <h3 class="text-[0.85rem] font-bold text-gray-800 mb-0.5">Prompt</h3>
+              <p class="text-[0.72rem] text-gray-400 mb-3">Instru&ccedil;&otilde;es enviadas &agrave; IA ao resumir o prontu&aacute;rio</p>
+              <div id="prompts-list-resumo">
+                <div class="flex items-center justify-center gap-2 py-8 text-gray-400 text-sm">
+                  <svg class="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"/></svg>
+                  Carregando…
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+
+      <!-- ═══════════════════════════════════════
+           BLOCO: Análise Financeira
+      ════════════════════════════════════════ -->
+      <div class="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden vitta-ai-feature">
+
+        <!-- Cabeçalho clicável -->
+        <button onclick="toggleBlock('fin')" class="w-full flex items-center gap-3 px-6 py-4 text-left hover:bg-gray-50/80 transition-colors">
+          <div class="w-9 h-9 rounded-xl bg-emerald-50 border border-emerald-100 flex items-center justify-center shrink-0">
+            <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-emerald-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+              <line x1="12" y1="1" x2="12" y2="23"/>
+              <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
+            </svg>
+          </div>
+          <div class="flex-1 min-w-0">
+            <h2 class="text-[0.92rem] font-bold text-gray-800">An&aacute;lise Financeira</h2>
+            <p class="text-[0.72rem] text-gray-400 mt-0.5">IA para an&aacute;lise e insights financeiros da cl&iacute;nica</p>
+          </div>
+          <div id="ai-status-fin" class="flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[0.7rem] font-semibold bg-gray-100 text-gray-400 border border-gray-200 shrink-0">
+            <span class="w-1.5 h-1.5 rounded-full bg-gray-300"></span>&nbsp;N&atilde;o configurado
+          </div>
+          <svg id="block-chevron-fin" class="chevron w-4 h-4 text-gray-400 shrink-0 ml-2" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+            <polyline points="6 9 12 15 18 9"/>
+          </svg>
+        </button>
+
+        <!-- Corpo do bloco -->
+        <div id="block-content-fin" class="block-body">
+          <div class="px-6 pb-6 pt-4 border-t border-gray-100 space-y-4">
+
+            <!-- Provedor + Modelo -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div>
+                <label class="block text-[0.78rem] font-semibold text-gray-600 mb-1.5">Provedor de IA</label>
+                <select id="sel-provider-fin" onchange="onProviderChange('fin')"
+                  class="w-full py-2.5 px-3.5 text-sm border border-gray-200 rounded-xl outline-none focus:border-emerald-400 focus:ring-2 focus:ring-emerald-100 bg-white text-gray-700">
+                  <option value="CLAUDE">Claude (Anthropic)</option>
+                  <option value="OPENAI">OpenAI (ChatGPT)</option>
+                  <option value="GEMINI">Google Gemini</option>
+                  <option value="META">Meta Llama (via Groq)</option>
+                </select>
+              </div>
+              <div>
+                <label class="block text-[0.78rem] font-semibold text-gray-600 mb-1.5">Modelo</label>
+                <select id="sel-model-fin"
+                  class="w-full py-2.5 px-3.5 text-sm border border-gray-200 rounded-xl outline-none focus:border-emerald-400 focus:ring-2 focus:ring-emerald-100 bg-white text-gray-700">
+                </select>
+              </div>
+            </div>
+
+            <!-- Chave da API -->
+            <div>
+              <label id="lbl-api-key-fin" class="block text-[0.78rem] font-semibold text-gray-600 mb-1.5">Chave da API</label>
+              <div class="relative">
+                <input id="inp-api-key-fin" type="password" placeholder="sk-ant-api03-…"
+                  class="w-full py-2.5 px-3.5 pr-10 text-sm border border-gray-200 rounded-xl outline-none focus:border-emerald-400 focus:ring-2 focus:ring-emerald-100 font-mono text-gray-700"/>
+                <button type="button" onclick="toggleKeyVisibility('fin')" class="absolute right-2.5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors" title="Mostrar/ocultar">
+                  <svg id="eye-icon-fin" xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>
+                  </svg>
+                </button>
+              </div>
+              <p id="lbl-key-hint-fin" class="text-[0.7rem] text-gray-400 mt-1.5"></p>
+            </div>
+
+            <!-- Botões -->
+            <div class="flex items-center gap-3">
+              <button type="button" onclick="testConnection('fin')" class="flex items-center gap-1.5 px-4 py-2 border border-gray-200 rounded-xl text-[0.82rem] font-semibold text-gray-600 hover:bg-gray-50 transition-colors">
+                <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+                Testar Conex&atilde;o
+              </button>
+              <button type="button" onclick="saveAiConfig('fin')" class="flex-1 py-2 bg-emerald-500 text-white rounded-xl text-[0.82rem] font-semibold hover:bg-emerald-600 transition-colors shadow-sm">
+                Salvar Configura&ccedil;&otilde;es
+              </button>
+            </div>
+            <div id="api-test-result-fin" class="hidden"></div>
+
+            <!-- Seção de Prompts -->
+            <div class="border-t border-gray-100 pt-4">
+              <h3 class="text-[0.85rem] font-bold text-gray-800 mb-0.5">Prompt</h3>
+              <p class="text-[0.72rem] text-gray-400 mb-3">Instru&ccedil;&otilde;es enviadas &agrave; IA ao analisar dados financeiros</p>
+              <div id="prompts-list-fin">
+                <div class="flex items-center justify-center gap-2 py-8 text-gray-400 text-sm">
+                  <svg class="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"/></svg>
+                  Carregando…
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Acesso negado -->
+    <div id="accessDenied" class="hidden text-center max-w-md mx-auto fade-up">
+      <div class="w-20 h-20 rounded-2xl bg-red-50 border border-red-100 flex items-center justify-center mx-auto mb-6">
+        <svg xmlns="http://www.w3.org/2000/svg" class="w-9 h-9 text-red-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+          <circle cx="12" cy="12" r="10"/><line x1="4.93" y1="4.93" x2="19.07" y2="19.07"/>
+        </svg>
+      </div>
+      <h2 class="text-xl font-extrabold text-gray-800 mb-2">Acesso Negado</h2>
+      <p class="text-sm text-gray-500 mb-6">Esta p&aacute;gina &eacute; restrita a administradores globais do sistema.</p>
+      <a href="dashboard.html" class="inline-flex items-center gap-2 px-5 py-2.5 bg-vitta-500 text-white text-sm font-semibold rounded-xl hover:bg-vitta-600 transition-colors">
+        Voltar ao Dashboard
+      </a>
+    </div>
+
+  </main>
+
+  <!-- Toast -->
+  <div id="toast-conf" class="fixed bottom-6 right-6 z-50 hidden">
+    <div id="toast-conf-inner" class="flex items-center gap-3 px-4 py-3 rounded-xl shadow-lg text-sm font-medium text-white min-w-[240px]"></div>
+  </div>
+</div>
+
+</div><!-- /flex min-h-screen -->
+
+<script src="../assets/js/ai-utils.js?v=1"></script>
+<script>
+/* ─────────────────────────────────────────────
+   Definição dos blocos de IA
+   Cada bloco tem suas próprias chaves no Supabase
+   e seus próprios prompts.
+───────────────────────────────────────────── */
+const BLOCK_DEFS = {
+  resumo: {
+    providerKey: 'AI_PROVIDER',
+    modelKey:    'AI_MODEL',
+    keyMap: { CLAUDE:'CLAUDE_API_KEY', OPENAI:'OPENAI_API_KEY', GEMINI:'GEMINI_API_KEY', META:'META_API_KEY' },
+    promptChaves: ['PROMPT_RESUMO_HISTORICO']
+  },
+  fin: {
+    providerKey: 'FIN_AI_PROVIDER',
+    modelKey:    'FIN_AI_MODEL',
+    keyMap: { CLAUDE:'FIN_CLAUDE_API_KEY', OPENAI:'FIN_OPENAI_API_KEY', GEMINI:'FIN_GEMINI_API_KEY', META:'FIN_META_API_KEY' },
+    promptChaves: ['PROMPT_ANALISE_FINANCEIRA']
+  }
+};
+
+const PROMPT_META = {
+  PROMPT_RESUMO_HISTORICO:   { titulo: 'Resumo do Histórico Clínico',  descricao: 'Instruções para resumo e análise do prontuário do paciente' },
+  PROMPT_ANALISE_FINANCEIRA: { titulo: 'Análise Financeira',           descricao: 'Instruções para análise de dados financeiros da clínica' }
+};
+
+let _aiConfigMap  = {};
+let _blockPrompts = { resumo: [], fin: [] };
+let currentUserMeta = null;
+
+/* ── Utilitários ── */
+function escHtml(s) { return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+function showToastConf(msg, ok = true) {
+  const t = document.getElementById('toast-conf');
+  const i = document.getElementById('toast-conf-inner');
+  i.textContent = msg;
+  i.className = `flex items-center gap-3 px-4 py-3 rounded-xl shadow-lg text-sm font-medium text-white min-w-[240px] ${ok ? 'bg-emerald-500' : 'bg-red-500'}`;
+  t.classList.remove('hidden');
+  setTimeout(() => t.classList.add('hidden'), 3500);
+}
+
+function toggleMenu(k) {
+  const s = document.getElementById('sub-' + k);
+  const c = document.getElementById('chev-' + k);
+  const o = s.classList.contains('open');
+  s.classList.toggle('open', !o);
+  if (c) c.classList.toggle('open', !o);
+}
+
+function toggleSidebar() {
+  const sb = document.getElementById('sidebar');
+  const ov = document.getElementById('overlay');
+  const o  = sb.classList.contains('-translate-x-full');
+  sb.classList.toggle('-translate-x-full', !o);
+  ov.classList.toggle('hidden', !o);
+}
+
+async function handleLogout() { await supabase.auth.signOut(); window.location.href = '../index.html'; }
+
+/* ── Accordion ── */
+function toggleBlock(scope) {
+  const body    = document.getElementById('block-content-' + scope);
+  const chevron = document.getElementById('block-chevron-' + scope);
+  const isOpen  = body.classList.contains('open');
+  body.classList.toggle('open', !isOpen);
+  chevron.classList.toggle('open', !isOpen);
+}
+
+/* ── Provider / Model UI ── */
+function onProviderChange(scope) {
+  const provider = document.getElementById('sel-provider-' + scope).value;
+  populateModels(scope, provider, '');
+  updateProviderUI(scope, provider);
+}
+
+function populateModels(scope, provider, selectedModel) {
+  const P   = VittaAI.PROVIDERS[provider];
+  const sel = document.getElementById('sel-model-' + scope);
+  sel.innerHTML = (P?.models || []).map(m =>
+    `<option value="${m.id}" ${m.id === selectedModel ? 'selected' : ''}>${escHtml(m.label)}</option>`
+  ).join('');
+}
+
+function updateProviderUI(scope, provider) {
+  const P   = VittaAI.PROVIDERS[provider];
+  const def = BLOCK_DEFS[scope];
+  if (!P) return;
+  document.getElementById('lbl-api-key-' + scope).textContent = P.keyLabel;
+  document.getElementById('inp-api-key-' + scope).placeholder  = P.keyPlaceholder;
+  document.getElementById('lbl-key-hint-' + scope).innerHTML   = P.keyHint;
+  document.getElementById('inp-api-key-' + scope).value        = _aiConfigMap[def.keyMap[provider]] || '';
+  document.getElementById('api-test-result-' + scope).classList.add('hidden');
+}
+
+function updateStatusBadge(scope, provider) {
+  const el = document.getElementById('ai-status-' + scope);
+  const P  = VittaAI.PROVIDERS[provider];
+  el.innerHTML = `<span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span><span class="text-emerald-600">${escHtml(P?.name || provider)}</span>`;
+  el.className = 'flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[0.7rem] font-semibold bg-emerald-50 border border-emerald-200 shrink-0';
+}
+
+/* ── Testar conexão ── */
+async function testConnection(scope) {
+  const key      = document.getElementById('inp-api-key-' + scope).value.trim();
+  const provider = document.getElementById('sel-provider-' + scope).value;
+  const model    = document.getElementById('sel-model-' + scope).value;
+  if (!key) { alert('Digite a chave antes de testar.'); return; }
+  const result = document.getElementById('api-test-result-' + scope);
+  result.classList.remove('hidden');
+  result.innerHTML = `<div class="flex items-center gap-2 text-violet-600 text-[0.78rem]">
+    <svg class="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"/></svg>
+    Testando conexão com ${escHtml(VittaAI.PROVIDERS[provider]?.name || provider)}…</div>`;
+  try {
+    await VittaAI.callAI(key, 'Responda apenas "ok".', '', provider, model);
+    result.innerHTML = `<div class="flex items-center gap-2 text-emerald-600 text-[0.78rem] bg-emerald-50 border border-emerald-100 rounded-xl px-3 py-2">
+      <svg class="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+      Conexão bem-sucedida! ${escHtml(VittaAI.PROVIDERS[provider]?.name || provider)} — chave válida.</div>`;
+  } catch(err) {
+    result.innerHTML = `<div class="flex items-center gap-2 text-red-600 text-[0.78rem] bg-red-50 border border-red-100 rounded-xl px-3 py-2">
+      <svg class="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+      Erro: ${escHtml(err.message)}</div>`;
+  }
+}
+
+/* ── Salvar configurações do bloco ── */
+async function saveAiConfig(scope) {
+  const provider = document.getElementById('sel-provider-' + scope).value;
+  const model    = document.getElementById('sel-model-' + scope).value;
+  const key      = document.getElementById('inp-api-key-' + scope).value.trim();
+  if (!key) { alert('Digite a chave de API para salvar.'); return; }
+  const P   = VittaAI.PROVIDERS[provider];
+  const def = BLOCK_DEFS[scope];
+  if (!P) return;
+  try {
+    const keyChave = def.keyMap[provider];
+    const { error: e1 } = await supabase.from('AI_CONFIG').upsert(
+      { CHAVE: keyChave, VALOR: key, TITULO: P.keyLabel, TIPO: 'APIKEY', DTUPD: new Date().toISOString() },
+      { onConflict: 'CHAVE' }
+    );
+    if (e1) throw e1;
+    const { error: e2 } = await supabase.from('AI_CONFIG').upsert(
+      { CHAVE: def.providerKey, VALOR: provider, TITULO: 'Provedor — ' + scope, TIPO: 'CONFIG', DTUPD: new Date().toISOString() },
+      { onConflict: 'CHAVE' }
+    );
+    if (e2) throw e2;
+    const { error: e3 } = await supabase.from('AI_CONFIG').upsert(
+      { CHAVE: def.modelKey, VALOR: model, TITULO: 'Modelo — ' + scope, TIPO: 'CONFIG', DTUPD: new Date().toISOString() },
+      { onConflict: 'CHAVE' }
+    );
+    if (e3) throw e3;
+    _aiConfigMap[keyChave]        = key;
+    _aiConfigMap[def.providerKey] = provider;
+    _aiConfigMap[def.modelKey]    = model;
+    updateStatusBadge(scope, provider);
+    showToastConf('Configurações salvas! Usando ' + P.name + '.');
+  } catch(err) {
+    showToastConf(err.message || 'Erro ao salvar', false);
+  }
+}
+
+/* ── Visibilidade da chave ── */
+function toggleKeyVisibility(scope) {
+  const inp = document.getElementById('inp-api-key-' + scope);
+  const ico = document.getElementById('eye-icon-' + scope);
+  if (inp.type === 'password') {
+    inp.type = 'text';
+    ico.innerHTML = '<path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/>';
+  } else {
+    inp.type = 'password';
+    ico.innerHTML = '<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>';
+  }
+}
+
+/* ── Prompts ── */
+function promptCardHTML(scope, p, idx) {
+  const val     = p.VALOR || '';
+  const preview = val.slice(0, 200).replace(/\n/g, ' ');
+  const meta    = PROMPT_META[p.CHAVE] || {};
+  return `<div id="prompt-card-${scope}-${idx}" class="border border-gray-100 rounded-xl overflow-hidden">
+    <div class="flex items-start justify-between gap-3 p-4 bg-gray-50/60">
+      <div>
+        <p class="text-[0.88rem] font-bold text-gray-800">${escHtml(p.TITULO || meta.titulo || p.CHAVE)}</p>
+        <p class="text-[0.72rem] text-gray-400 mt-0.5">${escHtml(p.DESCRICAO || meta.descricao || '')}</p>
+      </div>
+      <button type="button" onclick="editPrompt('${scope}', ${idx})"
+        class="shrink-0 flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-gray-200 text-[0.75rem] font-semibold text-gray-600 hover:bg-white hover:border-violet-200 hover:text-violet-600 transition-all">
+        <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+          <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
+          <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
+        </svg>
+        Editar
+      </button>
+    </div>
+    <div id="prompt-preview-${scope}-${idx}" class="px-4 pb-4 pt-3">
+      ${val
+        ? `<p class="text-[0.72rem] text-gray-500 font-mono leading-relaxed">${escHtml(preview)}${val.length > 200 ? '…' : ''}</p>`
+        : `<p class="text-[0.75rem] text-gray-400 italic">Nenhum prompt configurado. Clique em <strong>Editar</strong> para adicionar.</p>`}
+    </div>
+    <div id="prompt-editor-${scope}-${idx}" class="hidden px-4 pb-4 space-y-3">
+      <textarea id="prompt-ta-${scope}-${idx}" rows="14"
+        placeholder="Descreva as instruções que a IA deve seguir ao executar esta ação…"
+        class="w-full py-2.5 px-3.5 text-[0.78rem] text-gray-700 border border-gray-200 rounded-xl outline-none focus:border-violet-400 focus:ring-2 focus:ring-violet-100 resize-none leading-relaxed font-mono"></textarea>
+      <div class="flex gap-2">
+        <button type="button" onclick="cancelEditPrompt('${scope}', ${idx})"
+          class="px-4 py-2 border border-gray-200 rounded-xl text-sm font-semibold text-gray-600 hover:bg-gray-50 transition-colors">Cancelar</button>
+        <button type="button" onclick="savePrompt('${scope}', ${idx}, '${p.CHAVE}')"
+          class="flex-1 py-2 bg-violet-500 text-white rounded-xl text-sm font-semibold hover:bg-violet-600 transition-colors shadow-sm">Salvar Prompt</button>
+      </div>
+    </div>
+  </div>`;
+}
+
+function renderPrompts(scope, prompts) {
+  document.getElementById('prompts-list-' + scope).innerHTML =
+    prompts.map((p, idx) => promptCardHTML(scope, p, idx)).join('');
+}
+
+function editPrompt(scope, idx) {
+  document.getElementById(`prompt-preview-${scope}-${idx}`).classList.add('hidden');
+  document.getElementById(`prompt-editor-${scope}-${idx}`).classList.remove('hidden');
+  document.getElementById(`prompt-ta-${scope}-${idx}`).value = _blockPrompts[scope][idx].VALOR || '';
+}
+
+function cancelEditPrompt(scope, idx) {
+  document.getElementById(`prompt-preview-${scope}-${idx}`).classList.remove('hidden');
+  document.getElementById(`prompt-editor-${scope}-${idx}`).classList.add('hidden');
+}
+
+async function savePrompt(scope, idx, chave) {
+  const ta  = document.getElementById(`prompt-ta-${scope}-${idx}`);
+  const val = ta.value.trim();
+  if (!val) { alert('O prompt não pode estar vazio.'); return; }
+  const btn = document.getElementById(`prompt-editor-${scope}-${idx}`).querySelector('button:last-child');
+  btn.textContent = 'Salvando…'; btn.disabled = true;
+  try {
+    const meta = PROMPT_META[chave] || {};
+    const { error } = await supabase.from('AI_CONFIG').upsert(
+      { CHAVE: chave, VALOR: val, TITULO: meta.titulo || chave, TIPO: 'PROMPT', DTUPD: new Date().toISOString() },
+      { onConflict: 'CHAVE' }
+    );
+    if (error) throw error;
+    _blockPrompts[scope][idx].VALOR = val;
+    _aiConfigMap[chave] = val;
+    showToastConf('Prompt salvo com sucesso!');
+    cancelEditPrompt(scope, idx);
+    const preview = val.slice(0, 200).replace(/\n/g, ' ');
+    document.getElementById(`prompt-preview-${scope}-${idx}`).innerHTML =
+      `<p class="text-[0.72rem] text-gray-500 font-mono leading-relaxed">${escHtml(preview)}${val.length > 200 ? '…' : ''}</p>`;
+  } catch(err) {
+    showToastConf(err.message || 'Erro ao salvar', false);
+  } finally {
+    btn.textContent = 'Salvar Prompt'; btn.disabled = false;
+  }
+}
+
+/* ── Carrega todas as configurações e distribui por bloco ── */
+async function loadAiConfig() {
+  const { data, error } = await supabase.from('AI_CONFIG').select('*').order('DTCRI');
+  if (error) {
+    Object.keys(BLOCK_DEFS).forEach(scope => {
+      document.getElementById('prompts-list-' + scope).innerHTML =
+        `<p class="text-[0.82rem] text-red-500 text-center py-6 font-semibold">Tabela AI_CONFIG não encontrada.<br>
+         <span class="text-gray-400 font-normal text-[0.75rem]">Execute <code class="font-mono">assets/sql/ai_config.sql</code> no Supabase SQL Editor.</span></p>`;
+    });
+    return;
+  }
+  const configs = data || [];
+  configs.forEach(c => { _aiConfigMap[c.CHAVE] = c.VALOR; });
+
+  for (const scope of Object.keys(BLOCK_DEFS)) {
+    const def            = BLOCK_DEFS[scope];
+    const activeProvider = _aiConfigMap[def.providerKey] || 'CLAUDE';
+    const activeModel    = _aiConfigMap[def.modelKey]    || '';
+
+    document.getElementById('sel-provider-' + scope).value = activeProvider;
+    populateModels(scope, activeProvider, activeModel);
+    updateProviderUI(scope, activeProvider);
+
+    const key = _aiConfigMap[def.keyMap[activeProvider]] || '';
+    if (key) updateStatusBadge(scope, activeProvider);
+
+    // Para cada prompt do bloco: usa o existente no DB ou cria placeholder
+    const prompts = def.promptChaves.map(chave => {
+      const found = configs.find(c => c.CHAVE === chave);
+      const meta  = PROMPT_META[chave] || {};
+      return found || {
+        CHAVE:    chave,
+        TITULO:   meta.titulo   || chave,
+        DESCRICAO: meta.descricao || '',
+        VALOR:    '',
+        TIPO:     'PROMPT'
+      };
+    });
+    _blockPrompts[scope] = prompts;
+    renderPrompts(scope, prompts);
+  }
+}
+
+/* ── Inicialização ── */
+(async () => {
+  document.getElementById('header-date').textContent =
+    'Configurações — ' + new Date().toLocaleDateString('pt-BR', { weekday:'long', year:'numeric', month:'long', day:'numeric' });
+
+  const { data: { session } } = await supabase.auth.getSession();
+  if (!session) { window.location.href = '../index.html'; return; }
+
+  const meta = session.user.user_metadata;
+  currentUserMeta = meta;
+  const TIPO_LABELS = { ADMIN_GLOBAL:'Admin Global', ADMIN_EMPRESA:'Administrador', SECRETARIA:'Secretaria', PROFISSIONAL:'Profissional' };
+  const label = TIPO_LABELS[meta.tipo_usu] || meta.tipo_usu;
+  const nome  = meta.nome_usu || session.user.email;
+  const ini   = nome.split(' ').map(w => w[0]).join('').slice(0, 2).toUpperCase();
+
+  ['user-name', 'header-user-name'].forEach(id => document.getElementById(id).textContent = nome);
+  ['user-role', 'header-user-role'].forEach(id => document.getElementById(id).textContent = label);
+  ['user-avatar', 'header-avatar'].forEach(id => document.getElementById(id).textContent = ini);
+
+  if (meta.tipo_usu === 'ADMIN_GLOBAL') {
+    document.getElementById('empresa-nome').textContent = 'Vitta Sistemas';
+    AdminEmpresaCtx.initSelector('ADMIN_GLOBAL', session.user.id);
+    document.getElementById('sectionAdmin').classList.remove('hidden');
+    document.getElementById('mainContent').classList.remove('hidden');
+    await loadAiConfig();
+  } else {
+    const { data } = await supabase.from('EMPRESA').select('NOME_EMP').eq('ID_EMP', (meta.ID_EMP || meta.id_emp)).single();
+    document.getElementById('empresa-nome').textContent = data?.NOME_EMP || '';
+    document.getElementById('accessDenied').classList.remove('hidden');
+  }
+
+  let temAcessoConsultas = meta.tipo_usu === 'PROFISSIONAL';
+  if (['ADMIN_EMPRESA','ADMIN_GLOBAL'].includes(meta.tipo_usu)) {
+    const uOwn = await getUsuarioAtual('PROF_USU', session);
+    temAcessoConsultas = !!(uOwn?.PROF_USU);
+  }
+  if (!temAcessoConsultas)
+    document.querySelector('a[href="consultas.html"]')?.classList.add('hidden');
+})();
+
+document.querySelectorAll('#sidebar nav a').forEach(function(link) {
+  link.addEventListener('click', function() {
+    const sb = document.getElementById('sidebar');
+    const ov = document.getElementById('overlay');
+    if (sb && !sb.classList.contains('-translate-x-full')) {
+      sb.classList.add('-translate-x-full');
+      if (ov) ov.classList.add('hidden');
+    }
+  });
+});
+</script>
+<script>
+(async () => {
+  try {
+    const { data: { session } } = await supabase.auth.getSession();
+    if (['ADMIN_EMPRESA'].includes(session?.user?.user_metadata?.tipo_usu)) {
+      const el = document.getElementById('sectionMinhaEmpresa');
+      if (el) el.classList.remove('hidden');
+    }
+  } catch (_) {}
+})();
+</script>
+<script>
+(async () => {
+  try {
+    const { data: { session } } = await supabase.auth.getSession();
+    if (!session) return;
+    const u = await getUsuarioAtual('TIPO_USU,ID_EMP', session);
+    if (u && u.ID_EMP === '22ff26b9-3839-45ed-8a1d-df4a488d3aab' && ['ADMIN_EMPRESA','SECRETARIA'].includes(u.TIPO_USU)) {
+      document.getElementById('menuDocumentosWrap')?.classList.remove('hidden');
+    }
+  } catch (_) {}
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,1329 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Pacientes — Vitta BI</title>
+<link rel="icon" type="image/png" href="../img/Icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  * { box-sizing: border-box; }
+  body { margin: 0; font-family: 'Montserrat', system-ui, sans-serif; background: #FAFAFC; }
+  .bi-card { background: #FFFFFF; border: 1px solid #F1F0F7; border-radius: 16px; box-shadow: 0 2px 8px rgba(109,93,246,.04); }
+  .bi-kpi-icon { width: 36px; height: 36px; border-radius: 10px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+  .bi-filter { font-size: 14px; font-weight: 500; color: #6B7280; background: #FFFFFF; border: 1px solid #EFEDF9; border-radius: 9px; padding: 7px 12px; display: flex; align-items: center; gap: 6px; cursor: pointer; }
+  .bi-kpi-title { display: flex; align-items: center; gap: 6px; font-size: 13px; font-weight: 600; color: #6B7280; }
+  .bi-info { position: relative; width: 15px; height: 15px; border-radius: 50%; border: 1.3px solid #CBC8DC; color: #9C99B8; background: transparent; font-size: 10.5px; font-weight: 700; display: flex; align-items: center; justify-content: center; cursor: help; flex-shrink: 0; }
+  .bi-info-tip { visibility: hidden; opacity: 0; position: absolute; top: calc(100% + 9px); right: -10px; width: 220px; background: #1F2937; color: #fff; font-size: 12.5px; font-weight: 500; line-height: 1.45; padding: 10px 12px; border-radius: 8px; box-shadow: 0 6px 20px rgba(0,0,0,.18); transition: opacity .15s ease; z-index: 30; text-align: left; pointer-events: none; }
+  .bi-info-tip::after { content: ''; position: absolute; bottom: 100%; right: 13px; border: 5px solid transparent; border-bottom-color: #1F2937; }
+  .bi-info:hover .bi-info-tip, .bi-info:focus .bi-info-tip { visibility: visible; opacity: 1; }
+  .bi-info-tip.bi-info-tip-left { left: -10px; right: auto; }
+  .bi-info-tip.bi-info-tip-left::after { left: 13px; right: auto; }
+
+  .bi-period-panel { display: none; position: absolute; top: calc(100% + 8px); left: 0; width: 250px; background: #FFFFFF; border: 1px solid #F1F0F7; border-radius: 14px; box-shadow: 0 14px 34px rgba(17,17,17,.14); z-index: 40; padding: 10px; cursor: default; }
+  .bi-period-panel.open { display: block; }
+  .bi-period-panel-title { font-size: 11.5px; font-weight: 700; color: #9C99B8; letter-spacing: .05em; text-transform: uppercase; padding: 4px 10px 8px; }
+  .bi-period-opt { display: flex; align-items: center; gap: 10px; padding: 9px 10px; border-radius: 10px; cursor: pointer; }
+  .bi-period-opt:hover { background: #F7F6FC; }
+  .bi-period-opt.active { background: #FDECEC; }
+  .bi-period-opt-icon { width: 15px; height: 15px; flex-shrink: 0; color: #9C99B8; }
+  .bi-period-opt-text { flex: 1; min-width: 0; }
+  .bi-period-opt-title { font-size: 14px; font-weight: 600; color: #111827; }
+  .bi-period-opt.active .bi-period-opt-title { color: #C0392B; }
+  .bi-period-opt-sub { font-size: 12px; color: #9CA3AF; margin-top: 1px; }
+  .bi-period-opt-check { color: #C0392B; font-size: 14.5px; flex-shrink: 0; }
+  .bi-period-opt-chevron { color: #C4C1D6; flex-shrink: 0; font-size: 15.5px; }
+  .bi-period-back { border: none; background: transparent; color: #6B7280; font-size: 16.5px; cursor: pointer; padding: 2px 6px 2px 2px; border-radius: 6px; }
+  .bi-period-back:hover { background: #F7F6FC; }
+  .bi-range-input { flex: 1; border: 1.5px solid #EFEDF9; border-radius: 10px; padding: 7px 10px; cursor: pointer; }
+  .bi-range-input.active { border-color: #E4534B; }
+  .bi-range-input-label { font-size: 10px; font-weight: 700; color: #9C99B8; text-transform: uppercase; letter-spacing: .03em; }
+  .bi-range-input-value { font-size: 13px; font-weight: 600; color: #111827; margin-top: 1px; }
+  .bi-cal-nav-btn { border: none; background: transparent; color: #6B7280; font-size: 16.5px; cursor: pointer; width: 24px; height: 24px; border-radius: 6px; }
+  .bi-cal-nav-btn:hover { background: #F7F6FC; }
+  .bi-cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 2px; }
+  .bi-cal-dow { font-size: 11px; font-weight: 700; color: #C4C1D6; text-align: center; padding: 4px 0; }
+  .bi-cal-day { font-size: 12.5px; text-align: center; padding: 7px 0; border-radius: 8px; cursor: pointer; color: #111827; }
+  .bi-cal-day:hover { background: #F7F6FC; }
+  .bi-cal-day.muted { color: #C4C1D6; }
+  .bi-cal-day.in-range { background: #FCEAEA; }
+  .bi-cal-day.range-edge { background: #E4534B !important; color: #fff; font-weight: 600; }
+  .bi-pill { font-size: 11.5px; font-weight: 600; padding: 6px 10px; border-radius: 999px; border: 1px solid #EFEDF9; background: #fff; color: #6B7280; cursor: pointer; }
+  .bi-pill:hover { background: #F7F6FC; }
+  @keyframes bi-skeleton-shimmer { 0% { background-position: 100% 50%; } 100% { background-position: 0 50%; } }
+  .bi-skeleton { display: inline-block; background: linear-gradient(90deg, #F1F0F7 25%, #E9E7F3 37%, #F1F0F7 63%); background-size: 400% 100%; border-radius: 6px; animation: bi-skeleton-shimmer 1.4s ease infinite; vertical-align: middle; }
+  @keyframes bi-spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+  .bi-spin { animation: bi-spin .8s linear infinite; transform-origin: center; }
+  #btn-atualizar:disabled { opacity: .6; cursor: default; }
+</style>
+</head>
+<body>
+<!-- KPIs, evolução mensal e quebras por dimensão vêm das RPCs SECURITY DEFINER
+     bi_pacientes_resumo e bi_pacientes_por_dimensao (p_id_emp, p_period,
+     p_data_ini, p_data_fim), em supabase/migrations/20260904210000_bi_pacientes.sql —
+     ambas chamam bi_check_access(p_id_emp) antes de calcular qualquer número,
+     igual às RPCs de Leads/Financeiro: nunca consulta direta às tabelas
+     transacionais nem filtro client-side de empresa (regra inegociável, ver
+     Documentos/escopo-vitta-bi.md). Layout replica o padrão de
+     bi/pages/leads.html (mesmo filtro de período em painel, mesmos cards de
+     KPI, mesmos helpers de gráfico SVG de assets/js/charts.js). Cobre as
+     Fases 1-3 de bi/PLANO_BI_PACIENTES.md: cards de topo, evolução mensal
+     (ativos x novos, ano corrente), quebras por profissional/sexo/faixa
+     etária/grupo (Fase 1), frequência/esporadicidade via bi_pacientes_frequencia
+     e rotatividade/retenção via bi_pacientes_rotatividade (Fases 2-3, em
+     supabase/migrations/20260904220000_bi_pacientes_fase2_fase3.sql). "Pacientes
+     ativos" é sempre a base atual (não segue o filtro de período do topo,
+     mesma lógica de "pacientesAtivos" em bi_trend_data — snapshot cumulativo);
+     frequência/esporadicidade/rotatividade também não seguem o filtro de
+     período do topo — usam o histórico completo do paciente (e para
+     rotatividade, o ano corrente para os gráficos mensais). Fases 4 e 5
+     (valor/LTV/Pareto via bi_pacientes_valor, RFM + funil lifecycle via
+     bi_pacientes_ciclo_vida, complementos clínicos + cross-sell via
+     bi_pacientes_clinico) estão em
+     supabase/migrations/20260904230000_bi_pacientes_fase4_fase5.sql — também
+     usam o histórico completo do paciente, sem filtro de período do topo. -->
+<div style="display:flex;height:100vh;overflow:hidden;">
+  <div id="bi-sidebar"></div>
+  <div style="flex:1;display:flex;flex-direction:column;min-width:0;background:#FAFAFC;">
+    <div id="bi-header"></div>
+
+    <main style="flex:1;overflow:auto;padding:24px 28px;display:flex;flex-direction:column;gap:20px;">
+
+      <div style="display:flex;align-items:center;gap:10px;">
+        <div class="bi-filter" id="filtro-periodo-btn" style="position:relative;">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#9CA3AF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="17" rx="2"/><path d="M3 9h18M8 2v4M16 2v4"/></svg>
+          <span id="filtro-periodo-label">Este mês</span>
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#C4C1D6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>
+
+          <div class="bi-period-panel" id="periodo-panel">
+            <div id="periodo-view-main">
+              <div class="bi-period-panel-title">Período</div>
+              <div id="periodo-opcoes"></div>
+            </div>
+
+            <div id="periodo-view-custom" style="display:none;">
+              <div style="display:flex;align-items:center;gap:2px;margin-bottom:10px;">
+                <button type="button" class="bi-period-back" id="periodo-custom-voltar">←</button>
+                <span style="font-size:13px;font-weight:700;color:#111827;">Personalizado</span>
+              </div>
+              <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px;">
+                <div class="bi-range-input active" id="range-input-ini">
+                  <div class="bi-range-input-label">Início</div>
+                  <div class="bi-range-input-value" id="range-ini-value">Selecionar</div>
+                </div>
+                <span style="color:#C4C1D6;">→</span>
+                <div class="bi-range-input" id="range-input-fim">
+                  <div class="bi-range-input-label">Fim</div>
+                  <div class="bi-range-input-value" id="range-fim-value">Selecionar</div>
+                </div>
+              </div>
+              <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;">
+                <button type="button" class="bi-cal-nav-btn" id="cal-prev">‹</button>
+                <span id="cal-month-label" style="font-size:13px;font-weight:600;color:#111827;"></span>
+                <button type="button" class="bi-cal-nav-btn" id="cal-next">›</button>
+              </div>
+              <div class="bi-cal-grid" id="cal-dow"></div>
+              <div class="bi-cal-grid" id="cal-days" style="margin-bottom:12px;"></div>
+              <div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:14px;">
+                <button type="button" class="bi-pill" data-preset="7dias">7 dias</button>
+                <button type="button" class="bi-pill" data-preset="30dias">30 dias</button>
+                <button type="button" class="bi-pill" data-preset="mes">Este mês</button>
+                <button type="button" class="bi-pill" data-preset="mes_passado">Mês passado</button>
+                <button type="button" class="bi-pill" data-preset="trimestre">Trimestre</button>
+                <button type="button" class="bi-pill" data-preset="ano">Ano (YTD)</button>
+              </div>
+              <div style="display:flex;gap:8px;">
+                <button type="button" id="periodo-custom-cancelar" style="flex:1;padding:9px;border-radius:10px;border:1px solid #EFEDF9;background:#fff;color:#6B7280;font-size:13px;font-weight:600;cursor:pointer;">Cancelar</button>
+                <button type="button" id="periodo-custom-aplicar" style="flex:1;padding:9px;border-radius:10px;border:none;background:#E4847D;color:#fff;font-size:13px;font-weight:600;cursor:pointer;">Aplicar período</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div style="flex:1;"></div>
+        <span id="bi-ultima-atualizacao" style="font-size:13px;color:#9CA3AF;"></span>
+        <button type="button" id="btn-atualizar" class="bi-filter">
+          <svg id="btn-atualizar-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#6B7280" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 4v6h-6"/><path d="M1 20v-6h6"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
+          Atualizar
+        </button>
+      </div>
+
+      <div style="display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px;">
+        <div class="bi-card" style="padding:14px 16px;">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">
+            <span class="bi-kpi-title">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#6D5DF6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8" r="3.2"/><path d="M3 20c0-3.3 2.7-6 6-6s6 2.7 6 6"/><circle cx="17.5" cy="9.5" r="2.4"/><path d="M15.5 14.2c2.6.3 4.7 2.6 4.7 5.3"/></svg>
+              Pacientes ativos
+            </span>
+            <span class="bi-info" tabindex="0">?<span class="bi-info-tip">Total de pacientes com ATIVO_PAC = true na base hoje. Não segue o filtro de período do topo.</span></span>
+          </div>
+          <div id="kpi-ativos" style="font-size:23px;font-weight:700;color:#111827;line-height:1;">—</div>
+          <div style="font-size:13px;color:#6B7280;margin-top:5px;">Base atual</div>
+        </div>
+
+        <div class="bi-card" style="padding:14px 16px;">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">
+            <span class="bi-kpi-title">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#22C55E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg>
+              Novos pacientes
+            </span>
+            <span class="bi-info" tabindex="0">?<span class="bi-info-tip">Pacientes cadastrados (DTCRI_PAC) dentro do período selecionado. Compara com o mesmo intervalo do período anterior.</span></span>
+          </div>
+          <div id="kpi-novos" style="font-size:23px;font-weight:700;color:#111827;line-height:1;">—</div>
+          <div id="kpi-novos-sub" style="font-size:13px;color:#6B7280;margin-top:5px;">—</div>
+        </div>
+
+        <div class="bi-card" style="padding:14px 16px;">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">
+            <span class="bi-kpi-title">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#1a96ac" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="17" rx="2"/><path d="M3 9h18M8 2v4M16 2v4"/></svg>
+              Consultas realizadas
+            </span>
+            <span class="bi-info" tabindex="0">?<span class="bi-info-tip">Registros de CONSULTA (DT_CONS) dentro do período selecionado. Compara com o mesmo intervalo do período anterior.</span></span>
+          </div>
+          <div id="kpi-consultas" style="font-size:23px;font-weight:700;color:#111827;line-height:1;">—</div>
+          <div id="kpi-consultas-sub" style="font-size:13px;color:#6B7280;margin-top:5px;">—</div>
+        </div>
+
+        <div class="bi-card" style="padding:14px 16px;">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">
+            <span class="bi-kpi-title">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#B7791F" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v10M9.5 9.5c0-1.4 1.2-2.2 2.5-2.2s2.5.8 2.5 2c0 2.4-5 1.6-5 4 0 1.2 1.2 2.2 2.5 2.2s2.5-.8 2.5-2.2"/></svg>
+              Ticket médio
+            </span>
+            <span class="bi-info" tabindex="0">?<span class="bi-info-tip bi-info-tip-left">Valor médio de PAGAMENTO (VL_PGTO), excluindo estornados, no período selecionado.</span></span>
+          </div>
+          <div id="kpi-ticket" style="font-size:23px;font-weight:700;color:#111827;line-height:1;">—</div>
+          <div id="kpi-ticket-sub" style="font-size:13px;color:#6B7280;margin-top:5px;">—</div>
+        </div>
+      </div>
+
+      <div style="display:grid;grid-template-columns:1fr;gap:20px;flex:none;">
+        <div class="bi-card" style="padding:24px;display:flex;flex-direction:column;">
+          <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:18px;flex-wrap:wrap;">
+            <div>
+              <span style="display:flex;align-items:center;gap:6px;font-size:17.5px;font-weight:700;color:#111827;">
+                Evolução mensal de pacientes
+                <span class="bi-info" tabindex="0">?<span class="bi-info-tip bi-info-tip-left" style="width:260px;">Pacientes ativos (snapshot no fim de cada mês) e novos pacientes cadastrados no mês, desde janeiro do ano atual. Não segue o filtro de período do topo da página.</span></span>
+              </span>
+              <div style="font-size:14px;color:#9CA3AF;margin-top:3px;">Ativos vs. novos por mês</div>
+            </div>
+            <span id="evolucao-sub" class="bi-filter" style="cursor:default;"></span>
+          </div>
+          <div id="chart-evolucao-legend" style="margin-bottom:16px;"></div>
+          <div id="chart-evolucao-skeleton" class="bi-skeleton" style="width:100%;height:220px;display:none;"></div>
+          <svg id="chart-evolucao" width="100%" height="220"></svg>
+        </div>
+      </div>
+
+      <div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:20px;flex:none;">
+        <div class="bi-card" style="padding:20px 24px;display:flex;flex-direction:column;">
+          <div style="margin-bottom:14px;">
+            <span style="font-size:15.5px;font-weight:600;color:#111827;">Por profissional</span>
+            <div style="font-size:14px;color:#9CA3AF;margin-top:3px;">Distribuição da base de pacientes ativos por profissional (PACIENTE_PROFISSIONAL)</div>
+          </div>
+          <div id="lista-por-profissional" style="display:flex;flex-direction:column;max-height:306px;overflow-y:auto;padding-right:10px;">—</div>
+        </div>
+
+        <div class="bi-card" style="padding:20px 24px;display:flex;flex-direction:column;">
+          <div style="margin-bottom:14px;">
+            <span style="font-size:15.5px;font-weight:600;color:#111827;">Por faixa etária</span>
+            <div style="font-size:14px;color:#9CA3AF;margin-top:3px;">Idade calculada a partir de DTNASC_PAC, base de pacientes ativos</div>
+          </div>
+          <div id="lista-por-faixa-etaria" style="display:flex;flex-direction:column;">—</div>
+        </div>
+      </div>
+
+      <div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:20px;flex:none;">
+        <div class="bi-card" style="padding:20px 24px;display:flex;flex-direction:column;">
+          <div style="margin-bottom:14px;">
+            <span style="font-size:15.5px;font-weight:600;color:#111827;">Por grupo/convênio</span>
+            <div style="font-size:14px;color:#9CA3AF;margin-top:3px;">Distribuição da base de pacientes ativos por GRUPO</div>
+          </div>
+          <div id="lista-por-grupo" style="display:flex;flex-direction:column;">—</div>
+        </div>
+
+        <div class="bi-card" style="padding:20px 24px;display:flex;flex-direction:column;">
+          <div style="margin-bottom:14px;">
+            <span style="font-size:15.5px;font-weight:600;color:#111827;">Por sexo</span>
+            <div style="font-size:14px;color:#9CA3AF;margin-top:3px;">Distribuição da base de pacientes ativos (SEXO_PAC)</div>
+          </div>
+          <div id="lista-por-sexo" style="display:flex;flex-direction:column;">—</div>
+        </div>
+      </div>
+
+      <div style="font-size:19px;font-weight:700;color:#111827;margin-top:4px;">Frequência e esporadicidade</div>
+
+      <div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;">
+        <div class="bi-card" style="padding:14px 16px;">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">
+            <span class="bi-kpi-title">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#6D5DF6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="17" rx="2"/><path d="M3 9h18M8 2v4M16 2v4"/></svg>
+              Intervalo médio entre consultas
+            </span>
+            <span class="bi-info" tabindex="0">?<span class="bi-info-tip">Média dos intervalos (em dias) entre consultas consecutivas de cada paciente (CONSULTA.DT_CONS), considerando todo o histórico. Não segue o filtro de período do topo.</span></span>
+          </div>
+          <div id="kpi-intervalo-medio" style="font-size:23px;font-weight:700;color:#111827;line-height:1;">—</div>
+          <div style="font-size:13px;color:#6B7280;margin-top:5px;">dias, em média, entre visitas</div>
+        </div>
+
+        <div class="bi-card" style="padding:14px 16px;">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">
+            <span class="bi-kpi-title">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#C0392B" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 8v5M12 16h.01"/></svg>
+              Só vieram 1x
+            </span>
+            <span class="bi-info" tabindex="0">?<span class="bi-info-tip">% de pacientes com apenas 1 consulta registrada (CONSULTA) em todo o histórico, ou seja, que nunca retornaram.</span></span>
+          </div>
+          <div id="kpi-pct-so-uma" style="font-size:23px;font-weight:700;color:#111827;line-height:1;">—</div>
+          <div style="font-size:13px;color:#6B7280;margin-top:5px;">dos pacientes com histórico de consultas</div>
+        </div>
+
+        <div class="bi-card" style="padding:14px 16px;">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">
+            <span class="bi-kpi-title">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#1a96ac" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 14l4-4 4 4 8-8"/><path d="M14 6h6v6"/></svg>
+              Esporadicidade
+            </span>
+            <span class="bi-info" tabindex="0">?<span class="bi-info-tip bi-info-tip-left">Desvio-padrão médio (em dias) do intervalo entre consultas por paciente. Quanto maior, mais irregular é o padrão de retorno da base.</span></span>
+          </div>
+          <div id="kpi-desvio-medio" style="font-size:23px;font-weight:700;color:#111827;line-height:1;">—</div>
+          <div style="font-size:13px;color:#6B7280;margin-top:5px;">desvio-padrão médio, em dias</div>
+        </div>
+      </div>
+
+      <div style="display:grid;grid-template-columns:1fr;gap:20px;flex:none;">
+        <div class="bi-card" style="padding:20px 24px;display:flex;flex-direction:column;">
+          <div style="margin-bottom:14px;">
+            <span style="font-size:15.5px;font-weight:600;color:#111827;">Distribuição por faixa de frequência</span>
+            <div style="font-size:14px;color:#9CA3AF;margin-top:3px;">Pacientes agrupados pelo intervalo médio entre consultas (todo o histórico)</div>
+          </div>
+          <div id="lista-distribuicao-frequencia" style="display:flex;flex-direction:column;">—</div>
+        </div>
+      </div>
+
+      <div style="font-size:19px;font-weight:700;color:#111827;margin-top:4px;">Rotatividade e retenção</div>
+
+      <div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;">
+        <div class="bi-card" style="padding:14px 16px;">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">
+            <span class="bi-kpi-title">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#C0392B" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 20c0-3.3 2.7-6 6-6s6 2.7 6 6"/><circle cx="9" cy="8" r="3.2"/><path d="M17 8l4 4m0-4l-4 4"/></svg>
+              Pacientes sem retorno
+            </span>
+            <span class="bi-info" tabindex="0">?<span class="bi-info-tip">Pacientes sem nenhum agendamento REALIZADA há mais de 90 dias (ou sem retorno em 90 dias após o cadastro, para quem nunca veio). Baseado em AGENDAMENTO, independe do filtro de período do topo.</span></span>
+          </div>
+          <div id="kpi-perdidos" style="font-size:23px;font-weight:700;color:#111827;line-height:1;">—</div>
+          <div id="kpi-perdidos-sub" style="font-size:13px;color:#6B7280;margin-top:5px;">há mais de 90 dias sem visita</div>
+        </div>
+
+        <div class="bi-card" style="padding:14px 16px;">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">
+            <span class="bi-kpi-title">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#B7791F" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v10M9.5 9.5c0-1.4 1.2-2.2 2.5-2.2s2.5.8 2.5 2c0 2.4-5 1.6-5 4 0 1.2 1.2 2.2 2.5 2.2s2.5-.8 2.5-2.2"/></svg>
+              % da base sem retorno
+            </span>
+            <span class="bi-info" tabindex="0">?<span class="bi-info-tip bi-info-tip-left">% do total de pacientes cadastrados da empresa que está sem retorno há mais de 90 dias.</span></span>
+          </div>
+          <div id="kpi-perdidos-pct" style="font-size:23px;font-weight:700;color:#111827;line-height:1;">—</div>
+          <div style="font-size:13px;color:#6B7280;margin-top:5px;">do total de pacientes cadastrados</div>
+        </div>
+      </div>
+
+      <div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:20px;flex:none;">
+        <div class="bi-card" style="padding:24px;display:flex;flex-direction:column;">
+          <div style="margin-bottom:14px;">
+            <span style="display:flex;align-items:center;gap:6px;font-size:15.5px;font-weight:600;color:#111827;">
+              Taxa de churn mensal
+              <span class="bi-info" tabindex="0">?<span class="bi-info-tip" style="width:250px;">% da base ativa no início do mês (que já cruzou 90 dias sem retorno) que "virou perdida" naquele mês. Ano corrente, janeiro até o mês atual.</span></span>
+            </span>
+            <div style="font-size:14px;color:#9CA3AF;margin-top:3px;">Perdidos ÷ base ativa no início do mês</div>
+          </div>
+          <div id="chart-churn-skeleton" class="bi-skeleton" style="width:100%;height:200px;display:none;"></div>
+          <svg id="chart-churn" width="100%" height="200"></svg>
+        </div>
+
+        <div class="bi-card" style="padding:24px;display:flex;flex-direction:column;">
+          <div style="margin-bottom:14px;">
+            <span style="display:flex;align-items:center;gap:6px;font-size:15.5px;font-weight:600;color:#111827;">
+              Crescimento líquido
+              <span class="bi-info" tabindex="0">?<span class="bi-info-tip bi-info-tip-left" style="width:250px;">Novos pacientes cadastrados menos pacientes que se tornaram "perdidos" (90+ dias sem retorno) em cada mês. Ano corrente.</span></span>
+            </span>
+            <div style="font-size:14px;color:#9CA3AF;margin-top:3px;">Novos vs. perdidos por mês</div>
+          </div>
+          <div id="chart-crescimento-skeleton" class="bi-skeleton" style="width:100%;height:200px;display:none;"></div>
+          <svg id="chart-crescimento" width="100%" height="200"></svg>
+        </div>
+      </div>
+
+      <div style="display:grid;grid-template-columns:1fr;gap:20px;flex:none;">
+        <div class="bi-card" style="padding:24px;display:flex;flex-direction:column;">
+          <div style="margin-bottom:14px;">
+            <span style="display:flex;align-items:center;gap:6px;font-size:17.5px;font-weight:700;color:#111827;">
+              Curva de retenção por coorte
+              <span class="bi-info" tabindex="0">?<span class="bi-info-tip bi-info-tip-left" style="width:260px;">Coorte = pacientes cadastrados no mesmo mês (DTCRI_PAC). Cada coluna mostra o % da coorte com ao menos 1 agendamento REALIZADA naquele mês seguinte. Ano corrente.</span></span>
+            </span>
+            <div style="font-size:14px;color:#9CA3AF;margin-top:3px;">% da coorte retida em cada mês seguinte ao cadastro</div>
+          </div>
+          <div id="tabela-retencao" style="overflow-x:auto;">—</div>
+        </div>
+      </div>
+
+      <div style="font-size:19px;font-weight:700;color:#111827;margin-top:4px;">Valor e segmentação</div>
+
+      <div style="display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px;">
+        <div class="bi-card" style="padding:14px 16px;">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">
+            <span class="bi-kpi-title">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#B7791F" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v10M9.5 9.5c0-1.4 1.2-2.2 2.5-2.2s2.5.8 2.5 2c0 2.4-5 1.6-5 4 0 1.2 1.2 2.2 2.5 2.2s2.5-.8 2.5-2.2"/></svg>
+              LTV médio
+            </span>
+            <span class="bi-info" tabindex="0">?<span class="bi-info-tip">Soma de PAGAMENTO.VL_PGTO (excluindo estornados) por paciente, em média, considerando todo o histórico. Não segue o filtro de período do topo.</span></span>
+          </div>
+          <div id="kpi-ltv-medio" style="font-size:23px;font-weight:700;color:#111827;line-height:1;">—</div>
+          <div style="font-size:13px;color:#6B7280;margin-top:5px;">receita total por paciente pagante</div>
+        </div>
+
+        <div class="bi-card" style="padding:14px 16px;">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">
+            <span class="bi-kpi-title">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#6D5DF6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="17" rx="2"/><path d="M3 9h18M8 2v4M16 2v4"/></svg>
+              Ticket médio
+            </span>
+            <span class="bi-info" tabindex="0">?<span class="bi-info-tip">Por visita: valor médio de cada pagamento (VL_PGTO). Por paciente: valor médio total pago por cada paciente (igual ao LTV médio). Todo o histórico.</span></span>
+          </div>
+          <div style="display:flex;align-items:baseline;gap:6px;">
+            <div id="kpi-ticket-visita" style="font-size:19px;font-weight:700;color:#111827;line-height:1;">—</div>
+            <span style="font-size:12px;color:#9CA3AF;">/ visita</span>
+          </div>
+          <div style="display:flex;align-items:baseline;gap:6px;margin-top:4px;">
+            <div id="kpi-ticket-paciente" style="font-size:15px;font-weight:600;color:#6B7280;line-height:1;">—</div>
+            <span style="font-size:12px;color:#9CA3AF;">/ paciente</span>
+          </div>
+        </div>
+
+        <div class="bi-card" style="padding:14px 16px;">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">
+            <span class="bi-kpi-title">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#22C55E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg>
+              Receita total
+            </span>
+            <span class="bi-info" tabindex="0">?<span class="bi-info-tip bi-info-tip-left">Soma de todos os PAGAMENTO.VL_PGTO não estornados, todo o histórico.</span></span>
+          </div>
+          <div id="kpi-receita-total" style="font-size:23px;font-weight:700;color:#111827;line-height:1;">—</div>
+          <div id="kpi-receita-total-sub" style="font-size:13px;color:#6B7280;margin-top:5px;">—</div>
+        </div>
+
+        <div class="bi-card" style="padding:14px 16px;">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">
+            <span class="bi-kpi-title">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#C0392B" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 14l4-4 4 4 8-8"/><path d="M14 6h6v6"/></svg>
+              Curva de Pareto
+            </span>
+            <span class="bi-info" tabindex="0">?<span class="bi-info-tip bi-info-tip-left">% da receita total concentrada nos 20% de pacientes que mais pagaram (todo o histórico).</span></span>
+          </div>
+          <div id="kpi-pareto-top20" style="font-size:23px;font-weight:700;color:#111827;line-height:1;">—</div>
+          <div style="font-size:13px;color:#6B7280;margin-top:5px;">da receita nos 20% que mais pagam</div>
+        </div>
+      </div>
+
+      <div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:20px;flex:none;">
+        <div class="bi-card" style="padding:20px 24px;display:flex;flex-direction:column;">
+          <div style="margin-bottom:14px;">
+            <span style="font-size:15.5px;font-weight:600;color:#111827;">Top pacientes por receita</span>
+            <div style="font-size:14px;color:#9CA3AF;margin-top:3px;">Maiores pagadores da base, todo o histórico</div>
+          </div>
+          <div id="lista-top-pacientes" style="display:flex;flex-direction:column;">—</div>
+        </div>
+
+        <div class="bi-card" style="padding:24px;display:flex;flex-direction:column;">
+          <div style="margin-bottom:14px;">
+            <span style="display:flex;align-items:center;gap:6px;font-size:15.5px;font-weight:600;color:#111827;">
+              Curva de Pareto
+              <span class="bi-info" tabindex="0">?<span class="bi-info-tip" style="width:250px;">Eixo X: % acumulado de pacientes pagantes, ordenados do maior para o menor pagador. Eixo Y: % acumulado da receita.</span></span>
+            </span>
+            <div style="font-size:14px;color:#9CA3AF;margin-top:3px;">% acumulado da receita x % acumulado de pacientes</div>
+          </div>
+          <div id="chart-pareto-skeleton" class="bi-skeleton" style="width:100%;height:200px;display:none;"></div>
+          <svg id="chart-pareto" width="100%" height="200"></svg>
+        </div>
+      </div>
+
+      <div style="font-size:19px;font-weight:700;color:#111827;margin-top:4px;">Ciclo de vida e segmentação RFM</div>
+
+      <div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:20px;flex:none;">
+        <div class="bi-card" style="padding:20px 24px;display:flex;flex-direction:column;">
+          <div style="margin-bottom:14px;">
+            <span style="display:flex;align-items:center;gap:6px;font-size:15.5px;font-weight:600;color:#111827;">
+              Funil Lead → Paciente → Recorrente → Fiel
+              <span class="bi-info" tabindex="0">?<span class="bi-info-tip" style="width:260px;">Leads = total de LEADS cadastrados. Paciente = com 1ª consulta. Recorrente = 2ª+ consulta. Fiel = 3+ consultas. Perdidos = sem consulta há mais de 180 dias (não é um degrau sequencial do funil).</span></span>
+            </span>
+            <div style="font-size:14px;color:#9CA3AF;margin-top:3px;">Todo o histórico, não segue o filtro de período do topo</div>
+          </div>
+          <div id="funil-lifecycle" style="display:flex;flex-direction:column;">—</div>
+        </div>
+
+        <div class="bi-card" style="padding:20px 24px;display:flex;flex-direction:column;">
+          <div style="margin-bottom:14px;">
+            <span style="display:flex;align-items:center;gap:6px;font-size:15.5px;font-weight:600;color:#111827;">
+              Segmentos RFM
+              <span class="bi-info" tabindex="0">?<span class="bi-info-tip bi-info-tip-left" style="width:260px;">Recência (dias desde a última consulta) + Frequência (nº de consultas) + Valor (total pago), cruzados em 6 segmentos. Só entram pacientes com pelo menos 1 consulta.</span></span>
+            </span>
+            <div style="font-size:14px;color:#9CA3AF;margin-top:3px;">Campeões, Fiéis, Novos, Ocasionais, Em risco, Perdidos</div>
+          </div>
+          <div id="lista-segmentos-rfm" style="display:flex;flex-direction:column;">—</div>
+        </div>
+      </div>
+
+      <div style="font-size:19px;font-weight:700;color:#111827;margin-top:4px;">Complementos clínicos</div>
+
+      <div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;">
+        <div class="bi-card" style="padding:14px 16px;">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">
+            <span class="bi-kpi-title">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#C0392B" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 8v5M12 16h.01"/></svg>
+              Com alergia cadastrada
+            </span>
+            <span class="bi-info" tabindex="0">?<span class="bi-info-tip">% de pacientes ativos com pelo menos 1 registro em ALERGIA marcado como ativo.</span></span>
+          </div>
+          <div id="kpi-pct-alergia" style="font-size:23px;font-weight:700;color:#111827;line-height:1;">—</div>
+          <div id="kpi-pct-alergia-sub" style="font-size:13px;color:#6B7280;margin-top:5px;">—</div>
+        </div>
+
+        <div class="bi-card" style="padding:14px 16px;">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">
+            <span class="bi-kpi-title">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#1a96ac" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 14l4-4 4 4 8-8"/><path d="M14 6h6v6"/></svg>
+              Com sinais vitais
+            </span>
+            <span class="bi-info" tabindex="0">?<span class="bi-info-tip">% de agendamentos REALIZADA com pelo menos 1 registro em SINAL_VITAL vinculado.</span></span>
+          </div>
+          <div id="kpi-pct-sinais-vitais" style="font-size:23px;font-weight:700;color:#111827;line-height:1;">—</div>
+          <div id="kpi-pct-sinais-vitais-sub" style="font-size:13px;color:#6B7280;margin-top:5px;">—</div>
+        </div>
+
+        <div class="bi-card" style="padding:14px 16px;">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">
+            <span class="bi-kpi-title">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#B7791F" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="17" rx="2"/><path d="M3 9h18M8 2v4M16 2v4"/></svg>
+              Consultas em rascunho
+            </span>
+            <span class="bi-info" tabindex="0">?<span class="bi-info-tip bi-info-tip-left">% de CONSULTA com RASCUNHO = true (não finalizadas), sobre o total de consultas.</span></span>
+          </div>
+          <div id="kpi-pct-rascunho" style="font-size:23px;font-weight:700;color:#111827;line-height:1;">—</div>
+          <div id="kpi-pct-rascunho-sub" style="font-size:13px;color:#6B7280;margin-top:5px;">—</div>
+        </div>
+      </div>
+
+      <div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:20px;flex:none;">
+        <div class="bi-card" style="padding:20px 24px;display:flex;flex-direction:column;">
+          <div style="margin-bottom:14px;">
+            <span style="font-size:15.5px;font-weight:600;color:#111827;">Diagnósticos mais comuns</span>
+            <div style="font-size:14px;color:#9CA3AF;margin-top:3px;">Top CIDs registrados em CONSULTA, todo o histórico</div>
+          </div>
+          <div id="lista-diagnosticos" style="display:flex;flex-direction:column;">—</div>
+        </div>
+
+        <div class="bi-card" style="padding:20px 24px;display:flex;flex-direction:column;">
+          <div style="margin-bottom:14px;display:flex;align-items:center;justify-content:space-between;gap:8px;">
+            <div>
+              <span style="font-size:15.5px;font-weight:600;color:#111827;">Cross-sell por especialidade</span>
+              <div style="font-size:14px;color:#9CA3AF;margin-top:3px;">Especialidade "porta de entrada" entre quem passou por 2+ especialidades</div>
+            </div>
+            <div style="text-align:right;flex-shrink:0;">
+              <div id="kpi-pct-cross-sell" style="font-size:19px;font-weight:700;color:#111827;line-height:1;">—</div>
+              <div style="font-size:11.5px;color:#9CA3AF;margin-top:2px;">atendidos por 2+ especialidades</div>
+            </div>
+          </div>
+          <div id="lista-porta-entrada" style="display:flex;flex-direction:column;">—</div>
+        </div>
+      </div>
+
+    </main>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<script src="../assets/js/bi-auth.js"></script>
+<script src="../assets/js/bi-menu.js"></script>
+<script src="../assets/js/charts.js"></script>
+<script>
+  let idEmp = null;
+  let periodo = 'mes';
+  let customIni = null;
+  let customFim = null;
+
+  const COMPARE_LABEL = {
+    hoje: 'ontem',
+    ontem: 'dois dias atrás',
+    '7dias': '7 dias anteriores',
+    '30dias': '30 dias anteriores',
+    mes: 'mês anterior',
+    mes_passado: 'mês anterior',
+    trimestre: 'trimestre anterior',
+    ano: 'ano anterior',
+    custom: 'período anterior equivalente',
+  };
+
+  const PERIOD_PRESETS = [
+    { value: 'hoje', label: 'Hoje' },
+    { value: 'ontem', label: 'Ontem' },
+    { value: '7dias', label: 'Últimos 7 dias' },
+    { value: '30dias', label: 'Últimos 30 dias' },
+    { value: 'mes', label: 'Este mês' },
+    { value: 'mes_passado', label: 'Mês passado' },
+    { value: 'trimestre', label: 'Trimestre' },
+    { value: 'ano', label: 'Ano (YTD)' },
+  ];
+
+  const CAL_ICON = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="17" rx="2"/><path d="M3 9h18M8 2v4M16 2v4"/></svg>';
+
+  function addDays(d, n) { const r = new Date(d); r.setDate(r.getDate() + n); return r; }
+
+  function presetRange(value) {
+    const hoje = new Date();
+    hoje.setHours(0, 0, 0, 0);
+    switch (value) {
+      case 'hoje': return { ini: hoje, fim: hoje };
+      case 'ontem': { const d = addDays(hoje, -1); return { ini: d, fim: d }; }
+      case '7dias': return { ini: addDays(hoje, -6), fim: hoje };
+      case '30dias': return { ini: addDays(hoje, -29), fim: hoje };
+      case 'mes': return { ini: new Date(hoje.getFullYear(), hoje.getMonth(), 1), fim: hoje };
+      case 'mes_passado': return { ini: new Date(hoje.getFullYear(), hoje.getMonth() - 1, 1), fim: new Date(hoje.getFullYear(), hoje.getMonth(), 0) };
+      case 'trimestre': return { ini: new Date(hoje.getFullYear(), hoje.getMonth() - 2, 1), fim: hoje };
+      case 'ano': return { ini: new Date(hoje.getFullYear(), 0, 1), fim: hoje };
+      default: return { ini: hoje, fim: hoje };
+    }
+  }
+
+  function fmtDateBR(d) {
+    return String(d.getDate()).padStart(2, '0') + '/' + String(d.getMonth() + 1).padStart(2, '0') + '/' + d.getFullYear();
+  }
+
+  function toISODate(d) {
+    return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
+  }
+
+  function sameDay(a, b) {
+    return !!a && !!b && a.getFullYear() === b.getFullYear() && a.getMonth() === b.getMonth() && a.getDate() === b.getDate();
+  }
+
+  function fmtPct(v) {
+    return (v === null || v === undefined) ? '—' : `${v}%`;
+  }
+
+  function fmtBRL(v) {
+    return (v || 0).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL', maximumFractionDigits: 0 });
+  }
+
+  function renderDeltaLine(elId, value) {
+    const el = document.getElementById(elId);
+    const compareLabel = COMPARE_LABEL[periodo] || 'período anterior';
+    if (value === null || value === undefined) {
+      el.textContent = `sem dados do ${compareLabel}`;
+      return;
+    }
+    const positivo = value >= 0;
+    const color = positivo ? '#1D8A4A' : '#C0392B';
+    const arrow = value >= 0 ? '▲' : '▼';
+    el.innerHTML = `<span style="color:${color};font-weight:600;">${arrow} ${Math.abs(value)}%</span> vs ${compareLabel}`;
+  }
+
+  function skeletonListRows(n = 4) {
+    return Array.from({ length: n }).map(() => `
+      <div style="padding:9px 0;border-bottom:1px solid #E3E1EE;">
+        <div class="bi-skeleton" style="width:60%;height:14px;margin-bottom:7px;"></div>
+        <div class="bi-skeleton" style="width:100%;height:7px;"></div>
+      </div>
+    `).join('');
+  }
+
+  function setResumoLoading() {
+    document.getElementById('kpi-ativos').innerHTML = '<span class="bi-skeleton" style="width:64px;height:22px;"></span>';
+    ['kpi-novos', 'kpi-consultas', 'kpi-ticket'].forEach((id) => {
+      document.getElementById(id).innerHTML = '<span class="bi-skeleton" style="width:64px;height:22px;"></span>';
+      document.getElementById(`${id}-sub`).innerHTML = '<span class="bi-skeleton" style="width:130px;height:13px;"></span>';
+    });
+  }
+
+  async function loadResumo() {
+    setResumoLoading();
+    const { data, error } = await BIAuth.client.rpc('bi_pacientes_resumo', {
+      p_id_emp: idEmp,
+      p_period: periodo,
+      p_data_ini: periodo === 'custom' ? toISODate(customIni) : null,
+      p_data_fim: periodo === 'custom' ? toISODate(customFim) : null,
+    });
+    if (error) {
+      console.error('bi_pacientes_resumo:', error);
+      document.getElementById('kpi-ativos').textContent = '—';
+      ['kpi-novos', 'kpi-consultas', 'kpi-ticket'].forEach((id) => {
+        document.getElementById(id).textContent = '—';
+        document.getElementById(`${id}-sub`).textContent = 'Erro ao carregar';
+      });
+      return;
+    }
+
+    document.getElementById('kpi-ativos').textContent = data.pacientesAtivos;
+
+    document.getElementById('kpi-novos').textContent = data.novosPacientes;
+    renderDeltaLine('kpi-novos-sub', data.novosPacientesDeltaPct);
+
+    document.getElementById('kpi-consultas').textContent = data.consultasRealizadas;
+    renderDeltaLine('kpi-consultas-sub', data.consultasRealizadasDeltaPct);
+
+    document.getElementById('kpi-ticket').textContent = fmtBRL(data.ticketMedio);
+    renderDeltaLine('kpi-ticket-sub', data.ticketMedioDeltaPct);
+  }
+
+  const MONTH_ABBR = ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'];
+
+  function setEvolucaoLoading() {
+    document.getElementById('chart-evolucao-legend').innerHTML = '<span class="bi-skeleton" style="width:140px;height:15px;margin-right:22px;"></span><span class="bi-skeleton" style="width:140px;height:15px;"></span>';
+    document.getElementById('evolucao-sub').textContent = '';
+    document.getElementById('chart-evolucao-skeleton').style.display = 'block';
+    document.getElementById('chart-evolucao').style.display = 'none';
+    ['lista-por-profissional', 'lista-por-sexo', 'lista-por-faixa-etaria', 'lista-por-grupo'].forEach((id) => {
+      document.getElementById(id).innerHTML = skeletonListRows();
+    });
+  }
+
+  async function loadEvolucao() {
+    setEvolucaoLoading();
+    const { data, error } = await BIAuth.client.rpc('bi_pacientes_por_dimensao', {
+      p_id_emp: idEmp,
+      p_period: periodo,
+      p_data_ini: periodo === 'custom' ? toISODate(customIni) : null,
+      p_data_fim: periodo === 'custom' ? toISODate(customFim) : null,
+    });
+    if (error) {
+      console.error('bi_pacientes_por_dimensao:', error);
+      document.getElementById('chart-evolucao-skeleton').style.display = 'none';
+      document.getElementById('chart-evolucao').style.display = '';
+      ['lista-por-profissional', 'lista-por-sexo', 'lista-por-faixa-etaria', 'lista-por-grupo'].forEach((id) => {
+        document.getElementById(id).innerHTML = '<div style="font-size:14px;color:#9CA3AF;padding:8px 0;">Erro ao carregar.</div>';
+      });
+      return;
+    }
+
+    document.getElementById('chart-evolucao-skeleton').style.display = 'none';
+    document.getElementById('chart-evolucao').style.display = '';
+
+    const meses = data.evolucaoMensal || [];
+    const labels = meses.map((m) => MONTH_ABBR[m.mes - 1]);
+    document.getElementById('evolucao-sub').textContent = labels.length ? `${labels[0]} – ${labels[labels.length - 1]} / ${data.ano}` : '';
+
+    BICharts.drawLineChart(document.getElementById('chart-evolucao'), {
+      labels,
+      series: [
+        { name: 'Pacientes ativos', color: '#6D5DF6', values: meses.map((m) => m.ativos), area: true },
+        { name: 'Novos pacientes', color: '#22C55E', values: meses.map((m) => m.novos) },
+      ],
+      height: 220,
+      yFmt: BICharts.fmtInt,
+      niceGrid: false,
+      showEndLabels: false,
+    });
+
+    document.getElementById('chart-evolucao-legend').innerHTML = [
+      { name: 'Pacientes ativos', color: '#6D5DF6' },
+      { name: 'Novos pacientes', color: '#22C55E' },
+    ].map((s) => `
+      <span style="display:inline-flex;align-items:center;gap:7px;font-size:15px;font-weight:700;color:#111827;margin-right:22px;">
+        <span style="width:11px;height:11px;border-radius:3px;background:${s.color};display:inline-block;"></span>${s.name}
+      </span>
+    `).join('');
+
+    renderListaSimples('lista-por-profissional', data.porProfissional, { vazio: 'Sem pacientes vinculados.' });
+    renderListaSimples('lista-por-sexo', data.porSexo);
+    renderListaSimples('lista-por-faixa-etaria', data.porFaixaEtaria, { ordenado: false });
+    renderListaSimples('lista-por-grupo', data.porGrupo);
+  }
+
+  function renderListaSimples(containerId, itens, { vazio = 'Sem dados no período.', ordenado = true } = {}) {
+    const container = document.getElementById(containerId);
+    if (!itens || !itens.length) {
+      container.innerHTML = `<div style="font-size:14px;color:#9CA3AF;padding:8px 0;">${vazio}</div>`;
+      return;
+    }
+    const total = itens.reduce((s, i) => s + i.total, 0) || 1;
+    const maxTotal = Math.max(...itens.map((i) => i.total), 1);
+    container.innerHTML = itens.map((item) => {
+      const pct = Math.max(2, Math.round((item.total / maxTotal) * 100));
+      const pctDoTotal = Math.round((item.total / total) * 100);
+      return `
+        <div style="padding:9px 0;border-bottom:1px solid #E3E1EE;">
+          <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;">
+            <span style="font-size:15px;font-weight:600;color:#111827;">${item.nome}</span>
+            <span style="font-size:14px;color:#9CA3AF;">${item.total} (${pctDoTotal}%)</span>
+          </div>
+          <div style="height:7px;background:#F1F0F7;border-radius:999px;margin-top:5px;overflow:hidden;">
+            <div style="height:100%;width:${pct}%;background:#9C99B8;border-radius:999px;"></div>
+          </div>
+        </div>
+      `;
+    }).join('');
+  }
+
+  function setFrequenciaLoading() {
+    ['kpi-intervalo-medio', 'kpi-pct-so-uma', 'kpi-desvio-medio'].forEach((id) => {
+      document.getElementById(id).innerHTML = '<span class="bi-skeleton" style="width:64px;height:22px;"></span>';
+    });
+    document.getElementById('lista-distribuicao-frequencia').innerHTML = skeletonListRows();
+  }
+
+  async function loadFrequencia() {
+    setFrequenciaLoading();
+    const { data, error } = await BIAuth.client.rpc('bi_pacientes_frequencia', { p_id_emp: idEmp });
+    if (error) {
+      console.error('bi_pacientes_frequencia:', error);
+      ['kpi-intervalo-medio', 'kpi-pct-so-uma', 'kpi-desvio-medio'].forEach((id) => {
+        document.getElementById(id).textContent = '—';
+      });
+      document.getElementById('lista-distribuicao-frequencia').innerHTML = '<div style="font-size:14px;color:#9CA3AF;padding:8px 0;">Erro ao carregar.</div>';
+      return;
+    }
+
+    document.getElementById('kpi-intervalo-medio').textContent = data.intervaloMedioDias != null ? `${data.intervaloMedioDias} dias` : '—';
+    document.getElementById('kpi-pct-so-uma').textContent = fmtPct(data.pctSoUmaConsulta);
+    document.getElementById('kpi-desvio-medio').textContent = data.desvioPadraoMedioDias != null ? `${data.desvioPadraoMedioDias} dias` : '—';
+
+    renderListaSimples('lista-distribuicao-frequencia', data.distribuicaoFrequencia, { vazio: 'Sem consultas registradas.' });
+  }
+
+  const DIAS_SEM_RETORNO = 90;
+
+  function setRotatividadeLoading() {
+    ['kpi-perdidos', 'kpi-perdidos-pct'].forEach((id) => {
+      document.getElementById(id).innerHTML = '<span class="bi-skeleton" style="width:64px;height:22px;"></span>';
+    });
+    document.getElementById('chart-churn-skeleton').style.display = 'block';
+    document.getElementById('chart-churn').style.display = 'none';
+    document.getElementById('chart-crescimento-skeleton').style.display = 'block';
+    document.getElementById('chart-crescimento').style.display = 'none';
+    document.getElementById('tabela-retencao').innerHTML = skeletonListRows();
+  }
+
+  async function loadRotatividade() {
+    setRotatividadeLoading();
+    const { data, error } = await BIAuth.client.rpc('bi_pacientes_rotatividade', { p_id_emp: idEmp, p_dias_sem_retorno: DIAS_SEM_RETORNO });
+    if (error) {
+      console.error('bi_pacientes_rotatividade:', error);
+      ['kpi-perdidos', 'kpi-perdidos-pct'].forEach((id) => { document.getElementById(id).textContent = '—'; });
+      document.getElementById('chart-churn-skeleton').style.display = 'none';
+      document.getElementById('chart-churn').style.display = '';
+      document.getElementById('chart-crescimento-skeleton').style.display = 'none';
+      document.getElementById('chart-crescimento').style.display = '';
+      document.getElementById('tabela-retencao').innerHTML = '<div style="font-size:14px;color:#9CA3AF;padding:8px 0;">Erro ao carregar.</div>';
+      return;
+    }
+
+    document.getElementById('kpi-perdidos').textContent = data.pacientesPerdidos;
+    document.getElementById('kpi-perdidos-pct').textContent = fmtPct(data.pacientesPerdidosPct);
+
+    document.getElementById('chart-churn-skeleton').style.display = 'none';
+    document.getElementById('chart-churn').style.display = '';
+    document.getElementById('chart-crescimento-skeleton').style.display = 'none';
+    document.getElementById('chart-crescimento').style.display = '';
+
+    const churn = data.churnMensal || [];
+    const labels = churn.map((m) => MONTH_ABBR[m.mes - 1]);
+
+    BICharts.drawLineChart(document.getElementById('chart-churn'), {
+      labels,
+      series: [{ name: 'Churn', color: '#C0392B', values: churn.map((m) => m.churnPct || 0), area: true }],
+      height: 200,
+      yFmt: (v) => `${Math.round(v * 10) / 10}%`,
+      niceGrid: false,
+      showEndLabels: false,
+    });
+
+    BICharts.drawGroupedBarChart(document.getElementById('chart-crescimento'), {
+      labels,
+      series: [
+        { name: 'Novos', color: '#22C55E', values: churn.map((m) => m.novos) },
+        { name: 'Perdidos', color: '#C0392B', values: churn.map((m) => m.perdidos) },
+      ],
+      height: 200,
+      yFmt: BICharts.fmtInt,
+    });
+
+    renderTabelaRetencao(data.retencaoCoorte || []);
+  }
+
+  function renderTabelaRetencao(coortes) {
+    const container = document.getElementById('tabela-retencao');
+    if (!coortes.length) {
+      container.innerHTML = '<div style="font-size:14px;color:#9CA3AF;padding:8px 0;">Sem coortes no ano corrente.</div>';
+      return;
+    }
+    const maxK = Math.max(...coortes.flatMap((c) => c.pontos.map((p) => p.k)));
+    const headerCols = Array.from({ length: maxK + 1 }, (_, k) => `<th style="padding:8px 10px;font-size:12px;font-weight:700;color:#9C99B8;text-align:center;white-space:nowrap;">Mês ${k}</th>`).join('');
+
+    const rows = coortes.map((c) => {
+      const cells = Array.from({ length: maxK + 1 }, (_, k) => {
+        const ponto = c.pontos.find((p) => p.k === k);
+        if (!ponto || ponto.pct === null || ponto.pct === undefined) {
+          return '<td style="padding:8px 10px;text-align:center;color:#C4C1D6;font-size:13px;">—</td>';
+        }
+        const alpha = Math.max(0.08, Math.min(1, ponto.pct / 100));
+        return `<td style="padding:8px 10px;text-align:center;font-size:13px;font-weight:600;color:#111827;background:rgba(109,93,246,${alpha});border-radius:6px;">${ponto.pct}%</td>`;
+      }).join('');
+      return `<tr><td style="padding:8px 10px;font-size:13.5px;font-weight:600;color:#111827;white-space:nowrap;">${MONTH_ABBR[c.mes - 1]} (${c.tamanho})</td>${cells}</tr>`;
+    }).join('');
+
+    container.innerHTML = `
+      <table style="border-collapse:separate;border-spacing:4px 4px;width:100%;">
+        <thead><tr><th style="padding:8px 10px;font-size:12px;font-weight:700;color:#9C99B8;text-align:left;">Coorte</th>${headerCols}</tr></thead>
+        <tbody>${rows}</tbody>
+      </table>
+    `;
+  }
+
+  function setValorLoading() {
+    ['kpi-ltv-medio', 'kpi-ticket-visita', 'kpi-ticket-paciente', 'kpi-receita-total', 'kpi-pareto-top20'].forEach((id) => {
+      document.getElementById(id).innerHTML = '<span class="bi-skeleton" style="width:64px;height:22px;"></span>';
+    });
+    document.getElementById('kpi-receita-total-sub').innerHTML = '<span class="bi-skeleton" style="width:130px;height:13px;"></span>';
+    document.getElementById('lista-top-pacientes').innerHTML = skeletonListRows();
+    document.getElementById('chart-pareto-skeleton').style.display = 'block';
+    document.getElementById('chart-pareto').style.display = 'none';
+  }
+
+  async function loadValor() {
+    setValorLoading();
+    const { data, error } = await BIAuth.client.rpc('bi_pacientes_valor', { p_id_emp: idEmp });
+    if (error) {
+      console.error('bi_pacientes_valor:', error);
+      ['kpi-ltv-medio', 'kpi-ticket-visita', 'kpi-ticket-paciente', 'kpi-receita-total', 'kpi-pareto-top20'].forEach((id) => {
+        document.getElementById(id).textContent = '—';
+      });
+      document.getElementById('kpi-receita-total-sub').textContent = 'Erro ao carregar';
+      document.getElementById('lista-top-pacientes').innerHTML = '<div style="font-size:14px;color:#9CA3AF;padding:8px 0;">Erro ao carregar.</div>';
+      document.getElementById('chart-pareto-skeleton').style.display = 'none';
+      document.getElementById('chart-pareto').style.display = '';
+      return;
+    }
+
+    document.getElementById('chart-pareto-skeleton').style.display = 'none';
+    document.getElementById('chart-pareto').style.display = '';
+
+    document.getElementById('kpi-ltv-medio').textContent = fmtBRL(data.ltvMedio);
+    document.getElementById('kpi-ticket-visita').textContent = fmtBRL(data.ticketMedioVisita);
+    document.getElementById('kpi-ticket-paciente').textContent = fmtBRL(data.ticketMedioPaciente);
+    document.getElementById('kpi-receita-total').textContent = fmtBRL(data.receitaTotal);
+    document.getElementById('kpi-receita-total-sub').textContent = `${data.nPacientesPagantes || 0} paciente${data.nPacientesPagantes === 1 ? '' : 's'} pagante${data.nPacientesPagantes === 1 ? '' : 's'}`;
+    document.getElementById('kpi-pareto-top20').textContent = fmtPct(data.pctReceitaTop20);
+
+    renderListaTopPacientes('lista-top-pacientes', data.topPacientes);
+
+    const pareto = data.pareto || [];
+    BICharts.drawLineChart(document.getElementById('chart-pareto'), {
+      labels: pareto.map((p) => `${Math.round(p.pctPacientes)}%`),
+      series: [{ name: '% da receita', color: '#B7791F', values: pareto.map((p) => p.pctReceita), area: true }],
+      height: 200,
+      yFmt: (v) => `${Math.round(v)}%`,
+      niceGrid: false,
+      showEndLabels: false,
+    });
+  }
+
+  function renderListaTopPacientes(containerId, itens) {
+    const container = document.getElementById(containerId);
+    if (!itens || !itens.length) {
+      container.innerHTML = '<div style="font-size:14px;color:#9CA3AF;padding:8px 0;">Sem pagamentos registrados.</div>';
+      return;
+    }
+    const maxTotal = Math.max(...itens.map((i) => i.totalPago), 1);
+    container.innerHTML = itens.map((item, idx) => {
+      const pct = Math.max(2, Math.round((item.totalPago / maxTotal) * 100));
+      return `
+        <div style="display:flex;align-items:center;gap:12px;padding:9px 0;border-bottom:1px solid #E3E1EE;">
+          <div style="width:18px;flex-shrink:0;font-size:12.5px;font-weight:700;color:#C4C1D6;text-align:center;">${idx + 1}</div>
+          <div style="flex:1;min-width:0;">
+            <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;">
+              <span style="font-size:15px;font-weight:600;color:#111827;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${item.nome}</span>
+              <span style="font-size:13px;color:#6B7280;white-space:nowrap;flex-shrink:0;">${fmtBRL(item.totalPago)}</span>
+            </div>
+            <div style="height:7px;background:#F1F0F7;border-radius:999px;margin-top:5px;overflow:hidden;">
+              <div style="height:100%;width:${pct}%;background:#B7791F;border-radius:999px;"></div>
+            </div>
+            <div style="font-size:13px;color:#6B7280;margin-top:4px;">${item.numPagamentos} pagamento${item.numPagamentos === 1 ? '' : 's'}</div>
+          </div>
+        </div>
+      `;
+    }).join('');
+  }
+
+  const RFM_COLORS = {
+    'Campeões': '#22C55E',
+    'Fiéis': '#6D5DF6',
+    'Novos': '#2ABCD4',
+    'Ocasionais': '#B7791F',
+    'Em risco': '#E4847D',
+    'Perdidos': '#C0392B',
+  };
+
+  function renderSegmentosRFM(containerId, segmentos) {
+    const container = document.getElementById(containerId);
+    if (!segmentos || !segmentos.length) {
+      container.innerHTML = '<div style="font-size:14px;color:#9CA3AF;padding:8px 0;">Sem pacientes com consultas registradas.</div>';
+      return;
+    }
+    const total = segmentos.reduce((s, i) => s + i.total, 0) || 1;
+    const maxTotal = Math.max(...segmentos.map((i) => i.total), 1);
+    container.innerHTML = segmentos.map((item) => {
+      const pct = Math.max(2, Math.round((item.total / maxTotal) * 100));
+      const pctDoTotal = Math.round((item.total / total) * 100);
+      const cor = RFM_COLORS[item.nome] || '#9C99B8';
+      return `
+        <div style="padding:9px 0;border-bottom:1px solid #E3E1EE;">
+          <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;">
+            <span style="display:flex;align-items:center;gap:7px;font-size:15px;font-weight:600;color:#111827;">
+              <span style="width:9px;height:9px;border-radius:50%;background:${cor};display:inline-block;flex-shrink:0;"></span>${item.nome}
+            </span>
+            <span style="font-size:14px;color:#9CA3AF;white-space:nowrap;">${item.total} (${pctDoTotal}%) · ${fmtBRL(item.valorMedio)}</span>
+          </div>
+          <div style="height:7px;background:#F1F0F7;border-radius:999px;margin-top:5px;overflow:hidden;">
+            <div style="height:100%;width:${pct}%;background:${cor};border-radius:999px;"></div>
+          </div>
+        </div>
+      `;
+    }).join('');
+  }
+
+  function renderFunil(containerId, funil) {
+    const container = document.getElementById(containerId);
+    const estagios = [
+      { nome: 'Leads', valor: funil.leads, cor: '#9C99B8' },
+      { nome: 'Pacientes (1ª consulta)', valor: funil.pacientes, cor: '#2ABCD4' },
+      { nome: 'Recorrentes (2ª+)', valor: funil.recorrentes, cor: '#6D5DF6' },
+      { nome: 'Fiéis (3+ consultas)', valor: funil.fieis, cor: '#22C55E' },
+    ];
+    const max = Math.max(...estagios.map((e) => e.valor), 1);
+    container.innerHTML = estagios.map((e) => {
+      const pct = Math.max(3, Math.round((e.valor / max) * 100));
+      return `
+        <div style="padding:9px 0;">
+          <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:5px;">
+            <span style="font-size:14.5px;font-weight:600;color:#111827;">${e.nome}</span>
+            <span style="font-size:14px;font-weight:700;color:#111827;">${e.valor}</span>
+          </div>
+          <div style="height:14px;background:#F1F0F7;border-radius:999px;overflow:hidden;">
+            <div style="height:100%;width:${pct}%;background:${e.cor};border-radius:999px;"></div>
+          </div>
+        </div>
+      `;
+    }).join('') + `
+      <div style="margin-top:10px;padding-top:14px;border-top:1px solid #E3E1EE;display:flex;align-items:center;justify-content:space-between;">
+        <span style="font-size:14.5px;font-weight:600;color:#C0392B;">Perdidos (180+ dias sem consulta)</span>
+        <span style="font-size:14px;font-weight:700;color:#C0392B;">${funil.perdidos}</span>
+      </div>
+    `;
+  }
+
+  function setCicloVidaLoading() {
+    document.getElementById('funil-lifecycle').innerHTML = skeletonListRows(5);
+    document.getElementById('lista-segmentos-rfm').innerHTML = skeletonListRows(6);
+  }
+
+  async function loadCicloVida() {
+    setCicloVidaLoading();
+    const { data, error } = await BIAuth.client.rpc('bi_pacientes_ciclo_vida', { p_id_emp: idEmp });
+    if (error) {
+      console.error('bi_pacientes_ciclo_vida:', error);
+      document.getElementById('funil-lifecycle').innerHTML = '<div style="font-size:14px;color:#9CA3AF;padding:8px 0;">Erro ao carregar.</div>';
+      document.getElementById('lista-segmentos-rfm').innerHTML = '<div style="font-size:14px;color:#9CA3AF;padding:8px 0;">Erro ao carregar.</div>';
+      return;
+    }
+
+    renderFunil('funil-lifecycle', data.funil || { leads: 0, pacientes: 0, recorrentes: 0, fieis: 0, perdidos: 0 });
+    renderSegmentosRFM('lista-segmentos-rfm', data.rfm);
+  }
+
+  function setClinicoLoading() {
+    ['kpi-pct-alergia', 'kpi-pct-sinais-vitais', 'kpi-pct-rascunho'].forEach((id) => {
+      document.getElementById(id).innerHTML = '<span class="bi-skeleton" style="width:64px;height:22px;"></span>';
+      document.getElementById(`${id}-sub`).innerHTML = '<span class="bi-skeleton" style="width:130px;height:13px;"></span>';
+    });
+    document.getElementById('kpi-pct-cross-sell').innerHTML = '<span class="bi-skeleton" style="width:50px;height:19px;"></span>';
+    document.getElementById('lista-diagnosticos').innerHTML = skeletonListRows();
+    document.getElementById('lista-porta-entrada').innerHTML = skeletonListRows();
+  }
+
+  async function loadClinico() {
+    setClinicoLoading();
+    const { data, error } = await BIAuth.client.rpc('bi_pacientes_clinico', { p_id_emp: idEmp });
+    if (error) {
+      console.error('bi_pacientes_clinico:', error);
+      ['kpi-pct-alergia', 'kpi-pct-sinais-vitais', 'kpi-pct-rascunho'].forEach((id) => {
+        document.getElementById(id).textContent = '—';
+        document.getElementById(`${id}-sub`).textContent = 'Erro ao carregar';
+      });
+      document.getElementById('kpi-pct-cross-sell').textContent = '—';
+      document.getElementById('lista-diagnosticos').innerHTML = '<div style="font-size:14px;color:#9CA3AF;padding:8px 0;">Erro ao carregar.</div>';
+      document.getElementById('lista-porta-entrada').innerHTML = '<div style="font-size:14px;color:#9CA3AF;padding:8px 0;">Erro ao carregar.</div>';
+      return;
+    }
+
+    document.getElementById('kpi-pct-alergia').textContent = fmtPct(data.pctComAlergia);
+    document.getElementById('kpi-pct-alergia-sub').textContent = `${data.totalComAlergia || 0} de ${data.totalAtivos || 0} pacientes ativos`;
+
+    document.getElementById('kpi-pct-sinais-vitais').textContent = fmtPct(data.pctComSinaisVitais);
+    document.getElementById('kpi-pct-sinais-vitais-sub').textContent = `${data.totalComSinaisVitais || 0} de ${data.totalAgendamentosRealizados || 0} agendamentos`;
+
+    document.getElementById('kpi-pct-rascunho').textContent = fmtPct(data.pctRascunho);
+    document.getElementById('kpi-pct-rascunho-sub').textContent = `${data.consultasRascunho || 0} de ${(data.consultasRascunho || 0) + (data.consultasFinalizadas || 0)} consultas`;
+
+    const diagnosticos = (data.diagnosticosComuns || []).map((d) => ({ nome: d.cid, total: d.total }));
+    renderListaSimples('lista-diagnosticos', diagnosticos, { vazio: 'Sem CID registrado nas consultas.' });
+
+    const crossSell = data.crossSell || {};
+    document.getElementById('kpi-pct-cross-sell').textContent = fmtPct(crossSell.pctMultiEspecialidade);
+    const portaEntrada = (crossSell.portaEntrada || []).map((p) => ({ nome: p.especialidade, total: p.total }));
+    renderListaSimples('lista-porta-entrada', portaEntrada, { vazio: 'Sem pacientes atendidos por 2+ especialidades.' });
+  }
+
+  function updateUltimaAtualizacao() {
+    const now = new Date();
+    const hh = String(now.getHours()).padStart(2, '0');
+    const mm = String(now.getMinutes()).padStart(2, '0');
+    document.getElementById('bi-ultima-atualizacao').textContent = `Atualizado às ${hh}:${mm}`;
+  }
+
+  async function refreshData({ manual = false } = {}) {
+    const btn = document.getElementById('btn-atualizar');
+    const icon = document.getElementById('btn-atualizar-icon');
+    if (manual) { btn.disabled = true; icon.classList.add('bi-spin'); }
+    await Promise.all([
+      loadResumo(),
+      loadEvolucao(),
+      loadFrequencia(),
+      loadRotatividade(),
+      loadValor(),
+      loadCicloVida(),
+      loadClinico(),
+    ]);
+    updateUltimaAtualizacao();
+    if (manual) { btn.disabled = false; icon.classList.remove('bi-spin'); }
+  }
+
+  function applyPeriodoLabel() {
+    const label = document.getElementById('filtro-periodo-label');
+    if (periodo === 'custom' && customIni && customFim) {
+      label.textContent = sameDay(customIni, customFim) ? fmtDateBR(customIni) : `${fmtDateBR(customIni)} → ${fmtDateBR(customFim)}`;
+    } else {
+      const preset = PERIOD_PRESETS.find((p) => p.value === periodo);
+      label.textContent = preset ? preset.label : 'Este mês';
+    }
+  }
+
+  function closePeriodoPanel() {
+    document.getElementById('periodo-panel').classList.remove('open');
+  }
+
+  function openPeriodoPanel() {
+    document.getElementById('periodo-view-custom').style.display = 'none';
+    document.getElementById('periodo-view-main').style.display = 'block';
+    renderPeriodoOpcoes();
+    document.getElementById('periodo-panel').classList.add('open');
+  }
+
+  function selecionarPeriodo(value) {
+    periodo = value;
+    customIni = null;
+    customFim = null;
+    applyPeriodoLabel();
+    closePeriodoPanel();
+    refreshData();
+  }
+
+  function renderPeriodoOpcoes() {
+    const container = document.getElementById('periodo-opcoes');
+    const rows = PERIOD_PRESETS.map((p) => {
+      const { ini, fim } = presetRange(p.value);
+      const rangeText = sameDay(ini, fim) ? fmtDateBR(ini) : `${fmtDateBR(ini)} → ${fmtDateBR(fim)}`;
+      const isActive = periodo === p.value;
+      return `
+        <div class="bi-period-opt${isActive ? ' active' : ''}" data-value="${p.value}">
+          <span class="bi-period-opt-icon">${CAL_ICON}</span>
+          <div class="bi-period-opt-text">
+            <div class="bi-period-opt-title">${p.label}</div>
+            <div class="bi-period-opt-sub">${rangeText}</div>
+          </div>
+          ${isActive ? '<span class="bi-period-opt-check">✓</span>' : ''}
+        </div>`;
+    }).join('');
+
+    const customActive = periodo === 'custom';
+    const customSub = customActive && customIni && customFim
+      ? (sameDay(customIni, customFim) ? fmtDateBR(customIni) : `${fmtDateBR(customIni)} → ${fmtDateBR(customFim)}`)
+      : 'Escolha um intervalo';
+    const customRow = `
+      <div class="bi-period-opt${customActive ? ' active' : ''}" id="periodo-opt-custom">
+        <span class="bi-period-opt-icon">${CAL_ICON}</span>
+        <div class="bi-period-opt-text">
+          <div class="bi-period-opt-title">Personalizado...</div>
+          <div class="bi-period-opt-sub">${customSub}</div>
+        </div>
+        ${customActive ? '<span class="bi-period-opt-check">✓</span>' : '<span class="bi-period-opt-chevron">›</span>'}
+      </div>`;
+
+    container.innerHTML = rows + customRow;
+    container.querySelectorAll('.bi-period-opt[data-value]').forEach((el) => {
+      el.addEventListener('click', () => selecionarPeriodo(el.dataset.value));
+    });
+    document.getElementById('periodo-opt-custom').addEventListener('click', abrirPeriodoCustom);
+  }
+
+  function renderRangeInputs() {
+    document.getElementById('range-ini-value').textContent = selStart ? fmtDateBR(selStart) : 'Selecionar';
+    document.getElementById('range-fim-value').textContent = selEnd ? fmtDateBR(selEnd) : 'Selecionar';
+    const nextIsIni = !selStart || (selStart && selEnd);
+    document.getElementById('range-input-ini').classList.toggle('active', nextIsIni);
+    document.getElementById('range-input-fim').classList.toggle('active', !nextIsIni);
+  }
+
+  let calViewDate = new Date();
+  let selStart = null;
+  let selEnd = null;
+  const DOW = ['D', 'S', 'T', 'Q', 'Q', 'S', 'S'];
+  const MONTH_NAMES = ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho', 'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'];
+
+  function renderCalendar() {
+    document.getElementById('cal-dow').innerHTML = DOW.map((d) => `<div class="bi-cal-dow">${d}</div>`).join('');
+    document.getElementById('cal-month-label').textContent = `${MONTH_NAMES[calViewDate.getMonth()]} ${calViewDate.getFullYear()}`;
+
+    const firstOfMonth = new Date(calViewDate.getFullYear(), calViewDate.getMonth(), 1);
+    const gridStart = new Date(firstOfMonth);
+    gridStart.setDate(gridStart.getDate() - firstOfMonth.getDay());
+
+    const hoje = new Date();
+    hoje.setHours(0, 0, 0, 0);
+
+    const dias = [];
+    for (let i = 0; i < 42; i++) {
+      const d = new Date(gridStart);
+      d.setDate(gridStart.getDate() + i);
+      dias.push(d);
+    }
+
+    document.getElementById('cal-days').innerHTML = dias.map((d) => {
+      const muted = d.getMonth() !== calViewDate.getMonth();
+      const inRange = selStart && selEnd && d > selStart && d < selEnd;
+      const isEdge = sameDay(d, selStart) || sameDay(d, selEnd);
+      const isToday = sameDay(d, hoje);
+      const cls = ['bi-cal-day'];
+      if (muted) cls.push('muted');
+      if (inRange) cls.push('in-range');
+      if (isEdge) cls.push('range-edge');
+      const style = isToday && !isEdge ? 'font-weight:700;text-decoration:underline;' : '';
+      return `<div class="${cls.join(' ')}" data-date="${toISODate(d)}" style="${style}">${d.getDate()}</div>`;
+    }).join('');
+
+    document.getElementById('cal-days').querySelectorAll('.bi-cal-day').forEach((el) => {
+      el.addEventListener('click', () => {
+        const [y, m, dd] = el.dataset.date.split('-').map(Number);
+        const clicked = new Date(y, m - 1, dd);
+        if (!selStart || (selStart && selEnd)) {
+          selStart = clicked;
+          selEnd = null;
+        } else if (clicked < selStart) {
+          selStart = clicked;
+        } else {
+          selEnd = clicked;
+        }
+        renderRangeInputs();
+        renderCalendar();
+      });
+    });
+  }
+
+  function abrirPeriodoCustom() {
+    document.getElementById('periodo-view-main').style.display = 'none';
+    document.getElementById('periodo-view-custom').style.display = 'block';
+    selStart = customIni || null;
+    selEnd = customFim || null;
+    calViewDate = new Date(selEnd || selStart || new Date());
+    renderRangeInputs();
+    renderCalendar();
+  }
+
+  function voltarPeriodoMain() {
+    document.getElementById('periodo-view-custom').style.display = 'none';
+    document.getElementById('periodo-view-main').style.display = 'block';
+    renderPeriodoOpcoes();
+  }
+
+  function setupPeriodoPanel() {
+    applyPeriodoLabel();
+    document.getElementById('filtro-periodo-btn').addEventListener('click', (ev) => {
+      ev.stopPropagation();
+      const panel = document.getElementById('periodo-panel');
+      panel.classList.contains('open') ? closePeriodoPanel() : openPeriodoPanel();
+    });
+    document.getElementById('periodo-panel').addEventListener('click', (ev) => ev.stopPropagation());
+    document.addEventListener('click', () => closePeriodoPanel());
+
+    document.getElementById('periodo-custom-voltar').addEventListener('click', voltarPeriodoMain);
+    document.getElementById('periodo-custom-cancelar').addEventListener('click', closePeriodoPanel);
+    document.getElementById('periodo-custom-aplicar').addEventListener('click', () => {
+      if (!selStart) return;
+      customIni = selStart;
+      customFim = selEnd || selStart;
+      periodo = 'custom';
+      applyPeriodoLabel();
+      closePeriodoPanel();
+      refreshData();
+    });
+
+    document.getElementById('cal-prev').addEventListener('click', () => {
+      calViewDate = new Date(calViewDate.getFullYear(), calViewDate.getMonth() - 1, 1);
+      renderCalendar();
+    });
+    document.getElementById('cal-next').addEventListener('click', () => {
+      calViewDate = new Date(calViewDate.getFullYear(), calViewDate.getMonth() + 1, 1);
+      renderCalendar();
+    });
+
+    document.querySelectorAll('.bi-pill').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        const { ini, fim } = presetRange(btn.dataset.preset);
+        selStart = ini;
+        selEnd = fim;
+        calViewDate = new Date(fim);
+        renderRangeInputs();
+        renderCalendar();
+      });
+    });
+  }
+
+  (async () => {
+    const user = await BIAuth.getCurrentUser();
+    if (!user) return;
+    idEmp = user.idEmp;
+
+    BIMenu.renderBISidebar('#bi-sidebar', { active: 'pacientes', empresaNome: user.empresaNome });
+    BIMenu.renderBIHeader('#bi-header', {
+      title: 'Pacientes',
+      subtitle: `Quadro e evolução da base de pacientes — ${user.empresaNome}`,
+      userName: user.userName,
+      userRole: user.userRole,
+      avatarLetter: user.avatarLetter,
+    });
+
+    if (!idEmp) {
+      console.error('Vitta BI: não foi possível identificar a empresa ativa do usuário.');
+      return;
+    }
+
+    setupPeriodoPanel();
+    document.getElementById('btn-atualizar').addEventListener('click', () => refreshData({ manual: true }));
+
+    refreshData();
+  })();
+</script>
+</body>
+</html>

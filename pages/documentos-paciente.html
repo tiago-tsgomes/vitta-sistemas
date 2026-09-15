@@ -1,0 +1,1034 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>Documentos do Paciente — Vitta Sistemas</title>
+  <link rel="icon" type="image/png" href="../img/favicon.png" />
+
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            vitta: { 50:'#f0fbfd', 100:'#e0f7fa', 300:'#80deea', 400:'#4dd9ed', 500:'#2ABCD4', 600:'#1a96ac', 700:'#127a8c' }
+          },
+          fontFamily: { sans: ['Inter','system-ui','sans-serif'] }
+        }
+      }
+    }
+  </script>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+
+  <style>
+    .sidebar-nav::-webkit-scrollbar { width:3px; }
+    .sidebar-nav::-webkit-scrollbar-thumb { background:rgba(255,255,255,.1); border-radius:4px; }
+    .submenu { overflow:hidden; max-height:0; opacity:0; transition:max-height .25s ease,opacity .2s ease; }
+    .submenu.open { max-height:500px; opacity:1; }
+    .chevron { transition:transform .25s ease; display:inline-block; }
+    .chevron.open { transform:rotate(180deg); }
+    @keyframes fadeUp { from{opacity:0;transform:translateY(8px)} to{opacity:1;transform:translateY(0)} }
+    .fade-up { animation:fadeUp .35s ease forwards; }
+
+    .modal-overlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,.5); z-index:300;
+                     align-items:flex-start; justify-content:center; padding:24px 16px; overflow-y:auto; }
+    .modal-overlay.open { display:flex; }
+
+    #toast { position:fixed; bottom:24px; right:24px; z-index:999; transition:all .3s ease; }
+    tbody tr { transition:background .15s; }
+    tbody tr:hover { background:#f9fafb; }
+
+    .drop-zone { border:2px dashed #d1d5db; border-radius:12px; transition:all .2s; }
+    .drop-zone.dragover { border-color:#2ABCD4; background:#f0fbfd; }
+
+    .modal-scroll::-webkit-scrollbar { width:4px; }
+    .modal-scroll::-webkit-scrollbar-thumb { background:#e5e7eb; border-radius:4px; }
+  </style>
+</head>
+
+<body class="bg-[#F0F2F5] font-sans antialiased">
+<div class="flex min-h-screen">
+
+<!-- ══════════════════════════════════
+     SIDEBAR
+══════════════════════════════════ -->
+<aside id="sidebar"
+  class="fixed inset-y-0 left-0 w-[220px] bg-[#111827] flex flex-col z-30
+         -translate-x-full lg:translate-x-0 transition-transform duration-300">
+
+  <div class="flex flex-col items-center justify-center gap-1 py-4 px-5 border-b border-white/10 shrink-0">
+    <img src="../img/logo.png" alt="Vitta Sistemas" class="h-10 w-auto brightness-0 invert" />
+    <p class="text-[0.6rem] text-gray-500 tracking-wide">v1.2.1</p>
+  </div>
+
+  <nav class="flex-1 overflow-y-auto sidebar-nav py-3">
+    <p class="block text-[0.6rem] font-bold text-gray-500 uppercase tracking-widest px-4 pb-1 pt-3">Principal</p>
+    <a href="dashboard.html" class="flex items-center gap-3 px-3 py-2.5 mx-2 rounded-xl text-[0.83rem] font-medium text-gray-400 hover:bg-white/10 hover:text-white transition-colors duration-150 cursor-pointer mb-0.5">
+      <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+      Dashboard
+    </a>
+    <a href="agendamentos.html" class="flex items-center gap-3 px-3 py-2.5 mx-2 rounded-xl text-[0.83rem] font-medium text-gray-400 hover:bg-white/10 hover:text-white transition-colors duration-150 cursor-pointer mb-0.5">
+      <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+      Agendamentos
+    </a>
+    <a href="consultas.html" class="flex items-center gap-3 px-3 py-2.5 mx-2 rounded-xl text-[0.83rem] font-medium text-gray-400 hover:bg-white/10 hover:text-white transition-colors duration-150 cursor-pointer mb-0.5">
+      <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+      Consultas
+    </a>
+
+    <p class="block text-[0.6rem] font-bold text-gray-500 uppercase tracking-widest px-4 pb-1 pt-4">Cadastros</p>
+    <button onclick="toggleMenu('cadastros')" class="w-full flex items-center gap-3 px-3 py-2.5 mx-2 rounded-xl text-[0.83rem] font-medium text-vitta-400 bg-vitta-500/10 transition-colors duration-150 cursor-pointer mb-0.5" style="width:calc(100% - 16px)">
+      <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+      Cadastros
+      <svg id="chev-cadastros" class="chevron open w-3.5 h-3.5 ml-auto text-gray-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+    </button>
+    <div id="sub-cadastros" class="submenu open">
+      <a href="pacientes.html" class="flex items-center gap-2 pl-10 pr-3 py-2 mx-2 rounded-xl text-[0.8rem] font-semibold text-vitta-400 bg-vitta-500/10 transition-colors cursor-pointer">Pacientes</a>
+      <a href="profissionais.html" class="flex items-center gap-2 pl-10 pr-3 py-2 mx-2 rounded-xl text-[0.8rem] text-gray-500 hover:bg-white/5 hover:text-gray-300 transition-colors cursor-pointer">Profissionais</a>
+      <a href="usuarios-empresa.html" class="flex items-center gap-2 pl-10 pr-3 py-2 mx-2 rounded-xl text-[0.8rem] text-gray-500 hover:bg-white/5 hover:text-gray-300 transition-colors cursor-pointer">Usuários</a>
+      <div class="hidden" id="menuDocumentosWrap"><a href="documentos.html" class="flex items-center gap-2 pl-10 pr-3 py-2 mx-2 rounded-xl text-[0.8rem] text-gray-500 hover:bg-white/5 hover:text-gray-300 transition-colors cursor-pointer w-full">Documentos</a></div>
+      <a href="leads.html" class="flex items-center gap-2 pl-10 pr-3 py-2 mx-2 rounded-xl text-[0.8rem] text-gray-500 hover:bg-white/5 hover:text-gray-300 transition-colors cursor-pointer">Leads</a>
+    </div>
+
+    <p class="block text-[0.6rem] font-bold text-gray-500 uppercase tracking-widest px-4 pb-1 pt-4">Outros Cadastros</p>
+    <button onclick="toggleMenu('servicos')" class="w-full flex items-center gap-3 px-3 py-2.5 mx-2 rounded-xl text-[0.83rem] font-medium text-gray-400 hover:bg-white/10 hover:text-white transition-colors duration-150 cursor-pointer mb-0.5" style="width:calc(100% - 16px)">
+      <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>
+      Outros Cadastros
+      <svg id="chev-servicos" class="chevron w-3.5 h-3.5 ml-auto text-gray-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+    </button>
+    <div id="sub-servicos" class="submenu">
+      <a href="servicos.html" class="flex items-center gap-2 pl-10 pr-3 py-2 mx-2 rounded-xl text-[0.8rem] text-gray-500 hover:bg-white/5 hover:text-gray-300 transition-colors cursor-pointer">Serviços</a>
+      <a href="salas.html" class="flex items-center gap-2 pl-10 pr-3 py-2 mx-2 rounded-xl text-[0.8rem] text-gray-500 hover:bg-white/5 hover:text-gray-300 transition-colors cursor-pointer">Salas</a>
+      <a href="especialidades.html" class="flex items-center gap-2 pl-10 pr-3 py-2 mx-2 rounded-xl text-[0.8rem] text-gray-500 hover:bg-white/5 hover:text-gray-300 transition-colors cursor-pointer">Especialidades</a>
+      <a href="grupo.html" class="flex items-center gap-2 pl-10 pr-3 py-2 mx-2 rounded-xl text-[0.8rem] text-gray-500 hover:bg-white/5 hover:text-gray-300 transition-colors cursor-pointer">Grupo</a>
+      <a href="tipospagamento.html" class="flex items-center gap-2 pl-10 pr-3 py-2 mx-2 rounded-xl text-[0.8rem] text-gray-500 hover:bg-white/5 hover:text-gray-300 transition-colors cursor-pointer">Tipos de Pagamento</a>
+      <a href="tiposacompanhamento.html" class="flex items-center gap-2 pl-10 pr-3 py-2 mx-2 rounded-xl text-[0.8rem] text-gray-500 hover:bg-white/5 hover:text-gray-300 transition-colors cursor-pointer">Tipos de Acomp.</a>
+    </div>
+
+    <p class="block text-[0.6rem] font-bold text-gray-500 uppercase tracking-widest px-4 pb-1 pt-4">Financeiro</p>
+    <button onclick="toggleMenu('financeiro')" class="w-full flex items-center gap-3 px-3 py-2.5 mx-2 rounded-xl text-[0.83rem] font-medium text-gray-400 hover:bg-white/10 hover:text-white transition-colors duration-150 cursor-pointer mb-0.5" style="width:calc(100% - 16px)">
+      <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+      Financeiro
+      <svg id="chev-financeiro" class="chevron w-3.5 h-3.5 ml-auto text-gray-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+    </button>
+    <div id="sub-financeiro" class="submenu">
+      <a href="financeiro.html" class="flex items-center gap-2 pl-10 pr-3 py-2 mx-2 rounded-xl text-[0.8rem] text-gray-500 hover:bg-white/5 hover:text-gray-300 transition-colors cursor-pointer">Lançamentos</a>
+      <a href="relatorios.html" class="flex items-center gap-2 pl-10 pr-3 py-2 mx-2 rounded-xl text-[0.8rem] text-gray-500 hover:bg-white/5 hover:text-gray-300 transition-colors cursor-pointer">Relatórios</a>
+    </div>
+
+    <div id="sectionMinhaEmpresa" class="hidden">
+      <p class="block text-[0.6rem] font-bold text-gray-500 uppercase tracking-widest px-4 pb-1 pt-4">Minha Empresa</p>
+      <button onclick="toggleMenu('minhaempresa')" class="w-full flex items-center gap-3 px-3 py-2.5 mx-2 rounded-xl text-[0.83rem] font-medium text-gray-400 hover:bg-white/10 hover:text-white transition-colors duration-150 cursor-pointer mb-0.5" style="width:calc(100% - 16px)">
+        <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>Minha Empresa
+        <svg id="chev-minhaempresa" class="chevron w-3.5 h-3.5 ml-auto text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+      </button>
+      <div id="sub-minhaempresa" class="submenu">
+        <a href="minha-empresa.html" class="flex items-center gap-2 pl-10 pr-3 py-2 mx-2 rounded-xl text-[0.8rem] text-gray-500 hover:bg-white/5 hover:text-gray-300 transition-colors cursor-pointer">Meus Dados</a>
+        <a href="faturas.html" class="flex items-center gap-2 pl-10 pr-3 py-2 mx-2 rounded-xl text-[0.8rem] text-gray-500 hover:bg-white/5 hover:text-gray-300 transition-colors cursor-pointer">Minhas Faturas</a>
+      </div>
+    </div>
+
+    <div id="sectionVittaBI" class="hidden">
+    <p class="block text-[0.6rem] font-bold text-gray-500 uppercase tracking-widest px-4 pb-1 pt-4">Vitta BI</p>
+    <a id="linkVittaBI" href="https://bi.vittasistemas.com.br" target="_blank" rel="noopener"
+       class="flex items-center gap-3 px-3 py-2.5 mx-2 rounded-xl text-[0.83rem] font-medium text-gray-400 hover:bg-white/10 hover:text-white transition-colors duration-150 cursor-pointer mb-0.5">
+      <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+        <path d="M3 3v18h18"/><path d="M18.7 8l-5.3 5.3-3-3L4 16.3"/>
+      </svg>
+      Vitta BI
+      <span class="ml-auto text-[0.55rem] font-bold text-violet-300 bg-violet-500/20 px-1.5 py-0.5 rounded">BI</span>
+    </a>
+    </div>
+
+    <div id="sectionAdmin" class="hidden">
+      <p class="block text-[0.6rem] font-bold text-gray-500 uppercase tracking-widest px-4 pb-1 pt-4">Sistema</p>
+      <button onclick="toggleMenu('admin')" class="w-full flex items-center gap-3 px-3 py-2.5 mx-2 rounded-xl text-[0.83rem] font-medium text-gray-400 hover:bg-white/10 hover:text-white transition-colors duration-150 cursor-pointer mb-0.5" style="width:calc(100% - 16px)">
+        <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14M4.93 4.93a10 10 0 0 0 0 14.14"/></svg>
+        Administração
+        <svg id="chev-admin" class="chevron w-3.5 h-3.5 ml-auto text-gray-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+      </button>
+      <div id="sub-admin" class="submenu">
+        <a href="empresas.html" class="flex items-center gap-2 pl-10 pr-3 py-2 mx-2 rounded-xl text-[0.8rem] text-gray-500 hover:bg-white/5 hover:text-gray-300 transition-colors cursor-pointer">Empresas</a>
+        <a href="usuarios.html" class="flex items-center gap-2 pl-10 pr-3 py-2 mx-2 rounded-xl text-[0.8rem] text-gray-500 hover:bg-white/5 hover:text-gray-300 transition-colors cursor-pointer">Usuários</a>
+        <a href="planos.html" class="flex items-center gap-2 pl-10 pr-3 py-2 mx-2 rounded-xl text-[0.8rem] text-gray-500 hover:bg-white/5 hover:text-gray-300 transition-colors cursor-pointer">Planos</a>
+        <a href="configuracoes.html" class="flex items-center gap-2 pl-10 pr-3 py-2 mx-2 rounded-xl text-[0.8rem] text-gray-500 hover:bg-white/5 hover:text-gray-300 transition-colors cursor-pointer">Configurações</a>
+        <a href="logs.html" class="flex items-center gap-2 pl-10 pr-3 py-2 mx-2 rounded-xl text-[0.8rem] text-gray-500 hover:bg-white/5 hover:text-gray-300 transition-colors cursor-pointer">Log</a>
+      </div>
+    </div>
+
+    <div class="h-4"></div>
+  </nav>
+
+  <div class="shrink-0 border-t border-white/10 p-3">
+    <div class="group flex items-center gap-2.5 p-2.5 rounded-xl hover:bg-white/5 cursor-pointer">
+      <div id="user-avatar" class="w-8 h-8 rounded-full bg-vitta-500 flex items-center justify-center text-white text-xs font-bold shrink-0">A</div>
+      <div class="flex-1 min-w-0">
+        <p id="user-name" class="text-white text-[0.8rem] font-semibold truncate">Usuário</p>
+        <p id="user-role" class="text-gray-500 text-[0.7rem] truncate">Administrador</p>
+      </div>
+      <button onclick="handleLogout()" title="Sair" class="text-gray-600 hover:text-red-400 transition-colors opacity-0 group-hover:opacity-100">
+        <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+      </button>
+    </div>
+  </div>
+</aside>
+
+<div id="overlay" class="fixed inset-0 bg-black/50 z-20 hidden lg:hidden" onclick="toggleSidebar()"></div>
+
+<!-- ══════════════════════════════════
+     WRAPPER PRINCIPAL
+══════════════════════════════════ -->
+<div class="flex-1 lg:ml-[220px] flex flex-col min-h-screen">
+
+  <!-- HEADER -->
+  <header class="sticky top-0 z-20 h-16 bg-white border-b border-gray-200 flex items-center px-5 gap-3 shadow-sm">
+    <button onclick="toggleSidebar()" class="lg:hidden p-2 rounded-lg hover:bg-gray-100 text-gray-500">
+      <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+    </button>
+    <div class="flex-1">
+      <h1 class="text-[1rem] font-bold text-gray-800 leading-tight">Documentos do Paciente</h1>
+      <p id="header-subtitle" class="text-[0.7rem] text-gray-400 leading-tight">Carregando...</p>
+    </div>
+    <div class="hidden md:flex items-center gap-2 px-3 py-2 bg-gray-50 border border-gray-200 rounded-xl">
+      <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-vitta-500 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+      <span id="empresa-nome" class="text-[0.78rem] font-semibold text-gray-700">Clínica</span>
+    </div>
+    <div class="flex items-center gap-2.5">
+      <div id="header-avatar" class="w-9 h-9 rounded-full bg-vitta-500 flex items-center justify-center text-white text-sm font-bold shrink-0">A</div>
+      <div class="hidden sm:block">
+        <p id="header-user-name" class="text-[0.8rem] font-semibold text-gray-800 leading-tight">Usuário</p>
+        <p id="header-user-role" class="text-[0.7rem] text-gray-400 leading-tight">Administrador</p>
+      </div>
+    </div>
+    <button onclick="handleLogout()" class="p-2.5 rounded-xl hover:bg-red-50 text-gray-400 hover:text-red-500 transition-colors" title="Sair">
+      <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+    </button>
+  </header>
+
+  <!-- CONTEÚDO -->
+  <main class="flex-1 p-5 lg:p-6 space-y-5 fade-up">
+
+    <!-- Breadcrumb + título -->
+    <div class="flex items-start justify-between gap-4 flex-wrap">
+      <div>
+        <div class="flex items-center gap-2 text-[0.72rem] text-gray-400 mb-1">
+          <a href="pacientes.html" class="flex items-center gap-1 hover:text-vitta-600 transition-colors">
+            <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><polyline points="15 18 9 12 15 6"/></svg>
+            Voltar
+          </a>
+          <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg>
+          <span class="text-gray-600 font-medium">Documentos</span>
+        </div>
+        <p class="text-[0.65rem] font-bold text-vitta-600 uppercase tracking-widest mb-0.5">Paciente</p>
+        <h2 id="pacNomeTitle" class="text-[1.4rem] font-extrabold text-gray-800 tracking-tight leading-none">—</h2>
+        <p class="text-[0.8rem] text-gray-400 mt-1">Gerencie os documentos deste paciente</p>
+      </div>
+      <button onclick="openUploadForm()"
+              class="flex items-center gap-2 px-4 py-2.5 bg-vitta-500 hover:bg-vitta-600 text-white text-sm font-semibold rounded-xl shadow-sm transition-colors">
+        <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        Anexar Arquivo
+      </button>
+    </div>
+
+    <!-- Card do Paciente -->
+    <div id="pacienteCard" class="bg-white rounded-2xl border border-gray-100 shadow-sm p-5 hidden">
+      <div class="flex flex-wrap gap-6">
+        <div class="flex items-center gap-4">
+          <div id="pacAvatar" class="w-14 h-14 rounded-full bg-gradient-to-br from-vitta-500 to-vitta-700 flex items-center justify-center text-white text-xl font-bold shrink-0">?</div>
+          <div>
+            <p class="text-[0.65rem] font-bold uppercase tracking-wider text-gray-400 mb-0.5">Paciente</p>
+            <p id="pacNome" class="text-base font-bold text-gray-800">—</p>
+          </div>
+        </div>
+        <div class="flex items-center gap-1.5 h-10 w-px bg-gray-100 self-center hidden sm:block"></div>
+        <div>
+          <p class="text-[0.65rem] font-bold uppercase tracking-wider text-gray-400 mb-0.5">Telefone</p>
+          <p id="pacTel" class="text-sm font-medium text-gray-700">—</p>
+        </div>
+        <div>
+          <p class="text-[0.65rem] font-bold uppercase tracking-wider text-gray-400 mb-0.5">Grupo</p>
+          <p id="pacGrupo" class="text-sm font-medium text-gray-700">—</p>
+        </div>
+        <div>
+          <p class="text-[0.65rem] font-bold uppercase tracking-wider text-gray-400 mb-0.5">Profissional(is)</p>
+          <p id="pacProfs" class="text-sm font-medium text-gray-700">—</p>
+        </div>
+        <div class="ml-auto">
+          <div id="docCountBadge" class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-amber-50 border border-amber-200 rounded-xl">
+            <svg class="w-4 h-4 text-amber-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
+            <span id="docCount" class="text-sm font-bold text-amber-700">0 documentos</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- FORMULÁRIO UPLOAD (oculto por padrão) -->
+    <div id="uploadFormWrap" class="hidden">
+      <div class="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
+        <div class="px-5 py-4 border-b border-gray-100 flex items-center justify-between">
+          <div class="flex items-center gap-2">
+            <svg class="w-5 h-5 text-vitta-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+            <h3 class="text-sm font-bold text-gray-800">Anexar Novo Arquivo</h3>
+          </div>
+          <button onclick="closeUploadForm()" class="text-gray-400 hover:text-gray-600 transition-colors p-1 rounded-lg hover:bg-gray-100">
+            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+          </button>
+        </div>
+
+        <div class="p-5">
+          <div class="flex flex-col lg:flex-row gap-5">
+
+            <!-- Drop Zone -->
+            <div class="lg:w-64 shrink-0">
+              <div id="dropZone" class="drop-zone flex flex-col items-center justify-center gap-3 p-6 cursor-pointer h-40"
+                   onclick="document.getElementById('fileInput').click()"
+                   ondragover="onDragOver(event)" ondragleave="onDragLeave(event)" ondrop="onDrop(event)">
+                <svg class="w-10 h-10 text-gray-300" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+                <div class="text-center">
+                  <p class="text-sm font-semibold text-gray-500">Clique para selecionar</p>
+                  <p class="text-xs text-gray-400 mt-0.5">ou arraste o arquivo até aqui</p>
+                </div>
+                <input id="fileInput" type="file" class="hidden"
+                       accept=".pdf,.jpg,.jpeg,.png,.gif,.doc,.docx,.xls,.xlsx,.txt"
+                       onchange="onFileSelected(this.files[0])">
+              </div>
+              <div id="filePreview" class="hidden mt-3 flex items-center gap-3 bg-gray-50 border border-gray-200 rounded-xl px-3 py-2.5">
+                <div id="fileIcon" class="w-9 h-9 rounded-lg flex items-center justify-center text-white text-xs font-bold shrink-0">PDF</div>
+                <div class="flex-1 min-w-0">
+                  <p id="fileName" class="text-xs font-semibold text-gray-800 truncate"></p>
+                  <p id="fileSize" class="text-[0.65rem] text-gray-400"></p>
+                </div>
+                <button onclick="clearFile()" class="text-gray-400 hover:text-red-500 transition-colors shrink-0">
+                  <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                </button>
+              </div>
+              <p class="text-[0.65rem] text-gray-400 mt-2 text-center">PDF, JPG, PNG, DOC, DOCX, XLS, XLSX, TXT · máx. 10MB</p>
+            </div>
+
+            <!-- Campos -->
+            <div class="flex-1 grid grid-cols-1 sm:grid-cols-2 gap-4">
+
+              <!-- Categoria -->
+              <div class="flex flex-col gap-1.5">
+                <label class="text-xs font-semibold text-gray-600">Categoria <span class="text-red-500">*</span></label>
+                <select id="fCategoria" class="px-3 py-2.5 border-[1.5px] border-gray-200 rounded-xl text-sm bg-gray-50 outline-none focus:border-vitta-500 focus:bg-white transition-colors">
+                  <option value="">Selecione a categoria</option>
+                  <option>Relatório</option>
+                  <option>Declaração</option>
+                  <option>Receita</option>
+                  <option>Ficha</option>
+                  <option>Avaliação</option>
+                </select>
+              </div>
+
+              <!-- Profissional Responsável -->
+              <div class="flex flex-col gap-1.5">
+                <label class="text-xs font-semibold text-gray-600">
+                  Profissional Responsável <span class="text-red-500">*</span>
+                </label>
+                <select id="fProfissional" class="px-3 py-2.5 border-[1.5px] border-gray-200 rounded-xl text-sm bg-gray-50 outline-none focus:border-vitta-500 focus:bg-white transition-colors">
+                  <option value="">Selecione o profissional</option>
+                </select>
+                <p class="text-[0.68rem] text-gray-400 flex items-center gap-1">
+                  <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+                  O documento ficará visível apenas para o profissional selecionado e para a secretaria.
+                </p>
+              </div>
+
+              <!-- Descrição -->
+              <div class="sm:col-span-2 flex flex-col gap-1.5">
+                <label class="text-xs font-semibold text-gray-600">Descrição <span class="text-gray-400 font-normal">(opcional)</span></label>
+                <input id="fDescricao" type="text" placeholder="Descreva o conteúdo do arquivo"
+                       class="px-3 py-2.5 border-[1.5px] border-gray-200 rounded-xl text-sm bg-gray-50 outline-none focus:border-vitta-500 focus:bg-white transition-colors">
+              </div>
+
+              <!-- Botões -->
+              <div class="sm:col-span-2 flex justify-end gap-3">
+                <button onclick="closeUploadForm()" class="px-4 py-2.5 border border-gray-200 rounded-xl text-sm font-semibold text-gray-600 hover:bg-gray-50 transition-colors">Cancelar</button>
+                <button onclick="uploadDocumento()" id="btnUpload"
+                        class="flex items-center gap-2 px-5 py-2.5 bg-vitta-500 hover:bg-vitta-600 text-white text-sm font-semibold rounded-xl transition-colors">
+                  <svg id="uploadSpin" class="hidden animate-spin w-4 h-4" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/></svg>
+                  <svg id="uploadIcon" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+                  <span id="uploadTxt">Salvar</span>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Busca + Filtro -->
+    <div class="bg-white border border-gray-100 rounded-2xl shadow-sm p-4 flex flex-wrap gap-3 items-center">
+      <div class="relative flex-1 min-w-[200px]">
+        <svg class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        <input id="filterSearch" type="text" placeholder="Buscar arquivos..."
+               oninput="applyFilter()"
+               class="w-full pl-9 pr-3 py-2.5 border border-gray-200 rounded-xl text-sm bg-gray-50 outline-none focus:border-vitta-500 focus:bg-white transition-colors">
+      </div>
+      <div class="relative min-w-[160px]">
+        <select id="filterCat" onchange="applyFilter()"
+                class="w-full px-3 py-2.5 border border-gray-200 rounded-xl text-sm bg-gray-50 outline-none focus:border-vitta-500 focus:bg-white transition-colors appearance-none pr-8">
+          <option value="">Todas as categorias</option>
+          <option>Relatório</option>
+          <option>Declaração</option>
+          <option>Receita</option>
+          <option>Ficha</option>
+          <option>Avaliação</option>
+        </select>
+        <svg class="absolute right-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-gray-400 pointer-events-none" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+      </div>
+    </div>
+
+    <!-- Tabela de documentos -->
+    <div class="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
+      <div class="px-5 py-3.5 border-b border-gray-100 text-[0.8rem] text-gray-500" id="tableCount">
+        Mostrando <strong class="text-gray-800">—</strong> de <strong class="text-gray-800">—</strong> arquivos
+      </div>
+
+      <!-- Loading -->
+      <div id="tableLoader" class="flex items-center justify-center py-16 gap-3">
+        <svg class="animate-spin w-5 h-5 text-vitta-500" fill="none" viewBox="0 0 24 24">
+          <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/>
+          <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/>
+        </svg>
+        <span class="text-sm text-gray-400">Carregando documentos...</span>
+      </div>
+
+      <div id="tableWrap" class="hidden overflow-x-auto">
+        <table class="w-full text-left text-sm">
+          <thead>
+            <tr class="bg-gray-50 border-b border-gray-100">
+              <th class="px-5 py-3 text-[0.7rem] font-bold text-gray-500 uppercase tracking-wider">Nome do Arquivo</th>
+              <th class="px-4 py-3 text-[0.7rem] font-bold text-gray-500 uppercase tracking-wider">Tipo</th>
+              <th class="px-4 py-3 text-[0.7rem] font-bold text-gray-500 uppercase tracking-wider">Categoria</th>
+              <th class="px-4 py-3 text-[0.7rem] font-bold text-gray-500 uppercase tracking-wider">Profissional Vinculado</th>
+              <th class="px-4 py-3 text-[0.7rem] font-bold text-gray-500 uppercase tracking-wider">Data de Envio</th>
+              <th class="px-4 py-3 text-[0.7rem] font-bold text-gray-500 uppercase tracking-wider text-right">Ações</th>
+            </tr>
+          </thead>
+          <tbody id="docsBody"></tbody>
+        </table>
+      </div>
+
+      <!-- Paginação -->
+      <div id="pagination" class="flex items-center gap-1.5 justify-end px-5 py-3.5 border-t border-gray-100"></div>
+    </div>
+
+  </main>
+</div>
+
+<!-- ══════════════════════════════════
+     MODAL: CONFIRMAR EXCLUSÃO
+══════════════════════════════════ -->
+<div class="modal-overlay" id="deleteModal">
+  <div class="bg-white rounded-2xl w-full max-w-[400px] shadow-2xl mx-auto my-auto p-6">
+    <div class="w-14 h-14 rounded-full bg-red-50 flex items-center justify-center mx-auto mb-4 text-2xl">🗑️</div>
+    <h3 class="text-base font-bold text-gray-800 text-center mb-2">Excluir Documento?</h3>
+    <p class="text-sm text-gray-500 text-center mb-5">
+      O arquivo <strong id="deleteDocNome" class="text-gray-800 break-all"></strong> será removido permanentemente.
+    </p>
+    <div class="flex gap-3">
+      <button onclick="closeDeleteModal()" class="flex-1 py-2.5 border border-gray-200 rounded-xl text-sm font-semibold text-gray-600 hover:bg-gray-50 transition-colors">Cancelar</button>
+      <button onclick="confirmDelete()" id="btnDeleteConfirm"
+              class="flex-1 flex items-center justify-center gap-2 py-2.5 bg-red-500 hover:bg-red-600 text-white text-sm font-semibold rounded-xl transition-colors">
+        <svg id="delSpin" class="hidden animate-spin w-4 h-4" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/></svg>
+        Excluir
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Toast -->
+<div id="toast" class="hidden">
+  <div id="toastMsg" class="flex items-center gap-3 px-4 py-3 rounded-xl shadow-lg text-sm font-semibold text-white min-w-[260px]">
+    <span id="toastIcon"></span><span id="toastText"></span>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<script src="../assets/js/config.js?v=2"></script>
+<script src="../assets/js/access-guard.js?v=2"></script>
+<script src="../assets/js/admin-empresa-context.js?v=1"></script>
+<script src="../assets/js/notifications.js?v=3"></script>
+<script>
+/* ═══════════════════════════════════════════════════
+   ESTADO
+═══════════════════════════════════════════════════ */
+const PAGE_SIZE = 10;
+let currentPage = 1;
+let allDocs     = [];
+let filtered    = [];
+let pacienteId  = null;
+let pacData     = null;
+let profsVinculados = [];
+let selectedFile    = null;
+let deleteTargetId  = null;
+let deleteStoragePath = null;
+let currentEmpId    = null;
+let currentUserId   = null;
+let isProfissional  = false;
+let isAdminGlobal   = false;
+let currentProfId   = null;
+
+/* ═══════════════════════════════════════════════════
+   UTILITÁRIOS
+═══════════════════════════════════════════════════ */
+const AV_COLORS = [
+  'bg-gradient-to-br from-vitta-500 to-vitta-700',
+  'bg-gradient-to-br from-green-400 to-green-600',
+  'bg-gradient-to-br from-purple-400 to-purple-600',
+  'bg-gradient-to-br from-amber-400 to-amber-600',
+  'bg-gradient-to-br from-blue-400 to-blue-600',
+];
+function avColor(n) { return AV_COLORS[(n||'').charCodeAt(0) % AV_COLORS.length]; }
+function initials(n) { return (n||'?').trim().split(/\s+/).slice(0,2).map(w=>w[0]).join('').toUpperCase(); }
+function fmtTel(v) {
+  const d = (v||'').replace(/\D/g,'');
+  if (d.length===11) return d.replace(/(\d{2})(\d{5})(\d{4})/,'($1) $2-$3');
+  if (d.length===10) return d.replace(/(\d{2})(\d{4})(\d{4})/,'($1) $2-$3');
+  return v||'—';
+}
+function fmtSize(bytes) {
+  if (!bytes) return '';
+  if (bytes < 1024) return bytes + ' B';
+  if (bytes < 1048576) return (bytes/1024).toFixed(0) + ' KB';
+  return (bytes/1048576).toFixed(1) + ' MB';
+}
+function fmtDatetime(str) {
+  if (!str) return '—';
+  const d = new Date(str);
+  return d.toLocaleDateString('pt-BR') + ' ' +
+         d.toLocaleTimeString('pt-BR', { hour:'2-digit', minute:'2-digit' });
+}
+
+function showToast(msg, type='success') {
+  const el = document.getElementById('toast');
+  const box = document.getElementById('toastMsg');
+  document.getElementById('toastText').textContent = msg;
+  document.getElementById('toastIcon').textContent = type==='success'?'✓':type==='error'?'✕':'ℹ';
+  box.className = `flex items-center gap-3 px-4 py-3 rounded-xl shadow-lg text-sm font-semibold text-white min-w-[260px] ${
+    type==='success'?'bg-green-600':type==='error'?'bg-red-500':'bg-vitta-600'
+  }`;
+  el.classList.remove('hidden');
+  setTimeout(()=>el.classList.add('hidden'), 3500);
+}
+
+/* Cor + ícone do tipo de arquivo */
+function fileTypeInfo(nome, tipo) {
+  const ext = (nome||'').split('.').pop().toUpperCase();
+  const map = {
+    PDF:  { color: 'bg-red-500',   label: 'PDF' },
+    JPG:  { color: 'bg-green-500', label: 'JPG' },
+    JPEG: { color: 'bg-green-500', label: 'JPG' },
+    PNG:  { color: 'bg-blue-500',  label: 'PNG' },
+    GIF:  { color: 'bg-blue-400',  label: 'GIF' },
+    DOC:  { color: 'bg-blue-700',    label: 'DOC'  },
+    DOCX: { color: 'bg-blue-700',    label: 'DOCX' },
+    XLS:  { color: 'bg-green-700',   label: 'XLS'  },
+    XLSX: { color: 'bg-green-700',   label: 'XLSX' },
+    TXT:  { color: 'bg-gray-500',    label: 'TXT'  },
+  };
+  return map[ext] || { color: 'bg-gray-400', label: ext || '?' };
+}
+
+function catBadgeColor(cat) {
+  const m = {
+    'Relatório':   'bg-purple-100 text-purple-700',
+    'Declaração':  'bg-blue-100 text-blue-700',
+    'Receita':     'bg-green-100 text-green-700',
+    'Ficha':       'bg-amber-100 text-amber-700',
+    'Avaliação':   'bg-rose-100 text-rose-700',
+  };
+  return m[cat] || 'bg-gray-100 text-gray-600';
+}
+
+/* ═══════════════════════════════════════════════════
+   SIDEBAR
+═══════════════════════════════════════════════════ */
+function toggleMenu(key) {
+  const sub  = document.getElementById('sub-'+key);
+  const chev = document.getElementById('chev-'+key);
+  const open = sub.classList.contains('open');
+  sub.classList.toggle('open', !open);
+  if (chev) chev.classList.toggle('open', !open);
+}
+function toggleSidebar() {
+  const sb = document.getElementById('sidebar');
+  const ov = document.getElementById('overlay');
+  const open = sb.classList.contains('-translate-x-full');
+  sb.classList.toggle('-translate-x-full', !open);
+  ov.classList.toggle('hidden', !open);
+}
+
+/* ═══════════════════════════════════════════════════
+   AUTH
+═══════════════════════════════════════════════════ */
+async function initAuth() {
+  const { data: { session } } = await supabase.auth.getSession();
+  if (!session) { window.location.href = '../index.html'; return false; }
+
+  currentUserId = session.user.id;
+  const u = await getUsuarioAtual('NOME_USU,TIPO_USU,ATIVO_USU,EMPRESA(NOME_EMP),ID_EMP,PROF_USU', session);
+
+  if (!u || !u.ATIVO_USU) { await supabase.auth.signOut(); window.location.href = '../index.html'; return false; }
+
+  currentEmpId = AdminEmpresaCtx.resolveIdEmp(u.TIPO_USU, u.ID_EMP);
+  const nome = u.NOME_USU || session.user.email;
+  const ini  = initials(nome);
+  const TIPO_LABELS = { 'ADMIN_GLOBAL':'Admin Global','ADMIN_EMPRESA':'Administrador','SECRETARIA':'Secretaria','PROFISSIONAL':'Profissional' };
+  const tipo = TIPO_LABELS[u.TIPO_USU] || 'Usuário';
+
+  ['user-name','header-user-name'].forEach(id=>document.getElementById(id).textContent=nome);
+  ['user-role','header-user-role'].forEach(id=>document.getElementById(id).textContent=tipo);
+  ['user-avatar','header-avatar'].forEach(id=>document.getElementById(id).textContent=ini);
+  document.getElementById('empresa-nome').textContent = u.EMPRESA?.NOME_EMP ?? 'Vitta Sistemas';
+
+  if (u.TIPO_USU==='ADMIN_GLOBAL') {
+    isAdminGlobal=true;
+    document.getElementById('sectionAdmin').classList.remove('hidden');
+    AdminEmpresaCtx.initSelector('ADMIN_GLOBAL', session.user.id);
+  }
+  if (u.TIPO_USU==='PROFISSIONAL') {
+    isProfissional = true;
+    currentProfId  = u.PROF_USU || null;
+  }
+  const temAcessoConsultas = u.TIPO_USU === 'PROFISSIONAL' || (['ADMIN_EMPRESA','ADMIN_GLOBAL'].includes(u.TIPO_USU) && u.PROF_USU);
+  if (!temAcessoConsultas)
+    document.querySelector('a[href="consultas.html"]')?.classList.add('hidden');
+  return true;
+}
+async function handleLogout() { await supabase.auth.signOut(); window.location.href='../index.html'; }
+
+/* ═══════════════════════════════════════════════════
+   CARREGAR PACIENTE
+═══════════════════════════════════════════════════ */
+async function loadPaciente() {
+  const params = new URLSearchParams(location.search);
+  pacienteId = params.get('pac');
+  if (!pacienteId) { window.location.href='pacientes.html'; return; }
+
+  let _pacQ = supabase
+    .from('PACIENTE')
+    .select('ID_PAC,NOME_PAC,TEL_PAC,GRUPO(NOME_GRUPO),PACIENTE_PROFISSIONAL(PROF_ID,PROFISSIONAL(ID_PROF,NOME_PROF))')
+    .eq('ID_PAC', pacienteId);
+  if (currentEmpId) _pacQ = _pacQ.eq('EMP_PAC', currentEmpId);
+  const { data: p, error } = await _pacQ.single();
+
+  if (error || !p) { window.location.href='pacientes.html'; return; }
+  pacData = p;
+
+  const profsArr = (p.PACIENTE_PROFISSIONAL||[]).map(r=>({id:r.PROF_ID, nome:r.PROFISSIONAL?.NOME_PROF||''}));
+  profsVinculados = profsArr;
+
+  document.getElementById('pacNomeTitle').textContent = p.NOME_PAC;
+  document.getElementById('header-subtitle').textContent = 'Documentos de ' + p.NOME_PAC;
+
+  const av = document.getElementById('pacAvatar');
+  av.textContent = initials(p.NOME_PAC);
+  av.className = `w-14 h-14 rounded-full ${avColor(p.NOME_PAC)} flex items-center justify-center text-white text-xl font-bold shrink-0`;
+
+  document.getElementById('pacNome').textContent   = p.NOME_PAC;
+  document.getElementById('pacTel').textContent    = fmtTel(p.TEL_PAC);
+  document.getElementById('pacGrupo').textContent  = p.GRUPO?.NOME_GRUPO || '—';
+  document.getElementById('pacProfs').textContent  = profsArr.length ? profsArr.map(x=>x.nome).join(', ') : '—';
+  document.getElementById('pacienteCard').classList.remove('hidden');
+
+  // Preenche select de profissionais
+  const sel = document.getElementById('fProfissional');
+  sel.innerHTML = '';
+
+  if (isProfissional && currentProfId) {
+    // Profissional logado: fixa no próprio nome, sem opção de trocar
+    const proprio = profsArr.find(pr => pr.id === currentProfId);
+    const nome = proprio ? proprio.nome : 'Profissional';
+    sel.insertAdjacentHTML('beforeend', `<option value="${currentProfId}" selected>${nome}</option>`);
+    sel.disabled = true;
+    sel.classList.add('opacity-70', 'cursor-not-allowed');
+  } else if (profsArr.length === 1) {
+    sel.insertAdjacentHTML('beforeend', `<option value="${profsArr[0].id}" selected>${profsArr[0].nome}</option>`);
+  } else {
+    sel.insertAdjacentHTML('beforeend', '<option value="">Selecione o profissional</option>');
+    profsArr.forEach(pr => sel.insertAdjacentHTML('beforeend', `<option value="${pr.id}">${pr.nome}</option>`));
+  }
+}
+
+/* ═══════════════════════════════════════════════════
+   CARREGAR DOCUMENTOS
+═══════════════════════════════════════════════════ */
+async function loadDocumentos() {
+  document.getElementById('tableLoader').classList.remove('hidden');
+  document.getElementById('tableWrap').classList.add('hidden');
+
+  let q = supabase
+    .from('DOCUMENTO_PACIENTE')
+    .select('ID_DOC,NOME_ARQUIVO,TIPO_ARQUIVO,CATEGORIA,DESCRICAO,STORAGE_PATH,TAMANHO_BYTES,CRIADO_EM,PROF_ID,PROFISSIONAL(NOME_PROF)')
+    .eq('PAC_ID', pacienteId)
+    .order('CRIADO_EM', { ascending: false });
+
+  // Profissional vê apenas os documentos vinculados a ele
+  if (isProfissional && currentProfId) {
+    q = q.eq('PROF_ID', currentProfId);
+  }
+
+  const { data, error } = await q;
+
+  if (error) { showToast('Erro ao carregar documentos.', 'error'); return; }
+  allDocs = data || [];
+
+  const count = allDocs.length;
+  document.getElementById('docCount').textContent = count + ' documento' + (count !== 1 ? 's' : '');
+
+  applyFilter();
+  document.getElementById('tableLoader').classList.add('hidden');
+  document.getElementById('tableWrap').classList.remove('hidden');
+}
+
+/* ═══════════════════════════════════════════════════
+   FILTROS
+═══════════════════════════════════════════════════ */
+function applyFilter() {
+  const q   = document.getElementById('filterSearch').value.trim().toLowerCase();
+  const cat = document.getElementById('filterCat').value;
+
+  filtered = allDocs.filter(d => {
+    if (cat && d.CATEGORIA !== cat) return false;
+    if (q && !(d.NOME_ARQUIVO||'').toLowerCase().includes(q) &&
+             !(d.DESCRICAO||'').toLowerCase().includes(q) &&
+             !(d.PROFISSIONAL?.NOME_PROF||'').toLowerCase().includes(q)) return false;
+    return true;
+  });
+  currentPage = 1;
+  renderTable();
+  renderPagination();
+}
+
+/* ═══════════════════════════════════════════════════
+   TABELA
+═══════════════════════════════════════════════════ */
+function renderTable() {
+  const start = (currentPage - 1) * PAGE_SIZE;
+  const slice = filtered.slice(start, start + PAGE_SIZE);
+
+  document.getElementById('tableCount').innerHTML =
+    `Mostrando <strong class="text-gray-800">${slice.length}</strong> de <strong class="text-gray-800">${filtered.length}</strong> arquivo${filtered.length !== 1 ? 's' : ''}`;
+
+  const tbody = document.getElementById('docsBody');
+  if (!slice.length) {
+    tbody.innerHTML = `<tr><td colspan="6" class="text-center py-14 text-gray-400 text-sm">Nenhum documento encontrado.</td></tr>`;
+    return;
+  }
+
+  tbody.innerHTML = slice.map(d => {
+    const { color, label } = fileTypeInfo(d.NOME_ARQUIVO, d.TIPO_ARQUIVO);
+    const catClass = catBadgeColor(d.CATEGORIA);
+    const profNome = d.PROFISSIONAL?.NOME_PROF || '—';
+    const profIni  = initials(d.PROFISSIONAL?.NOME_PROF || '?');
+    const profColor = avColor(d.PROFISSIONAL?.NOME_PROF || '');
+    return `
+    <tr class="border-b border-gray-50">
+      <td class="px-5 py-3.5">
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 rounded-lg ${color} flex items-center justify-center text-white text-[0.6rem] font-bold shrink-0">${label}</div>
+          <div>
+            <p class="text-[0.84rem] font-semibold text-gray-800 leading-tight">${d.NOME_ARQUIVO}</p>
+            <p class="text-[0.68rem] text-gray-400 mt-0.5">${fmtSize(d.TAMANHO_BYTES)}${d.DESCRICAO ? ' · ' + d.DESCRICAO : ''}</p>
+          </div>
+        </div>
+      </td>
+      <td class="px-4 py-3.5">
+        <span class="inline-flex text-[0.68rem] font-bold px-2 py-0.5 rounded-full ${color} text-white">${label}</span>
+      </td>
+      <td class="px-4 py-3.5">
+        ${d.CATEGORIA
+          ? `<span class="inline-flex text-[0.72rem] font-semibold px-2 py-0.5 rounded-full ${catClass}">${d.CATEGORIA}</span>`
+          : '<span class="text-gray-300 text-sm">—</span>'}
+      </td>
+      <td class="px-4 py-3.5">
+        <div class="flex items-center gap-2">
+          <div class="w-7 h-7 rounded-full ${profColor} flex items-center justify-center text-white text-[0.6rem] font-bold shrink-0">${profIni}</div>
+          <span class="text-[0.82rem] text-gray-700">${profNome}</span>
+        </div>
+      </td>
+      <td class="px-4 py-3.5 text-[0.82rem] text-gray-500 whitespace-nowrap">${fmtDatetime(d.CRIADO_EM)}</td>
+      <td class="px-4 py-3.5">
+        <div class="flex items-center gap-1.5 justify-end">
+          <button onclick="viewDoc('${d.STORAGE_PATH}','${(d.NOME_ARQUIVO||'').replace(/'/g,"\\'")}')" title="Visualizar"
+                  class="w-8 h-8 flex items-center justify-center rounded-lg border border-gray-200 hover:border-vitta-400 hover:bg-vitta-50 text-gray-400 hover:text-vitta-600 transition-colors">
+            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+          </button>
+          <button onclick="downloadDoc('${d.STORAGE_PATH}','${(d.NOME_ARQUIVO||'').replace(/'/g,"\\'")}')" title="Baixar"
+                  class="w-8 h-8 flex items-center justify-center rounded-lg border border-gray-200 hover:border-blue-400 hover:bg-blue-50 text-gray-400 hover:text-blue-600 transition-colors">
+            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+          </button>
+          <button onclick="openDeleteModal('${d.ID_DOC}','${(d.NOME_ARQUIVO||'').replace(/'/g,"\\'")}','${d.STORAGE_PATH}')" title="Excluir"
+                  class="w-8 h-8 flex items-center justify-center rounded-lg border border-gray-200 hover:border-red-400 hover:bg-red-50 text-gray-400 hover:text-red-500 transition-colors">
+            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4h6v2"/></svg>
+          </button>
+        </div>
+      </td>
+    </tr>`;
+  }).join('');
+}
+
+/* ═══════════════════════════════════════════════════
+   PAGINAÇÃO
+═══════════════════════════════════════════════════ */
+function renderPagination() {
+  const total = Math.ceil(filtered.length / PAGE_SIZE);
+  const pg = document.getElementById('pagination');
+  if (total <= 1) { pg.innerHTML = ''; return; }
+
+  const btnBase = 'min-w-[32px] h-8 rounded-lg border border-gray-200 text-xs font-semibold flex items-center justify-center px-2 transition-colors';
+  let html = `<button class="${btnBase} hover:bg-gray-50 text-gray-500" onclick="goPage(${currentPage-1})" ${currentPage===1?'disabled':''}>‹</button>`;
+  for (let i=1; i<=total; i++) {
+    html += `<button class="${btnBase} ${i===currentPage?'bg-vitta-500 text-white border-vitta-500':'hover:bg-gray-50 text-gray-600'}" onclick="goPage(${i})">${i}</button>`;
+  }
+  html += `<button class="${btnBase} hover:bg-gray-50 text-gray-500" onclick="goPage(${currentPage+1})" ${currentPage===total?'disabled':''}>›</button>`;
+  pg.innerHTML = html;
+}
+function goPage(n) {
+  const total = Math.ceil(filtered.length / PAGE_SIZE);
+  if (n<1||n>total) return;
+  currentPage = n;
+  renderTable();
+  renderPagination();
+}
+
+/* ═══════════════════════════════════════════════════
+   UPLOAD FORM
+═══════════════════════════════════════════════════ */
+function openUploadForm() {
+  document.getElementById('uploadFormWrap').classList.remove('hidden');
+  document.getElementById('uploadFormWrap').scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+function closeUploadForm() {
+  document.getElementById('uploadFormWrap').classList.add('hidden');
+  clearFile();
+  document.getElementById('fCategoria').value   = '';
+  document.getElementById('fDescricao').value   = '';
+  // profissional: mantém fixo; outros: reset
+  const sel = document.getElementById('fProfissional');
+  if (!isProfissional) {
+    if (profsVinculados.length === 1) sel.value = profsVinculados[0].id;
+    else sel.value = '';
+  }
+}
+
+/* ═══════════════════════════════════════════════════
+   DROP ZONE
+═══════════════════════════════════════════════════ */
+function onDragOver(e) {
+  e.preventDefault();
+  document.getElementById('dropZone').classList.add('dragover');
+}
+function onDragLeave(e) {
+  document.getElementById('dropZone').classList.remove('dragover');
+}
+function onDrop(e) {
+  e.preventDefault();
+  document.getElementById('dropZone').classList.remove('dragover');
+  const file = e.dataTransfer.files[0];
+  if (file) onFileSelected(file);
+}
+function onFileSelected(file) {
+  if (!file) return;
+  const maxBytes = 10 * 1024 * 1024;
+  if (file.size > maxBytes) { showToast('Arquivo muito grande. Máximo 10MB.', 'error'); return; }
+  selectedFile = file;
+
+  const { color, label } = fileTypeInfo(file.name, file.type);
+  const icon = document.getElementById('fileIcon');
+  icon.textContent = label;
+  icon.className   = `w-9 h-9 rounded-lg ${color} flex items-center justify-center text-white text-xs font-bold shrink-0`;
+
+  document.getElementById('fileName').textContent = file.name;
+  document.getElementById('fileSize').textContent = fmtSize(file.size);
+  document.getElementById('filePreview').classList.remove('hidden');
+}
+function clearFile() {
+  selectedFile = null;
+  document.getElementById('fileInput').value = '';
+  document.getElementById('filePreview').classList.add('hidden');
+}
+
+/* ═══════════════════════════════════════════════════
+   UPLOAD DOCUMENTO
+═══════════════════════════════════════════════════ */
+async function uploadDocumento() {
+  if (!selectedFile) { showToast('Selecione um arquivo.', 'error'); return; }
+  const categoria = document.getElementById('fCategoria').value;
+  if (!categoria)  { showToast('Selecione a categoria.', 'error'); return; }
+  const profId = document.getElementById('fProfissional').value;
+  if (!profId) { showToast('Selecione o profissional responsável.', 'error'); return; }
+
+  setUploadLoading(true);
+  try {
+    const ext  = selectedFile.name.split('.').pop();
+    const path = `${pacienteId}/${Date.now()}_${selectedFile.name.replace(/[^a-zA-Z0-9._-]/g,'_')}`;
+
+    const { error: storErr } = await supabase.storage
+      .from('documentos-paciente')
+      .upload(path, selectedFile, { upsert: false });
+
+    if (storErr) throw new Error('Erro no upload: ' + storErr.message);
+
+    const { error: dbErr } = await supabase.from('DOCUMENTO_PACIENTE').insert({
+      PAC_ID:        pacienteId,
+      EMP_ID:        currentEmpId || null,
+      PROF_ID:       profId || null,
+      NOME_ARQUIVO:  selectedFile.name,
+      TIPO_ARQUIVO:  selectedFile.type,
+      CATEGORIA:     categoria,
+      DESCRICAO:     document.getElementById('fDescricao').value.trim() || null,
+      STORAGE_PATH:  path,
+      TAMANHO_BYTES: selectedFile.size,
+      CRIADO_POR:    currentUserId,
+    });
+
+    if (dbErr) {
+      await supabase.storage.from('documentos-paciente').remove([path]);
+      throw new Error('Erro ao salvar no banco: ' + dbErr.message);
+    }
+
+    showToast('Documento anexado com sucesso!');
+    closeUploadForm();
+    await loadDocumentos();
+  } catch (e) {
+    showToast(e.message || 'Erro inesperado.', 'error');
+  } finally {
+    setUploadLoading(false);
+  }
+}
+
+function setUploadLoading(on) {
+  document.getElementById('btnUpload').disabled = on;
+  document.getElementById('uploadSpin').classList.toggle('hidden', !on);
+  document.getElementById('uploadIcon').classList.toggle('hidden', on);
+  document.getElementById('uploadTxt').textContent = on ? 'Enviando...' : 'Salvar';
+}
+
+/* ═══════════════════════════════════════════════════
+   VISUALIZAR / BAIXAR
+═══════════════════════════════════════════════════ */
+async function viewDoc(path, nome) {
+  try {
+    const { data, error } = await supabase.storage
+      .from('documentos-paciente')
+      .createSignedUrl(path, 300);
+    if (error) throw error;
+    window.open(data.signedUrl, '_blank');
+  } catch (e) {
+    showToast('Não foi possível abrir o arquivo.', 'error');
+  }
+}
+
+async function downloadDoc(path, nome) {
+  try {
+    const { data, error } = await supabase.storage
+      .from('documentos-paciente')
+      .download(path);
+    if (error) throw error;
+    const url = URL.createObjectURL(data);
+    const a   = document.createElement('a');
+    a.href = url; a.download = nome; a.click();
+    URL.revokeObjectURL(url);
+  } catch (e) {
+    showToast('Não foi possível baixar o arquivo.', 'error');
+  }
+}
+
+/* ═══════════════════════════════════════════════════
+   EXCLUIR
+═══════════════════════════════════════════════════ */
+function openDeleteModal(id, nome, storagePath) {
+  deleteTargetId   = id;
+  deleteStoragePath = storagePath;
+  document.getElementById('deleteDocNome').textContent = nome;
+  document.getElementById('deleteModal').classList.add('open');
+}
+function closeDeleteModal() {
+  document.getElementById('deleteModal').classList.remove('open');
+  deleteTargetId = null; deleteStoragePath = null;
+}
+async function confirmDelete() {
+  if (!deleteTargetId) return;
+  document.getElementById('delSpin').classList.remove('hidden');
+  document.getElementById('btnDeleteConfirm').disabled = true;
+  try {
+    if (deleteStoragePath) {
+      await supabase.storage.from('documentos-paciente').remove([deleteStoragePath]);
+    }
+    const { error } = await supabase.from('DOCUMENTO_PACIENTE').delete().eq('ID_DOC', deleteTargetId);
+    if (error) throw error;
+    showToast('Documento excluído com sucesso!');
+    closeDeleteModal();
+    await loadDocumentos();
+  } catch (e) {
+    showToast('Erro ao excluir documento.', 'error');
+  } finally {
+    document.getElementById('delSpin').classList.add('hidden');
+    document.getElementById('btnDeleteConfirm').disabled = false;
+  }
+}
+
+/* ═══════════════════════════════════════════════════
+   FECHAR MODAL CLICANDO FORA
+═══════════════════════════════════════════════════ */
+document.getElementById('deleteModal').addEventListener('click', e => {
+  if (e.target.id === 'deleteModal') closeDeleteModal();
+});
+
+/* ═══════════════════════════════════════════════════
+   INICIALIZAÇÃO
+═══════════════════════════════════════════════════ */
+(async () => {
+  const ok = await initAuth();
+  if (!ok) return;
+  if (isAdminGlobal && !AdminEmpresaCtx.get()) {
+    AdminEmpresaCtx.renderBloqueio(['main']);
+    return;
+  }
+  await loadPaciente();
+  await loadDocumentos();
+})();
+
+document.querySelectorAll('#sidebar nav a').forEach(function(link) {
+  link.addEventListener('click', function() {
+    var sb = document.getElementById('sidebar');
+    var ov = document.getElementById('overlay');
+    if (sb && !sb.classList.contains('-translate-x-full')) {
+      sb.classList.add('-translate-x-full');
+      if (ov) ov.classList.add('hidden');
+    }
+  });
+});
+</script>
+<script>
+(async () => {
+  try {
+    const { data: { session } } = await supabase.auth.getSession();
+    if (['ADMIN_EMPRESA'].includes(session?.user?.user_metadata?.tipo_usu)) {
+      const el = document.getElementById('sectionMinhaEmpresa');
+      if (el) el.classList.remove('hidden');
+    }
+  } catch (_) {}
+})();
+</script>
+<script>
+(async () => {
+  try {
+    const { data: { session } } = await supabase.auth.getSession();
+    if (!session) return;
+    const u = await getUsuarioAtual('TIPO_USU,ID_EMP', session);
+    if (u && u.ID_EMP === '22ff26b9-3839-45ed-8a1d-df4a488d3aab' && ['ADMIN_EMPRESA','SECRETARIA'].includes(u.TIPO_USU)) {
+      document.getElementById('menuDocumentosWrap')?.classList.remove('hidden');
+    }
+  } catch (_) {}
+})();
+</script>
+</body>
+</html>

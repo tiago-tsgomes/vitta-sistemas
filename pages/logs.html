@@ -1,0 +1,459 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>Log &mdash; Vitta Sistemas</title>
+  <link rel="icon" type="image/png" href="../img/favicon.png" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: { vitta: { 50:'#f0fbfd',100:'#e0f7fa',300:'#80deea',400:'#4dd9ed',500:'#2ABCD4',600:'#1a96ac',700:'#127a8c' } },
+          fontFamily: { sans: ['Inter','system-ui','sans-serif'] }
+        }
+      }
+    }
+  </script>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+  <script src="../assets/js/config.js?v=2"></script>
+  <script src="../assets/js/admin-empresa-context.js?v=1"></script>
+  <script src="../assets/js/access-guard.js?v=2"></script>
+  <script src="../assets/js/notifications.js?v=3"></script>
+  <style>
+    .sidebar-nav::-webkit-scrollbar { width:3px; }
+    .sidebar-nav::-webkit-scrollbar-thumb { background:rgba(255,255,255,.1); border-radius:4px; }
+    .submenu { overflow:hidden; max-height:0; opacity:0; transition:max-height .25s ease,opacity .2s ease; }
+    .submenu.open { max-height:500px; opacity:1; }
+    .chevron { transition:transform .25s ease; display:inline-block; }
+    .chevron.open { transform:rotate(180deg); }
+    .block-body { overflow:hidden; transition:max-height .3s ease, opacity .25s ease; max-height:0; opacity:0; }
+    .block-body.open { max-height:2000px; opacity:1; }
+    @keyframes fadeUp { from{opacity:0;transform:translateY(8px)} to{opacity:1;transform:translateY(0)} }
+    .fade-up { animation:fadeUp .35s ease forwards; }
+  </style>
+</head>
+
+<body class="bg-[#F0F2F5] font-sans antialiased">
+<div class="flex min-h-screen">
+
+<!-- ====== SIDEBAR ====== -->
+<aside id="sidebar" class="fixed inset-y-0 left-0 w-[220px] bg-[#111827] flex flex-col z-30 -translate-x-full lg:translate-x-0 transition-transform duration-300">
+  <div class="flex flex-col items-center justify-center gap-1 py-4 px-5 border-b border-white/10 shrink-0">
+    <img src="../img/logo.png" alt="Vitta Sistemas" class="h-10 w-auto brightness-0 invert" />
+    <p class="text-[0.6rem] text-gray-500 tracking-wide">v1.2.1</p>
+  </div>
+  <nav class="flex-1 overflow-y-auto sidebar-nav py-3">
+    <p class="block text-[0.6rem] font-bold text-gray-500 uppercase tracking-widest px-4 pb-1 pt-3">Principal</p>
+    <a href="dashboard.html" class="flex items-center gap-3 px-3 py-2.5 mx-2 rounded-xl text-[0.83rem] font-medium text-gray-400 hover:bg-white/10 hover:text-white transition-colors duration-150 mb-0.5">
+      <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>Dashboard
+    </a>
+    <a href="agendamentos.html" class="flex items-center gap-3 px-3 py-2.5 mx-2 rounded-xl text-[0.83rem] font-medium text-gray-400 hover:bg-white/10 hover:text-white transition-colors duration-150 mb-0.5">
+      <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>Agendamentos
+    </a>
+    <a href="consultas.html" class="flex items-center gap-3 px-3 py-2.5 mx-2 rounded-xl text-[0.83rem] font-medium text-gray-400 hover:bg-white/10 hover:text-white transition-colors duration-150 mb-0.5">
+      <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>Consultas
+    </a>
+
+    <p class="block text-[0.6rem] font-bold text-gray-500 uppercase tracking-widest px-4 pb-1 pt-4">Cadastros</p>
+    <button onclick="toggleMenu('cadastros')" class="w-full flex items-center gap-3 px-3 py-2.5 mx-2 rounded-xl text-[0.83rem] font-medium text-gray-400 hover:bg-white/10 hover:text-white transition-colors duration-150 mb-0.5" style="width:calc(100% - 16px)">
+      <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>Cadastros
+      <svg id="chev-cadastros" class="chevron w-3.5 h-3.5 ml-auto text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+    </button>
+    <div id="sub-cadastros" class="submenu">
+      <a href="pacientes.html" class="flex items-center gap-2 pl-10 pr-3 py-2 mx-2 rounded-xl text-[0.8rem] text-gray-500 hover:bg-white/5 hover:text-gray-300 transition-colors cursor-pointer">Pacientes</a>
+      <a href="profissionais.html" class="flex items-center gap-2 pl-10 pr-3 py-2 mx-2 rounded-xl text-[0.8rem] text-gray-500 hover:bg-white/5 hover:text-gray-300 transition-colors cursor-pointer">Profissionais</a>
+      <a href="usuarios-empresa.html" class="flex items-center gap-2 pl-10 pr-3 py-2 mx-2 rounded-xl text-[0.8rem] text-gray-500 hover:bg-white/5 hover:text-gray-300 transition-colors cursor-pointer">Usu&aacute;rios</a>
+      <div class="hidden" id="menuDocumentosWrap"><a href="documentos.html" class="flex items-center gap-2 pl-10 pr-3 py-2 mx-2 rounded-xl text-[0.8rem] text-gray-500 hover:bg-white/5 hover:text-gray-300 transition-colors cursor-pointer w-full">Documentos</a></div>
+      <a href="leads.html" class="flex items-center gap-2 pl-10 pr-3 py-2 mx-2 rounded-xl text-[0.8rem] text-gray-500 hover:bg-white/5 hover:text-gray-300 transition-colors cursor-pointer">Leads</a>
+    </div>
+
+    <p class="block text-[0.6rem] font-bold text-gray-500 uppercase tracking-widest px-4 pb-1 pt-4">Outros Cadastros</p>
+    <button onclick="toggleMenu('servicos')" class="w-full flex items-center gap-3 px-3 py-2.5 mx-2 rounded-xl text-[0.83rem] font-medium text-gray-400 hover:bg-white/10 hover:text-white transition-colors duration-150 cursor-pointer mb-0.5" style="width:calc(100% - 16px)">
+      <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>Outros Cadastros
+      <svg id="chev-servicos" class="chevron w-3.5 h-3.5 ml-auto text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+    </button>
+    <div id="sub-servicos" class="submenu">
+      <a href="servicos.html" class="flex items-center gap-2 pl-10 pr-3 py-2 mx-2 rounded-xl text-[0.8rem] text-gray-500 hover:bg-white/5 hover:text-gray-300 transition-colors cursor-pointer">Servi&ccedil;os</a>
+      <a href="salas.html" class="flex items-center gap-2 pl-10 pr-3 py-2 mx-2 rounded-xl text-[0.8rem] text-gray-500 hover:bg-white/5 hover:text-gray-300 transition-colors cursor-pointer">Salas</a>
+      <a href="especialidades.html" class="flex items-center gap-2 pl-10 pr-3 py-2 mx-2 rounded-xl text-[0.8rem] text-gray-500 hover:bg-white/5 hover:text-gray-300 transition-colors cursor-pointer">Especialidades</a>
+      <a href="grupo.html" class="flex items-center gap-2 pl-10 pr-3 py-2 mx-2 rounded-xl text-[0.8rem] text-gray-500 hover:bg-white/5 hover:text-gray-300 transition-colors cursor-pointer">Grupo</a>
+      <a href="tipospagamento.html" class="flex items-center gap-2 pl-10 pr-3 py-2 mx-2 rounded-xl text-[0.8rem] text-gray-500 hover:bg-white/5 hover:text-gray-300 transition-colors cursor-pointer">Tipos de Pagamento</a>
+      <a href="tiposacompanhamento.html" class="flex items-center gap-2 pl-10 pr-3 py-2 mx-2 rounded-xl text-[0.8rem] text-gray-500 hover:bg-white/5 hover:text-gray-300 transition-colors cursor-pointer">Tipos de Acomp.</a>
+    </div>
+
+    <p class="block text-[0.6rem] font-bold text-gray-500 uppercase tracking-widest px-4 pb-1 pt-4">Financeiro</p>
+    <button onclick="toggleMenu('financeiro')" class="w-full flex items-center gap-3 px-3 py-2.5 mx-2 rounded-xl text-[0.83rem] font-medium text-gray-400 hover:bg-white/10 hover:text-white transition-colors duration-150 cursor-pointer mb-0.5" style="width:calc(100% - 16px)">
+      <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>Financeiro
+      <svg id="chev-financeiro" class="chevron w-3.5 h-3.5 ml-auto text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+    </button>
+    <div id="sub-financeiro" class="submenu">
+      <a href="financeiro.html" class="flex items-center gap-2 pl-10 pr-3 py-2 mx-2 rounded-xl text-[0.8rem] text-gray-500 hover:bg-white/5 hover:text-gray-300 transition-colors cursor-pointer">Lan&ccedil;amentos</a>
+      <a href="relatorios.html" class="flex items-center gap-2 pl-10 pr-3 py-2 mx-2 rounded-xl text-[0.8rem] text-gray-500 hover:bg-white/5 hover:text-gray-300 transition-colors cursor-pointer">Relat&oacute;rios</a>
+    </div>
+
+
+    <div id="sectionMinhaEmpresa" class="hidden">
+    <p class="block text-[0.6rem] font-bold text-gray-500 uppercase tracking-widest px-4 pb-1 pt-4">Minha Empresa</p>
+    <button onclick="toggleMenu('minhaempresa')" class="w-full flex items-center gap-3 px-3 py-2.5 mx-2 rounded-xl text-[0.83rem] font-medium text-gray-400 hover:bg-white/10 hover:text-white transition-colors duration-150 cursor-pointer mb-0.5" style="width:calc(100% - 16px)">
+      <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>Minha Empresa
+      <svg id="chev-minhaempresa" class="chevron w-3.5 h-3.5 ml-auto text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+    </button>
+    <div id="sub-minhaempresa" class="submenu">
+      <a href="minha-empresa.html" class="flex items-center gap-2 pl-10 pr-3 py-2 mx-2 rounded-xl text-[0.8rem] text-gray-500 hover:bg-white/5 hover:text-gray-300 transition-colors cursor-pointer">Meus Dados</a>
+      <a href="faturas.html" class="flex items-center gap-2 pl-10 pr-3 py-2 mx-2 rounded-xl text-[0.8rem] text-gray-500 hover:bg-white/5 hover:text-gray-300 transition-colors cursor-pointer">Minhas Faturas</a>
+    </div>
+    </div>
+    <div id="sectionVittaBI" class="hidden">
+    <p class="block text-[0.6rem] font-bold text-gray-500 uppercase tracking-widest px-4 pb-1 pt-4">Vitta BI</p>
+    <a id="linkVittaBI" href="https://bi.vittasistemas.com.br" target="_blank" rel="noopener"
+       class="flex items-center gap-3 px-3 py-2.5 mx-2 rounded-xl text-[0.83rem] font-medium text-gray-400 hover:bg-white/10 hover:text-white transition-colors duration-150 cursor-pointer mb-0.5">
+      <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+        <path d="M3 3v18h18"/><path d="M18.7 8l-5.3 5.3-3-3L4 16.3"/>
+      </svg>
+      Vitta BI
+      <span class="ml-auto text-[0.55rem] font-bold text-violet-300 bg-violet-500/20 px-1.5 py-0.5 rounded">BI</span>
+    </a>
+    </div>
+
+    <div id="sectionAdmin" class="hidden">
+    <p class="block text-[0.6rem] font-bold text-gray-500 uppercase tracking-widest px-4 pb-1 pt-4">Sistema</p>
+    <button onclick="toggleMenu('admin')" class="w-full flex items-center gap-3 px-3 py-2.5 mx-2 rounded-xl text-[0.83rem] font-medium text-vitta-400 bg-vitta-500/10 transition-colors duration-150 mb-0.5" style="width:calc(100% - 16px)">
+      <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14M4.93 4.93a10 10 0 0 0 0 14.14"/></svg>Administra&ccedil;&atilde;o
+      <svg id="chev-admin" class="chevron open w-3.5 h-3.5 ml-auto text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+    </button>
+    <div id="sub-admin" class="submenu open">
+      <a href="empresas.html" class="flex items-center gap-2 pl-10 pr-3 py-2 mx-2 rounded-xl text-[0.8rem] text-gray-500 hover:bg-white/5 hover:text-gray-300 transition-colors cursor-pointer">Empresas</a>
+      <a href="usuarios.html" class="flex items-center gap-2 pl-10 pr-3 py-2 mx-2 rounded-xl text-[0.8rem] text-gray-500 hover:bg-white/5 hover:text-gray-300 transition-colors cursor-pointer">Usu&aacute;rios Admin</a>
+      <a href="planos.html" class="flex items-center gap-2 pl-10 pr-3 py-2 mx-2 rounded-xl text-[0.8rem] text-gray-500 hover:bg-white/5 hover:text-gray-300 transition-colors cursor-pointer">Planos</a>
+      <a href="dashboard-gerencial.html" class="flex items-center gap-2 pl-10 pr-3 py-2 mx-2 rounded-xl text-[0.8rem] text-gray-500 hover:bg-white/5 hover:text-gray-300 transition-colors cursor-pointer">Dashboard Gerencial</a>
+      <a href="configuracoes.html" class="flex items-center gap-2 pl-10 pr-3 py-2 mx-2 rounded-xl text-[0.8rem] text-gray-500 hover:bg-white/5 hover:text-gray-300 transition-colors cursor-pointer">Configura&ccedil;&otilde;es</a>
+      <a href="logs.html" class="flex items-center gap-2 pl-10 pr-3 py-2 mx-2 rounded-xl text-[0.8rem] font-semibold text-vitta-400 bg-vitta-500/10 transition-colors cursor-pointer">Log</a>
+    </div>
+    </div>
+    <div class="h-4"></div>
+  </nav>
+  <div class="shrink-0 border-t border-white/10 p-3">
+    <div class="group flex items-center gap-2.5 p-2.5 rounded-xl hover:bg-white/5 cursor-pointer">
+      <div id="user-avatar" class="w-8 h-8 rounded-full bg-vitta-500 flex items-center justify-center text-white text-xs font-bold shrink-0">A</div>
+      <div class="flex-1 min-w-0">
+        <p id="user-name" class="text-white text-[0.8rem] font-semibold truncate">Usu&aacute;rio</p>
+        <p id="user-role" class="text-gray-500 text-[0.7rem] truncate">Admin</p>
+      </div>
+      <button onclick="handleLogout()" title="Sair" class="text-gray-600 hover:text-red-400 transition-colors opacity-0 group-hover:opacity-100">
+        <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+      </button>
+    </div>
+  </div>
+</aside>
+
+<div id="overlay" class="fixed inset-0 bg-black/50 z-20 hidden lg:hidden" onclick="toggleSidebar()"></div>
+
+<div class="flex-1 lg:ml-[220px] flex flex-col min-h-screen">
+  <header class="sticky top-0 z-20 h-16 bg-white border-b border-gray-200 flex items-center px-5 gap-3 shadow-sm">
+    <button onclick="toggleSidebar()" class="lg:hidden p-2 rounded-lg hover:bg-gray-100 text-gray-500">
+      <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+        <line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/>
+      </svg>
+    </button>
+    <div class="flex-1">
+      <h1 class="text-[1rem] font-bold text-gray-800 leading-tight">Log de Acessos</h1>
+      <p id="header-date" class="text-[0.7rem] text-gray-400 leading-tight">Registro de acessos dos usu&aacute;rios</p>
+    </div>
+    <div class="hidden md:flex items-center gap-2 px-3 py-2 bg-gray-50 border border-gray-200 rounded-xl">
+      <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-vitta-500 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+        <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/>
+      </svg>
+      <span id="empresa-nome" class="text-[0.78rem] font-semibold text-gray-700">Cl&iacute;nica</span>
+    </div>
+    <div class="flex items-center gap-2.5">
+      <div id="header-avatar" class="w-9 h-9 rounded-full bg-vitta-500 flex items-center justify-center text-white text-sm font-bold shrink-0">A</div>
+      <div class="hidden sm:block">
+        <p id="header-user-name" class="text-[0.8rem] font-semibold text-gray-800 leading-tight">Usu&aacute;rio</p>
+        <p id="header-user-role" class="text-[0.7rem] text-gray-400 leading-tight">Administrador</p>
+      </div>
+    </div>
+    <button onclick="handleLogout()" class="p-2.5 rounded-xl hover:bg-red-50 text-gray-400 hover:text-red-500 transition-colors" title="Sair">
+      <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+        <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/>
+      </svg>
+    </button>
+  </header>
+
+  <main class="flex-1 p-5 lg:p-6">
+
+    <!-- Acesso negado (não ADMIN_GLOBAL) -->
+    <div id="accessDenied" class="hidden max-w-md mx-auto mt-16 text-center fade-up">
+      <div class="w-14 h-14 rounded-2xl bg-red-50 border border-red-100 flex items-center justify-center mx-auto mb-4">
+        <svg xmlns="http://www.w3.org/2000/svg" class="w-7 h-7 text-red-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+      </div>
+      <h2 class="text-lg font-bold text-gray-800">Acesso restrito</h2>
+      <p class="text-sm text-gray-500 mt-1">Esta &aacute;rea &eacute; exclusiva do Admin Global.</p>
+    </div>
+
+    <!-- Conteúdo principal (ADMIN_GLOBAL) -->
+    <div id="mainContent" class="hidden max-w-6xl mx-auto fade-up space-y-4">
+
+      <!-- Cards de resumo -->
+      <div class="grid grid-cols-2 lg:grid-cols-4 gap-3">
+        <div class="bg-white rounded-2xl border border-gray-100 p-4">
+          <p class="text-[0.7rem] font-semibold text-gray-400 uppercase tracking-wide">Total de usu&aacute;rios</p>
+          <p id="stat-total" class="text-2xl font-bold text-gray-800 mt-1">&mdash;</p>
+        </div>
+        <div class="bg-white rounded-2xl border border-gray-100 p-4">
+          <p class="text-[0.7rem] font-semibold text-gray-400 uppercase tracking-wide">Acessaram hoje</p>
+          <p id="stat-hoje" class="text-2xl font-bold text-emerald-500 mt-1">&mdash;</p>
+        </div>
+        <div class="bg-white rounded-2xl border border-gray-100 p-4">
+          <p class="text-[0.7rem] font-semibold text-gray-400 uppercase tracking-wide">&Uacute;ltimos 7 dias</p>
+          <p id="stat-semana" class="text-2xl font-bold text-vitta-500 mt-1">&mdash;</p>
+        </div>
+        <div class="bg-white rounded-2xl border border-gray-100 p-4">
+          <p class="text-[0.7rem] font-semibold text-gray-400 uppercase tracking-wide">Nunca acessaram</p>
+          <p id="stat-nunca" class="text-2xl font-bold text-gray-400 mt-1">&mdash;</p>
+        </div>
+      </div>
+
+      <!-- Tabela de logs -->
+      <div class="bg-white rounded-2xl border border-gray-100 overflow-hidden">
+        <div class="flex flex-col sm:flex-row sm:items-center gap-3 px-5 py-4 border-b border-gray-100">
+          <div class="flex-1">
+            <h2 class="text-[0.95rem] font-bold text-gray-800">&Uacute;ltimo acesso por usu&aacute;rio</h2>
+            <p class="text-[0.72rem] text-gray-400">Ordenado do acesso mais recente para o mais antigo</p>
+          </div>
+          <div class="relative">
+            <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M3 4h18l-7 8v6l-4 2v-8z"/></svg>
+            <select id="filterEmpresa" onchange="renderLogs()"
+              class="w-full sm:w-56 appearance-none pl-9 pr-8 py-2 text-[0.8rem] text-gray-700 border border-gray-200 rounded-xl outline-none focus:border-vitta-400 focus:ring-2 focus:ring-vitta-100 bg-white">
+              <option value="">Todas as empresas</option>
+            </select>
+            <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5 text-gray-400 absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+          </div>
+          <div class="relative">
+            <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+            <input id="searchLog" type="text" oninput="renderLogs()" placeholder="Buscar por nome, usu&aacute;rio ou empresa&hellip;"
+              class="w-full sm:w-72 pl-9 pr-3 py-2 text-[0.8rem] text-gray-700 border border-gray-200 rounded-xl outline-none focus:border-vitta-400 focus:ring-2 focus:ring-vitta-100" />
+          </div>
+        </div>
+
+        <div class="overflow-x-auto">
+          <table class="w-full text-left">
+            <thead>
+              <tr class="text-[0.68rem] font-bold text-gray-400 uppercase tracking-wide bg-gray-50/70">
+                <th class="px-5 py-3">Nome</th>
+                <th class="px-5 py-3">Usu&aacute;rio</th>
+                <th class="px-5 py-3">Perfil</th>
+                <th class="px-5 py-3">Empresa</th>
+                <th class="px-5 py-3">&Uacute;ltimo acesso</th>
+                <th class="px-5 py-3">Plataforma</th>
+                <th class="px-5 py-3">Criado em</th>
+              </tr>
+            </thead>
+            <tbody id="logsBody" class="divide-y divide-gray-50">
+              <tr><td colspan="7" class="px-5 py-10 text-center text-sm text-gray-400">Carregando&hellip;</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="px-5 py-3 border-t border-gray-100 text-[0.72rem] text-gray-400">
+          <span id="logsCount">&mdash;</span>
+        </div>
+      </div>
+
+    </div>
+
+  </main>
+
+  <!-- Toast -->
+  <div id="toast-conf" class="fixed bottom-6 right-6 z-50 hidden">
+    <div id="toast-conf-inner" class="flex items-center gap-3 px-4 py-3 rounded-xl shadow-lg text-sm font-medium text-white min-w-[240px]"></div>
+  </div>
+</div>
+
+</div><!-- /flex min-h-screen -->
+
+<script>
+/* ── Utilitários ── */
+function escHtml(s) { return (s == null ? '' : String(s)).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+function toggleMenu(k) {
+  const s = document.getElementById('sub-' + k);
+  const c = document.getElementById('chev-' + k);
+  const o = s.classList.contains('open');
+  s.classList.toggle('open', !o);
+  if (c) c.classList.toggle('open', !o);
+}
+
+function toggleSidebar() {
+  const sb = document.getElementById('sidebar');
+  const ov = document.getElementById('overlay');
+  const o  = sb.classList.contains('-translate-x-full');
+  sb.classList.toggle('-translate-x-full', !o);
+  ov.classList.toggle('hidden', !o);
+}
+
+async function handleLogout() { await supabase.auth.signOut(); window.location.href = '../index.html'; }
+
+const TIPO_LABELS = { ADMIN_GLOBAL:'Admin Global', ADMIN_EMPRESA:'Administrador', SECRETARIA:'Secretaria', PROFISSIONAL:'Profissional' };
+const TIPO_BADGE = {
+  ADMIN_GLOBAL:  'bg-violet-50 text-violet-600 border-violet-100',
+  ADMIN_EMPRESA: 'bg-vitta-50 text-vitta-600 border-vitta-100',
+  SECRETARIA:    'bg-amber-50 text-amber-600 border-amber-100',
+  PROFISSIONAL:  'bg-emerald-50 text-emerald-600 border-emerald-100'
+};
+const PLATAFORMA_BADGE = {
+  web: '<span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[0.68rem] font-semibold border bg-sky-50 text-sky-600 border-sky-100"><svg xmlns="http://www.w3.org/2000/svg" class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>Web</span>',
+  ios: '<span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[0.68rem] font-semibold border bg-gray-100 text-gray-700 border-gray-200"><svg xmlns="http://www.w3.org/2000/svg" class="w-3 h-3" viewBox="0 0 24 24" fill="currentColor"><path d="M12.152 6.896c-.948 0-2.415-1.078-3.96-1.04-2.04.027-3.91 1.183-4.961 3.014-2.117 3.675-.546 9.103 1.519 12.09 1.013 1.454 2.208 3.09 3.792 3.039 1.52-.065 2.09-.987 3.935-.987 1.831 0 2.35.987 3.96.948 1.637-.026 2.676-1.48 3.676-2.948 1.156-1.688 1.636-3.325 1.662-3.415-.039-.013-3.182-1.221-3.22-4.857-.026-3.04 2.48-4.494 2.597-4.559-1.429-2.09-3.623-2.324-4.39-2.376-2-.156-3.675 1.09-4.61 1.09zm3.75-3.415c.833-1.014 1.402-2.428 1.246-3.831-1.207.052-2.663.805-3.522 1.818-.767.896-1.443 2.336-1.264 3.714 1.34.104 2.708-.688 3.54-1.701z"/></svg>iOS</span>',
+  android: '<span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[0.68rem] font-semibold border bg-emerald-50 text-emerald-600 border-emerald-100"><svg xmlns="http://www.w3.org/2000/svg" class="w-3 h-3" viewBox="0 0 24 24" fill="currentColor"><path d="M17.523 15.3414c-.5511 0-.9993-.4486-.9993-.9997s.4482-.9993.9993-.9993c.5511 0 .9993.4482.9993.9993 0 .5511-.4482.9997-.9993.9997m-11.046 0c-.5511 0-.9993-.4486-.9993-.9997s.4482-.9993.9993-.9993c.5511 0 .9993.4482.9993.9993 0 .5511-.4482.9997-.9993.9997m11.4046-6.02l1.9973-3.4592a.416.416 0 00-.1521-.5676.4157.4157 0 00-.5677.1521l-2.0223 3.503C15.5902 8.2439 13.8533 7.8508 12 7.8508s-3.5902.3931-5.1367 1.0989L4.841 5.4467a.4157.4157 0 00-.5676-.1521.4157.4157 0 00-.1521.5676l1.9973 3.4592C2.6889 11.1867.3432 14.6589 0 18.761h24c-.3435-4.1021-2.6892-7.5743-6.1185-9.4396"/></svg>Android</span>'
+};
+
+let _logs = [];
+
+function fmtDateTime(iso) {
+  if (!iso) return null;
+  const d = new Date(iso);
+  if (isNaN(d)) return null;
+  return d.toLocaleString('pt-BR', { day:'2-digit', month:'2-digit', year:'numeric', hour:'2-digit', minute:'2-digit' });
+}
+function fmtDate(iso) {
+  if (!iso) return null;
+  const d = new Date(iso);
+  if (isNaN(d)) return null;
+  return d.toLocaleDateString('pt-BR', { day:'2-digit', month:'2-digit', year:'numeric' });
+}
+
+function updateStats() {
+  const now = Date.now();
+  const dia = 24 * 60 * 60 * 1000;
+  const startToday = new Date(); startToday.setHours(0,0,0,0);
+  let hoje = 0, semana = 0, nunca = 0;
+  _logs.forEach(l => {
+    if (!l.ultimo_acesso) { nunca++; return; }
+    const t = new Date(l.ultimo_acesso).getTime();
+    if (t >= startToday.getTime()) hoje++;
+    if (t >= now - 7 * dia) semana++;
+  });
+  document.getElementById('stat-total').textContent  = _logs.length;
+  document.getElementById('stat-hoje').textContent   = hoje;
+  document.getElementById('stat-semana').textContent = semana;
+  document.getElementById('stat-nunca').textContent  = nunca;
+}
+
+function normalizeSearch(s) {
+  return (s || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().trim();
+}
+
+function renderLogs() {
+  const q         = normalizeSearch(document.getElementById('searchLog').value);
+  const empresaId = document.getElementById('filterEmpresa').value;
+  const body = document.getElementById('logsBody');
+  const rows = _logs.filter(l => {
+    if (empresaId && l.id_emp !== empresaId) return false;
+    if (!q) return true;
+    return [l.nome, l.usuario, l.empresa, TIPO_LABELS[l.perfil] || l.perfil]
+      .some(v => normalizeSearch(v).includes(q));
+  });
+
+  if (!rows.length) {
+    body.innerHTML = '<tr><td colspan="7" class="px-5 py-10 text-center text-sm text-gray-400">Nenhum registro encontrado.</td></tr>';
+    document.getElementById('logsCount').textContent = '0 registro(s)';
+    return;
+  }
+
+  body.innerHTML = rows.map(l => {
+    const acesso     = fmtDateTime(l.ultimo_acesso);
+    const badge      = TIPO_BADGE[l.perfil] || 'bg-gray-50 text-gray-500 border-gray-100';
+    const plataforma = l.plataforma ? PLATAFORMA_BADGE[l.plataforma] : null;
+    return `<tr class="hover:bg-gray-50/60 transition-colors">
+      <td class="px-5 py-3 text-[0.82rem] font-semibold text-gray-800">${escHtml(l.nome)}</td>
+      <td class="px-5 py-3 text-[0.8rem] text-gray-500">${escHtml(l.usuario)}</td>
+      <td class="px-5 py-3"><span class="inline-flex px-2 py-0.5 rounded-full text-[0.68rem] font-semibold border ${badge}">${escHtml(TIPO_LABELS[l.perfil] || l.perfil)}</span></td>
+      <td class="px-5 py-3 text-[0.8rem] text-gray-500">${escHtml(l.empresa) || '<span class="text-gray-300">&mdash;</span>'}</td>
+      <td class="px-5 py-3 text-[0.8rem] ${acesso ? 'text-gray-700 font-medium' : 'text-gray-300'}">${acesso || 'Nunca acessou'}</td>
+      <td class="px-5 py-3 text-[0.8rem]">${plataforma || '<span class="text-gray-300">&mdash;</span>'}</td>
+      <td class="px-5 py-3 text-[0.8rem] text-gray-500">${fmtDate(l.criado_em) || '<span class="text-gray-300">&mdash;</span>'}</td>
+    </tr>`;
+  }).join('');
+
+  document.getElementById('logsCount').textContent = `${rows.length} de ${_logs.length} registro(s)`;
+}
+
+async function loadLogs() {
+  const body = document.getElementById('logsBody');
+  const { data, error } = await supabase.rpc('get_user_access_logs');
+  if (error) {
+    body.innerHTML = `<tr><td colspan="7" class="px-5 py-10 text-center text-sm text-red-500 font-semibold">
+      Erro ao carregar logs.<br>
+      <span class="text-gray-400 font-normal text-[0.75rem]">Verifique se a fun\u00e7\u00e3o <code class="font-mono">get_user_access_logs</code> foi criada no Supabase (assets/sql/get_user_access_logs.sql).</span>
+    </td></tr>`;
+    return;
+  }
+  _logs = data || [];
+  populateFilterEmpresa();
+  updateStats();
+  renderLogs();
+}
+
+function populateFilterEmpresa() {
+  const sel = document.getElementById('filterEmpresa');
+  const vistas = new Map();
+  _logs.forEach(l => { if (l.id_emp && !vistas.has(l.id_emp)) vistas.set(l.id_emp, l.empresa || ''); });
+  const empresas = [...vistas.entries()].sort((a, b) => a[1].localeCompare(b[1], 'pt-BR'));
+  sel.innerHTML = '<option value="">Todas as empresas</option>' +
+    empresas.map(([id, nome]) => `<option value="${id}">${escHtml(nome)}</option>`).join('');
+}
+
+/* ── Inicialização ── */
+(async () => {
+  document.getElementById('header-date').textContent =
+    'Log — ' + new Date().toLocaleDateString('pt-BR', { weekday:'long', year:'numeric', month:'long', day:'numeric' });
+
+  const { data: { session } } = await supabase.auth.getSession();
+  if (!session) { window.location.href = '../index.html'; return; }
+
+  const meta = session.user.user_metadata;
+  const label = TIPO_LABELS[meta.tipo_usu] || meta.tipo_usu;
+  const nome  = meta.nome_usu || session.user.email;
+  const ini   = nome.split(' ').map(w => w[0]).join('').slice(0, 2).toUpperCase();
+
+  ['user-name', 'header-user-name'].forEach(id => document.getElementById(id).textContent = nome);
+  ['user-role', 'header-user-role'].forEach(id => document.getElementById(id).textContent = label);
+  ['user-avatar', 'header-avatar'].forEach(id => document.getElementById(id).textContent = ini);
+
+  if (meta.tipo_usu === 'ADMIN_GLOBAL') {
+    document.getElementById('empresa-nome').textContent = 'Vitta Sistemas';
+    AdminEmpresaCtx.initSelector('ADMIN_GLOBAL', session.user.id);
+    document.getElementById('sectionAdmin').classList.remove('hidden');
+    document.getElementById('mainContent').classList.remove('hidden');
+    await loadLogs();
+  } else {
+    const { data } = await supabase.from('EMPRESA').select('NOME_EMP').eq('ID_EMP', (meta.ID_EMP || meta.id_emp)).single();
+    document.getElementById('empresa-nome').textContent = data?.NOME_EMP || '';
+    document.getElementById('accessDenied').classList.remove('hidden');
+  }
+
+  let temAcessoConsultas = meta.tipo_usu === 'PROFISSIONAL';
+  if (['ADMIN_EMPRESA','ADMIN_GLOBAL'].includes(meta.tipo_usu)) {
+    const uOwn = await getUsuarioAtual('PROF_USU', session);
+    temAcessoConsultas = !!(uOwn?.PROF_USU);
+  }
+  if (!temAcessoConsultas)
+    document.querySelector('a[href="consultas.html"]')?.classList.add('hidden');
+})();
+
+document.querySelectorAll('#sidebar nav a').forEach(function(link) {
+  link.addEventListener('click', function() {
+    const sb = document.getElementById('sidebar');
+    const ov = document.getElementById('overlay');
+    if (sb && !sb.classList.contains('-translate-x-full')) {
+      sb.classList.add('-translate-x-full');
+      if (ov) ov.classList.add('hidden');
+    }
+  });
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,1187 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>Faturas da Empresa — Vitta Sistemas</title>
+  <link rel="icon" type="image/png" href="../img/favicon.png" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: { vitta: { 50:'#f0fbfd',100:'#e0f7fa',300:'#80deea',400:'#4dd9ed',500:'#2ABCD4',600:'#1a96ac',700:'#127a8c' } },
+          fontFamily: { sans: ['Inter','system-ui','sans-serif'] }
+        }
+      }
+    }
+  </script>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <style>
+    .sidebar-nav::-webkit-scrollbar { width:3px; }
+    .sidebar-nav::-webkit-scrollbar-thumb { background:rgba(255,255,255,.1); border-radius:4px; }
+    .submenu { overflow:hidden; max-height:0; opacity:0; transition:max-height .25s ease,opacity .2s ease; }
+    .submenu.open { max-height:500px; opacity:1; }
+    .chevron { transition:transform .25s ease; display:inline-block; }
+    .chevron.open { transform:rotate(180deg); }
+    @keyframes fadeUp { from{opacity:0;transform:translateY(8px)} to{opacity:1;transform:translateY(0)} }
+    .fade-up { animation:fadeUp .35s ease forwards; }
+    tbody tr { transition:background .15s; }
+    tbody tr:hover { background:#f9fafb; }
+    .modal-overlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,.5); z-index:300;
+                     align-items:flex-start; justify-content:center; padding:24px 16px; overflow-y:auto; }
+    .modal-overlay.open { display:flex; }
+  </style>
+</head>
+
+<body class="bg-[#F0F2F5] font-sans antialiased">
+<div class="flex min-h-screen">
+
+<!-- SIDEBAR -->
+<aside id="sidebar" class="fixed inset-y-0 left-0 w-[220px] bg-[#111827] flex flex-col z-30 -translate-x-full lg:translate-x-0 transition-transform duration-300">
+  <div class="flex flex-col items-center justify-center gap-1 py-4 px-5 border-b border-white/10 shrink-0">
+    <img src="../img/logo.png" alt="Vitta Sistemas" class="h-10 w-auto brightness-0 invert" />
+    <p class="text-[0.6rem] text-gray-500 tracking-wide">v1.2.1</p>
+  </div>
+  <nav class="flex-1 overflow-y-auto sidebar-nav py-3">
+    <p class="block text-[0.6rem] font-bold text-gray-500 uppercase tracking-widest px-4 pb-1 pt-3">Principal</p>
+    <a href="dashboard.html" class="flex items-center gap-3 px-3 py-2.5 mx-2 rounded-xl text-[0.83rem] font-medium text-gray-400 hover:bg-white/10 hover:text-white transition-colors duration-150 cursor-pointer mb-0.5">
+      <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+      Dashboard
+    </a>
+    <a href="agendamentos.html" class="flex items-center gap-3 px-3 py-2.5 mx-2 rounded-xl text-[0.83rem] font-medium text-gray-400 hover:bg-white/10 hover:text-white transition-colors duration-150 cursor-pointer mb-0.5">
+      <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+      Agendamentos
+    </a>
+    <a href="consultas.html" class="flex items-center gap-3 px-3 py-2.5 mx-2 rounded-xl text-[0.83rem] font-medium text-gray-400 hover:bg-white/10 hover:text-white transition-colors duration-150 cursor-pointer mb-0.5">
+      <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+      Consultas
+    </a>
+    <p class="block text-[0.6rem] font-bold text-gray-500 uppercase tracking-widest px-4 pb-1 pt-4">Cadastros</p>
+    <button onclick="toggleMenu('cadastros')" class="w-full flex items-center gap-3 px-3 py-2.5 mx-2 rounded-xl text-[0.83rem] font-medium text-gray-400 hover:bg-white/10 hover:text-white transition-colors duration-150 cursor-pointer mb-0.5" style="width:calc(100% - 16px)">
+      <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+      Cadastros
+      <svg id="chev-cadastros" class="chevron w-3.5 h-3.5 ml-auto text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+    </button>
+    <div id="sub-cadastros" class="submenu">
+      <a href="pacientes.html" class="flex items-center gap-2 pl-10 pr-3 py-2 mx-2 rounded-xl text-[0.8rem] text-gray-500 hover:bg-white/5 hover:text-gray-300 transition-colors cursor-pointer">Pacientes</a>
+      <a href="profissionais.html" class="flex items-center gap-2 pl-10 pr-3 py-2 mx-2 rounded-xl text-[0.8rem] text-gray-500 hover:bg-white/5 hover:text-gray-300 transition-colors cursor-pointer">Profissionais</a>
+      <a href="usuarios-empresa.html" class="flex items-center gap-2 pl-10 pr-3 py-2 mx-2 rounded-xl text-[0.8rem] text-gray-500 hover:bg-white/5 hover:text-gray-300 transition-colors cursor-pointer">Usu&aacute;rios</a>
+      <div class="hidden" id="menuDocumentosWrap"><a href="documentos.html" class="flex items-center gap-2 pl-10 pr-3 py-2 mx-2 rounded-xl text-[0.8rem] text-gray-500 hover:bg-white/5 hover:text-gray-300 transition-colors cursor-pointer w-full">Documentos</a></div>
+      <a href="leads.html" class="flex items-center gap-2 pl-10 pr-3 py-2 mx-2 rounded-xl text-[0.8rem] text-gray-500 hover:bg-white/5 hover:text-gray-300 transition-colors cursor-pointer">Leads</a>
+    </div>
+    <p class="block text-[0.6rem] font-bold text-gray-500 uppercase tracking-widest px-4 pb-1 pt-4">Outros Cadastros</p>
+    <button onclick="toggleMenu('servicos')" class="w-full flex items-center gap-3 px-3 py-2.5 mx-2 rounded-xl text-[0.83rem] font-medium text-gray-400 hover:bg-white/10 hover:text-white transition-colors duration-150 cursor-pointer mb-0.5" style="width:calc(100% - 16px)">
+      <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>
+      Outros Cadastros
+      <svg id="chev-servicos" class="chevron w-3.5 h-3.5 ml-auto text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+    </button>
+    <div id="sub-servicos" class="submenu">
+      <a href="servicos.html" class="flex items-center gap-2 pl-10 pr-3 py-2 mx-2 rounded-xl text-[0.8rem] text-gray-500 hover:bg-white/5 hover:text-gray-300 transition-colors cursor-pointer">Serviços</a>
+      <a href="salas.html" class="flex items-center gap-2 pl-10 pr-3 py-2 mx-2 rounded-xl text-[0.8rem] text-gray-500 hover:bg-white/5 hover:text-gray-300 transition-colors cursor-pointer">Salas</a>
+      <a href="especialidades.html" class="flex items-center gap-2 pl-10 pr-3 py-2 mx-2 rounded-xl text-[0.8rem] text-gray-500 hover:bg-white/5 hover:text-gray-300 transition-colors cursor-pointer">Especialidades</a>
+      <a href="grupo.html" class="flex items-center gap-2 pl-10 pr-3 py-2 mx-2 rounded-xl text-[0.8rem] text-gray-500 hover:bg-white/5 hover:text-gray-300 transition-colors cursor-pointer">Grupo</a>
+      <a href="tipospagamento.html" class="flex items-center gap-2 pl-10 pr-3 py-2 mx-2 rounded-xl text-[0.8rem] text-gray-500 hover:bg-white/5 hover:text-gray-300 transition-colors cursor-pointer">Tipos de Pagamento</a>
+      <a href="tiposacompanhamento.html" class="flex items-center gap-2 pl-10 pr-3 py-2 mx-2 rounded-xl text-[0.8rem] text-gray-500 hover:bg-white/5 hover:text-gray-300 transition-colors cursor-pointer">Tipos de Acomp.</a>
+    </div>
+    <p class="block text-[0.6rem] font-bold text-gray-500 uppercase tracking-widest px-4 pb-1 pt-4">Financeiro</p>
+    <button onclick="toggleMenu('financeiro')" class="w-full flex items-center gap-3 px-3 py-2.5 mx-2 rounded-xl text-[0.83rem] font-medium text-gray-400 hover:bg-white/10 hover:text-white transition-colors duration-150 cursor-pointer mb-0.5" style="width:calc(100% - 16px)">
+      <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>Financeiro
+      <svg id="chev-financeiro" class="chevron w-3.5 h-3.5 ml-auto text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+    </button>
+    <div id="sub-financeiro" class="submenu">
+      <a href="financeiro.html" class="flex items-center gap-2 pl-10 pr-3 py-2 mx-2 rounded-xl text-[0.8rem] text-gray-500 hover:bg-white/5 hover:text-gray-300 transition-colors cursor-pointer">Lançamentos</a>
+      <a href="relatorios.html" class="flex items-center gap-2 pl-10 pr-3 py-2 mx-2 rounded-xl text-[0.8rem] text-gray-500 hover:bg-white/5 hover:text-gray-300 transition-colors cursor-pointer">Relatórios</a>
+    </div>
+    <div id="sectionVittaBI" class="hidden">
+    <p class="block text-[0.6rem] font-bold text-gray-500 uppercase tracking-widest px-4 pb-1 pt-4">Vitta BI</p>
+    <a id="linkVittaBI" href="https://bi.vittasistemas.com.br" target="_blank" rel="noopener"
+       class="flex items-center gap-3 px-3 py-2.5 mx-2 rounded-xl text-[0.83rem] font-medium text-gray-400 hover:bg-white/10 hover:text-white transition-colors duration-150 cursor-pointer mb-0.5">
+      <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+        <path d="M3 3v18h18"/><path d="M18.7 8l-5.3 5.3-3-3L4 16.3"/>
+      </svg>
+      Vitta BI
+      <span class="ml-auto text-[0.55rem] font-bold text-violet-300 bg-violet-500/20 px-1.5 py-0.5 rounded">BI</span>
+    </a>
+    </div>
+    <p class="block text-[0.6rem] font-bold text-gray-500 uppercase tracking-widest px-4 pb-1 pt-4">Sistema</p>
+    <button onclick="toggleMenu('admin')" class="w-full flex items-center gap-3 px-3 py-2.5 mx-2 rounded-xl text-[0.83rem] font-medium text-vitta-400 bg-vitta-500/10 transition-colors duration-150 cursor-pointer mb-0.5" style="width:calc(100% - 16px)">
+      <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14M4.93 4.93a10 10 0 0 0 0 14.14"/></svg>
+      Administra&ccedil;&atilde;o
+      <svg id="chev-admin" class="chevron open w-3.5 h-3.5 ml-auto text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+    </button>
+    <div id="sub-admin" class="submenu open">
+      <a href="empresas.html" class="flex items-center gap-2 pl-10 pr-3 py-2 mx-2 rounded-xl text-[0.8rem] font-semibold text-vitta-400 bg-vitta-500/10 transition-colors cursor-pointer">Empresas</a>
+      <a href="usuarios.html" class="flex items-center gap-2 pl-10 pr-3 py-2 mx-2 rounded-xl text-[0.8rem] text-gray-500 hover:bg-white/5 hover:text-gray-300 transition-colors cursor-pointer">Usu&aacute;rios Admin</a>
+      <a href="planos.html" class="flex items-center gap-2 pl-10 pr-3 py-2 mx-2 rounded-xl text-[0.8rem] text-gray-500 hover:bg-white/5 hover:text-gray-300 transition-colors cursor-pointer">Planos</a>
+      <a href="dashboard-gerencial.html" class="flex items-center gap-2 pl-10 pr-3 py-2 mx-2 rounded-xl text-[0.8rem] text-gray-500 hover:bg-white/5 hover:text-gray-300 transition-colors cursor-pointer">Dashboard Gerencial</a>
+      <a href="configuracoes.html" class="flex items-center gap-2 pl-10 pr-3 py-2 mx-2 rounded-xl text-[0.8rem] text-gray-500 hover:bg-white/5 hover:text-gray-300 transition-colors cursor-pointer">Configura&ccedil;&otilde;es</a>
+      <a href="logs.html" class="flex items-center gap-2 pl-10 pr-3 py-2 mx-2 rounded-xl text-[0.8rem] text-gray-500 hover:bg-white/5 hover:text-gray-300 transition-colors cursor-pointer">Log</a>
+    </div>
+    <div class="h-4"></div>
+  </nav>
+  <div class="shrink-0 border-t border-white/10 p-3">
+    <div class="group flex items-center gap-2.5 p-2.5 rounded-xl hover:bg-white/5 cursor-pointer">
+      <div id="user-avatar" class="w-8 h-8 rounded-full bg-vitta-500 flex items-center justify-center text-white text-xs font-bold shrink-0">A</div>
+      <div class="flex-1 min-w-0">
+        <p id="user-name" class="text-white text-[0.8rem] font-semibold truncate">Usu&aacute;rio</p>
+        <p id="user-role" class="text-gray-500 text-[0.7rem] truncate">Admin Global</p>
+      </div>
+      <button onclick="handleLogout()" title="Sair" class="text-gray-600 hover:text-red-400 transition-colors opacity-0 group-hover:opacity-100">
+        <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+      </button>
+    </div>
+  </div>
+</aside>
+
+<div id="overlay" class="fixed inset-0 bg-black/50 z-20 hidden lg:hidden" onclick="toggleSidebar()"></div>
+
+<!-- WRAPPER PRINCIPAL -->
+<div class="flex-1 lg:ml-[220px] flex flex-col min-h-screen">
+
+  <!-- HEADER -->
+  <header class="sticky top-0 z-20 h-16 bg-white border-b border-gray-200 flex items-center px-5 gap-3 shadow-sm">
+    <button onclick="toggleSidebar()" class="lg:hidden p-2 rounded-lg hover:bg-gray-100 text-gray-500">
+      <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+    </button>
+    <a href="empresas.html" class="p-2 rounded-lg hover:bg-gray-100 text-gray-500 transition-colors shrink-0" title="Voltar para Empresas">
+      <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg>
+    </a>
+    <div class="flex-1 min-w-0">
+      <h1 class="text-[1rem] font-bold text-gray-800 leading-tight truncate">Faturas da Empresa</h1>
+      <p id="header-empresa" class="text-[0.7rem] text-gray-400 leading-tight truncate">Carregando...</p>
+    </div>
+    <div class="hidden sm:flex items-center gap-1.5 px-3 py-1.5 bg-amber-50 border border-amber-200 rounded-xl shrink-0">
+      <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5 text-amber-500 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+      <span class="text-[0.72rem] font-bold text-amber-600">Admin Global</span>
+    </div>
+    <div class="flex items-center gap-2.5">
+      <div id="header-avatar" class="w-9 h-9 rounded-full bg-vitta-500 flex items-center justify-center text-white text-sm font-bold shrink-0">A</div>
+      <div class="hidden sm:block">
+        <p id="header-user-name" class="text-[0.8rem] font-semibold text-gray-800 leading-tight">Usu&aacute;rio</p>
+        <p id="header-user-role" class="text-[0.7rem] text-gray-400 leading-tight">Admin Global</p>
+      </div>
+    </div>
+    <button onclick="handleLogout()" class="p-2.5 rounded-xl hover:bg-red-50 text-gray-400 hover:text-red-500 transition-colors" title="Sair">
+      <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+    </button>
+  </header>
+
+  <!-- CONTEÚDO -->
+  <main class="flex-1 p-5 lg:p-6 space-y-5 fade-up">
+
+    <!-- Cabeçalho da página -->
+    <div class="flex items-start justify-between gap-4 flex-wrap">
+      <div>
+        <p class="text-[0.65rem] font-bold text-vitta-600 uppercase tracking-widest mb-0.5">Sistema · Empresas · Faturas</p>
+        <h2 id="page-title" class="text-[1.4rem] font-extrabold text-gray-800 tracking-tight leading-none">Histórico Financeiro</h2>
+        <p id="page-subtitle" class="text-[0.8rem] text-gray-400 mt-1">Carregando informações da empresa...</p>
+      </div>
+      <div class="flex gap-2">
+        <a href="empresas.html"
+           class="flex items-center gap-2 px-4 py-2.5 border border-gray-200 rounded-xl text-sm font-semibold text-gray-600 hover:bg-gray-50 transition-colors bg-white shadow-sm">
+          <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg>
+          Voltar
+        </a>
+        <button onclick="loadFaturas()" id="btn-refresh"
+                class="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-white border border-gray-200 text-sm font-semibold text-gray-600 hover:bg-gray-50 transition-colors shadow-sm">
+          <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M23 4v6h-6"/><path d="M1 20v-6h6"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
+          Atualizar
+        </button>
+        <button onclick="openNfModal()"
+                class="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-vitta-500 hover:bg-vitta-600 text-white text-sm font-semibold transition-colors shadow-sm">
+          <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+          Anexar Nota Fiscal
+        </button>
+      </div>
+    </div>
+
+    <!-- Card da empresa -->
+    <div id="company-card" class="hidden bg-white rounded-2xl border border-gray-100 shadow-sm p-5">
+      <div class="flex items-center gap-5 flex-wrap sm:flex-nowrap">
+        <div id="company-logo" class="w-16 h-16 rounded-2xl flex items-center justify-center text-white text-2xl font-bold shrink-0 overflow-hidden bg-gradient-to-br from-vitta-500 to-vitta-700">
+          <span id="company-ini">V</span>
+          <img id="company-img" class="hidden w-full h-full object-cover" src="" alt="">
+        </div>
+        <div class="flex-1 min-w-0">
+          <div class="flex items-center gap-3 flex-wrap">
+            <h3 id="company-name" class="text-xl font-extrabold text-gray-800">—</h3>
+            <span id="company-status"></span>
+          </div>
+          <p id="company-cnpj" class="text-sm text-gray-500 font-mono mt-0.5">—</p>
+          <div class="flex items-center gap-3 mt-2 flex-wrap">
+            <span id="company-plano-badge"></span>
+            <span id="company-preco" class="text-sm font-semibold text-vitta-600"></span>
+          </div>
+        </div>
+        <div id="company-next-due" class="hidden shrink-0 text-right">
+          <p class="text-[0.65rem] font-bold text-gray-400 uppercase tracking-wider">Próx. Vencimento</p>
+          <p id="company-next-due-date" class="text-sm font-bold text-gray-700 mt-0.5">—</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Stats -->
+    <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
+
+      <div class="bg-white rounded-2xl p-4 border border-gray-100 shadow-sm">
+        <div class="w-8 h-8 rounded-lg bg-gray-100 flex items-center justify-center mb-2">
+          <svg class="w-4 h-4 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>
+        </div>
+        <p class="text-[0.65rem] font-bold text-gray-400 uppercase tracking-wider leading-none">Total</p>
+        <p id="stat-total" class="text-2xl font-extrabold text-gray-800 leading-tight mt-1">—</p>
+        <p class="text-xs text-gray-400 mt-0.5">cobranças</p>
+      </div>
+
+      <div class="bg-white rounded-2xl p-4 border border-gray-100 shadow-sm">
+        <div class="w-8 h-8 rounded-lg bg-green-50 flex items-center justify-center mb-2">
+          <svg class="w-4 h-4 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+        </div>
+        <p class="text-[0.65rem] font-bold text-green-600 uppercase tracking-wider leading-none">Total Pago</p>
+        <p id="stat-total-pago" class="text-lg font-extrabold text-gray-800 leading-tight mt-1">—</p>
+        <p id="stat-total-pago-count" class="text-xs text-green-600 mt-0.5">—</p>
+      </div>
+
+      <div class="bg-white rounded-2xl p-4 border border-blue-50 shadow-sm">
+        <div class="w-8 h-8 rounded-lg bg-blue-50 flex items-center justify-center mb-2">
+          <svg class="w-4 h-4 text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+        </div>
+        <p class="text-[0.65rem] font-bold text-blue-500 uppercase tracking-wider leading-none">No Prazo</p>
+        <p id="stat-noprazo" class="text-2xl font-extrabold text-gray-800 leading-tight mt-1">—</p>
+        <p id="stat-noprazo-val" class="text-xs text-blue-500 mt-0.5">—</p>
+      </div>
+
+      <div class="bg-white rounded-2xl p-4 border border-amber-50 shadow-sm">
+        <div class="w-8 h-8 rounded-lg bg-amber-50 flex items-center justify-center mb-2">
+          <svg class="w-4 h-4 text-amber-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+        </div>
+        <p class="text-[0.65rem] font-bold text-amber-600 uppercase tracking-wider leading-none">Em Atraso</p>
+        <p id="stat-atraso" class="text-2xl font-extrabold text-gray-800 leading-tight mt-1">—</p>
+        <p id="stat-atraso-val" class="text-xs text-amber-600 mt-0.5">—</p>
+      </div>
+
+      <div class="bg-white rounded-2xl p-4 border border-purple-50 shadow-sm">
+        <div class="w-8 h-8 rounded-lg bg-purple-50 flex items-center justify-center mb-2">
+          <svg class="w-4 h-4 text-purple-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+        </div>
+        <p class="text-[0.65rem] font-bold text-purple-500 uppercase tracking-wider leading-none">Antecipado</p>
+        <p id="stat-antecipado" class="text-2xl font-extrabold text-gray-800 leading-tight mt-1">—</p>
+        <p id="stat-antecipado-val" class="text-xs text-purple-500 mt-0.5">—</p>
+      </div>
+
+      <div class="bg-white rounded-2xl p-4 border border-red-100 shadow-sm">
+        <div class="w-8 h-8 rounded-lg bg-red-50 flex items-center justify-center mb-2">
+          <svg class="w-4 h-4 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+        </div>
+        <p class="text-[0.65rem] font-bold text-red-500 uppercase tracking-wider leading-none">Vencidas</p>
+        <p id="stat-vencidas" class="text-2xl font-extrabold text-gray-800 leading-tight mt-1">—</p>
+        <p id="stat-vencidas-val" class="text-xs text-red-500 mt-0.5">em aberto</p>
+      </div>
+
+    </div>
+
+    <!-- Área da tabela -->
+    <div class="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
+
+      <!-- Filtros -->
+      <div class="px-5 py-3.5 border-b border-gray-100 flex items-center gap-3 flex-wrap">
+        <div class="relative flex-1 min-w-[160px]">
+          <svg class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+          <input id="filter-search" type="text" placeholder="Buscar descrição..."
+                 class="w-full pl-9 pr-3 py-2 border border-gray-200 rounded-xl text-sm bg-gray-50 outline-none focus:border-vitta-500 focus:bg-white transition-colors">
+        </div>
+        <select id="filter-status"
+                class="px-3 py-2 border border-gray-200 rounded-xl text-sm bg-gray-50 outline-none focus:border-vitta-500 focus:bg-white transition-colors">
+          <option value="">Todos os status</option>
+          <option value="pago">Pago</option>
+          <option value="avencer">A Vencer</option>
+          <option value="vencido">Vencido</option>
+          <option value="cancelado">Cancelado</option>
+          <option value="reembolsado">Reembolsado</option>
+        </select>
+        <select id="filter-pont"
+                class="px-3 py-2 border border-gray-200 rounded-xl text-sm bg-gray-50 outline-none focus:border-vitta-500 focus:bg-white transition-colors">
+          <option value="">Toda pontualidade</option>
+          <option value="noprazo">No prazo</option>
+          <option value="atraso">Em atraso</option>
+          <option value="antecipado">Antecipado</option>
+        </select>
+        <button onclick="clearFilters()"
+                class="flex items-center gap-1.5 px-3 py-2 border border-gray-200 rounded-xl text-sm text-gray-600 hover:bg-gray-50 transition-colors">
+          <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+          Limpar
+        </button>
+        <span id="filter-count" class="text-xs text-gray-400 ml-auto shrink-0"></span>
+      </div>
+
+      <!-- Loader -->
+      <div id="loader" class="flex flex-col items-center justify-center py-16 gap-3">
+        <svg class="w-8 h-8 text-vitta-400 animate-spin" fill="none" viewBox="0 0 24 24">
+          <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/>
+          <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/>
+        </svg>
+        <p class="text-sm text-gray-400">Buscando faturas...</p>
+      </div>
+
+      <!-- Erro -->
+      <div id="error-area" class="hidden p-8 text-center">
+        <div class="w-14 h-14 bg-red-50 rounded-full flex items-center justify-center mx-auto mb-3">
+          <svg class="w-7 h-7 text-red-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
+          </svg>
+        </div>
+        <p class="font-semibold text-gray-700 mb-1">Não foi possível carregar as faturas</p>
+        <p id="error-msg" class="text-sm text-gray-400 mb-4">Verifique sua conexão e tente novamente.</p>
+        <button onclick="loadFaturas()" class="px-4 py-2 rounded-xl bg-vitta-500 text-white text-sm font-semibold hover:bg-vitta-600 transition-colors">
+          Tentar novamente
+        </button>
+      </div>
+
+      <!-- Vazio -->
+      <div id="empty-area" class="hidden p-10 text-center">
+        <div class="w-14 h-14 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-3">
+          <svg class="w-7 h-7 text-gray-300" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+            <rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/>
+          </svg>
+        </div>
+        <p class="font-semibold text-gray-500 mb-1">Nenhuma fatura encontrada</p>
+        <p class="text-sm text-gray-400">Esta empresa não possui cobranças registradas.</p>
+      </div>
+
+      <!-- Sem resultado nos filtros -->
+      <div id="no-filter-area" class="hidden p-8 text-center">
+        <p class="text-sm text-gray-400">Nenhuma fatura corresponde aos filtros aplicados.</p>
+      </div>
+
+      <!-- Tabela Desktop -->
+      <div id="table-wrap" class="hidden">
+        <div class="hidden sm:block overflow-x-auto">
+          <table class="w-full text-left text-sm">
+            <thead>
+              <tr class="bg-gray-50 border-b border-gray-100">
+                <th class="px-5 py-3 text-[0.7rem] font-bold text-gray-500 uppercase tracking-wider">Descrição</th>
+                <th class="px-4 py-3 text-[0.7rem] font-bold text-gray-500 uppercase tracking-wider whitespace-nowrap">Vencimento</th>
+                <th class="px-4 py-3 text-[0.7rem] font-bold text-gray-500 uppercase tracking-wider whitespace-nowrap">Dt. Pagamento</th>
+                <th class="px-4 py-3 text-[0.7rem] font-bold text-gray-500 uppercase tracking-wider text-right whitespace-nowrap">Valor</th>
+                <th class="px-4 py-3 text-[0.7rem] font-bold text-gray-500 uppercase tracking-wider text-center">Pontualidade</th>
+                <th class="px-4 py-3 text-[0.7rem] font-bold text-gray-500 uppercase tracking-wider text-center">Status</th>
+                <th class="px-4 py-3 text-[0.7rem] font-bold text-gray-500 uppercase tracking-wider text-center">Ação</th>
+              </tr>
+            </thead>
+            <tbody id="table-body" class="divide-y divide-gray-50"></tbody>
+          </table>
+        </div>
+
+        <!-- Cards Mobile -->
+        <div id="mobile-list" class="sm:hidden divide-y divide-gray-100"></div>
+      </div>
+
+    </div>
+
+    <!-- Notas Fiscais anexadas -->
+    <div class="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
+      <div class="px-5 py-3.5 border-b border-gray-100 flex items-center justify-between">
+        <h3 class="text-sm font-bold text-gray-800 flex items-center gap-2">
+          <svg class="w-4 h-4 text-vitta-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+          Notas Fiscais
+        </h3>
+      </div>
+
+      <div id="nf-loader" class="flex items-center justify-center py-10 gap-3">
+        <svg class="w-5 h-5 text-vitta-400 animate-spin" fill="none" viewBox="0 0 24 24">
+          <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/>
+          <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/>
+        </svg>
+        <p class="text-sm text-gray-400">Carregando notas fiscais...</p>
+      </div>
+
+      <div id="nf-empty" class="hidden p-8 text-center">
+        <p class="text-sm text-gray-400">Nenhuma nota fiscal anexada ainda.</p>
+      </div>
+
+      <div id="nf-table-wrap" class="hidden overflow-x-auto">
+        <table class="w-full text-left text-sm">
+          <thead>
+            <tr class="bg-gray-50 border-b border-gray-100">
+              <th class="px-5 py-3 text-[0.7rem] font-bold text-gray-500 uppercase tracking-wider">Arquivo</th>
+              <th class="px-4 py-3 text-[0.7rem] font-bold text-gray-500 uppercase tracking-wider whitespace-nowrap">Mês de Referência</th>
+              <th class="px-4 py-3 text-[0.7rem] font-bold text-gray-500 uppercase tracking-wider whitespace-nowrap">Enviado em</th>
+              <th class="px-4 py-3 text-[0.7rem] font-bold text-gray-500 uppercase tracking-wider text-right">Ações</th>
+            </tr>
+          </thead>
+          <tbody id="nf-table-body" class="divide-y divide-gray-50"></tbody>
+        </table>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+</div>
+
+<!-- MODAL: ANEXAR NOTA FISCAL -->
+<div class="modal-overlay" id="nfModal" onclick="if(event.target===this)closeNfModal()">
+  <div class="bg-white rounded-2xl w-full max-w-[440px] shadow-2xl mx-auto my-auto" onclick="event.stopPropagation()">
+    <div class="flex items-center justify-between px-6 py-4 border-b border-gray-100">
+      <h2 class="text-[1rem] font-bold text-gray-800">Anexar Nota Fiscal</h2>
+      <button onclick="closeNfModal()" class="text-gray-400 hover:text-gray-600 transition-colors p-1">
+        <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+    <div class="p-6 space-y-4">
+
+      <div class="flex items-center gap-3 bg-gray-50 border border-gray-200 rounded-xl px-3 py-2.5">
+        <div id="nf-company-ini" class="w-9 h-9 rounded-lg bg-vitta-500 flex items-center justify-center text-white text-xs font-bold shrink-0">—</div>
+        <p id="nf-company-name" class="text-sm font-semibold text-gray-800 truncate">—</p>
+      </div>
+
+      <div>
+        <label class="block text-[0.78rem] font-semibold text-gray-600 mb-1">Mês de Referência <span class="text-red-500">*</span></label>
+        <input id="nf-mes" type="month" class="w-full py-2.5 px-3 text-sm border border-gray-200 rounded-xl outline-none focus:border-vitta-500 focus:ring-2 focus:ring-vitta-500/20">
+      </div>
+
+      <div>
+        <label class="block text-[0.78rem] font-semibold text-gray-600 mb-1">Arquivo PDF <span class="text-red-500">*</span></label>
+        <div id="nf-drop-zone" class="border-2 border-dashed border-gray-200 rounded-xl flex flex-col items-center justify-center gap-2 p-5 cursor-pointer transition-colors"
+             onclick="document.getElementById('nf-file-input').click()"
+             ondragover="event.preventDefault(); this.classList.add('border-vitta-500','bg-vitta-50')"
+             ondragleave="this.classList.remove('border-vitta-500','bg-vitta-50')"
+             ondrop="onNfDrop(event)">
+          <svg class="w-8 h-8 text-gray-300" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+          <p class="text-xs text-gray-500 font-semibold">Clique ou arraste o PDF aqui</p>
+          <input id="nf-file-input" type="file" accept="application/pdf" class="hidden" onchange="onNfFileSelected(this.files[0])">
+        </div>
+        <div id="nf-file-preview" class="hidden mt-2 flex items-center gap-3 bg-gray-50 border border-gray-200 rounded-xl px-3 py-2">
+          <div class="w-8 h-8 rounded-lg bg-red-500 flex items-center justify-center text-white text-[0.6rem] font-bold shrink-0">PDF</div>
+          <div class="flex-1 min-w-0">
+            <p id="nf-file-name" class="text-xs font-semibold text-gray-800 truncate"></p>
+            <p id="nf-file-size" class="text-[0.65rem] text-gray-400"></p>
+          </div>
+          <button onclick="clearNfFile()" class="text-gray-400 hover:text-red-500 transition-colors shrink-0">
+            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+          </button>
+        </div>
+      </div>
+
+      <div class="flex gap-3 pt-2">
+        <button onclick="closeNfModal()" class="flex-1 py-2.5 border border-gray-200 rounded-xl text-sm font-medium text-gray-600 hover:bg-gray-50 transition-colors">Cancelar</button>
+        <button onclick="salvarNf()" id="btnSaveNf" class="flex-1 flex items-center justify-center gap-2 py-2.5 bg-vitta-500 text-white rounded-xl text-sm font-semibold hover:bg-vitta-600 transition-colors">
+          <svg id="nfSaveSpin" class="hidden animate-spin w-4 h-4" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/></svg>
+          <span id="nfSaveTxt">Salvar</span>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: EXCLUIR NOTA FISCAL -->
+<div class="modal-overlay" id="deleteNfModal" onclick="if(event.target===this)closeDeleteNfModal()">
+  <div class="bg-white rounded-2xl w-full max-w-[400px] shadow-2xl mx-auto my-auto p-6" onclick="event.stopPropagation()">
+    <div class="w-14 h-14 rounded-full bg-red-50 flex items-center justify-center mx-auto mb-4">
+      <svg xmlns="http://www.w3.org/2000/svg" class="w-7 h-7 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4h6v2"/></svg>
+    </div>
+    <h3 class="text-base font-bold text-gray-800 text-center mb-2">Excluir Nota Fiscal?</h3>
+    <p class="text-sm text-gray-500 text-center mb-5">
+      O arquivo <strong id="deleteNfNome" class="text-gray-800 break-all"></strong> será removido permanentemente.
+    </p>
+    <div class="flex gap-3">
+      <button onclick="closeDeleteNfModal()" class="flex-1 py-2.5 border border-gray-200 rounded-xl text-sm font-semibold text-gray-600 hover:bg-gray-50 transition-colors">Cancelar</button>
+      <button onclick="confirmDeleteNf()" id="btnDeleteNfConfirm"
+              class="flex-1 flex items-center justify-center gap-2 py-2.5 bg-red-500 hover:bg-red-600 text-white text-sm font-semibold rounded-xl transition-colors">
+        <svg id="deleteNfSpin" class="hidden animate-spin w-4 h-4" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/></svg>
+        Excluir
+      </button>
+    </div>
+  </div>
+</div>
+
+<div id="nf-toast" class="hidden fixed bottom-6 right-6 z-[999]">
+  <div id="nf-toast-msg" class="flex items-center gap-3 px-4 py-3 rounded-xl shadow-lg text-sm font-semibold text-white min-w-[260px]">
+    <span id="nf-toast-icon"></span><span id="nf-toast-text"></span>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<script src="../assets/js/config.js?v=2"></script>
+<script src="../assets/js/access-guard.js?v=2"></script>
+<script>
+/* ═══════════════════════════════════════════
+   ESTADO
+═══════════════════════════════════════════ */
+const params    = new URLSearchParams(window.location.search);
+const empresaId = params.get('id');
+let allPayments = [];
+let empresa     = null;
+let currentUserId = null;
+const hoje      = new Date(); hoje.setHours(0,0,0,0);
+
+/* Notas Fiscais */
+let notasFiscais    = [];
+let nfSelectedFile  = null;
+let deleteNfTarget  = null;
+let deleteNfStoragePath = null;
+
+/* ═══════════════════════════════════════════
+   UTILITÁRIOS
+═══════════════════════════════════════════ */
+function fmtBRL(v) {
+  return new Intl.NumberFormat('pt-BR', { style:'currency', currency:'BRL' }).format(v || 0);
+}
+
+function fmtDate(str) {
+  if (!str) return '—';
+  const [y, m, d] = str.split('-');
+  return `${d}/${m}/${y}`;
+}
+
+function fmtCnpj(v) {
+  return (v || '').replace(/\D/g,'')
+    .replace(/(\d{2})(\d)/,'$1.$2')
+    .replace(/(\d{3})(\d)/,'$1.$2')
+    .replace(/(\d{3})(\d)/,'$1/$2')
+    .replace(/(\d{4})(\d{1,2})$/,'$1-$2')
+    .substring(0,18);
+}
+
+function initials(name) {
+  if (!name) return '?';
+  return name.trim().split(/\s+/).slice(0,2).map(w => w[0]).join('').toUpperCase();
+}
+
+const AV_COLORS = [
+  'bg-gradient-to-br from-vitta-500 to-vitta-700',
+  'bg-gradient-to-br from-green-400 to-green-600',
+  'bg-gradient-to-br from-purple-400 to-purple-600',
+  'bg-gradient-to-br from-amber-400 to-amber-600',
+  'bg-gradient-to-br from-blue-400 to-blue-600',
+  'bg-gradient-to-br from-rose-400 to-rose-600',
+];
+function avColor(name) { return AV_COLORS[(name || '').charCodeAt(0) % AV_COLORS.length]; }
+
+/* ═══════════════════════════════════════════
+   CLASSIFICAÇÃO DE STATUS E PONTUALIDADE
+═══════════════════════════════════════════ */
+function resolveStatus(p) {
+  const s = p.status;
+  if (['RECEIVED','CONFIRMED','RECEIVED_IN_CASH'].includes(s)) return 'pago';
+  if (s === 'OVERDUE') return 'vencido';
+  if (s === 'REFUNDED') return 'reembolsado';
+  if (s === 'CANCELLED') return 'cancelado';
+  if (s === 'PENDING') {
+    const due = new Date(p.dueDate + 'T00:00:00');
+    return due < hoje ? 'vencido' : 'avencer';
+  }
+  return 'outro';
+}
+
+function resolvePontualidade(p) {
+  const st = resolveStatus(p);
+  if (st !== 'pago') return null;
+  const paidStr = p.paymentDate || p.clientPaymentDate;
+  if (!paidStr || !p.dueDate) return null;
+
+  const dueTs  = new Date(p.dueDate   + 'T00:00:00').getTime();
+  const paidTs = new Date(paidStr.substring(0, 10) + 'T00:00:00').getTime();
+  const diffDays = Math.round((paidTs - dueTs) / 86400000);
+
+  if (diffDays < 0) return { tipo: 'antecipado', dias: Math.abs(diffDays) };
+  if (diffDays === 0) return { tipo: 'noprazo', dias: 0 };
+  return { tipo: 'atraso', dias: diffDays };
+}
+
+const STATUS_CONFIG = {
+  pago:        { label:'Pago',         cls:'bg-green-100 text-green-700',  dot:'bg-green-500' },
+  avencer:     { label:'A vencer',     cls:'bg-amber-100 text-amber-700',  dot:'bg-amber-400' },
+  vencido:     { label:'Vencido',      cls:'bg-red-100 text-red-700',      dot:'bg-red-500' },
+  reembolsado: { label:'Reembolsado',  cls:'bg-gray-100 text-gray-600',    dot:'bg-gray-400' },
+  cancelado:   { label:'Cancelado',    cls:'bg-gray-100 text-gray-500',    dot:'bg-gray-300' },
+  outro:       { label:'—',            cls:'bg-gray-100 text-gray-500',    dot:'bg-gray-300' },
+};
+
+function statusBadge(st) {
+  const c = STATUS_CONFIG[st] || STATUS_CONFIG.outro;
+  return `<span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[0.72rem] font-semibold ${c.cls}">
+    <span class="w-1.5 h-1.5 rounded-full ${c.dot} shrink-0"></span>${c.label}
+  </span>`;
+}
+
+function pontBadge(pont) {
+  if (!pont) return '<span class="text-gray-300 text-xs">—</span>';
+  if (pont.tipo === 'noprazo')    return `<span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[0.72rem] font-semibold bg-blue-50 text-blue-700">No prazo</span>`;
+  if (pont.tipo === 'atraso')     return `<span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[0.72rem] font-semibold bg-red-50 text-red-700">Atraso +${pont.dias}d</span>`;
+  if (pont.tipo === 'antecipado') return `<span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[0.72rem] font-semibold bg-purple-50 text-purple-700">Antecipado ${pont.dias}d</span>`;
+  return '<span class="text-gray-300 text-xs">—</span>';
+}
+
+function actionBtn(p, st) {
+  const url = p.invoiceUrl || p.bankSlipUrl;
+  if (!url) return '<span class="text-gray-300 text-xs">—</span>';
+  if (st === 'pago' || st === 'reembolsado') {
+    return `<a href="${url}" target="_blank" rel="noopener"
+              class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-gray-100 hover:bg-gray-200 text-gray-600 text-xs font-semibold transition-colors">
+      <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+      Comprovante</a>`;
+  }
+  return `<a href="${url}" target="_blank" rel="noopener"
+            class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-vitta-500 hover:bg-vitta-600 text-white text-xs font-semibold transition-colors shadow-sm">
+    <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+    Ver boleto</a>`;
+}
+
+/* ═══════════════════════════════════════════
+   RENDER LINHAS
+═══════════════════════════════════════════ */
+function renderRow(p) {
+  const st   = resolveStatus(p);
+  const pont = resolvePontualidade(p);
+  const desc = p.description || 'Mensalidade Vitta Sistemas';
+  const paidDate = p.paymentDate || p.clientPaymentDate;
+  return `<tr class="border-b border-gray-50">
+    <td class="px-5 py-3.5 text-[0.84rem] text-gray-700 max-w-[200px]">
+      <span class="truncate block" title="${desc}">${desc}</span>
+    </td>
+    <td class="px-4 py-3.5 text-[0.83rem] text-gray-600 whitespace-nowrap">${fmtDate(p.dueDate)}</td>
+    <td class="px-4 py-3.5 text-[0.83rem] text-gray-500 whitespace-nowrap">${fmtDate(paidDate ? paidDate.substring(0,10) : null)}</td>
+    <td class="px-4 py-3.5 text-[0.83rem] font-semibold text-gray-800 text-right whitespace-nowrap">${fmtBRL(p.value)}</td>
+    <td class="px-4 py-3.5 text-center whitespace-nowrap">${pontBadge(pont)}</td>
+    <td class="px-4 py-3.5 text-center whitespace-nowrap">${statusBadge(st)}</td>
+    <td class="px-4 py-3.5 text-center whitespace-nowrap">${actionBtn(p, st)}</td>
+  </tr>`;
+}
+
+function renderMobileCard(p) {
+  const st   = resolveStatus(p);
+  const pont = resolvePontualidade(p);
+  const desc = p.description || 'Mensalidade Vitta Sistemas';
+  const url  = p.invoiceUrl || p.bankSlipUrl;
+  const paidDate = p.paymentDate || p.clientPaymentDate;
+  const bgMap = { pago:'bg-green-100', vencido:'bg-red-50', avencer:'bg-amber-50', reembolsado:'bg-gray-100', cancelado:'bg-gray-100' };
+  const icMap = { pago:'text-green-600', vencido:'text-red-500', avencer:'text-amber-500', reembolsado:'text-gray-400', cancelado:'text-gray-400' };
+  return `<div class="px-4 py-4">
+    <div class="flex items-start gap-3">
+      <div class="w-10 h-10 rounded-xl ${bgMap[st] || 'bg-gray-100'} flex items-center justify-center shrink-0 mt-0.5">
+        <svg class="w-5 h-5 ${icMap[st] || 'text-gray-400'}" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>
+      </div>
+      <div class="flex-1 min-w-0">
+        <p class="text-sm font-semibold text-gray-800 truncate">${desc}</p>
+        <div class="flex items-center gap-2 mt-1 flex-wrap">
+          <span class="text-xs text-gray-500">Venc. ${fmtDate(p.dueDate)}</span>
+          ${paidDate ? `<span class="text-xs text-gray-400">· Pago ${fmtDate(paidDate.substring(0,10))}</span>` : ''}
+        </div>
+        <div class="flex items-center gap-2 mt-1.5 flex-wrap">
+          ${statusBadge(st)}
+          ${pont ? pontBadge(pont) : ''}
+        </div>
+      </div>
+      <div class="text-right shrink-0">
+        <p class="text-sm font-bold text-gray-800">${fmtBRL(p.value)}</p>
+        ${url ? `<a href="${url}" target="_blank" rel="noopener" class="text-[0.7rem] font-semibold ${st === 'pago' ? 'text-gray-500' : 'text-vitta-600'} hover:underline mt-1 inline-block">
+          ${st === 'pago' ? 'Comprovante' : 'Ver boleto'} ↗</a>` : ''}
+      </div>
+    </div>
+  </div>`;
+}
+
+/* ═══════════════════════════════════════════
+   FILTROS
+═══════════════════════════════════════════ */
+function applyFilters() {
+  const q      = document.getElementById('filter-search').value.trim().toLowerCase();
+  const stFilt = document.getElementById('filter-status').value;
+  const pontFilt = document.getElementById('filter-pont').value;
+
+  const filtered = allPayments.filter(p => {
+    const st   = resolveStatus(p);
+    const pont = resolvePontualidade(p);
+    const desc = (p.description || 'Mensalidade Vitta Sistemas').toLowerCase();
+    if (q && !desc.includes(q)) return false;
+    if (stFilt && st !== stFilt) return false;
+    if (pontFilt && (!pont || pont.tipo !== pontFilt)) return false;
+    return true;
+  });
+
+  const countEl = document.getElementById('filter-count');
+  countEl.textContent = `${filtered.length} fatura${filtered.length !== 1 ? 's' : ''}`;
+
+  const noFilter = document.getElementById('no-filter-area');
+  const tableWrap = document.getElementById('table-wrap');
+
+  if (!filtered.length) {
+    tableWrap.classList.add('hidden');
+    noFilter.classList.remove('hidden');
+    return;
+  }
+
+  noFilter.classList.add('hidden');
+  tableWrap.classList.remove('hidden');
+  document.getElementById('table-body').innerHTML  = filtered.map(renderRow).join('');
+  document.getElementById('mobile-list').innerHTML = filtered.map(renderMobileCard).join('');
+}
+
+function clearFilters() {
+  document.getElementById('filter-search').value  = '';
+  document.getElementById('filter-status').value  = '';
+  document.getElementById('filter-pont').value    = '';
+  applyFilters();
+}
+
+/* ═══════════════════════════════════════════
+   STATS
+═══════════════════════════════════════════ */
+function updateStats(payments) {
+  const pagas    = payments.filter(p => resolveStatus(p) === 'pago');
+  const vencidas = payments.filter(p => resolveStatus(p) === 'vencido');
+  const sum      = arr => arr.reduce((a, p) => a + (p.value || 0), 0);
+
+  const noprazo    = pagas.filter(p => { const pt = resolvePontualidade(p); return pt && pt.tipo === 'noprazo'; });
+  const atraso     = pagas.filter(p => { const pt = resolvePontualidade(p); return pt && pt.tipo === 'atraso'; });
+  const antecipado = pagas.filter(p => { const pt = resolvePontualidade(p); return pt && pt.tipo === 'antecipado'; });
+
+  document.getElementById('stat-total').textContent        = payments.length;
+  document.getElementById('stat-total-pago').textContent   = pagas.length ? fmtBRL(sum(pagas)) : '—';
+  document.getElementById('stat-total-pago-count').textContent = pagas.length ? `${pagas.length} fatura${pagas.length !== 1 ? 's' : ''}` : '—';
+
+  document.getElementById('stat-noprazo').textContent      = noprazo.length;
+  document.getElementById('stat-noprazo-val').textContent  = noprazo.length ? fmtBRL(sum(noprazo)) : '—';
+
+  document.getElementById('stat-atraso').textContent       = atraso.length;
+  document.getElementById('stat-atraso-val').textContent   = atraso.length ? fmtBRL(sum(atraso)) : '—';
+
+  document.getElementById('stat-antecipado').textContent   = antecipado.length;
+  document.getElementById('stat-antecipado-val').textContent = antecipado.length ? fmtBRL(sum(antecipado)) : '—';
+
+  document.getElementById('stat-vencidas').textContent     = vencidas.length;
+  document.getElementById('stat-vencidas-val').textContent = vencidas.length ? fmtBRL(sum(vencidas)) : '—';
+}
+
+/* ═══════════════════════════════════════════
+   CARD DA EMPRESA
+═══════════════════════════════════════════ */
+function renderCompanyCard(emp) {
+  const ini = initials(emp.NOME_EMP);
+
+  document.getElementById('company-logo').className =
+    `w-16 h-16 rounded-2xl flex items-center justify-center text-white text-2xl font-bold shrink-0 overflow-hidden ${avColor(emp.NOME_EMP)}`;
+  document.getElementById('company-ini').textContent = ini;
+
+  if (emp.LOGO_EMP) {
+    const img = document.getElementById('company-img');
+    img.src = emp.LOGO_EMP;
+    img.classList.remove('hidden');
+    document.getElementById('company-ini').classList.add('hidden');
+    img.onerror = () => { img.classList.add('hidden'); document.getElementById('company-ini').classList.remove('hidden'); };
+  }
+
+  document.getElementById('company-name').textContent = emp.NOME_EMP;
+  document.getElementById('company-cnpj').textContent = emp.CNPJ_EMP ? fmtCnpj(emp.CNPJ_EMP) : 'CNPJ não informado';
+  document.getElementById('company-status').innerHTML = emp.ATIVO_EMP
+    ? `<span class="text-xs font-bold bg-green-100 text-green-700 px-2 py-0.5 rounded-full">Ativa</span>`
+    : `<span class="text-xs font-bold bg-gray-100 text-gray-500 px-2 py-0.5 rounded-full">Inativa</span>`;
+
+  if (emp.PLANO?.NOME_PLANO) {
+    document.getElementById('company-plano-badge').innerHTML =
+      `<span class="inline-flex items-center gap-1 text-xs font-semibold bg-vitta-50 text-vitta-700 border border-vitta-100 px-2.5 py-1 rounded-full">${emp.PLANO.NOME_PLANO}</span>`;
+  }
+
+  document.getElementById('company-card').classList.remove('hidden');
+
+  document.getElementById('page-title').textContent = emp.NOME_EMP;
+  document.getElementById('page-subtitle').textContent = 'Histórico financeiro e faturas da empresa';
+  document.getElementById('header-empresa').textContent = emp.NOME_EMP;
+}
+
+/* ═══════════════════════════════════════════
+   CARREGAR DADOS
+═══════════════════════════════════════════ */
+async function loadFaturas() {
+  if (!empresaId) {
+    document.getElementById('loader').classList.add('hidden');
+    document.getElementById('error-msg').textContent = 'ID da empresa não informado na URL.';
+    document.getElementById('error-area').classList.remove('hidden');
+    return;
+  }
+
+  document.getElementById('loader').classList.remove('hidden');
+  document.getElementById('error-area').classList.add('hidden');
+  document.getElementById('empty-area').classList.add('hidden');
+  document.getElementById('no-filter-area').classList.add('hidden');
+  document.getElementById('table-wrap').classList.add('hidden');
+
+  try {
+    const { data: { session } } = await supabase.auth.getSession();
+    if (!session) { window.location.href = '../index.html'; return; }
+
+    // Carrega dados da empresa
+    const { data: emp, error: empErr } = await supabase
+      .from('EMPRESA')
+      .select('ID_EMP,NOME_EMP,CNPJ_EMP,EMAIL_EMP,TEL_EMP,LOGO_EMP,ATIVO_EMP,DTCRI_EMP,ID_PLANO,PLANO(NOME_PLANO)')
+      .eq('ID_EMP', empresaId)
+      .single();
+
+    if (empErr) console.warn('Erro ao carregar empresa:', empErr.message);
+
+    if (emp) {
+      empresa = emp;
+      renderCompanyCard(emp);
+    }
+
+    // Busca faturas via edge function
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(), 20000);
+
+    let resp, data;
+    try {
+      resp = await fetch(
+        `${SUPABASE_URL}/functions/v1/buscar-faturas?empresa_id=${empresaId}`,
+        {
+          method: 'GET',
+          headers: { 'Authorization': `Bearer ${session.access_token}` },
+          signal: controller.signal,
+        }
+      );
+      clearTimeout(timer);
+      data = await resp.json();
+    } catch (fetchErr) {
+      clearTimeout(timer);
+      const msg = fetchErr.name === 'AbortError'
+        ? 'Tempo limite excedido. O servidor demorou muito para responder.'
+        : `Erro de rede: ${fetchErr.message}`;
+      throw new Error(msg);
+    }
+
+    document.getElementById('loader').classList.add('hidden');
+
+    if (!resp.ok || !data.sucesso) {
+      document.getElementById('error-msg').textContent =
+        data.erro || `Erro ${resp.status}: não foi possível buscar as faturas.`;
+      document.getElementById('error-area').classList.remove('hidden');
+      return;
+    }
+
+    const payments = data.payments || [];
+    allPayments = payments;
+
+    if (data.plano?.preco && empresa) {
+      document.getElementById('company-preco').textContent = `${fmtBRL(data.plano.preco)}/mês`;
+    }
+
+    if (!payments.length) {
+      document.getElementById('empty-area').classList.remove('hidden');
+      updateStats([]);
+      return;
+    }
+
+    updateStats(payments);
+    applyFilters();
+
+  } catch (err) {
+    document.getElementById('loader').classList.add('hidden');
+    document.getElementById('error-msg').textContent = err.message || 'Erro ao conectar.';
+    document.getElementById('error-area').classList.remove('hidden');
+  }
+}
+
+/* ═══════════════════════════════════════════
+   NOTAS FISCAIS
+═══════════════════════════════════════════ */
+function fmtSize(bytes) {
+  if (!bytes) return '';
+  if (bytes < 1024) return bytes + ' B';
+  if (bytes < 1048576) return (bytes/1024).toFixed(0) + ' KB';
+  return (bytes/1048576).toFixed(1) + ' MB';
+}
+
+function fmtMesRef(dateStr) {
+  if (!dateStr) return '—';
+  const [y, m] = dateStr.split('-');
+  const MESES = ['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'];
+  return `${MESES[parseInt(m,10)-1]}/${y}`;
+}
+
+function showNfToast(msg, type='success') {
+  const el  = document.getElementById('nf-toast');
+  const box = document.getElementById('nf-toast-msg');
+  document.getElementById('nf-toast-text').textContent = msg;
+  document.getElementById('nf-toast-icon').textContent = type==='success'?'✓':'✕';
+  box.className = `flex items-center gap-3 px-4 py-3 rounded-xl shadow-lg text-sm font-semibold text-white min-w-[260px] ${type==='success'?'bg-green-600':'bg-red-500'}`;
+  el.classList.remove('hidden');
+  setTimeout(() => el.classList.add('hidden'), 3500);
+}
+
+function openNfModal() {
+  if (!empresa) { showNfToast('Aguarde o carregamento dos dados da empresa.', 'error'); return; }
+  document.getElementById('nf-company-ini').textContent = initials(empresa.NOME_EMP);
+  document.getElementById('nf-company-name').textContent = empresa.NOME_EMP;
+  document.getElementById('nf-mes').value = '';
+  clearNfFile();
+  document.getElementById('nfModal').classList.add('open');
+}
+function closeNfModal() { document.getElementById('nfModal').classList.remove('open'); }
+
+function onNfDrop(e) {
+  e.preventDefault();
+  document.getElementById('nf-drop-zone').classList.remove('border-vitta-500','bg-vitta-50');
+  const file = e.dataTransfer.files[0];
+  if (file) onNfFileSelected(file);
+}
+function onNfFileSelected(file) {
+  if (!file) return;
+  if (file.type !== 'application/pdf') { showNfToast('Selecione um arquivo PDF.', 'error'); return; }
+  const maxBytes = 15 * 1024 * 1024;
+  if (file.size > maxBytes) { showNfToast('Arquivo muito grande. Máximo 15MB.', 'error'); return; }
+  nfSelectedFile = file;
+  document.getElementById('nf-file-name').textContent = file.name;
+  document.getElementById('nf-file-size').textContent = fmtSize(file.size);
+  document.getElementById('nf-file-preview').classList.remove('hidden');
+}
+function clearNfFile() {
+  nfSelectedFile = null;
+  document.getElementById('nf-file-input').value = '';
+  document.getElementById('nf-file-preview').classList.add('hidden');
+}
+
+async function salvarNf() {
+  if (!empresaId) return;
+  const mes = document.getElementById('nf-mes').value;
+  if (!mes) { showNfToast('Informe o mês de referência.', 'error'); return; }
+  if (!nfSelectedFile) { showNfToast('Selecione o arquivo PDF.', 'error'); return; }
+
+  const btn = document.getElementById('btnSaveNf');
+  btn.disabled = true;
+  document.getElementById('nfSaveSpin').classList.remove('hidden');
+  document.getElementById('nfSaveTxt').textContent = 'Enviando...';
+
+  try {
+    const path = `${empresaId}/${Date.now()}_${nfSelectedFile.name.replace(/[^a-zA-Z0-9._-]/g,'_')}`;
+    const { error: storErr } = await supabase.storage.from('notas-fiscais').upload(path, nfSelectedFile, { upsert: false });
+    if (storErr) throw new Error('Erro no upload: ' + storErr.message);
+
+    const { error: dbErr } = await supabase.from('NOTA_FISCAL_EMPRESA').insert({
+      ID_EMP:         empresaId,
+      MES_REFERENCIA: `${mes}-01`,
+      NOME_ARQUIVO:   nfSelectedFile.name,
+      STORAGE_PATH:   path,
+      TAMANHO_BYTES:  nfSelectedFile.size,
+      CRIADO_POR:     currentUserId,
+    });
+
+    if (dbErr) {
+      await supabase.storage.from('notas-fiscais').remove([path]);
+      throw new Error('Erro ao salvar no banco: ' + dbErr.message);
+    }
+
+    showNfToast('Nota fiscal anexada com sucesso!');
+    closeNfModal();
+    await loadNotasFiscais();
+  } catch (e) {
+    showNfToast(e.message || 'Erro inesperado.', 'error');
+  } finally {
+    btn.disabled = false;
+    document.getElementById('nfSaveSpin').classList.add('hidden');
+    document.getElementById('nfSaveTxt').textContent = 'Salvar';
+  }
+}
+
+async function loadNotasFiscais() {
+  if (!empresaId) return;
+  document.getElementById('nf-loader').classList.remove('hidden');
+  document.getElementById('nf-empty').classList.add('hidden');
+  document.getElementById('nf-table-wrap').classList.add('hidden');
+
+  const { data, error } = await supabase
+    .from('NOTA_FISCAL_EMPRESA')
+    .select('ID_NF,MES_REFERENCIA,NOME_ARQUIVO,STORAGE_PATH,TAMANHO_BYTES,CRIADO_EM')
+    .eq('ID_EMP', empresaId)
+    .order('MES_REFERENCIA', { ascending: false });
+
+  document.getElementById('nf-loader').classList.add('hidden');
+
+  if (error) { showNfToast('Erro ao carregar notas fiscais.', 'error'); return; }
+  notasFiscais = data || [];
+  renderNf();
+}
+
+function renderNf() {
+  if (!notasFiscais.length) {
+    document.getElementById('nf-table-wrap').classList.add('hidden');
+    document.getElementById('nf-empty').classList.remove('hidden');
+    return;
+  }
+  document.getElementById('nf-empty').classList.add('hidden');
+  document.getElementById('nf-table-wrap').classList.remove('hidden');
+
+  document.getElementById('nf-table-body').innerHTML = notasFiscais.map(nf => `
+    <tr>
+      <td class="px-5 py-3.5">
+        <div class="flex items-center gap-3">
+          <div class="w-9 h-9 rounded-lg bg-red-500 flex items-center justify-center text-white text-[0.6rem] font-bold shrink-0">PDF</div>
+          <div>
+            <p class="text-[0.84rem] font-semibold text-gray-800 leading-tight">${nf.NOME_ARQUIVO}</p>
+            <p class="text-[0.68rem] text-gray-400 mt-0.5">${fmtSize(nf.TAMANHO_BYTES)}</p>
+          </div>
+        </div>
+      </td>
+      <td class="px-4 py-3.5 text-[0.82rem] text-gray-700 whitespace-nowrap">${fmtMesRef(nf.MES_REFERENCIA)}</td>
+      <td class="px-4 py-3.5 text-[0.82rem] text-gray-500 whitespace-nowrap">${fmtDate(nf.CRIADO_EM ? nf.CRIADO_EM.substring(0,10) : null)}</td>
+      <td class="px-4 py-3.5">
+        <div class="flex items-center gap-1.5 justify-end">
+          <button onclick="viewNf('${nf.STORAGE_PATH}')" title="Visualizar"
+                  class="w-8 h-8 flex items-center justify-center rounded-lg border border-gray-200 hover:border-vitta-400 hover:bg-vitta-50 text-gray-400 hover:text-vitta-600 transition-colors">
+            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+          </button>
+          <button onclick="downloadNf('${nf.STORAGE_PATH}','${(nf.NOME_ARQUIVO||'').replace(/'/g,"\\'")}')" title="Baixar"
+                  class="w-8 h-8 flex items-center justify-center rounded-lg border border-gray-200 hover:border-blue-400 hover:bg-blue-50 text-gray-400 hover:text-blue-600 transition-colors">
+            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+          </button>
+          <button onclick="openDeleteNfModal('${nf.ID_NF}','${(nf.NOME_ARQUIVO||'').replace(/'/g,"\\'")}','${nf.STORAGE_PATH}')" title="Excluir"
+                  class="w-8 h-8 flex items-center justify-center rounded-lg border border-gray-200 hover:border-red-400 hover:bg-red-50 text-gray-400 hover:text-red-500 transition-colors">
+            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4h6v2"/></svg>
+          </button>
+        </div>
+      </td>
+    </tr>`).join('');
+}
+
+async function viewNf(path) {
+  try {
+    const { data, error } = await supabase.storage.from('notas-fiscais').createSignedUrl(path, 300);
+    if (error) throw error;
+    window.open(data.signedUrl, '_blank');
+  } catch (e) {
+    showNfToast('Não foi possível abrir o arquivo.', 'error');
+  }
+}
+async function downloadNf(path, nome) {
+  try {
+    const { data, error } = await supabase.storage.from('notas-fiscais').download(path);
+    if (error) throw error;
+    const url = URL.createObjectURL(data);
+    const a = document.createElement('a');
+    a.href = url; a.download = nome; a.click();
+    URL.revokeObjectURL(url);
+  } catch (e) {
+    showNfToast('Não foi possível baixar o arquivo.', 'error');
+  }
+}
+
+function openDeleteNfModal(id, nome, storagePath) {
+  deleteNfTarget = id;
+  deleteNfStoragePath = storagePath;
+  document.getElementById('deleteNfNome').textContent = nome;
+  document.getElementById('deleteNfModal').classList.add('open');
+}
+function closeDeleteNfModal() {
+  document.getElementById('deleteNfModal').classList.remove('open');
+  deleteNfTarget = null; deleteNfStoragePath = null;
+}
+async function confirmDeleteNf() {
+  if (!deleteNfTarget) return;
+  document.getElementById('deleteNfSpin').classList.remove('hidden');
+  document.getElementById('btnDeleteNfConfirm').disabled = true;
+  try {
+    if (deleteNfStoragePath) {
+      await supabase.storage.from('notas-fiscais').remove([deleteNfStoragePath]);
+    }
+    const { error } = await supabase.from('NOTA_FISCAL_EMPRESA').delete().eq('ID_NF', deleteNfTarget);
+    if (error) throw error;
+    showNfToast('Nota fiscal excluída com sucesso!');
+    closeDeleteNfModal();
+    await loadNotasFiscais();
+  } catch (e) {
+    showNfToast('Erro ao excluir nota fiscal.', 'error');
+  } finally {
+    document.getElementById('deleteNfSpin').classList.add('hidden');
+    document.getElementById('btnDeleteNfConfirm').disabled = false;
+  }
+}
+
+/* ═══════════════════════════════════════════
+   AUTENTICAÇÃO — somente ADMIN_GLOBAL
+═══════════════════════════════════════════ */
+async function initAuth() {
+  const { data: { session } } = await supabase.auth.getSession();
+  if (!session) { window.location.href = '../index.html'; return false; }
+
+  currentUserId = session.user.id;
+
+  const u = await getUsuarioAtual('NOME_USU,TIPO_USU,ATIVO_USU,PROF_USU', session);
+
+  if (!u || !u.ATIVO_USU) { await supabase.auth.signOut(); window.location.href = '../index.html'; return false; }
+  if (u.TIPO_USU !== 'ADMIN_GLOBAL') { window.location.href = 'dashboard.html'; return false; }
+
+  const nome = u.NOME_USU || session.user.email;
+  const ini  = initials(nome);
+  ['user-name','header-user-name'].forEach(id => document.getElementById(id).textContent = nome);
+  ['user-role','header-user-role'].forEach(id => document.getElementById(id).textContent = 'Admin Global');
+  ['user-avatar','header-avatar'].forEach(id => document.getElementById(id).textContent = ini);
+  if (!u.PROF_USU) document.querySelector('a[href="consultas.html"]')?.classList.add('hidden');
+  return true;
+}
+
+async function handleLogout() { await supabase.auth.signOut(); window.location.href = '../index.html'; }
+
+/* ═══════════════════════════════════════════
+   SIDEBAR
+═══════════════════════════════════════════ */
+function toggleMenu(key) {
+  const sub  = document.getElementById('sub-' + key);
+  const chev = document.getElementById('chev-' + key);
+  if (!sub) return;
+  const open = sub.classList.contains('open');
+  sub.classList.toggle('open', !open);
+  if (chev) chev.classList.toggle('open', !open);
+}
+
+function toggleSidebar() {
+  const sb  = document.getElementById('sidebar');
+  const ov  = document.getElementById('overlay');
+  const open = sb.classList.contains('-translate-x-full');
+  sb.classList.toggle('-translate-x-full', !open);
+  ov.classList.toggle('hidden', !open);
+}
+
+document.querySelectorAll('#sidebar nav a').forEach(link => {
+  link.addEventListener('click', () => {
+    const sb = document.getElementById('sidebar');
+    const ov = document.getElementById('overlay');
+    if (sb && !sb.classList.contains('-translate-x-full')) {
+      sb.classList.add('-translate-x-full');
+      ov?.classList.add('hidden');
+    }
+  });
+});
+
+/* ═══════════════════════════════════════════
+   FILTROS — LISTENERS
+═══════════════════════════════════════════ */
+document.getElementById('filter-search').addEventListener('input', applyFilters);
+document.getElementById('filter-status').addEventListener('change', applyFilters);
+document.getElementById('filter-pont').addEventListener('change', applyFilters);
+
+/* ═══════════════════════════════════════════
+   INICIALIZAÇÃO
+═══════════════════════════════════════════ */
+(async () => {
+  const ok = await initAuth();
+  if (ok) {
+    await loadFaturas();
+    await loadNotasFiscais();
+  }
+})();
+</script>
+<script>
+(async () => {
+  try {
+    const { data: { session } } = await supabase.auth.getSession();
+    if (!session) return;
+    const u = await getUsuarioAtual('TIPO_USU,ID_EMP', session);
+    if (u && u.ID_EMP === '22ff26b9-3839-45ed-8a1d-df4a488d3aab' && ['ADMIN_EMPRESA','SECRETARIA'].includes(u.TIPO_USU)) {
+      document.getElementById('menuDocumentosWrap')?.classList.remove('hidden');
+    }
+  } catch (_) {}
+})();
+</script>
+</body>
+</html>

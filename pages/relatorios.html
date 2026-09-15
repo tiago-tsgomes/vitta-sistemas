@@ -1,0 +1,1100 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>Relat&oacute;rios &mdash; Vitta Sistemas</title>
+  <link rel="icon" type="image/png" href="../img/favicon.png" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: { extend: {
+        colors: { vitta: { 50:'#f0fbfd',100:'#e0f7fa',300:'#80deea',400:'#4dd9ed',500:'#2ABCD4',600:'#1a96ac',700:'#127a8c' } },
+        fontFamily: { sans: ['Inter','system-ui','sans-serif'] }
+      }}
+    }
+  </script>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
+  <script src="../assets/js/config.js?v=2"></script>
+  <script src="../assets/js/admin-empresa-context.js?v=1"></script>
+  <script src="../assets/js/access-guard.js?v=2"></script>
+  <script src="../assets/js/notifications.js?v=3"></script>
+  <style>
+    .sidebar-nav::-webkit-scrollbar{width:3px}
+    .sidebar-nav::-webkit-scrollbar-thumb{background:rgba(255,255,255,.1);border-radius:4px}
+    .submenu{overflow:hidden;max-height:0;opacity:0;transition:max-height .25s ease,opacity .2s ease}
+    .submenu.open{max-height:500px;opacity:1}
+    .chevron{transition:transform .25s ease;display:inline-block}
+    .chevron.open{transform:rotate(180deg)}
+    .scroll-thin::-webkit-scrollbar{width:3px}
+    .scroll-thin::-webkit-scrollbar-thumb{background:#e5e7eb;border-radius:4px}
+    #toast{position:fixed;bottom:24px;right:24px;z-index:9999;transition:all .3s ease}
+    .rtab{flex:1;text-align:center;font-size:0.78rem;font-weight:600;padding:0.4rem 0.75rem;border-radius:8px;color:#6b7280;cursor:pointer;transition:all .15s;white-space:nowrap}
+    .rtab.active{background:#fff;color:#2ABCD4;box-shadow:0 1px 3px rgba(0,0,0,.08)}
+    .bar-track{background:#f3f4f6;border-radius:99px;height:8px;overflow:hidden}
+    .bar-fill{height:8px;border-radius:99px;transition:width .4s ease}
+    .btn-adobe{background:#FA0F00}
+    .btn-adobe:not(:disabled):hover{background:#D40D00}
+  </style>
+</head>
+<body class="bg-[#F0F2F5] font-sans antialiased">
+<div class="flex min-h-screen">
+
+<!-- SIDEBAR -->
+<aside id="sidebar" class="fixed inset-y-0 left-0 w-[220px] bg-[#111827] flex flex-col z-30 -translate-x-full lg:translate-x-0 transition-transform duration-300">
+  <div class="flex flex-col items-center justify-center gap-1 py-4 px-5 border-b border-white/10 shrink-0">
+    <img src="../img/logo.png" alt="Vitta Sistemas" class="h-10 w-auto brightness-0 invert" />
+    <p class="text-[0.6rem] text-gray-500 tracking-wide">v1.2.1</p>
+  </div>
+  <nav class="flex-1 overflow-y-auto sidebar-nav py-3">
+    <p class="block text-[0.6rem] font-bold text-gray-500 uppercase tracking-widest px-4 pb-1 pt-3">Principal</p>
+    <a href="dashboard.html" class="flex items-center gap-3 px-3 py-2.5 mx-2 rounded-xl text-[0.83rem] font-medium text-gray-400 hover:bg-white/10 hover:text-white transition-colors mb-0.5">
+      <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>Dashboard
+    </a>
+    <a href="agendamentos.html" class="flex items-center gap-3 px-3 py-2.5 mx-2 rounded-xl text-[0.83rem] font-medium text-gray-400 hover:bg-white/10 hover:text-white transition-colors mb-0.5">
+      <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>Agendamentos
+    </a>
+    <a href="consultas.html" class="flex items-center gap-3 px-3 py-2.5 mx-2 rounded-xl text-[0.83rem] font-medium text-gray-400 hover:bg-white/10 hover:text-white transition-colors mb-0.5">
+      <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>Consultas
+    </a>
+    <p class="block text-[0.6rem] font-bold text-gray-500 uppercase tracking-widest px-4 pb-1 pt-4">Cadastros</p>
+    <button onclick="toggleMenu('cadastros')" class="w-full flex items-center gap-3 px-3 py-2.5 mx-2 rounded-xl text-[0.83rem] font-medium text-gray-400 hover:bg-white/10 hover:text-white transition-colors mb-0.5" style="width:calc(100% - 16px)">
+      <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>Cadastros
+      <svg id="chev-cadastros" class="chevron w-3.5 h-3.5 ml-auto text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+    </button>
+    <div id="sub-cadastros" class="submenu">
+      <a href="pacientes.html" class="flex items-center gap-2 pl-10 pr-3 py-2 mx-2 rounded-xl text-[0.8rem] text-gray-500 hover:bg-white/5 hover:text-gray-300 transition-colors">Pacientes</a>
+      <a href="profissionais.html" class="flex items-center gap-2 pl-10 pr-3 py-2 mx-2 rounded-xl text-[0.8rem] text-gray-500 hover:bg-white/5 hover:text-gray-300 transition-colors">Profissionais</a>
+      <a href="usuarios-empresa.html" class="flex items-center gap-2 pl-10 pr-3 py-2 mx-2 rounded-xl text-[0.8rem] text-gray-500 hover:bg-white/5 hover:text-gray-300 transition-colors">Usu&aacute;rios</a>
+      <div class="hidden" id="menuDocumentosWrap"><a href="documentos.html" class="flex items-center gap-2 pl-10 pr-3 py-2 mx-2 rounded-xl text-[0.8rem] text-gray-500 hover:bg-white/5 hover:text-gray-300 transition-colors cursor-pointer w-full">Documentos</a></div>
+      <a href="leads.html" class="flex items-center gap-2 pl-10 pr-3 py-2 mx-2 rounded-xl text-[0.8rem] text-gray-500 hover:bg-white/5 hover:text-gray-300 transition-colors cursor-pointer">Leads</a>
+    </div>
+
+    <p class="block text-[0.6rem] font-bold text-gray-500 uppercase tracking-widest px-4 pb-1 pt-4">Outros Cadastros</p>
+    <button onclick="toggleMenu('servicos')" class="w-full flex items-center gap-3 px-3 py-2.5 mx-2 rounded-xl text-[0.83rem] font-medium text-gray-400 hover:bg-white/10 hover:text-white transition-colors duration-150 cursor-pointer mb-0.5" style="width:calc(100% - 16px)">
+      <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>Outros Cadastros
+      <svg id="chev-servicos" class="chevron w-3.5 h-3.5 ml-auto text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+    </button>
+    <div id="sub-servicos" class="submenu">
+      <a href="servicos.html" class="flex items-center gap-2 pl-10 pr-3 py-2 mx-2 rounded-xl text-[0.8rem] text-gray-500 hover:bg-white/5 hover:text-gray-300 transition-colors cursor-pointer">Serviços</a>
+      <a href="salas.html" class="flex items-center gap-2 pl-10 pr-3 py-2 mx-2 rounded-xl text-[0.8rem] text-gray-500 hover:bg-white/5 hover:text-gray-300 transition-colors cursor-pointer">Salas</a>
+      <a href="especialidades.html" class="flex items-center gap-2 pl-10 pr-3 py-2 mx-2 rounded-xl text-[0.8rem] text-gray-500 hover:bg-white/5 hover:text-gray-300 transition-colors cursor-pointer">Especialidades</a>
+      <a href="grupo.html" class="flex items-center gap-2 pl-10 pr-3 py-2 mx-2 rounded-xl text-[0.8rem] text-gray-500 hover:bg-white/5 hover:text-gray-300 transition-colors cursor-pointer">Grupo</a>
+      <a href="tipospagamento.html" class="flex items-center gap-2 pl-10 pr-3 py-2 mx-2 rounded-xl text-[0.8rem] text-gray-500 hover:bg-white/5 hover:text-gray-300 transition-colors cursor-pointer">Tipos de Pagamento</a>
+      <a href="tiposacompanhamento.html" class="flex items-center gap-2 pl-10 pr-3 py-2 mx-2 rounded-xl text-[0.8rem] text-gray-500 hover:bg-white/5 hover:text-gray-300 transition-colors cursor-pointer">Tipos de Acomp.</a>
+    </div>
+
+    <p class="block text-[0.6rem] font-bold text-gray-500 uppercase tracking-widest px-4 pb-1 pt-4">Financeiro</p>
+    <button onclick="toggleMenu('financeiro')" class="w-full flex items-center gap-3 px-3 py-2.5 mx-2 rounded-xl text-[0.83rem] font-medium text-vitta-400 bg-vitta-500/10 mb-0.5" style="width:calc(100% - 16px)">
+      <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>Financeiro
+      <svg id="chev-financeiro" class="chevron open w-3.5 h-3.5 ml-auto text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+    </button>
+    <div id="sub-financeiro" class="submenu open">
+      <a href="financeiro.html" class="flex items-center gap-2 pl-10 pr-3 py-2 mx-2 rounded-xl text-[0.8rem] text-gray-500 hover:bg-white/5 hover:text-gray-300 transition-colors">Lan&ccedil;amentos</a>
+      <a href="relatorios.html" class="flex items-center gap-2 pl-10 pr-3 py-2 mx-2 rounded-xl text-[0.8rem] font-semibold text-vitta-400 bg-vitta-500/10">Relat&oacute;rios</a>
+    </div>
+
+    <div id="sectionMinhaEmpresa" class="hidden">
+    <p class="block text-[0.6rem] font-bold text-gray-500 uppercase tracking-widest px-4 pb-1 pt-4">Minha Empresa</p>
+    <button onclick="toggleMenu('minhaempresa')" class="w-full flex items-center gap-3 px-3 py-2.5 mx-2 rounded-xl text-[0.83rem] font-medium text-gray-400 hover:bg-white/10 hover:text-white transition-colors duration-150 cursor-pointer mb-0.5" style="width:calc(100% - 16px)">
+      <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>Minha Empresa
+      <svg id="chev-minhaempresa" class="chevron w-3.5 h-3.5 ml-auto text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+    </button>
+    <div id="sub-minhaempresa" class="submenu">
+      <a href="minha-empresa.html" class="flex items-center gap-2 pl-10 pr-3 py-2 mx-2 rounded-xl text-[0.8rem] text-gray-500 hover:bg-white/5 hover:text-gray-300 transition-colors cursor-pointer">Meus Dados</a>
+      <a href="faturas.html" class="flex items-center gap-2 pl-10 pr-3 py-2 mx-2 rounded-xl text-[0.8rem] text-gray-500 hover:bg-white/5 hover:text-gray-300 transition-colors cursor-pointer">Minhas Faturas</a>
+    </div>
+    </div>
+    <div id="sectionVittaBI" class="hidden">
+    <p class="block text-[0.6rem] font-bold text-gray-500 uppercase tracking-widest px-4 pb-1 pt-4">Vitta BI</p>
+    <a id="linkVittaBI" href="https://bi.vittasistemas.com.br" target="_blank" rel="noopener"
+       class="flex items-center gap-3 px-3 py-2.5 mx-2 rounded-xl text-[0.83rem] font-medium text-gray-400 hover:bg-white/10 hover:text-white transition-colors duration-150 cursor-pointer mb-0.5">
+      <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+        <path d="M3 3v18h18"/><path d="M18.7 8l-5.3 5.3-3-3L4 16.3"/>
+      </svg>
+      Vitta BI
+      <span class="ml-auto text-[0.55rem] font-bold text-violet-300 bg-violet-500/20 px-1.5 py-0.5 rounded">BI</span>
+    </a>
+    </div>
+
+    <div id="sectionAdmin" class="hidden">
+      <p class="block text-[0.6rem] font-bold text-gray-500 uppercase tracking-widest px-4 pb-1 pt-4">Sistema</p>
+      <button onclick="toggleMenu('admin')" class="w-full flex items-center gap-3 px-3 py-2.5 mx-2 rounded-xl text-[0.83rem] font-medium text-gray-400 hover:bg-white/10 hover:text-white transition-colors mb-0.5" style="width:calc(100% - 16px)">
+        <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14M4.93 4.93a10 10 0 0 0 0 14.14"/></svg>Administra&ccedil;&atilde;o
+        <svg id="chev-admin" class="chevron w-3.5 h-3.5 ml-auto text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+      </button>
+      <div id="sub-admin" class="submenu">
+        <a href="empresas.html" class="flex items-center gap-2 pl-10 pr-3 py-2 mx-2 rounded-xl text-[0.8rem] text-gray-500 hover:bg-white/5 hover:text-gray-300 transition-colors">Empresas</a>
+        <a href="usuarios.html" class="flex items-center gap-2 pl-10 pr-3 py-2 mx-2 rounded-xl text-[0.8rem] text-gray-500 hover:bg-white/5 hover:text-gray-300 transition-colors">Usu&aacute;rios Admin</a>
+      <a href="planos.html" class="flex items-center gap-2 pl-10 pr-3 py-2 mx-2 rounded-xl text-[0.8rem] text-gray-500 hover:bg-white/5 hover:text-gray-300 transition-colors cursor-pointer">Planos</a>
+        <a href="configuracoes.html" class="flex items-center gap-2 pl-10 pr-3 py-2 mx-2 rounded-xl text-[0.8rem] text-gray-500 hover:bg-white/5 hover:text-gray-300 transition-colors">Configura&ccedil;&otilde;es</a>
+        <a href="logs.html" class="flex items-center gap-2 pl-10 pr-3 py-2 mx-2 rounded-xl text-[0.8rem] text-gray-500 hover:bg-white/5 hover:text-gray-300 transition-colors cursor-pointer">Log</a>
+      </div>
+    </div>
+    <div class="h-4"></div>
+  </nav>
+  <div class="shrink-0 border-t border-white/10 p-3">
+    <div class="group flex items-center gap-2.5 p-2.5 rounded-xl hover:bg-white/5 cursor-pointer">
+      <div id="user-avatar" class="w-8 h-8 rounded-full bg-vitta-500 flex items-center justify-center text-white text-xs font-bold shrink-0">A</div>
+      <div class="flex-1 min-w-0">
+        <p id="user-name" class="text-white text-[0.8rem] font-semibold truncate">Usu&aacute;rio</p>
+        <p id="user-role" class="text-gray-500 text-[0.7rem] truncate">Admin</p>
+      </div>
+      <button onclick="handleLogout()" title="Sair" class="text-gray-600 hover:text-red-400 transition-colors opacity-0 group-hover:opacity-100">
+        <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+      </button>
+    </div>
+  </div>
+</aside>
+
+<div id="overlay" class="fixed inset-0 bg-black/50 z-20 hidden lg:hidden" onclick="toggleSidebar()"></div>
+
+<div class="flex-1 lg:ml-[220px] flex flex-col min-h-screen">
+  <header class="sticky top-0 z-20 h-16 bg-white border-b border-gray-200 flex items-center px-5 gap-3 shadow-sm">
+    <button onclick="toggleSidebar()" class="lg:hidden p-2 rounded-lg hover:bg-gray-100 text-gray-500">
+      <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+    </button>
+    <div class="flex-1">
+      <h1 class="text-[1rem] font-bold text-gray-800 leading-tight">Relat&oacute;rios</h1>
+      <p id="header-date" class="text-[0.7rem] text-gray-400 leading-tight"></p>
+    </div>
+    <div class="hidden md:flex items-center gap-2 px-3 py-2 bg-gray-50 border border-gray-200 rounded-xl">
+      <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-vitta-500 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+      <span id="empresa-nome" class="text-[0.78rem] font-semibold text-gray-700">Cl&iacute;nica</span>
+    </div>
+    <div class="flex items-center gap-2.5">
+      <div id="header-avatar" class="w-9 h-9 rounded-full bg-vitta-500 flex items-center justify-center text-white text-sm font-bold shrink-0">A</div>
+      <div class="hidden sm:block">
+        <p id="header-user-name" class="text-[0.8rem] font-semibold text-gray-800 leading-tight">Usu&aacute;rio</p>
+        <p id="header-user-role" class="text-[0.7rem] text-gray-400 leading-tight"></p>
+      </div>
+    </div>
+    <button onclick="handleLogout()" class="p-2.5 rounded-xl hover:bg-red-50 text-gray-400 hover:text-red-500 transition-colors" title="Sair">
+      <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+    </button>
+  </header>
+
+  <main class="flex-1 p-5 lg:p-6">
+
+    <!-- FILTROS -->
+    <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-4 mb-5">
+      <div class="flex flex-wrap gap-3 items-end">
+        <div>
+          <label class="block text-[0.7rem] font-semibold text-gray-400 uppercase tracking-wider mb-1">Per&iacute;odo</label>
+          <div class="flex items-center gap-2">
+            <input type="date" id="rDtDe" class="py-2 px-3 text-sm border border-gray-200 rounded-xl outline-none focus:border-vitta-500 bg-white text-gray-700"/>
+            <span class="text-gray-400 text-sm">até</span>
+            <input type="date" id="rDtAte" class="py-2 px-3 text-sm border border-gray-200 rounded-xl outline-none focus:border-vitta-500 bg-white text-gray-700"/>
+          </div>
+        </div>
+        <div>
+          <label class="block text-[0.7rem] font-semibold text-gray-400 uppercase tracking-wider mb-1">Profissional</label>
+          <select id="rProf" class="py-2 px-3 text-sm border border-gray-200 rounded-xl outline-none focus:border-vitta-500 bg-white text-gray-700 min-w-[180px]">
+            <option value="">Todos os profissionais</option>
+          </select>
+        </div>
+        <button id="btnRelatorioPdf" onclick="gerarRelatorioPdfProfissional()" disabled
+                title="Selecione um profissional espec&iacute;fico no filtro para gerar o relat&oacute;rio em PDF"
+                class="btn-adobe flex items-center gap-2 px-4 py-2 text-white text-sm font-semibold rounded-xl shadow-sm transition-colors disabled:opacity-40 disabled:cursor-not-allowed disabled:shadow-none">
+          <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="9" y1="13" x2="15" y2="13"/><line x1="9" y1="17" x2="13" y2="17"/></svg>
+          Relat&oacute;rio em PDF
+        </button>
+      </div>
+    </div>
+
+    <!-- KPI CARDS -->
+    <div class="grid grid-cols-2 lg:grid-cols-3 gap-4 mb-5">
+      <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-4">
+        <div class="flex items-center gap-3 mb-2">
+          <div class="w-9 h-9 rounded-xl bg-indigo-100 flex items-center justify-center">
+            <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-indigo-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+          </div>
+          <p class="text-[0.7rem] font-semibold text-gray-400 uppercase tracking-wider">Consultas</p>
+        </div>
+        <p id="kpiTotalAgds" class="text-2xl font-extrabold text-gray-800">—</p>
+        <p class="text-[0.72rem] text-gray-400 mt-1">agendamentos no per&iacute;odo</p>
+      </div>
+      <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-4">
+        <div class="flex items-center gap-3 mb-2">
+          <div class="w-9 h-9 rounded-xl bg-vitta-100 flex items-center justify-center">
+            <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-vitta-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+          </div>
+          <p class="text-[0.7rem] font-semibold text-gray-400 uppercase tracking-wider">Realizadas</p>
+        </div>
+        <p id="kpiRealizadas" class="text-2xl font-extrabold text-gray-800">—</p>
+        <p id="kpiFaltas" class="text-[0.72rem] text-red-400 mt-1 font-medium">—</p>
+      </div>
+      <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-4">
+        <div class="flex items-center gap-3 mb-2">
+          <div class="w-9 h-9 rounded-xl bg-blue-100 flex items-center justify-center">
+            <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+          </div>
+          <p class="text-[0.7rem] font-semibold text-gray-400 uppercase tracking-wider">Taxa Atend.</p>
+        </div>
+        <p id="kpiTaxa" class="text-2xl font-extrabold text-gray-800">—</p>
+        <p class="text-[0.72rem] text-gray-400 mt-1">realizadas sobre atendidas</p>
+      </div>
+      <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-4">
+        <div class="flex items-center gap-3 mb-2">
+          <div class="w-9 h-9 rounded-xl bg-emerald-100 flex items-center justify-center">
+            <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-emerald-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+          </div>
+          <p class="text-[0.7rem] font-semibold text-gray-400 uppercase tracking-wider">Total Recebido</p>
+        </div>
+        <p id="kpiRecebido" class="text-2xl font-extrabold text-gray-800">—</p>
+        <p id="kpiPendente" class="text-[0.72rem] text-amber-500 mt-1 font-medium"></p>
+        <p id="kpiEstornado" class="text-[0.72rem] text-red-500 mt-0.5 font-medium"></p>
+      </div>
+      <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-4">
+        <div class="flex items-center gap-3 mb-2">
+          <div class="w-9 h-9 rounded-xl bg-rose-100 flex items-center justify-center">
+            <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-rose-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><line x1="19" y1="5" x2="5" y2="19"/><circle cx="6.5" cy="6.5" r="2.5"/><circle cx="17.5" cy="17.5" r="2.5"/></svg>
+          </div>
+          <p class="text-[0.7rem] font-semibold text-gray-400 uppercase tracking-wider">Repasse &agrave; Cl&iacute;nica</p>
+        </div>
+        <p id="kpiRepasse" class="text-2xl font-extrabold text-gray-800">—</p>
+        <p class="text-[0.72rem] text-gray-400 mt-1">% cadastrado por profissional</p>
+      </div>
+      <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-4">
+        <div class="flex items-center gap-3 mb-2">
+          <div class="w-9 h-9 rounded-xl bg-teal-100 flex items-center justify-center">
+            <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-teal-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M20 12V8H6a2 2 0 0 1-2-2c0-1.1.9-2 2-2h12v4"/><path d="M4 6v12c0 1.1.9 2 2 2h14v-4"/><path d="M18 12a2 2 0 0 0 0 4h4v-4Z"/></svg>
+          </div>
+          <p class="text-[0.7rem] font-semibold text-gray-400 uppercase tracking-wider">L&iacute;quido Profissional</p>
+        </div>
+        <p id="kpiLiquido" class="text-2xl font-extrabold text-gray-800">—</p>
+        <p class="text-[0.72rem] text-gray-400 mt-1">recebido menos repasse</p>
+      </div>
+    </div>
+
+    <!-- TABS -->
+    <div class="bg-gray-100 rounded-xl p-1 flex gap-1 mb-4 max-w-sm">
+      <button id="tab-financeiro" class="rtab active" onclick="setTab('financeiro')">Financeiro</button>
+      <button id="tab-atendimentos" class="rtab" onclick="setTab('atendimentos')">Atendimentos</button>
+      <button id="tab-profissionais" class="rtab" onclick="setTab('profissionais')">Profissionais</button>
+    </div>
+
+    <!-- TAB CONTENT -->
+    <div id="tabContent">
+      <p class="text-center text-[0.8rem] text-gray-400 py-16">Carregando&hellip;</p>
+    </div>
+
+  </main>
+</div>
+
+<!-- TOAST -->
+<div id="toast" class="hidden">
+  <div id="toastInner" class="flex items-center gap-3 px-4 py-3 rounded-xl shadow-lg text-sm font-medium text-white min-w-[240px]"></div>
+</div>
+
+<!-- ═══ MODAL: PREVIEW PDF ═══ -->
+<div id="modalPdfPreview" class="fixed inset-0 bg-black/60 z-[70] hidden items-center justify-center p-4" onclick="if(event.target===this)closePdfPreview()">
+  <div class="bg-white rounded-2xl w-full max-w-3xl flex flex-col shadow-2xl" style="height:90vh" onclick="event.stopPropagation()">
+    <div class="shrink-0 px-6 py-4 border-b border-gray-100 flex items-center justify-between">
+      <h3 id="pdfPreviewTitle" class="text-[0.95rem] font-bold text-gray-800">Visualizar PDF</h3>
+      <button onclick="closePdfPreview()" class="p-1.5 rounded-lg hover:bg-gray-100 text-gray-400 hover:text-gray-600 transition-colors">
+        <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+    <div class="flex-1 min-h-0 bg-gray-100">
+      <iframe id="pdfPreviewFrame" class="w-full h-full" style="border:none"></iframe>
+    </div>
+    <div class="shrink-0 px-6 py-3 border-t border-gray-100 flex items-center justify-end gap-2">
+      <button onclick="closePdfPreview()" class="px-4 py-2 rounded-xl text-sm font-semibold text-gray-500 hover:bg-gray-100 transition-colors">Fechar</button>
+      <button id="btnEnviarPdfEmail" onclick="enviarPdfPreviewPorEmail()" class="flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-semibold text-vitta-600 border border-vitta-200 hover:bg-vitta-50 transition-colors">
+        <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path d="M4 4h16v16H4z" stroke="none"/><path d="M22 6l-10 7L2 6"/><rect x="2" y="4" width="20" height="16" rx="2"/></svg>
+        Enviar por Email
+      </button>
+      <button onclick="baixarPdfPreview()" class="flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-semibold text-white bg-vitta-500 hover:bg-vitta-600 transition-colors">
+        <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+        Baixar PDF
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- ===== MODAL ENVIAR PDF POR EMAIL ===== -->
+<div id="modalEnviarEmail" class="fixed inset-0 bg-black/60 z-[80] hidden items-center justify-center p-4" onclick="if(event.target===this)fecharModalEnviarEmail()">
+  <div class="bg-white rounded-2xl w-full max-w-[420px] shadow-2xl p-6" onclick="event.stopPropagation()">
+    <div class="w-14 h-14 rounded-full bg-vitta-50 flex items-center justify-center mx-auto mb-4">
+      <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6 text-vitta-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M22 6l-10 7L2 6"/><rect x="2" y="4" width="20" height="16" rx="2"/></svg>
+    </div>
+    <h3 class="text-base font-bold text-gray-800 text-center mb-1">Enviar por Email</h3>
+    <p id="enviarEmailDocTitulo" class="text-sm text-gray-500 text-center mb-5">Documento</p>
+    <label class="block text-xs font-semibold text-gray-500 mb-1.5">Enviar para</label>
+    <input type="email" id="inputEnviarEmailDestino" placeholder="email@profissional.com"
+           class="w-full px-3.5 py-2.5 border border-gray-200 rounded-xl text-sm text-gray-800 focus:outline-none focus:ring-2 focus:ring-vitta-200 focus:border-vitta-400 mb-5" />
+    <div class="flex gap-3">
+      <button onclick="fecharModalEnviarEmail()" class="flex-1 py-2.5 border border-gray-200 rounded-xl text-sm font-semibold text-gray-600 hover:bg-gray-50 transition-colors">Cancelar</button>
+      <button onclick="confirmarEnvioPdfEmail()" id="btnConfirmarEnvioEmail"
+              class="flex-1 flex items-center justify-center gap-2 py-2.5 bg-vitta-500 hover:bg-vitta-600 text-white text-sm font-semibold rounded-xl transition-colors">
+        <svg id="enviarEmailSpin" class="hidden animate-spin w-4 h-4" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/></svg>
+        <span id="enviarEmailBtnTxt">Enviar</span>
+      </button>
+    </div>
+  </div>
+</div>
+
+<script>
+let currentUserMeta = null, currentProfId = null, allData = [], currentTab = 'financeiro', profPercMap = {};
+const STATUS_LABELS = {AGENDADO:'Agendado',CONFIRMADA:'Confirmada',SEM_VALOR:'Sem Valor',FALTA:'Falta',REALIZADA:'Realizada',FEEDBACK:'Feedback',CANCELADO:'Cancelado'};
+const STATUS_COLORS = {AGENDADO:'#3B82F6',CONFIRMADA:'#10B981',SEM_VALOR:'#F59E0B',FALTA:'#EF4444',REALIZADA:'#2ABCD4',FEEDBACK:'#EC4899',CANCELADO:'#9CA3AF'};
+const FORMA_LABELS = {PIX:'PIX',DINHEIRO:'Dinheiro',CARTAO_DEB:'Cartão Débito',CARTAO_CRED:'Cartão Crédito',TRANSF:'Transferência',OUTROS:'Outros'};
+
+function toggleMenu(k){const s=document.getElementById('sub-'+k),c=document.getElementById('chev-'+k);const o=s.classList.contains('open');s.classList.toggle('open',!o);if(c)c.classList.toggle('open',!o);}
+function toggleSidebar(){const sb=document.getElementById('sidebar'),ov=document.getElementById('overlay');const o=sb.classList.contains('-translate-x-full');sb.classList.toggle('-translate-x-full',!o);ov.classList.toggle('hidden',!o);}
+async function handleLogout(){await supabase.auth.signOut();window.location.href='../index.html';}
+function showToast(msg,ok=true){const t=document.getElementById('toast'),i=document.getElementById('toastInner');i.textContent=msg;i.className=`flex items-center gap-3 px-4 py-3 rounded-xl shadow-lg text-sm font-medium text-white min-w-[240px] ${ok?'bg-emerald-500':'bg-red-500'}`;t.classList.remove('hidden');setTimeout(()=>t.classList.add('hidden'),3500);}
+
+function fmtMoney(v){return'R$ '+(v||0).toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2});}
+function fmtDate(dt){return new Date(dt).toLocaleDateString('pt-BR');}
+
+function setTab(tab){
+  currentTab=tab;
+  ['financeiro','atendimentos','profissionais'].forEach(t=>{
+    document.getElementById('tab-'+t).classList.toggle('active',t===tab);
+  });
+  renderTab();
+}
+
+function renderTab(){
+  if(!allData.length){document.getElementById('tabContent').innerHTML='<p class="text-center text-[0.8rem] text-gray-400 py-16">Nenhum dado no período selecionado.</p>';return;}
+  if(currentTab==='financeiro')renderFinanceiro();
+  else if(currentTab==='atendimentos')renderAtendimentos();
+  else renderProfissionais();
+}
+
+function renderFinanceiro(){
+  const payments=allData.filter(a=>a.pagamento&&!a.pagamento.ESTORNADO_PGTO);
+  const estornos=allData.filter(a=>a.pagamento&&a.pagamento.ESTORNADO_PGTO);
+  const pending=allData.filter(a=>!a.pagamento||a.pagamento.ESTORNADO_PGTO);
+  const byForma={};
+  payments.forEach(a=>{
+    const nome=a.pagamento.TIPPAG?.NOME_TIPPAG||(FORMA_LABELS[a.pagamento.FORMA_PGTO]||a.pagamento.FORMA_PGTO||'Outros');
+    if(!byForma[nome])byForma[nome]={count:0,total:0};
+    byForma[nome].count++;
+    byForma[nome].total+=a.pagamento.VL_PGTO||0;
+  });
+  const max=Math.max(...Object.values(byForma).map(x=>x.total),1);
+  const rows=Object.entries(byForma).sort((a,b)=>b[1].total-a[1].total);
+  document.getElementById('tabContent').innerHTML=`
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+      <!-- Formas de pagamento -->
+      <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-5">
+        <h3 class="text-[0.82rem] font-bold text-gray-700 mb-4">Por Forma de Pagamento</h3>
+        ${rows.length?rows.map(([nome,d])=>`
+          <div class="mb-3">
+            <div class="flex items-center justify-between mb-1">
+              <span class="text-[0.8rem] font-medium text-gray-700">${nome}</span>
+              <span class="text-[0.8rem] font-bold text-gray-800">${fmtMoney(d.total)} <span class="text-gray-400 font-normal">(${d.count})</span></span>
+            </div>
+            <div class="bar-track"><div class="bar-fill bg-vitta-500" style="width:${(d.total/max*100).toFixed(1)}%"></div></div>
+          </div>`).join(''):'<p class="text-[0.8rem] text-gray-400">Nenhum pagamento no período.</p>'}
+      </div>
+      <!-- Resumo financeiro -->
+      <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-5">
+        <h3 class="text-[0.82rem] font-bold text-gray-700 mb-4">Resumo do Per&iacute;odo</h3>
+        <div class="space-y-3">
+          <div class="flex justify-between items-center py-2.5 border-b border-gray-50">
+            <span class="text-[0.8rem] text-gray-600">Pagamentos confirmados</span>
+            <span class="text-[0.8rem] font-bold text-emerald-600">${fmtMoney(payments.reduce((s,a)=>s+(a.pagamento.VL_PGTO||0),0))}</span>
+          </div>
+          <div class="flex justify-between items-center py-2.5 border-b border-gray-50">
+            <span class="text-[0.8rem] text-gray-600">Pendente de pagamento</span>
+            <span class="text-[0.8rem] font-bold text-amber-500">${fmtMoney(pending.filter(a=>a.STATUS_AGD==='REALIZADA').length*0)}&mdash;</span>
+          </div>
+          <div class="flex justify-between items-center py-2.5 border-b border-gray-50">
+            <span class="text-[0.8rem] text-gray-600">Estornos</span>
+            <span class="text-[0.8rem] font-bold text-red-500">${estornos.length} registro${estornos.length!==1?'s':''}</span>
+          </div>
+          <div class="flex justify-between items-center py-2.5">
+            <span class="text-[0.82rem] font-bold text-gray-700">Total Líquido</span>
+            <span class="text-[0.88rem] font-extrabold text-gray-800">${fmtMoney(payments.reduce((s,a)=>s+(a.pagamento.VL_PGTO||0),0))}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- Lançamentos recentes -->
+    <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden mt-4">
+      <div class="px-5 py-3.5 border-b border-gray-100 flex items-center justify-between">
+        <p class="text-[0.82rem] font-bold text-gray-700">Lan&ccedil;amentos do Per&iacute;odo</p>
+        <span class="text-[0.72rem] text-gray-400">${allData.length} registro${allData.length!==1?'s':''}</span>
+      </div>
+      <div class="overflow-x-auto">
+        <table class="w-full text-sm">
+          <thead><tr class="bg-gray-50 border-b border-gray-100 text-[0.7rem] font-bold text-gray-500 uppercase tracking-wider">
+            <th class="px-4 py-3 text-left">Data</th>
+            <th class="px-4 py-3 text-left">Paciente</th>
+            <th class="px-4 py-3 text-left">Profissional</th>
+            <th class="px-4 py-3 text-left">Status</th>
+            <th class="px-4 py-3 text-right">Valor</th>
+            <th class="px-4 py-3 text-left">Pagamento</th>
+          </tr></thead>
+          <tbody>${allData.slice(0,50).map(a=>{
+            const pgto=a.pagamento;
+            const isEstornado=pgto?.ESTORNADO_PGTO;
+            const isPago=pgto&&!isEstornado;
+            const forma=pgto?(pgto.TIPPAG?.NOME_TIPPAG||FORMA_LABELS[pgto.FORMA_PGTO]||pgto.FORMA_PGTO||'—'):'—';
+            const statusColor=STATUS_COLORS[a.STATUS_AGD]||'#9ca3af';
+            return `<tr class="border-b border-gray-50 hover:bg-gray-50 transition-colors">
+              <td class="px-4 py-3 text-gray-600 text-[0.8rem] whitespace-nowrap">${fmtDate(a.DT_AGD)}</td>
+              <td class="px-4 py-3 text-gray-800 text-[0.8rem] font-medium">${a.PACIENTE?.NOME_PAC||'—'}</td>
+              <td class="px-4 py-3 text-gray-600 text-[0.8rem]">${a.PROFISSIONAL?.NOME_PROF||'—'}</td>
+              <td class="px-4 py-3"><span class="inline-flex text-[0.68rem] font-bold px-2 py-0.5 rounded-full text-white" style="background:${statusColor}">${STATUS_LABELS[a.STATUS_AGD]||a.STATUS_AGD}</span></td>
+              <td class="px-4 py-3 text-right text-[0.8rem] font-semibold ${isEstornado?'line-through text-gray-400':isPago?'text-gray-800':'text-gray-400'}">${pgto?fmtMoney(pgto.VL_PGTO||0):'—'}</td>
+              <td class="px-4 py-3 text-[0.8rem] ${isEstornado?'text-red-500':isPago?'text-emerald-600':'text-amber-500'}">${isEstornado?'Estornado':isPago?forma:'Pendente'}</td>
+            </tr>`;
+          }).join('')}</tbody>
+        </table>
+      </div>
+      ${allData.length>50?`<p class="text-center text-[0.72rem] text-gray-400 py-3">Exibindo 50 de ${allData.length} registros. Exporte o CSV para ver todos.</p>`:''}
+    </div>`;
+}
+
+function renderAtendimentos(){
+  const bySt={};
+  allData.forEach(a=>{
+    if(!bySt[a.STATUS_AGD])bySt[a.STATUS_AGD]=0;
+    bySt[a.STATUS_AGD]++;
+  });
+  const total=allData.length||1;
+  const sorted=Object.entries(bySt).sort((a,b)=>b[1]-a[1]);
+  const realizadas=bySt['REALIZADA']||0;
+  const faltas=bySt['FALTA']||0;
+  const attended=realizadas+faltas;
+  const taxa=attended>0?((realizadas/attended)*100).toFixed(1):0;
+  document.getElementById('tabContent').innerHTML=`
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+      <!-- Status distribution -->
+      <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-5">
+        <h3 class="text-[0.82rem] font-bold text-gray-700 mb-4">Distribui&ccedil;&atilde;o por Status</h3>
+        ${sorted.map(([st,cnt])=>`
+          <div class="mb-3">
+            <div class="flex items-center justify-between mb-1">
+              <span class="flex items-center gap-2">
+                <span class="w-2.5 h-2.5 rounded-full" style="background:${STATUS_COLORS[st]||'#9ca3af'}"></span>
+                <span class="text-[0.8rem] font-medium text-gray-700">${STATUS_LABELS[st]||st}</span>
+              </span>
+              <span class="text-[0.8rem] font-bold text-gray-800">${cnt} <span class="text-gray-400 font-normal">(${(cnt/total*100).toFixed(0)}%)</span></span>
+            </div>
+            <div class="bar-track"><div class="bar-fill" style="width:${(cnt/total*100).toFixed(1)}%;background:${STATUS_COLORS[st]||'#9ca3af'}"></div></div>
+          </div>`).join('')}
+      </div>
+      <!-- Taxa de atendimento -->
+      <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-5">
+        <h3 class="text-[0.82rem] font-bold text-gray-700 mb-4">Taxa de Atendimento</h3>
+        <div class="flex flex-col items-center justify-center py-4">
+          <div class="relative w-32 h-32">
+            <svg class="w-full h-full -rotate-90" viewBox="0 0 36 36">
+              <circle cx="18" cy="18" r="15.9" fill="none" stroke="#f3f4f6" stroke-width="3"/>
+              <circle cx="18" cy="18" r="15.9" fill="none" stroke="#2ABCD4" stroke-width="3"
+                stroke-dasharray="${taxa},100" stroke-linecap="round"/>
+            </svg>
+            <div class="absolute inset-0 flex items-center justify-center">
+              <span class="text-2xl font-extrabold text-gray-800">${taxa}%</span>
+            </div>
+          </div>
+          <p class="text-[0.8rem] text-gray-500 mt-3 text-center">${realizadas} realizadas de ${attended} agendadas (excl. cancelados)</p>
+        </div>
+        <div class="grid grid-cols-2 gap-3 mt-2">
+          <div class="bg-emerald-50 rounded-xl p-3 text-center">
+            <p class="text-xl font-extrabold text-emerald-600">${realizadas}</p>
+            <p class="text-[0.7rem] text-emerald-700 font-medium">Realizadas</p>
+          </div>
+          <div class="bg-red-50 rounded-xl p-3 text-center">
+            <p class="text-xl font-extrabold text-red-500">${faltas}</p>
+            <p class="text-[0.7rem] text-red-600 font-medium">Faltas</p>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- Tabela por status -->
+    <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden mt-4">
+      <div class="px-5 py-3.5 border-b border-gray-100">
+        <p class="text-[0.82rem] font-bold text-gray-700">Contagem por Status</p>
+      </div>
+      <table class="w-full text-sm">
+        <thead><tr class="bg-gray-50 border-b border-gray-100 text-[0.7rem] font-bold text-gray-500 uppercase tracking-wider">
+          <th class="px-5 py-3 text-left">Status</th>
+          <th class="px-5 py-3 text-right">Quantidade</th>
+          <th class="px-5 py-3 text-right">Percentual</th>
+        </tr></thead>
+        <tbody>${sorted.map(([st,cnt])=>`
+          <tr class="border-b border-gray-50">
+            <td class="px-5 py-3"><span class="inline-flex items-center gap-2 text-[0.8rem] font-medium text-gray-700"><span class="w-2.5 h-2.5 rounded-full" style="background:${STATUS_COLORS[st]||'#9ca3af'}"></span>${STATUS_LABELS[st]||st}</span></td>
+            <td class="px-5 py-3 text-right text-[0.8rem] font-bold text-gray-800">${cnt}</td>
+            <td class="px-5 py-3 text-right text-[0.8rem] text-gray-500">${(cnt/total*100).toFixed(1)}%</td>
+          </tr>`).join('')}
+          <tr class="bg-gray-50">
+            <td class="px-5 py-3 text-[0.8rem] font-bold text-gray-700">Total</td>
+            <td class="px-5 py-3 text-right text-[0.8rem] font-extrabold text-gray-800">${allData.length}</td>
+            <td class="px-5 py-3 text-right text-[0.8rem] font-bold text-gray-600">100%</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>`;
+}
+
+function renderProfissionais(){
+  const byProf={};
+  allData.forEach(a=>{
+    const nome=a.PROFISSIONAL?.NOME_PROF||'Sem profissional';
+    const id=a.PROF_AGD||'_';
+    if(!byProf[id])byProf[id]={nome,total:0,realizadas:0,faltas:0,receita:0,pendente:0};
+    byProf[id].total++;
+    if(a.STATUS_AGD==='REALIZADA')byProf[id].realizadas++;
+    if(a.STATUS_AGD==='FALTA')byProf[id].faltas++;
+    const pgto=a.pagamento;
+    if(pgto&&!pgto.ESTORNADO_PGTO)byProf[id].receita+=pgto.VL_PGTO||0;
+    else if(a.STATUS_AGD==='REALIZADA')byProf[id].pendente+=0;
+  });
+  const rows=Object.values(byProf).sort((a,b)=>b.realizadas-a.realizadas);
+  document.getElementById('tabContent').innerHTML=`
+    <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+      <div class="px-5 py-3.5 border-b border-gray-100">
+        <p class="text-[0.82rem] font-bold text-gray-700">Desempenho por Profissional</p>
+      </div>
+      <div class="overflow-x-auto">
+        <table class="w-full text-sm">
+          <thead><tr class="bg-gray-50 border-b border-gray-100 text-[0.7rem] font-bold text-gray-500 uppercase tracking-wider">
+            <th class="px-5 py-3 text-left">Profissional</th>
+            <th class="px-4 py-3 text-right">Agendamentos</th>
+            <th class="px-4 py-3 text-right">Realizados</th>
+            <th class="px-4 py-3 text-right">Faltas</th>
+            <th class="px-4 py-3 text-right">Taxa</th>
+            <th class="px-4 py-3 text-right">Receita</th>
+          </tr></thead>
+          <tbody>${rows.map(r=>{
+            const attended=r.realizadas+r.faltas;
+            const taxa=attended>0?((r.realizadas/attended)*100).toFixed(0):0;
+            return `<tr class="border-b border-gray-50 hover:bg-gray-50 transition-colors">
+              <td class="px-5 py-3.5 font-semibold text-[0.83rem] text-gray-800">${r.nome}</td>
+              <td class="px-4 py-3.5 text-right text-[0.8rem] text-gray-600">${r.total}</td>
+              <td class="px-4 py-3.5 text-right text-[0.8rem] font-semibold text-vitta-600">${r.realizadas}</td>
+              <td class="px-4 py-3.5 text-right text-[0.8rem] text-red-400">${r.faltas}</td>
+              <td class="px-4 py-3.5 text-right">
+                <span class="text-[0.75rem] font-bold px-2 py-0.5 rounded-full ${parseInt(taxa)>=80?'bg-emerald-100 text-emerald-700':parseInt(taxa)>=60?'bg-amber-100 text-amber-700':'bg-red-100 text-red-600'}">${taxa}%</span>
+              </td>
+              <td class="px-4 py-3.5 text-right text-[0.8rem] font-bold text-gray-800">${fmtMoney(r.receita)}</td>
+            </tr>`;
+          }).join('')}</tbody>
+        </table>
+      </div>
+    </div>`;
+}
+
+async function loadReport(){
+  const dtDe=document.getElementById('rDtDe').value;
+  const dtAte=document.getElementById('rDtAte').value;
+  const profId=currentProfId||document.getElementById('rProf').value;
+  const idEmp=AdminEmpresaCtx.resolveIdEmp(currentUserMeta?.tipo_usu, currentUserMeta?.ID_EMP || currentUserMeta?.id_emp);
+  document.getElementById('tabContent').innerHTML='<p class="text-center text-[0.8rem] text-gray-400 py-16">Carregando&hellip;</p>';
+  try {
+    // Query 1: agendamentos (sem join para PAGAMENTO, evita join triplo)
+    let q=supabase.from('AGENDAMENTO')
+      .select('ID_AGD,DT_AGD,STATUS_AGD,TIPO_AGD,PAC_AGD,PROF_AGD,ID_EMP,PACIENTE!PAC_AGD(NOME_PAC),PROFISSIONAL!PROF_AGD(NOME_PROF)')
+      .order('DT_AGD',{ascending:false});
+    if(idEmp)q=q.eq('ID_EMP',idEmp);
+    if(dtDe)q=q.gte('DT_AGD',dtDe+'T00:00:00');
+    if(dtAte)q=q.lte('DT_AGD',dtAte+'T23:59:59');
+    if(profId)q=q.eq('PROF_AGD',profId);
+    const{data:agds,error:agdErr}=await q;
+    if(agdErr)throw agdErr;
+
+    // Query 2: pagamentos separados (igual ao padrão do financeiro.html)
+    let pgtoMap={};
+    if(agds&&agds.length){
+      const ids=agds.map(a=>a.ID_AGD);
+      const{data:pgtos}=await supabase.from('PAGAMENTO')
+        .select('*,TIPPAG(ID_TIPPAG,NOME_TIPPAG)')
+        .in('ID_AGD',ids);
+      (pgtos||[]).forEach(p=>pgtoMap[p.ID_AGD]=p);
+    }
+
+    allData=(agds||[]).map(a=>({...a,pagamento:pgtoMap[a.ID_AGD]||null}));
+    computeKPIs();
+    renderTab();
+  } catch(err){
+    showToast('Erro ao carregar dados',false);
+    console.error('loadReport error:',err);
+  }
+}
+
+function computeKPIs(){
+  const pago=allData.filter(a=>a.pagamento&&!a.pagamento.ESTORNADO_PGTO);
+  const totalRecebido=pago.reduce((s,a)=>s+(a.pagamento.VL_PGTO||0),0);
+  const totalRepasse=pago.reduce((s,a)=>{
+    const perc=profPercMap[a.PROF_AGD]||0;
+    return s+(a.pagamento.VL_PGTO||0)*perc/100;
+  },0);
+  const totalLiquido=totalRecebido-totalRepasse;
+  const realizadas=allData.filter(a=>a.STATUS_AGD==='REALIZADA').length;
+  const faltas=allData.filter(a=>a.STATUS_AGD==='FALTA').length;
+  const attended=realizadas+faltas;
+  const taxa=attended>0?((realizadas/attended)*100).toFixed(1):0;
+  const pendente=allData.filter(a=>a.STATUS_AGD==='REALIZADA'&&!a.pagamento);
+  const estornadas=allData.filter(a=>a.pagamento&&a.pagamento.ESTORNADO_PGTO);
+  document.getElementById('kpiTotalAgds').textContent=allData.length;
+  document.getElementById('kpiRealizadas').textContent=realizadas;
+  document.getElementById('kpiFaltas').textContent=faltas?`${faltas} falta${faltas!==1?'s':''}`:' ';
+  document.getElementById('kpiTaxa').textContent=taxa+'%';
+  document.getElementById('kpiRecebido').textContent=fmtMoney(totalRecebido);
+  document.getElementById('kpiPendente').textContent=pendente.length?`${pendente.length} consulta${pendente.length!==1?'s':''} pendente${pendente.length!==1?'s':''}`:' ';
+  document.getElementById('kpiEstornado').textContent=estornadas.length?`${estornadas.length} estorno${estornadas.length!==1?'s':''}`:'';
+  document.getElementById('kpiRepasse').textContent=fmtMoney(totalRepasse);
+  document.getElementById('kpiLiquido').textContent=fmtMoney(totalLiquido);
+}
+
+async function initAuth(){
+  document.getElementById('header-date').textContent=new Date().toLocaleDateString('pt-BR',{weekday:'long',year:'numeric',month:'long',day:'numeric'});
+  const{data:{session}}=await supabase.auth.getSession();
+  if(!session){window.location.href='../index.html';return false;}
+  const meta=session.user.user_metadata;
+  currentUserMeta=meta;
+  if(!['ADMIN_EMPRESA','ADMIN_GLOBAL','SECRETARIA','PROFISSIONAL'].includes(meta.tipo_usu)){window.location.href='dashboard.html';return false;}
+  const LABELS={ADMIN_GLOBAL:'Admin Global',ADMIN_EMPRESA:'Administrador',SECRETARIA:'Secretaria',PROFISSIONAL:'Profissional'};
+  const nome=meta.nome_usu||session.user.email;
+  const ini=nome.split(' ').filter(Boolean).slice(0,2).map(w=>w[0]).join('').toUpperCase();
+  ['user-name','header-user-name'].forEach(id=>document.getElementById(id).textContent=nome);
+  ['user-role','header-user-role'].forEach(id=>document.getElementById(id).textContent=LABELS[meta.tipo_usu]||meta.tipo_usu);
+  ['user-avatar','header-avatar'].forEach(id=>document.getElementById(id).textContent=ini);
+  if(meta.tipo_usu==='ADMIN_GLOBAL'){
+    document.getElementById('empresa-nome').textContent='Vitta Sistemas';
+    document.getElementById('sectionAdmin').classList.remove('hidden');
+    AdminEmpresaCtx.initSelector('ADMIN_GLOBAL', session.user.id);
+  } else {
+    const{data:emp}=await supabase.from('EMPRESA').select('NOME_EMP').eq('ID_EMP',(meta.ID_EMP || meta.id_emp)).single();
+    document.getElementById('empresa-nome').textContent=emp?.NOME_EMP||'';
+  }
+  if(meta.tipo_usu==='PROFISSIONAL'){
+    const u=await getUsuarioAtual('PROF_USU',session);
+    currentProfId=u?.PROF_USU||null;
+    document.querySelector('a[href="profissionais.html"]')?.classList.add('hidden');
+    document.querySelector('a[href="usuarios-empresa.html"]')?.classList.add('hidden');
+    document.getElementById('btnRelatorioPdf')?.classList.add('hidden');
+  }
+  let temAcessoConsultas = meta.tipo_usu === 'PROFISSIONAL';
+  if(['ADMIN_EMPRESA','ADMIN_GLOBAL'].includes(meta.tipo_usu)){
+    const uOwn=await getUsuarioAtual('PROF_USU',session);
+    temAcessoConsultas=!!(uOwn?.PROF_USU);
+  }
+  if(!temAcessoConsultas)
+    document.querySelector('a[href="consultas.html"]')?.classList.add('hidden');
+  return true;
+}
+
+async function loadProfissionais(){
+  const idEmp=AdminEmpresaCtx.resolveIdEmp(currentUserMeta?.tipo_usu, currentUserMeta?.ID_EMP || currentUserMeta?.id_emp);
+  let q=supabase.from('PROFISSIONAL').select('ID_PROF,NOME_PROF,PERC_PROF').eq('ATIVO_PROF',true).order('NOME_PROF');
+  if(idEmp)q=q.eq('ID_EMP',idEmp);
+  const{data}=await q;
+  profPercMap={};
+  (data||[]).forEach(p=>{profPercMap[p.ID_PROF]=Number(p.PERC_PROF||0);});
+  const sel=document.getElementById('rProf');
+  (data||[]).forEach(p=>sel.insertAdjacentHTML('beforeend',`<option value="${p.ID_PROF}">${p.NOME_PROF}</option>`));
+  if(currentProfId){sel.value=currentProfId;sel.disabled=true;}
+  sel.addEventListener('change',updateBtnRelatorioPdfState);
+  updateBtnRelatorioPdfState();
+}
+
+function updateBtnRelatorioPdfState(){
+  const sel=document.getElementById('rProf');
+  const btn=document.getElementById('btnRelatorioPdf');
+  if(btn) btn.disabled=!sel.value;
+}
+
+/* ═══ Geração de PDF (Relatório em PDF por profissional) ═══ */
+
+const _empresaLogoCache={};
+function loadImageAsBase64(url){
+  if(!url) return Promise.resolve(null);
+  if(_empresaLogoCache[url]) return _empresaLogoCache[url];
+  const p=fetch(url)
+    .then(r=>r.blob())
+    .then(blob=>new Promise((resolve,reject)=>{
+      const reader=new FileReader();
+      reader.onload=()=>resolve(reader.result);
+      reader.onerror=reject;
+      reader.readAsDataURL(blob);
+    }))
+    .then(dataUrl=>downscaleImage(dataUrl,800))
+    .catch(()=>null);
+  _empresaLogoCache[url]=p;
+  return p;
+}
+function downscaleImage(dataUrl,maxDim){
+  return new Promise(resolve=>{
+    const img=new Image();
+    img.onload=()=>{
+      const scale=Math.min(1,maxDim/Math.max(img.naturalWidth,img.naturalHeight));
+      if(scale>=1){ resolve(dataUrl); return; }
+      const canvas=document.createElement('canvas');
+      canvas.width=Math.round(img.naturalWidth*scale);
+      canvas.height=Math.round(img.naturalHeight*scale);
+      canvas.getContext('2d').drawImage(img,0,0,canvas.width,canvas.height);
+      resolve(canvas.toDataURL('image/png'));
+    };
+    img.onerror=()=>resolve(dataUrl);
+    img.src=dataUrl;
+  });
+}
+function dataUrlImgFormat(dataUrl){
+  const m=/^data:image\/(png|jpe?g|webp)/i.exec(dataUrl||'');
+  if(!m) return 'PNG';
+  const t=m[1].toLowerCase();
+  return t==='jpg'?'JPEG':t.toUpperCase();
+}
+function getImageDimensions(dataUrl){
+  return new Promise((resolve,reject)=>{
+    const img=new Image();
+    img.onload=()=>resolve({w:img.naturalWidth,h:img.naturalHeight});
+    img.onerror=reject;
+    img.src=dataUrl;
+  });
+}
+function fitImageBox(dims,maxW,maxH){
+  if(!dims||!dims.w||!dims.h) return {w:maxW,h:maxH};
+  const ratio=Math.min(maxW/dims.w,maxH/dims.h);
+  return {w:dims.w*ratio,h:dims.h*ratio};
+}
+function drawWatermark(doc,pageW,pageH,logoData,logoDims){
+  if(!logoData) return;
+  const{w,h}=fitImageBox(logoDims,130,130);
+  const x=(pageW-w)/2, y=(pageH-h)/2;
+  doc.setGState(new doc.GState({opacity:0.06}));
+  doc.addImage(logoData,dataUrlImgFormat(logoData),x,y,w,h,'empresaLogo');
+  doc.setGState(new doc.GState({opacity:1}));
+}
+function fmtTel(v){const d=(v||'').replace(/\D/g,'');return d.length===11?d.replace(/(\d{2})(\d{5})(\d{4})/,'($1) $2-$3'):d.length===10?d.replace(/(\d{2})(\d{4})(\d{4})/,'($1) $2-$3'):v||'';}
+function fmtDocEmpresa(v){
+  const d=(v||'').replace(/\D/g,'');
+  if(d.length===11) return d.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/,'$1.$2.$3-$4');
+  return d.replace(/(\d{2})(\d)/,'$1.$2').replace(/(\d{3})(\d)/,'$1.$2').replace(/(\d{3})(\d)/,'$1/$2').replace(/(\d{4})(\d{1,2})$/,'$1-$2').substring(0,18);
+}
+function fmtEnderecoEmpresa(e){
+  if(!e) return '';
+  const parts=[];
+  if(e.LOGRADOURO_EMP) parts.push(e.LOGRADOURO_EMP+(e.NUMERO_EMP?', '+e.NUMERO_EMP:''));
+  if(e.BAIRRO_EMP) parts.push(e.BAIRRO_EMP);
+  const cidadeUf=[e.CIDADE_EMP,e.UF_EMP].filter(Boolean).join('/');
+  if(cidadeUf) parts.push(cidadeUf);
+  return parts.join(' - ');
+}
+function fmtDateInput(d){
+  if(!d) return '';
+  const[y,m,dd]=d.split('-');
+  return `${dd}/${m}/${y}`;
+}
+
+let _empresaPdfInfoCache=null, _empresaPdfInfoCacheId=null;
+async function loadEmpresaPdfInfo(){
+  const idEmp=AdminEmpresaCtx.resolveIdEmp(currentUserMeta?.tipo_usu, currentUserMeta?.ID_EMP || currentUserMeta?.id_emp);
+  if(!idEmp) return null;
+  if(_empresaPdfInfoCacheId===idEmp) return _empresaPdfInfoCache;
+  const{data}=await supabase.from('EMPRESA').select('NOME_EMP,LOGO_EMP,TEL_EMP,CNPJ_EMP,LOGRADOURO_EMP,NUMERO_EMP,COMPLEMENTO_EMP,BAIRRO_EMP,CIDADE_EMP,UF_EMP').eq('ID_EMP',idEmp).maybeSingle();
+  _empresaPdfInfoCache=data||null;
+  _empresaPdfInfoCacheId=idEmp;
+  return _empresaPdfInfoCache;
+}
+
+async function gerarRelatorioPdfProfissional(){
+  const profId=currentProfId||document.getElementById('rProf').value;
+  if(!profId){showToast('Selecione um profissional para gerar o relatório em PDF',false);return;}
+  const btn=document.getElementById('btnRelatorioPdf');
+  const btnOrigHtml=btn.innerHTML;
+  btn.disabled=true;btn.textContent='Gerando…';
+  try{
+    const{data:prof}=await supabase.from('PROFISSIONAL').select('NOME_PROF,ESPECIAL_PROF,EMAIL_PROF,PERC_PROF').eq('ID_PROF',profId).maybeSingle();
+    const idEmp=AdminEmpresaCtx.resolveIdEmp(currentUserMeta?.tipo_usu, currentUserMeta?.ID_EMP || currentUserMeta?.id_emp);
+    const dtDe=document.getElementById('rDtDe').value;
+    const dtAte=document.getElementById('rDtAte').value;
+
+    const{jsPDF}=window.jspdf;
+    const doc=new jsPDF({unit:'mm',format:'a4'});
+    const filename=`${(prof?.NOME_PROF||'profissional').trim().replace(/\s+/g,'_')}.pdf`;
+    doc.setProperties({title:filename.replace(/\.pdf$/i,'')});
+    const pageW=doc.internal.pageSize.getWidth();
+    const pageH=doc.internal.pageSize.getHeight();
+    const marginX=16;
+    const TEAL_DARK=[18,122,140], GRAY_LABEL=[140,140,140], GRAY_TEXT=[60,60,60], GRAY_LINE=[230,230,230];
+
+    const empInfo=await loadEmpresaPdfInfo();
+    const empresaNome=empInfo?.NOME_EMP || document.getElementById('empresa-nome')?.textContent?.trim() || 'Clínica';
+    const endereco=fmtEnderecoEmpresa(empInfo);
+    const telFmt=empInfo?.TEL_EMP ? fmtTel(empInfo.TEL_EMP) : '';
+    const cnpjFmt=empInfo?.CNPJ_EMP ? fmtDocEmpresa(empInfo.CNPJ_EMP) : '';
+    const logoData=await loadImageAsBase64(empInfo?.LOGO_EMP);
+    let logoDims=null;
+    if(logoData){ try{ logoDims=await getImageDimensions(logoData); }catch(e){} }
+
+    function desenharCabecalho(){
+      drawWatermark(doc,pageW,pageH,logoData,logoDims);
+      doc.setFillColor(TEAL_DARK[0],TEAL_DARK[1],TEAL_DARK[2]);
+      doc.rect(0,0,pageW,1.1,'F');
+      doc.setDrawColor(GRAY_LINE[0],GRAY_LINE[1],GRAY_LINE[2]);doc.setLineWidth(0.15);
+      doc.line(0,32,pageW,32);
+      let textX=marginX;
+      if(logoData){ const logoBox=fitImageBox(logoDims,18,18); doc.addImage(logoData,dataUrlImgFormat(logoData),marginX,6+(18-logoBox.h)/2,logoBox.w,logoBox.h,'empresaLogo'); textX=marginX+22; }
+      doc.setFont('helvetica','bold');doc.setFontSize(14);doc.setTextColor(25,25,25);
+      doc.text(empresaNome,textX,13);
+      let infoY=18.5;
+      doc.setFont('helvetica','normal');doc.setFontSize(7.8);doc.setTextColor(GRAY_LABEL[0],GRAY_LABEL[1],GRAY_LABEL[2]);
+      if(endereco){ doc.text(endereco,textX,infoY); infoY+=4.4; }
+      const cnpjTelLine=[cnpjFmt?('CNPJ '+cnpjFmt):'',telFmt?('Tel. '+telFmt):''].filter(Boolean).join('   •   ');
+      if(cnpjTelLine){ doc.text(cnpjTelLine,textX,infoY); infoY+=4.4; }
+      doc.setFont('helvetica','normal');doc.setFontSize(8);doc.setTextColor(GRAY_LABEL[0],GRAY_LABEL[1],GRAY_LABEL[2]);
+      doc.text('Emitido em '+new Date().toLocaleDateString('pt-BR'),pageW-marginX,13,{align:'right'});
+    }
+
+    desenharCabecalho();
+
+    let y=42;
+    doc.setFont('helvetica','bold');doc.setFontSize(9.5);doc.setTextColor(90,90,90);
+    doc.text('RELATÓRIO DE ATENDIMENTOS',marginX,y);
+    y+=7;
+
+    doc.setFont('helvetica','normal');doc.setFontSize(7);doc.setTextColor(GRAY_LABEL[0],GRAY_LABEL[1],GRAY_LABEL[2]);
+    doc.text('PROFISSIONAL',marginX,y);
+    doc.text('PERÍODO',marginX+110,y);
+    y+=4;
+    doc.setFont('helvetica','bold');doc.setFontSize(10.5);doc.setTextColor(30,30,30);
+    const profLabel=(prof?.NOME_PROF||'—')+(prof?.ESPECIAL_PROF?' — '+prof.ESPECIAL_PROF:'');
+    doc.text(profLabel,marginX,y);
+    const periodoLabel=(dtDe?fmtDateInput(dtDe):'início')+' a '+(dtAte?fmtDateInput(dtAte):'hoje');
+    doc.text(periodoLabel,marginX+110,y);
+    y+=6;
+    doc.setDrawColor(GRAY_LINE[0],GRAY_LINE[1],GRAY_LINE[2]);
+    doc.line(marginX,y,pageW-marginX,y);
+    y+=8;
+
+    const pago=allData.filter(a=>a.pagamento&&!a.pagamento.ESTORNADO_PGTO);
+    const totalRecebido=pago.reduce((s,a)=>s+(a.pagamento.VL_PGTO||0),0);
+    const perc=Number(prof?.PERC_PROF ?? profPercMap[profId] ?? 0);
+    const totalRepasse=totalRecebido*perc/100;
+    const totalLiquido=totalRecebido-totalRepasse;
+    const kpis=[
+      {label:'TOTAL RECEBIDO',value:fmtMoney(totalRecebido)},
+      {label:'RECEBIMENTOS',value:String(pago.length)},
+      {label:'REPASSE À CLÍNICA',value:fmtMoney(totalRepasse)},
+      {label:'LÍQUIDO PROFISSIONAL',value:fmtMoney(totalLiquido)},
+    ];
+    const boxW=(pageW-marginX*2-3*4)/4;
+    kpis.forEach((k,i)=>{
+      const bx=marginX+i*(boxW+4);
+      doc.setFillColor(248,249,249);
+      doc.setDrawColor(GRAY_LINE[0],GRAY_LINE[1],GRAY_LINE[2]);
+      doc.roundedRect(bx,y,boxW,16,2,2,'FD');
+      doc.setFont('helvetica','normal');doc.setFontSize(6.3);doc.setTextColor(GRAY_LABEL[0],GRAY_LABEL[1],GRAY_LABEL[2]);
+      doc.text(k.label,bx+3.5,y+5.5);
+      doc.setFont('helvetica','bold');doc.setFontSize(10.5);doc.setTextColor(30,30,30);
+      doc.text(k.value,bx+3.5,y+12);
+    });
+    y+=24;
+
+    doc.setFont('helvetica','bold');doc.setFontSize(9.5);doc.setTextColor(50,50,50);
+    doc.text('ATENDIMENTOS DO PERÍODO',marginX,y);
+    y+=7;
+
+    const cols=[
+      {label:'PACIENTE',w:70,align:'left'},
+      {label:'TIPO',w:30,align:'left'},
+      {label:'DATA',w:30,align:'left'},
+      {label:'VALOR',w:48,align:'right'},
+    ];
+    const atendimentosPagos=allData.filter(a=>a.STATUS_AGD==='REALIZADA'&&a.pagamento&&!a.pagamento.ESTORNADO_PGTO);
+    function drawTableHeader(){
+      doc.setFillColor(245,246,247);
+      doc.rect(marginX,y-4.5,pageW-marginX*2,7,'F');
+      doc.setFont('helvetica','bold');doc.setFontSize(6.8);doc.setTextColor(GRAY_LABEL[0],GRAY_LABEL[1],GRAY_LABEL[2]);
+      let cx=marginX;
+      cols.forEach(c=>{
+        doc.text(c.label,c.align==='right'?cx+c.w-1.5:cx+1.5,y,{align:c.align==='right'?'right':'left'});
+        cx+=c.w;
+      });
+      y+=6;
+      doc.setDrawColor(GRAY_LINE[0],GRAY_LINE[1],GRAY_LINE[2]);
+      doc.line(marginX,y-4,pageW-marginX,y-4);
+    }
+    drawTableHeader();
+
+    if(!atendimentosPagos.length){
+      doc.setFont('helvetica','normal');doc.setFontSize(9.5);doc.setTextColor(150,150,150);
+      doc.text('Nenhum atendimento realizado e pago no período selecionado.',marginX,y+2);
+      y+=10;
+    } else {
+      doc.setFont('helvetica','normal');doc.setFontSize(8);
+      atendimentosPagos.forEach(a=>{
+        if(y>pageH-30){
+          doc.addPage();
+          desenharCabecalho();
+          y=42;
+          drawTableHeader();
+          doc.setFont('helvetica','normal');doc.setFontSize(8);
+        }
+        const valor=fmtMoney(a.pagamento.VL_PGTO||0);
+        const rowVals=[
+          a.PACIENTE?.NOME_PAC||'—',
+          a.TIPO_AGD==='ONLINE'?'Online':'Presencial',
+          fmtDate(a.DT_AGD),
+          valor,
+        ];
+        doc.setTextColor(GRAY_TEXT[0],GRAY_TEXT[1],GRAY_TEXT[2]);
+        let cx=marginX;
+        rowVals.forEach((v,i)=>{
+          const c=cols[i];
+          const txt=doc.splitTextToSize(String(v),c.w-3)[0]||'';
+          doc.text(txt,c.align==='right'?cx+c.w-1.5:cx+1.5,y,{align:c.align==='right'?'right':'left'});
+          cx+=c.w;
+        });
+        y+=5.5;
+        doc.setDrawColor(248,248,248);
+        doc.line(marginX,y-2,pageW-marginX,y-2);
+      });
+    }
+
+    const footY=pageH-14;
+    doc.setDrawColor(GRAY_LINE[0],GRAY_LINE[1],GRAY_LINE[2]);
+    doc.line(marginX,footY,pageW-marginX,footY);
+    doc.setFont('helvetica','normal');doc.setFontSize(6.5);doc.setTextColor(170,170,170);
+    doc.text('Gerado por Vitta Sistemas',pageW-marginX,footY+5,{align:'right'});
+
+    showPdfPreview(doc,'Relatório de Atendimentos',filename,{idEmp,destEmail:prof?.EMAIL_PROF||'',destNome:prof?.NOME_PROF||''});
+  }catch(e){
+    console.error('gerarRelatorioPdfProfissional error:',e);
+    showToast('Erro ao gerar relatório em PDF',false);
+  }finally{
+    btn.innerHTML=btnOrigHtml;
+    updateBtnRelatorioPdfState();
+  }
+}
+
+let _pdfPreview={blobUrl:null,filename:null,doc:null,titulo:null,meta:null};
+function showPdfPreview(doc, titulo, filename, meta){
+  if(_pdfPreview.blobUrl) URL.revokeObjectURL(_pdfPreview.blobUrl);
+  const blobUrl=doc.output('bloburl');
+  _pdfPreview={blobUrl,filename,doc,titulo,meta};
+  document.getElementById('pdfPreviewTitle').textContent=titulo;
+  document.getElementById('pdfPreviewFrame').src=blobUrl;
+  const modal=document.getElementById('modalPdfPreview');
+  modal.classList.remove('hidden');modal.classList.add('flex');
+}
+function closePdfPreview(){
+  const modal=document.getElementById('modalPdfPreview');
+  modal.classList.add('hidden');modal.classList.remove('flex');
+  document.getElementById('pdfPreviewFrame').src='about:blank';
+}
+function baixarPdfPreview(){
+  if(!_pdfPreview.blobUrl) return;
+  const a=document.createElement('a');
+  a.href=_pdfPreview.blobUrl;
+  a.download=_pdfPreview.filename||'documento.pdf';
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+}
+function enviarPdfPreviewPorEmail(){
+  if(!_pdfPreview.doc){ showToast('Nenhum documento para enviar.',false); return; }
+  const meta=_pdfPreview.meta||{};
+  if(!meta.idEmp){ showToast('Não foi possível identificar a empresa deste documento.',false); return; }
+  document.getElementById('enviarEmailDocTitulo').textContent=_pdfPreview.titulo||'Documento';
+  const input=document.getElementById('inputEnviarEmailDestino');
+  input.value=meta.destEmail||'';
+  const modal=document.getElementById('modalEnviarEmail');
+  modal.classList.remove('hidden');modal.classList.add('flex');
+  setTimeout(()=>input.focus(),50);
+}
+function fecharModalEnviarEmail(){
+  const modal=document.getElementById('modalEnviarEmail');
+  modal.classList.add('hidden');modal.classList.remove('flex');
+}
+async function confirmarEnvioPdfEmail(){
+  const email=document.getElementById('inputEnviarEmailDestino').value.trim();
+  if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){ showToast('Email inválido.',false); return; }
+  if(!_pdfPreview.doc){ showToast('Nenhum documento para enviar.',false); return; }
+  const meta=_pdfPreview.meta||{};
+
+  const btn=document.getElementById('btnConfirmarEnvioEmail');
+  const spin=document.getElementById('enviarEmailSpin');
+  const txt=document.getElementById('enviarEmailBtnTxt');
+  btn.disabled=true;spin.classList.remove('hidden');txt.textContent='Enviando...';
+
+  try{
+    const dataUri=_pdfPreview.doc.output('datauristring');
+    const pdfBase64=dataUri.substring(dataUri.indexOf(',')+1);
+    const{error}=await supabase.functions.invoke('enviar-documento-pdf-email',{
+      body:{
+        id_emp:meta.idEmp,
+        paciente_email:email,
+        paciente_nome:meta.destNome||'',
+        tipo_documento:_pdfPreview.titulo||'Documento',
+        nome_arquivo:_pdfPreview.filename||'documento.pdf',
+        pdf_base64:pdfBase64,
+      }
+    });
+    if(error) throw error;
+    showToast('Email enviado para '+email+'!');
+    fecharModalEnviarEmail();
+  }catch(e){
+    let msg=e?.message||'tente novamente.';
+    if(e?.context && typeof e.context.json==='function'){
+      try{ const body=await e.context.json(); if(body?.erro) msg=body.erro; }catch(_){}
+    }
+    showToast('Erro ao enviar email: '+msg,false);
+  }finally{
+    btn.disabled=false;spin.classList.add('hidden');txt.textContent='Enviar';
+  }
+}
+
+(async()=>{
+  const ok=await initAuth();
+  if(!ok)return;
+  if(currentUserMeta?.tipo_usu==='ADMIN_GLOBAL' && !AdminEmpresaCtx.get()){
+    AdminEmpresaCtx.renderBloqueio(['main']);
+    return;
+  }
+  await loadProfissionais();
+  const today=new Date(),from=new Date(today);
+  from.setDate(from.getDate()-30);
+  document.getElementById('rDtDe').value=from.toISOString().split('T')[0];
+  document.getElementById('rDtAte').value=today.toISOString().split('T')[0];
+  document.getElementById('rDtDe').addEventListener('change',loadReport);
+  document.getElementById('rDtAte').addEventListener('change',loadReport);
+  document.getElementById('rProf').addEventListener('change',loadReport);
+  await loadReport();
+})();
+
+document.querySelectorAll('#sidebar nav a').forEach(function(link){
+  link.addEventListener('click',function(){
+    var sb=document.getElementById('sidebar'),ov=document.getElementById('overlay');
+    if(sb&&!sb.classList.contains('-translate-x-full')){sb.classList.add('-translate-x-full');if(ov)ov.classList.add('hidden');}
+  });
+});
+</script>
+<script>
+(async () => {
+  try {
+    const { data: { session } } = await supabase.auth.getSession();
+    if (['ADMIN_EMPRESA'].includes(session?.user?.user_metadata?.tipo_usu)) {
+      const el = document.getElementById('sectionMinhaEmpresa');
+      if (el) el.classList.remove('hidden');
+    }
+  } catch (_) {}
+})();
+</script>
+<script>
+(async () => {
+  try {
+    const { data: { session } } = await supabase.auth.getSession();
+    if (!session) return;
+    const u = await getUsuarioAtual('TIPO_USU,ID_EMP', session);
+    if (u && u.ID_EMP === '22ff26b9-3839-45ed-8a1d-df4a488d3aab' && ['ADMIN_EMPRESA','SECRETARIA'].includes(u.TIPO_USU)) {
+      document.getElementById('menuDocumentosWrap')?.classList.remove('hidden');
+    }
+  } catch (_) {}
+})();
+</script>
+</body>
+</html>

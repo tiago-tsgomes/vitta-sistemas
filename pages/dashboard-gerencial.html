@@ -1,0 +1,964 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>Dashboard Gerencial — Vitta Sistemas</title>
+  <link rel="icon" type="image/png" href="../img/favicon.png" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: { vitta: { 50:'#f0fbfd',100:'#e0f7fa',300:'#80deea',400:'#4dd9ed',500:'#2ABCD4',600:'#1a96ac',700:'#127a8c' } },
+          fontFamily: { sans: ['Inter','system-ui','sans-serif'] }
+        }
+      }
+    }
+  </script>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <style>
+    .sidebar-nav::-webkit-scrollbar { width:3px; }
+    .sidebar-nav::-webkit-scrollbar-thumb { background:rgba(255,255,255,.1); border-radius:4px; }
+    .submenu { overflow:hidden; max-height:0; opacity:0; transition:max-height .25s ease,opacity .2s ease; }
+    .submenu.open { max-height:500px; opacity:1; }
+    .chevron { transition:transform .25s ease; display:inline-block; }
+    .chevron.open { transform:rotate(180deg); }
+    @keyframes fadeUp { from{opacity:0;transform:translateY(10px)} to{opacity:1;transform:translateY(0)} }
+    .fade-up { animation:fadeUp .4s ease forwards; }
+    .bar-fill { transition: width .8s cubic-bezier(.4,0,.2,1); }
+    .skeleton { background: linear-gradient(90deg,#f3f4f6 25%,#e5e7eb 50%,#f3f4f6 75%); background-size:200% 100%; animation:shimmer 1.4s infinite; }
+    @keyframes shimmer { 0%{background-position:200% 0} 100%{background-position:-200% 0} }
+    .kpi-card { transition: transform .15s, box-shadow .15s; }
+    .kpi-card:hover { transform:translateY(-2px); box-shadow:0 8px 24px rgba(0,0,0,.08); }
+  </style>
+</head>
+
+<body class="bg-[#F0F2F5] font-sans antialiased">
+<div class="flex min-h-screen">
+
+<!-- SIDEBAR -->
+<aside id="sidebar" class="fixed inset-y-0 left-0 w-[220px] bg-[#111827] flex flex-col z-30 -translate-x-full lg:translate-x-0 transition-transform duration-300">
+  <div class="flex flex-col items-center justify-center gap-1 py-4 px-5 border-b border-white/10 shrink-0">
+    <img src="../img/logo.png" alt="Vitta Sistemas" class="h-10 w-auto brightness-0 invert" />
+    <p class="text-[0.6rem] text-gray-500 tracking-wide">v1.2.1</p>
+  </div>
+  <nav class="flex-1 overflow-y-auto sidebar-nav py-3">
+    <p class="block text-[0.6rem] font-bold text-gray-500 uppercase tracking-widest px-4 pb-1 pt-3">Principal</p>
+    <a href="dashboard.html" class="flex items-center gap-3 px-3 py-2.5 mx-2 rounded-xl text-[0.83rem] font-medium text-gray-400 hover:bg-white/10 hover:text-white transition-colors duration-150 cursor-pointer mb-0.5">
+      <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+      Dashboard
+    </a>
+    <a href="agendamentos.html" class="flex items-center gap-3 px-3 py-2.5 mx-2 rounded-xl text-[0.83rem] font-medium text-gray-400 hover:bg-white/10 hover:text-white transition-colors duration-150 cursor-pointer mb-0.5">
+      <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+      Agendamentos
+    </a>
+    <a href="consultas.html" class="flex items-center gap-3 px-3 py-2.5 mx-2 rounded-xl text-[0.83rem] font-medium text-gray-400 hover:bg-white/10 hover:text-white transition-colors duration-150 cursor-pointer mb-0.5">
+      <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+      Consultas
+    </a>
+    <p class="block text-[0.6rem] font-bold text-gray-500 uppercase tracking-widest px-4 pb-1 pt-4">Cadastros</p>
+    <button onclick="toggleMenu('cadastros')" class="w-full flex items-center gap-3 px-3 py-2.5 mx-2 rounded-xl text-[0.83rem] font-medium text-gray-400 hover:bg-white/10 hover:text-white transition-colors duration-150 cursor-pointer mb-0.5" style="width:calc(100% - 16px)">
+      <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+      Cadastros
+      <svg id="chev-cadastros" class="chevron w-3.5 h-3.5 ml-auto text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+    </button>
+    <div id="sub-cadastros" class="submenu">
+      <a href="pacientes.html" class="flex items-center gap-2 pl-10 pr-3 py-2 mx-2 rounded-xl text-[0.8rem] text-gray-500 hover:bg-white/5 hover:text-gray-300 transition-colors cursor-pointer">Pacientes</a>
+      <a href="profissionais.html" class="flex items-center gap-2 pl-10 pr-3 py-2 mx-2 rounded-xl text-[0.8rem] text-gray-500 hover:bg-white/5 hover:text-gray-300 transition-colors cursor-pointer">Profissionais</a>
+      <a href="usuarios-empresa.html" class="flex items-center gap-2 pl-10 pr-3 py-2 mx-2 rounded-xl text-[0.8rem] text-gray-500 hover:bg-white/5 hover:text-gray-300 transition-colors cursor-pointer">Usu&aacute;rios</a>
+      <div class="hidden" id="menuDocumentosWrap"><a href="documentos.html" class="flex items-center gap-2 pl-10 pr-3 py-2 mx-2 rounded-xl text-[0.8rem] text-gray-500 hover:bg-white/5 hover:text-gray-300 transition-colors cursor-pointer w-full">Documentos</a></div>
+      <a href="leads.html" class="flex items-center gap-2 pl-10 pr-3 py-2 mx-2 rounded-xl text-[0.8rem] text-gray-500 hover:bg-white/5 hover:text-gray-300 transition-colors cursor-pointer">Leads</a>
+    </div>
+    <p class="block text-[0.6rem] font-bold text-gray-500 uppercase tracking-widest px-4 pb-1 pt-4">Outros Cadastros</p>
+    <button onclick="toggleMenu('servicos')" class="w-full flex items-center gap-3 px-3 py-2.5 mx-2 rounded-xl text-[0.83rem] font-medium text-gray-400 hover:bg-white/10 hover:text-white transition-colors duration-150 cursor-pointer mb-0.5" style="width:calc(100% - 16px)">
+      <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+        <path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/>
+      </svg>
+      Outros Cadastros
+      <svg id="chev-servicos" class="chevron w-3.5 h-3.5 ml-auto text-gray-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+    </button>
+    <div id="sub-servicos" class="submenu">
+      <a href="servicos.html" class="flex items-center gap-2 pl-10 pr-3 py-2 mx-2 rounded-xl text-[0.8rem] text-gray-500 hover:bg-white/5 hover:text-gray-300 transition-colors cursor-pointer">Serviços</a>
+      <a href="salas.html" class="flex items-center gap-2 pl-10 pr-3 py-2 mx-2 rounded-xl text-[0.8rem] text-gray-500 hover:bg-white/5 hover:text-gray-300 transition-colors cursor-pointer">Salas</a>
+      <a href="especialidades.html" class="flex items-center gap-2 pl-10 pr-3 py-2 mx-2 rounded-xl text-[0.8rem] text-gray-500 hover:bg-white/5 hover:text-gray-300 transition-colors cursor-pointer">Especialidades</a>
+      <a href="grupo.html" class="flex items-center gap-2 pl-10 pr-3 py-2 mx-2 rounded-xl text-[0.8rem] text-gray-500 hover:bg-white/5 hover:text-gray-300 transition-colors cursor-pointer">Grupo</a>
+      <a href="tipospagamento.html" class="flex items-center gap-2 pl-10 pr-3 py-2 mx-2 rounded-xl text-[0.8rem] text-gray-500 hover:bg-white/5 hover:text-gray-300 transition-colors cursor-pointer">Tipos de Pagamento</a>
+      <a href="tiposacompanhamento.html" class="flex items-center gap-2 pl-10 pr-3 py-2 mx-2 rounded-xl text-[0.8rem] text-gray-500 hover:bg-white/5 hover:text-gray-300 transition-colors cursor-pointer">Tipos de Acomp.</a>
+    </div>
+    <p class="block text-[0.6rem] font-bold text-gray-500 uppercase tracking-widest px-4 pb-1 pt-4">Financeiro</p>
+    <button onclick="toggleMenu('financeiro')" class="w-full flex items-center gap-3 px-3 py-2.5 mx-2 rounded-xl text-[0.83rem] font-medium text-gray-400 hover:bg-white/10 hover:text-white transition-colors duration-150 cursor-pointer mb-0.5" style="width:calc(100% - 16px)">
+      <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>Financeiro
+      <svg id="chev-financeiro" class="chevron w-3.5 h-3.5 ml-auto text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+    </button>
+    <div id="sub-financeiro" class="submenu">
+      <a href="financeiro.html" class="flex items-center gap-2 pl-10 pr-3 py-2 mx-2 rounded-xl text-[0.8rem] text-gray-500 hover:bg-white/5 hover:text-gray-300 transition-colors cursor-pointer">Lançamentos</a>
+      <a href="relatorios.html" class="flex items-center gap-2 pl-10 pr-3 py-2 mx-2 rounded-xl text-[0.8rem] text-gray-500 hover:bg-white/5 hover:text-gray-300 transition-colors cursor-pointer">Relatórios</a>
+    </div>
+    <div id="sectionVittaBI" class="hidden">
+    <p class="block text-[0.6rem] font-bold text-gray-500 uppercase tracking-widest px-4 pb-1 pt-4">Vitta BI</p>
+    <a id="linkVittaBI" href="https://bi.vittasistemas.com.br" target="_blank" rel="noopener"
+       class="flex items-center gap-3 px-3 py-2.5 mx-2 rounded-xl text-[0.83rem] font-medium text-gray-400 hover:bg-white/10 hover:text-white transition-colors duration-150 cursor-pointer mb-0.5">
+      <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+        <path d="M3 3v18h18"/><path d="M18.7 8l-5.3 5.3-3-3L4 16.3"/>
+      </svg>
+      Vitta BI
+      <span class="ml-auto text-[0.55rem] font-bold text-violet-300 bg-violet-500/20 px-1.5 py-0.5 rounded">BI</span>
+    </a>
+    </div>
+    <p class="block text-[0.6rem] font-bold text-gray-500 uppercase tracking-widest px-4 pb-1 pt-4">Sistema</p>
+    <button onclick="toggleMenu('admin')" class="w-full flex items-center gap-3 px-3 py-2.5 mx-2 rounded-xl text-[0.83rem] font-medium text-vitta-400 bg-vitta-500/10 transition-colors duration-150 cursor-pointer mb-0.5" style="width:calc(100% - 16px)">
+      <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14M4.93 4.93a10 10 0 0 0 0 14.14"/></svg>
+      Administra&ccedil;&atilde;o
+      <svg id="chev-admin" class="chevron open w-3.5 h-3.5 ml-auto text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+    </button>
+    <div id="sub-admin" class="submenu open">
+      <a href="empresas.html" class="flex items-center gap-2 pl-10 pr-3 py-2 mx-2 rounded-xl text-[0.8rem] text-gray-500 hover:bg-white/5 hover:text-gray-300 transition-colors cursor-pointer">Empresas</a>
+      <a href="usuarios.html" class="flex items-center gap-2 pl-10 pr-3 py-2 mx-2 rounded-xl text-[0.8rem] text-gray-500 hover:bg-white/5 hover:text-gray-300 transition-colors cursor-pointer">Usu&aacute;rios Admin</a>
+      <a href="planos.html" class="flex items-center gap-2 pl-10 pr-3 py-2 mx-2 rounded-xl text-[0.8rem] text-gray-500 hover:bg-white/5 hover:text-gray-300 transition-colors cursor-pointer">Planos</a>
+      <a href="dashboard-gerencial.html" class="flex items-center gap-2 pl-10 pr-3 py-2 mx-2 rounded-xl text-[0.8rem] font-semibold text-vitta-400 bg-vitta-500/10 transition-colors cursor-pointer">Dashboard Gerencial</a>
+      <a href="configuracoes.html" class="flex items-center gap-2 pl-10 pr-3 py-2 mx-2 rounded-xl text-[0.8rem] text-gray-500 hover:bg-white/5 hover:text-gray-300 transition-colors cursor-pointer">Configura&ccedil;&otilde;es</a>
+      <a href="logs.html" class="flex items-center gap-2 pl-10 pr-3 py-2 mx-2 rounded-xl text-[0.8rem] text-gray-500 hover:bg-white/5 hover:text-gray-300 transition-colors cursor-pointer">Log</a>
+    </div>
+    <div class="h-4"></div>
+  </nav>
+  <div class="shrink-0 border-t border-white/10 p-3">
+    <div class="group flex items-center gap-2.5 p-2.5 rounded-xl hover:bg-white/5 cursor-pointer">
+      <div id="user-avatar" class="w-8 h-8 rounded-full bg-vitta-500 flex items-center justify-center text-white text-xs font-bold shrink-0">A</div>
+      <div class="flex-1 min-w-0">
+        <p id="user-name" class="text-white text-[0.8rem] font-semibold truncate">Usu&aacute;rio</p>
+        <p id="user-role" class="text-gray-500 text-[0.7rem] truncate">Admin Global</p>
+      </div>
+      <button onclick="handleLogout()" title="Sair" class="text-gray-600 hover:text-red-400 transition-colors opacity-0 group-hover:opacity-100">
+        <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+      </button>
+    </div>
+  </div>
+</aside>
+
+<div id="overlay" class="fixed inset-0 bg-black/50 z-20 hidden lg:hidden" onclick="toggleSidebar()"></div>
+
+<div class="flex-1 lg:ml-[220px] flex flex-col min-h-screen">
+
+  <!-- HEADER -->
+  <header class="sticky top-0 z-20 h-16 bg-white border-b border-gray-200 flex items-center px-5 gap-3 shadow-sm">
+    <button onclick="toggleSidebar()" class="lg:hidden p-2 rounded-lg hover:bg-gray-100 text-gray-500">
+      <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+    </button>
+    <div class="flex-1">
+      <h1 class="text-[1rem] font-bold text-gray-800 leading-tight">Dashboard Gerencial</h1>
+      <p class="text-[0.7rem] text-gray-400 leading-tight">Vis&atilde;o geral do sistema · Admin Global</p>
+    </div>
+    <div class="hidden sm:flex items-center gap-1.5 text-[0.7rem] text-gray-400">
+      <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+      Atualizado: <span id="last-update" class="font-semibold text-gray-600">—</span>
+    </div>
+    <button onclick="loadAll()" id="btn-refresh" class="flex items-center gap-2 px-3 py-2 rounded-xl bg-white border border-gray-200 text-sm font-semibold text-gray-600 hover:bg-gray-50 transition-colors shadow-sm">
+      <svg id="refresh-icon" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M23 4v6h-6"/><path d="M1 20v-6h6"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
+      Atualizar
+    </button>
+    <div class="hidden md:flex items-center gap-2 px-3 py-2 bg-gray-50 border border-gray-200 rounded-xl">
+      <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-vitta-500 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+        <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/>
+      </svg>
+      <span id="empresa-nome" class="hidden"></span>
+    </div>
+    <div class="hidden sm:flex items-center gap-1.5 px-3 py-1.5 bg-amber-50 border border-amber-200 rounded-xl">
+      <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5 text-amber-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+      <span class="text-[0.72rem] font-bold text-amber-600">Admin Global</span>
+    </div>
+    <div class="flex items-center gap-2">
+      <div id="header-avatar" class="w-9 h-9 rounded-full bg-vitta-500 flex items-center justify-center text-white text-sm font-bold shrink-0">A</div>
+      <div class="hidden sm:block">
+        <p id="header-user-name" class="text-[0.8rem] font-semibold text-gray-800 leading-tight">Usu&aacute;rio</p>
+        <p class="text-[0.7rem] text-gray-400 leading-tight">Admin Global</p>
+      </div>
+    </div>
+    <button onclick="handleLogout()" class="p-2.5 rounded-xl hover:bg-red-50 text-gray-400 hover:text-red-500 transition-colors" title="Sair">
+      <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+    </button>
+  </header>
+
+  <main class="flex-1 p-5 lg:p-6 space-y-6 fade-up">
+
+    <!-- Breadcrumb + Title -->
+    <div class="flex items-start justify-between gap-4 flex-wrap">
+      <div>
+        <p class="text-[0.65rem] font-bold text-vitta-600 uppercase tracking-widest mb-0.5">Sistema · Administra&ccedil;&atilde;o</p>
+        <h2 class="text-[1.4rem] font-extrabold text-gray-800 tracking-tight leading-none">Dashboard Gerencial</h2>
+        <p class="text-[0.8rem] text-gray-400 mt-1">Indicadores e m&eacute;tricas globais do sistema Vitta Sistemas</p>
+      </div>
+    </div>
+
+    <!-- ══════════════════════════ KPIs ══════════════════════════ -->
+    <div class="grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-6 gap-4">
+
+      <div class="kpi-card bg-white rounded-2xl p-4 border border-gray-100 shadow-sm">
+        <div class="w-10 h-10 rounded-xl bg-vitta-50 flex items-center justify-center mb-3">
+          <svg class="w-5 h-5 text-vitta-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+        </div>
+        <p class="text-[0.65rem] font-bold text-gray-400 uppercase tracking-wider">Empresas</p>
+        <p id="kpi-empresas" class="text-2xl font-extrabold text-gray-800 leading-tight mt-0.5">—</p>
+        <p id="kpi-empresas-sub" class="text-xs text-vitta-600 mt-0.5">— ativas</p>
+      </div>
+
+      <div class="kpi-card bg-white rounded-2xl p-4 border border-gray-100 shadow-sm">
+        <div class="w-10 h-10 rounded-xl bg-blue-50 flex items-center justify-center mb-3">
+          <svg class="w-5 h-5 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+        </div>
+        <p class="text-[0.65rem] font-bold text-gray-400 uppercase tracking-wider">Usu&aacute;rios</p>
+        <p id="kpi-usuarios" class="text-2xl font-extrabold text-gray-800 leading-tight mt-0.5">—</p>
+        <p id="kpi-usuarios-sub" class="text-xs text-blue-600 mt-0.5">— ativos</p>
+      </div>
+
+      <div class="kpi-card bg-white rounded-2xl p-4 border border-gray-100 shadow-sm">
+        <div class="w-10 h-10 rounded-xl bg-purple-50 flex items-center justify-center mb-3">
+          <svg class="w-5 h-5 text-purple-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>
+        </div>
+        <p class="text-[0.65rem] font-bold text-gray-400 uppercase tracking-wider">Profissionais</p>
+        <p id="kpi-profissionais" class="text-2xl font-extrabold text-gray-800 leading-tight mt-0.5">—</p>
+        <p id="kpi-profissionais-sub" class="text-xs text-purple-600 mt-0.5">— ativos</p>
+      </div>
+
+      <div class="kpi-card bg-white rounded-2xl p-4 border border-gray-100 shadow-sm">
+        <div class="w-10 h-10 rounded-xl bg-green-50 flex items-center justify-center mb-3">
+          <svg class="w-5 h-5 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+        </div>
+        <p class="text-[0.65rem] font-bold text-gray-400 uppercase tracking-wider">Pacientes</p>
+        <p id="kpi-pacientes" class="text-2xl font-extrabold text-gray-800 leading-tight mt-0.5">—</p>
+        <p id="kpi-pacientes-sub" class="text-xs text-green-600 mt-0.5">ativos</p>
+      </div>
+
+      <div class="kpi-card bg-white rounded-2xl p-4 border border-gray-100 shadow-sm">
+        <div class="w-10 h-10 rounded-xl bg-amber-50 flex items-center justify-center mb-3">
+          <svg class="w-5 h-5 text-amber-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+        </div>
+        <p class="text-[0.65rem] font-bold text-gray-400 uppercase tracking-wider">Agendamentos</p>
+        <p id="kpi-agendamentos" class="text-2xl font-extrabold text-gray-800 leading-tight mt-0.5">—</p>
+        <p class="text-xs text-amber-600 mt-0.5">total geral</p>
+      </div>
+
+      <div class="kpi-card bg-white rounded-2xl p-4 border border-gray-100 shadow-sm">
+        <div class="w-10 h-10 rounded-xl bg-emerald-50 flex items-center justify-center mb-3">
+          <svg class="w-5 h-5 text-emerald-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+        </div>
+        <p class="text-[0.65rem] font-bold text-gray-400 uppercase tracking-wider">MRR Estimado</p>
+        <p id="kpi-mrr" class="text-xl font-extrabold text-gray-800 leading-tight mt-0.5">—</p>
+        <p class="text-xs text-emerald-600 mt-0.5">receita mensal</p>
+      </div>
+
+    </div>
+
+    <!-- ══════════════════════════ EMPRESAS ══════════════════════════ -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+
+      <!-- Empresas por Plano -->
+      <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-5">
+        <div class="flex items-center gap-2 mb-4">
+          <div class="w-7 h-7 rounded-lg bg-vitta-50 flex items-center justify-center">
+            <svg class="w-3.5 h-3.5 text-vitta-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+          </div>
+          <h3 class="text-sm font-bold text-gray-700">Empresas por Plano</h3>
+        </div>
+        <div id="planos-list" class="space-y-2.5"></div>
+      </div>
+
+      <!-- Empresas por Status -->
+      <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-5">
+        <div class="flex items-center gap-2 mb-4">
+          <div class="w-7 h-7 rounded-lg bg-green-50 flex items-center justify-center">
+            <svg class="w-3.5 h-3.5 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+          </div>
+          <h3 class="text-sm font-bold text-gray-700">Empresas por Status</h3>
+        </div>
+        <div id="status-emp-list" class="space-y-2.5"></div>
+        <div class="mt-4 pt-3 border-t border-gray-50">
+          <div class="relative h-2 bg-gray-100 rounded-full overflow-hidden">
+            <div id="status-bar-ativo"    class="bar-fill absolute left-0 top-0 h-full bg-green-500 rounded-full" style="width:0%"></div>
+          </div>
+          <p class="text-[0.65rem] text-gray-400 mt-1.5 text-center">Proporção de empresas ativas</p>
+        </div>
+      </div>
+
+      <!-- Novas Empresas por Mês -->
+      <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-5">
+        <div class="flex items-center gap-2 mb-4">
+          <div class="w-7 h-7 rounded-lg bg-blue-50 flex items-center justify-center">
+            <svg class="w-3.5 h-3.5 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>
+          </div>
+          <h3 class="text-sm font-bold text-gray-700">Novas Empresas (6 meses)</h3>
+        </div>
+        <canvas id="chart-novas-empresas" height="130"></canvas>
+      </div>
+
+    </div>
+
+    <!-- ══════════════════════════ USUÁRIOS & PROFISSIONAIS ══════════════════════════ -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+
+      <!-- Usuários por Perfil -->
+      <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-5">
+        <div class="flex items-center gap-2 mb-4">
+          <div class="w-7 h-7 rounded-lg bg-blue-50 flex items-center justify-center">
+            <svg class="w-3.5 h-3.5 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>
+          </div>
+          <h3 class="text-sm font-bold text-gray-700">Usu&aacute;rios por Perfil</h3>
+        </div>
+        <div id="usuarios-perfil-list" class="space-y-2.5"></div>
+      </div>
+
+      <!-- Profissionais por Especialidade -->
+      <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-5">
+        <div class="flex items-center gap-2 mb-4">
+          <div class="w-7 h-7 rounded-lg bg-purple-50 flex items-center justify-center">
+            <svg class="w-3.5 h-3.5 text-purple-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>
+          </div>
+          <h3 class="text-sm font-bold text-gray-700">Profissionais por Especialidade</h3>
+        </div>
+        <div id="especialidades-list" class="space-y-2.5"></div>
+      </div>
+
+      <!-- Médias por Empresa -->
+      <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-5">
+        <div class="flex items-center gap-2 mb-4">
+          <div class="w-7 h-7 rounded-lg bg-amber-50 flex items-center justify-center">
+            <svg class="w-3.5 h-3.5 text-amber-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M18 20V10"/><path d="M12 20V4"/><path d="M6 20v-6"/></svg>
+          </div>
+          <h3 class="text-sm font-bold text-gray-700">M&eacute;dias por Empresa</h3>
+        </div>
+        <div class="space-y-3">
+          <div class="flex items-center justify-between py-2.5 border-b border-gray-50">
+            <span class="text-sm text-gray-500">Profissionais / empresa</span>
+            <span id="media-prof" class="text-sm font-bold text-gray-800">—</span>
+          </div>
+          <div class="flex items-center justify-between py-2.5 border-b border-gray-50">
+            <span class="text-sm text-gray-500">Pacientes / empresa</span>
+            <span id="media-pac" class="text-sm font-bold text-gray-800">—</span>
+          </div>
+          <div class="flex items-center justify-between py-2.5 border-b border-gray-50">
+            <span class="text-sm text-gray-500">Usu&aacute;rios / empresa</span>
+            <span id="media-usu" class="text-sm font-bold text-gray-800">—</span>
+          </div>
+          <div class="flex items-center justify-between py-2.5 border-b border-gray-50">
+            <span class="text-sm text-gray-500">Agend. / empresa (30d)</span>
+            <span id="media-agend" class="text-sm font-bold text-gray-800">—</span>
+          </div>
+          <div class="flex items-center justify-between py-2.5">
+            <span class="text-sm text-gray-500">Taxa de falta</span>
+            <span id="taxa-falta" class="text-sm font-bold text-red-600">—</span>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- ══════════════════════════ AGENDAMENTOS ══════════════════════════ -->
+    <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-5">
+      <div class="flex items-center justify-between gap-3 mb-5">
+        <div class="flex items-center gap-2">
+          <div class="w-7 h-7 rounded-lg bg-amber-50 flex items-center justify-center">
+            <svg class="w-3.5 h-3.5 text-amber-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+          </div>
+          <h3 class="text-sm font-bold text-gray-700">Agendamentos por Status — Total Geral</h3>
+        </div>
+        <span id="agend-total-label" class="text-xs text-gray-400 font-medium"></span>
+      </div>
+
+      <!-- Status cards -->
+      <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 mb-6">
+        <div class="rounded-xl p-3 bg-blue-50 border border-blue-100">
+          <div class="w-2.5 h-2.5 rounded-full bg-blue-500 mb-2"></div>
+          <p class="text-[0.65rem] font-bold text-blue-600 uppercase tracking-wider">Agendado</p>
+          <p id="agend-agendado" class="text-xl font-extrabold text-gray-800 mt-0.5">—</p>
+          <p id="agend-agendado-pct" class="text-[0.7rem] text-blue-600 mt-0.5">—</p>
+        </div>
+        <div class="rounded-xl p-3 bg-green-50 border border-green-100">
+          <div class="w-2.5 h-2.5 rounded-full bg-green-500 mb-2"></div>
+          <p class="text-[0.65rem] font-bold text-green-600 uppercase tracking-wider">Confirmada</p>
+          <p id="agend-confirmada" class="text-xl font-extrabold text-gray-800 mt-0.5">—</p>
+          <p id="agend-confirmada-pct" class="text-[0.7rem] text-green-600 mt-0.5">—</p>
+        </div>
+        <div class="rounded-xl p-3 bg-vitta-50 border border-vitta-100">
+          <div class="w-2.5 h-2.5 rounded-full bg-vitta-500 mb-2"></div>
+          <p class="text-[0.65rem] font-bold text-vitta-600 uppercase tracking-wider">Realizada</p>
+          <p id="agend-realizada" class="text-xl font-extrabold text-gray-800 mt-0.5">—</p>
+          <p id="agend-realizada-pct" class="text-[0.7rem] text-vitta-600 mt-0.5">—</p>
+        </div>
+        <div class="rounded-xl p-3 bg-red-50 border border-red-100">
+          <div class="w-2.5 h-2.5 rounded-full bg-red-500 mb-2"></div>
+          <p class="text-[0.65rem] font-bold text-red-600 uppercase tracking-wider">Falta</p>
+          <p id="agend-falta" class="text-xl font-extrabold text-gray-800 mt-0.5">—</p>
+          <p id="agend-falta-pct" class="text-[0.7rem] text-red-600 mt-0.5">—</p>
+        </div>
+        <div class="rounded-xl p-3 bg-gray-50 border border-gray-200">
+          <div class="w-2.5 h-2.5 rounded-full bg-gray-400 mb-2"></div>
+          <p class="text-[0.65rem] font-bold text-gray-500 uppercase tracking-wider">Cancelado</p>
+          <p id="agend-cancelado" class="text-xl font-extrabold text-gray-800 mt-0.5">—</p>
+          <p id="agend-cancelado-pct" class="text-[0.7rem] text-gray-500 mt-0.5">—</p>
+        </div>
+        <div class="rounded-xl p-3 bg-pink-50 border border-pink-100">
+          <div class="w-2.5 h-2.5 rounded-full bg-pink-400 mb-2"></div>
+          <p class="text-[0.65rem] font-bold text-pink-600 uppercase tracking-wider">Outros</p>
+          <p id="agend-outros" class="text-xl font-extrabold text-gray-800 mt-0.5">—</p>
+          <p id="agend-outros-pct" class="text-[0.7rem] text-pink-600 mt-0.5">—</p>
+        </div>
+      </div>
+
+      <!-- Monthly chart -->
+      <div class="border-t border-gray-100 pt-5">
+        <p class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-4">Agendamentos realizados &mdash; &Uacute;ltimos 12 meses</p>
+        <canvas id="chart-agendamentos-mes" height="90"></canvas>
+      </div>
+    </div>
+
+    <!-- ══════════════════════════ RANKINGS ══════════════════════════ -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+
+      <!-- Top Empresas por Agendamentos (30d) -->
+      <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-5">
+        <div class="flex items-center gap-2 mb-4">
+          <div class="w-7 h-7 rounded-lg bg-amber-50 flex items-center justify-center">
+            <svg class="w-3.5 h-3.5 text-amber-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+          </div>
+          <h3 class="text-sm font-bold text-gray-700">Top Empresas — Agendamentos (30d)</h3>
+        </div>
+        <div id="ranking-agendamentos" class="space-y-2"></div>
+      </div>
+
+      <!-- Top Empresas por Pacientes -->
+      <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-5">
+        <div class="flex items-center gap-2 mb-4">
+          <div class="w-7 h-7 rounded-lg bg-green-50 flex items-center justify-center">
+            <svg class="w-3.5 h-3.5 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>
+          </div>
+          <h3 class="text-sm font-bold text-gray-700">Top Empresas — Pacientes Ativos</h3>
+        </div>
+        <div id="ranking-pacientes" class="space-y-2"></div>
+      </div>
+
+    </div>
+
+    <!-- ══════════════════════════ ALERTAS ══════════════════════════ -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+
+      <!-- Empresas sem atividade -->
+      <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-5">
+        <div class="flex items-center gap-2 mb-4">
+          <div class="w-7 h-7 rounded-lg bg-orange-50 flex items-center justify-center">
+            <svg class="w-3.5 h-3.5 text-orange-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+          </div>
+          <h3 class="text-sm font-bold text-gray-700">Empresas sem Agendamento (30 dias)</h3>
+          <span id="alerta-inativas-count" class="ml-auto text-xs font-bold bg-orange-100 text-orange-600 px-2 py-0.5 rounded-full"></span>
+        </div>
+        <div id="alerta-inativas" class="space-y-1.5 max-h-48 overflow-y-auto pr-1">
+          <p class="text-sm text-gray-400">Carregando...</p>
+        </div>
+      </div>
+
+      <!-- Empresas em trial / inadimplência -->
+      <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-5">
+        <div class="flex items-center gap-2 mb-4">
+          <div class="w-7 h-7 rounded-lg bg-red-50 flex items-center justify-center">
+            <svg class="w-3.5 h-3.5 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+          </div>
+          <h3 class="text-sm font-bold text-gray-700">Status Financeiro das Empresas</h3>
+        </div>
+        <div id="status-financeiro" class="space-y-2.5"></div>
+      </div>
+
+    </div>
+
+    <!-- ══════════════════════════ IDEIAS / INDICADORES FUTUROS ══════════════════════════ -->
+    <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
+      <div class="flex items-center gap-3 mb-5">
+        <div class="w-9 h-9 rounded-xl bg-gradient-to-br from-vitta-500 to-vitta-700 flex items-center justify-center">
+          <svg class="w-4.5 h-4.5 text-white w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M12 2a10 10 0 1 0 0 20A10 10 0 0 0 12 2z"/><path d="M12 6v6l4 2"/></svg>
+        </div>
+        <div>
+          <h3 class="text-sm font-bold text-gray-800">Indicadores Futuros Sugeridos</h3>
+          <p class="text-xs text-gray-400">Dados valiosos que podem ser implementados para enriquecer o painel</p>
+        </div>
+      </div>
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+
+        <div class="rounded-xl border border-dashed border-gray-200 p-4 hover:border-vitta-300 hover:bg-vitta-50/40 transition-colors group">
+          <div class="w-8 h-8 rounded-lg bg-vitta-50 group-hover:bg-vitta-100 flex items-center justify-center mb-2.5 transition-colors">
+            <svg class="w-4 h-4 text-vitta-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M3 3l18 18"/><path d="M3 12a9 9 0 1 0 18 0 9 9 0 0 0-18 0"/></svg>
+          </div>
+          <p class="text-xs font-bold text-gray-700 mb-1">Taxa de Churn</p>
+          <p class="text-xs text-gray-500 leading-relaxed">% de empresas que cancelaram assinatura no mês. Indicador crítico de reten&ccedil;&atilde;o de clientes.</p>
+        </div>
+
+        <div class="rounded-xl border border-dashed border-gray-200 p-4 hover:border-green-300 hover:bg-green-50/40 transition-colors group">
+          <div class="w-8 h-8 rounded-lg bg-green-50 group-hover:bg-green-100 flex items-center justify-center mb-2.5 transition-colors">
+            <svg class="w-4 h-4 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>
+          </div>
+          <p class="text-xs font-bold text-gray-700 mb-1">ARR / MRR Detalhado</p>
+          <p class="text-xs text-gray-500 leading-relaxed">Receita Anual Recorrente por plano, crescimento MoM e previs&atilde;o de receita futura.</p>
+        </div>
+
+        <div class="rounded-xl border border-dashed border-gray-200 p-4 hover:border-purple-300 hover:bg-purple-50/40 transition-colors group">
+          <div class="w-8 h-8 rounded-lg bg-purple-50 group-hover:bg-purple-100 flex items-center justify-center mb-2.5 transition-colors">
+            <svg class="w-4 h-4 text-purple-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+          </div>
+          <p class="text-xs font-bold text-gray-700 mb-1">Hor&aacute;rios de Pico</p>
+          <p class="text-xs text-gray-500 leading-relaxed">Distribui&ccedil;&atilde;o de agendamentos por hora do dia e dia da semana. Identifica padr&otilde;es de uso.</p>
+        </div>
+
+        <div class="rounded-xl border border-dashed border-gray-200 p-4 hover:border-amber-300 hover:bg-amber-50/40 transition-colors group">
+          <div class="w-8 h-8 rounded-lg bg-amber-50 group-hover:bg-amber-100 flex items-center justify-center mb-2.5 transition-colors">
+            <svg class="w-4 h-4 text-amber-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+          </div>
+          <p class="text-xs font-bold text-gray-700 mb-1">Requer&ccedil;&atilde;o de Pacientes</p>
+          <p class="text-xs text-gray-500 leading-relaxed">% de pacientes que retornam ao menos 1x por m&ecirc;s. M&eacute;trica de fideliza&ccedil;&atilde;o e qualidade.</p>
+        </div>
+
+        <div class="rounded-xl border border-dashed border-gray-200 p-4 hover:border-blue-300 hover:bg-blue-50/40 transition-colors group">
+          <div class="w-8 h-8 rounded-lg bg-blue-50 group-hover:bg-blue-100 flex items-center justify-center mb-2.5 transition-colors">
+            <svg class="w-4 h-4 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+          </div>
+          <p class="text-xs font-bold text-gray-700 mb-1">Engajamento de Uso (DAU)</p>
+          <p class="text-xs text-gray-500 leading-relaxed">Usu&aacute;rios ativos di&aacute;rios vs mensais por empresa. Detecta empresas em risco de abandono.</p>
+        </div>
+
+        <div class="rounded-xl border border-dashed border-gray-200 p-4 hover:border-red-300 hover:bg-red-50/40 transition-colors group">
+          <div class="w-8 h-8 rounded-lg bg-red-50 group-hover:bg-red-100 flex items-center justify-center mb-2.5 transition-colors">
+            <svg class="w-4 h-4 text-red-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
+          </div>
+          <p class="text-xs font-bold text-gray-700 mb-1">Sa&uacute;de Financeira (NPS)</p>
+          <p class="text-xs text-gray-500 leading-relaxed">Pesquisa de satisfa&ccedil;&atilde;o com administradores de empresa. Net Promoter Score do SaaS.</p>
+        </div>
+
+        <div class="rounded-xl border border-dashed border-gray-200 p-4 hover:border-emerald-300 hover:bg-emerald-50/40 transition-colors group">
+          <div class="w-8 h-8 rounded-lg bg-emerald-50 group-hover:bg-emerald-100 flex items-center justify-center mb-2.5 transition-colors">
+            <svg class="w-4 h-4 text-emerald-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+          </div>
+          <p class="text-xs font-bold text-gray-700 mb-1">Ticket M&eacute;dio por Consulta</p>
+          <p class="text-xs text-gray-500 leading-relaxed">Valor m&eacute;dio cobrado por atendimento realizado. Requer integra&ccedil;&atilde;o com m&oacute;dulo financeiro.</p>
+        </div>
+
+        <div class="rounded-xl border border-dashed border-gray-200 p-4 hover:border-indigo-300 hover:bg-indigo-50/40 transition-colors group">
+          <div class="w-8 h-8 rounded-lg bg-indigo-50 group-hover:bg-indigo-100 flex items-center justify-center mb-2.5 transition-colors">
+            <svg class="w-4 h-4 text-indigo-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg>
+          </div>
+          <p class="text-xs font-bold text-gray-700 mb-1">Funil de Convers&atilde;o</p>
+          <p class="text-xs text-gray-500 leading-relaxed">Trial &rarr; Pagante &rarr; Upgrade de plano. Otimiza estrat&eacute;gia de ativa&ccedil;&atilde;o e upsell.</p>
+        </div>
+
+      </div>
+    </div>
+
+  </main>
+</div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<script src="../assets/js/config.js?v=2"></script>
+<script src="../assets/js/admin-empresa-context.js?v=1"></script>
+<script src="../assets/js/access-guard.js?v=2"></script>
+<script>
+/* ═══════════════════════════════════════════
+   UTILITÁRIOS
+═══════════════════════════════════════════ */
+function fmtNum(n) { return (n ?? 0).toLocaleString('pt-BR'); }
+function fmtBRL(v) { return new Intl.NumberFormat('pt-BR',{style:'currency',currency:'BRL'}).format(v||0); }
+function initials(n) { if(!n) return '?'; return n.trim().split(/\s+/).slice(0,2).map(w=>w[0]).join('').toUpperCase(); }
+function pct(a,b) { if(!b) return '0%'; return (a/b*100).toFixed(1)+'%'; }
+
+function barRow(label, value, total, color, sub) {
+  const p = total ? Math.round(value / total * 100) : 0;
+  return `<div>
+    <div class="flex items-center justify-between mb-1">
+      <span class="text-xs text-gray-600 font-medium">${label}</span>
+      <span class="text-xs font-bold text-gray-800">${fmtNum(value)}<span class="text-gray-400 font-normal ml-1">${sub || ''}</span></span>
+    </div>
+    <div class="h-1.5 bg-gray-100 rounded-full overflow-hidden">
+      <div class="bar-fill h-full rounded-full ${color}" style="width:${p}%"></div>
+    </div>
+  </div>`;
+}
+
+function rankRow(pos, nome, value, color, label) {
+  const medals = ['🥇','🥈','🥉'];
+  return `<div class="flex items-center gap-3 py-2 border-b border-gray-50 last:border-0">
+    <span class="text-base w-6 shrink-0">${medals[pos-1] || pos+'.'}</span>
+    <span class="flex-1 text-sm text-gray-700 font-medium truncate">${nome}</span>
+    <span class="text-sm font-bold ${color} shrink-0">${fmtNum(value)} <span class="text-gray-400 font-normal text-xs">${label}</span></span>
+  </div>`;
+}
+
+/* ═══════════════════════════════════════════
+   CHARTS
+═══════════════════════════════════════════ */
+const VITTA_COLOR   = '#2ABCD4';
+const VITTA_LIGHT   = 'rgba(42,188,212,0.15)';
+let chartNovas      = null;
+let chartAgend      = null;
+
+function getLast12Months() {
+  const months = [];
+  for (let i = 11; i >= 0; i--) {
+    const d = new Date();
+    d.setDate(1);
+    d.setMonth(d.getMonth() - i);
+    months.push({ key: d.toISOString().substring(0,7), label: d.toLocaleDateString('pt-BR',{month:'short',year:'2-digit'}) });
+  }
+  return months;
+}
+
+function getLast6Months() {
+  const months = [];
+  for (let i = 5; i >= 0; i--) {
+    const d = new Date();
+    d.setDate(1);
+    d.setMonth(d.getMonth() - i);
+    months.push({ key: d.toISOString().substring(0,7), label: d.toLocaleDateString('pt-BR',{month:'short',year:'2-digit'}) });
+  }
+  return months;
+}
+
+function buildNovasEmpresasChart(empresas) {
+  const months = getLast6Months();
+  const counts = months.map(m => empresas.filter(e => e.DTCRI_EMP && e.DTCRI_EMP.startsWith(m.key)).length);
+  if (chartNovas) chartNovas.destroy();
+  chartNovas = new Chart(document.getElementById('chart-novas-empresas'), {
+    type: 'bar',
+    data: {
+      labels: months.map(m => m.label),
+      datasets: [{ data: counts, backgroundColor: VITTA_LIGHT, borderColor: VITTA_COLOR, borderWidth: 2, borderRadius: 6 }]
+    },
+    options: {
+      responsive: true, plugins: { legend: { display: false }, tooltip: { callbacks: { label: ctx => ctx.parsed.y + ' empresa(s)' } } },
+      scales: { y: { beginAtZero: true, ticks: { stepSize: 1, font: { size: 10 } }, grid: { color: '#f3f4f6' } }, x: { ticks: { font: { size: 10 } }, grid: { display: false } } }
+    }
+  });
+}
+
+function buildAgendMesChart(agend12m) {
+  const months = getLast12Months();
+  const counts = months.map(m => agend12m.filter(a => a.DT_AGD && a.DT_AGD.startsWith(m.key) && a.STATUS_AGD === 'REALIZADA').length);
+  if (chartAgend) chartAgend.destroy();
+  chartAgend = new Chart(document.getElementById('chart-agendamentos-mes'), {
+    type: 'bar',
+    data: {
+      labels: months.map(m => m.label),
+      datasets: [{
+        label: 'Realizadas',
+        data: counts,
+        backgroundColor: 'rgba(42,188,212,0.2)',
+        borderColor: VITTA_COLOR,
+        borderWidth: 2,
+        borderRadius: 6,
+        fill: true,
+      }]
+    },
+    options: {
+      responsive: true,
+      plugins: { legend: { display: false }, tooltip: { callbacks: { label: ctx => ctx.parsed.y + ' realizados' } } },
+      scales: {
+        y: { beginAtZero: true, ticks: { font: { size: 10 } }, grid: { color: '#f3f4f6' } },
+        x: { ticks: { font: { size: 10 } }, grid: { display: false } }
+      }
+    }
+  });
+}
+
+/* ═══════════════════════════════════════════
+   RENDER SECTIONS
+═══════════════════════════════════════════ */
+function renderKPIs(empresas, usuarios, profissionais, pacientes, agendTotal) {
+  const empAtivas = empresas.filter(e => e.ATIVO_EMP).length;
+  const usuAtivos = usuarios.filter(u => u.ATIVO_USU).length;
+  const profAtivos = profissionais.filter(p => p.ATIVO_PROF).length;
+  const pacAtivos  = pacientes.filter(p => p.ATIVO_PAC).length;
+
+  // MRR estimado: soma PRECO_PLANO das empresas ativas com plano
+  const mrr = empresas.filter(e => e.ATIVO_EMP && e.PLANO?.PRECO_PLANO)
+    .reduce((s, e) => s + (Number(e.PLANO.PRECO_PLANO) || 0), 0);
+
+  document.getElementById('kpi-empresas').textContent       = fmtNum(empresas.length);
+  document.getElementById('kpi-empresas-sub').textContent    = `${empAtivas} ativas`;
+  document.getElementById('kpi-usuarios').textContent       = fmtNum(usuarios.length);
+  document.getElementById('kpi-usuarios-sub').textContent    = `${fmtNum(usuAtivos)} ativos`;
+  document.getElementById('kpi-profissionais').textContent  = fmtNum(profissionais.length);
+  document.getElementById('kpi-profissionais-sub').textContent = `${fmtNum(profAtivos)} ativos`;
+  document.getElementById('kpi-pacientes').textContent      = fmtNum(pacAtivos);
+  document.getElementById('kpi-agendamentos').textContent   = fmtNum(agendTotal);
+  document.getElementById('kpi-mrr').textContent            = mrr ? fmtBRL(mrr) : '—';
+}
+
+function renderEmpresas(empresas) {
+  // Por plano
+  const byPlano = {};
+  empresas.forEach(e => {
+    const nome = e.PLANO?.NOME_PLANO || 'Sem plano';
+    byPlano[nome] = (byPlano[nome] || 0) + 1;
+  });
+  const planosSorted = Object.entries(byPlano).sort((a,b) => b[1]-a[1]);
+  document.getElementById('planos-list').innerHTML = planosSorted
+    .map(([nome, cnt]) => barRow(nome, cnt, empresas.length, 'bg-vitta-500', pct(cnt, empresas.length)))
+    .join('') || '<p class="text-sm text-gray-400">Sem dados</p>';
+
+  // Por status
+  const statusMap = { ativo:'Ativo', trial:'Trial', inadimplente:'Inadimplente', cancelado:'Cancelado', cancelamento_agendado:'Cancelamento Ag.', outro:'Outro' };
+  const statusColors = { ativo:'bg-green-500', trial:'bg-amber-400', inadimplente:'bg-red-500', cancelado:'bg-gray-400', cancelamento_agendado:'bg-orange-400', outro:'bg-gray-300' };
+  const byStatus = {};
+  empresas.forEach(e => {
+    const s = e.STATUS_EMP || (e.ATIVO_EMP ? 'ativo' : 'outro');
+    byStatus[s] = (byStatus[s] || 0) + 1;
+  });
+
+  const statusSorted = Object.entries(byStatus).sort((a,b) => b[1]-a[1]);
+  document.getElementById('status-emp-list').innerHTML = statusSorted
+    .map(([s, cnt]) => barRow(statusMap[s] || s, cnt, empresas.length, statusColors[s] || 'bg-gray-300', pct(cnt, empresas.length)))
+    .join('');
+
+  const ativoPct = empresas.length ? (byStatus['ativo'] || 0) / empresas.length * 100 : 0;
+  document.getElementById('status-bar-ativo').style.width = ativoPct + '%';
+
+  // Status financeiro
+  const finItems = [
+    { label:'Ativas / Pagas', count: byStatus['ativo'] || 0, color:'text-green-600', dot:'bg-green-500' },
+    { label:'Em Trial',       count: byStatus['trial'] || 0, color:'text-amber-600', dot:'bg-amber-400' },
+    { label:'Inadimplentes',  count: byStatus['inadimplente'] || 0, color:'text-red-600', dot:'bg-red-500' },
+    { label:'Cancelamento Ag.', count: byStatus['cancelamento_agendado'] || 0, color:'text-orange-600', dot:'bg-orange-400' },
+    { label:'Canceladas',     count: byStatus['cancelado'] || 0, color:'text-gray-500', dot:'bg-gray-400' },
+  ];
+  document.getElementById('status-financeiro').innerHTML = finItems.map(item => `
+    <div class="flex items-center justify-between py-2 border-b border-gray-50 last:border-0">
+      <div class="flex items-center gap-2">
+        <span class="w-2 h-2 rounded-full ${item.dot} shrink-0"></span>
+        <span class="text-sm text-gray-600">${item.label}</span>
+      </div>
+      <span class="text-sm font-bold ${item.color}">${fmtNum(item.count)}</span>
+    </div>`).join('');
+}
+
+function renderUsuarios(usuarios) {
+  const LABELS = { ADMIN_EMPRESA:'Admin Empresa', SECRETARIA:'Secretaria', PROFISSIONAL:'Profissional' };
+  const COLORS = { ADMIN_EMPRESA:'bg-blue-500', SECRETARIA:'bg-purple-400', PROFISSIONAL:'bg-vitta-500' };
+  const byTipo = {};
+  usuarios.forEach(u => { byTipo[u.TIPO_USU] = (byTipo[u.TIPO_USU] || 0) + 1; });
+  const sorted = Object.entries(byTipo).sort((a,b) => b[1]-a[1]);
+  document.getElementById('usuarios-perfil-list').innerHTML = sorted
+    .map(([tipo, cnt]) => barRow(LABELS[tipo] || tipo, cnt, usuarios.length, COLORS[tipo] || 'bg-gray-400', pct(cnt, usuarios.length)))
+    .join('') || '<p class="text-sm text-gray-400">Sem dados</p>';
+}
+
+function renderProfissionais(profissionais) {
+  const byEspec = {};
+  profissionais.forEach(p => {
+    const nome = p.ESPECIALIDADE?.NOME_ESPEC || 'Sem especialidade';
+    byEspec[nome] = (byEspec[nome] || 0) + 1;
+  });
+  const sorted = Object.entries(byEspec).sort((a,b) => b[1]-a[1]).slice(0, 8);
+  document.getElementById('especialidades-list').innerHTML = sorted
+    .map(([nome, cnt]) => barRow(nome, cnt, profissionais.length, 'bg-purple-500', pct(cnt, profissionais.length)))
+    .join('') || '<p class="text-sm text-gray-400">Sem dados</p>';
+}
+
+function renderMedias(empresas, usuarios, profissionais, pacientes, agend30d) {
+  const empAtivas = empresas.filter(e => e.ATIVO_EMP);
+  const n = empAtivas.length || 1;
+
+  const profAtivos = profissionais.filter(p => p.ATIVO_PROF).length;
+  const pacAtivos  = pacientes.filter(p => p.ATIVO_PAC).length;
+  const usuAtivos  = usuarios.filter(u => u.ATIVO_USU).length;
+
+  document.getElementById('media-prof').textContent  = (profAtivos / n).toFixed(1);
+  document.getElementById('media-pac').textContent   = (pacAtivos / n).toFixed(1);
+  document.getElementById('media-usu').textContent   = (usuAtivos / n).toFixed(1);
+  document.getElementById('media-agend').textContent = (agend30d.length / n).toFixed(1);
+
+  const faltas    = agend30d.filter(a => a.STATUS_AGD === 'FALTA').length;
+  const realizadas = agend30d.filter(a => ['REALIZADA','FALTA'].includes(a.STATUS_AGD)).length;
+  document.getElementById('taxa-falta').textContent = realizadas ? pct(faltas, realizadas) : '—';
+}
+
+function renderAgendamentos(agendAll, agend30d, totalAgend) {
+  const counts = {};
+  agendAll.forEach(a => { counts[a.STATUS_AGD] = (counts[a.STATUS_AGD] || 0) + 1; });
+
+  const MAIN = ['AGENDADO','CONFIRMADA','REALIZADA','FALTA','CANCELADO'];
+  let outros = 0;
+  Object.entries(counts).forEach(([s,c]) => { if (!MAIN.includes(s)) outros += c; });
+
+  const setAgend = (id, val) => {
+    document.getElementById('agend-' + id).textContent = fmtNum(val || 0);
+    document.getElementById('agend-' + id + '-pct').textContent = pct(val || 0, totalAgend);
+  };
+
+  setAgend('agendado',   counts['AGENDADO']   || 0);
+  setAgend('confirmada', counts['CONFIRMADA'] || 0);
+  setAgend('realizada',  counts['REALIZADA']  || 0);
+  setAgend('falta',      counts['FALTA']      || 0);
+  setAgend('cancelado',  counts['CANCELADO']  || 0);
+  setAgend('outros',     outros);
+  document.getElementById('agend-total-label').textContent = `Total: ${fmtNum(totalAgend)} agendamentos`;
+}
+
+function renderRankings(agend30d, pacientes, empresas) {
+  // Top por agendamentos (30d)
+  const agByEmp = {};
+  agend30d.forEach(a => { agByEmp[a.ID_EMP] = (agByEmp[a.ID_EMP] || 0) + 1; });
+  const topAgend = Object.entries(agByEmp).sort((a,b) => b[1]-a[1]).slice(0, 5);
+  document.getElementById('ranking-agendamentos').innerHTML = topAgend.length
+    ? topAgend.map(([id, cnt], i) => {
+        const emp = empresas.find(e => e.ID_EMP === id);
+        return rankRow(i+1, emp?.NOME_EMP || id.substring(0,8), cnt, 'text-amber-600', 'agend.');
+      }).join('')
+    : '<p class="text-sm text-gray-400">Sem agendamentos nos &uacute;ltimos 30 dias</p>';
+
+  // Top por pacientes
+  const pacByEmp = {};
+  pacientes.filter(p => p.ATIVO_PAC).forEach(p => { pacByEmp[p.EMP_PAC] = (pacByEmp[p.EMP_PAC] || 0) + 1; });
+  const topPac = Object.entries(pacByEmp).sort((a,b) => b[1]-a[1]).slice(0, 5);
+  document.getElementById('ranking-pacientes').innerHTML = topPac.length
+    ? topPac.map(([id, cnt], i) => {
+        const emp = empresas.find(e => e.ID_EMP === id);
+        return rankRow(i+1, emp?.NOME_EMP || id.substring(0,8), cnt, 'text-green-600', 'pac.');
+      }).join('')
+    : '<p class="text-sm text-gray-400">Sem dados de pacientes</p>';
+}
+
+function renderAlertas(empresas, agend30d) {
+  const empComAgend = new Set(agend30d.map(a => a.ID_EMP));
+  const semAtividade = empresas.filter(e => e.ATIVO_EMP && !empComAgend.has(e.ID_EMP));
+
+  document.getElementById('alerta-inativas-count').textContent = semAtividade.length || '0';
+  document.getElementById('alerta-inativas').innerHTML = semAtividade.length
+    ? semAtividade.map(e => `
+        <div class="flex items-center justify-between py-1.5 border-b border-gray-50 last:border-0">
+          <span class="text-sm text-gray-700 truncate">${e.NOME_EMP}</span>
+          <a href="empresa-fatura.html?id=${e.ID_EMP}" class="text-xs text-vitta-600 hover:underline shrink-0 ml-2">Ver faturas</a>
+        </div>`).join('')
+    : '<p class="text-sm text-green-600 font-medium">Todas as empresas ativas t&ecirc;m agendamentos recentes 🎉</p>';
+}
+
+/* ═══════════════════════════════════════════
+   CARGA PRINCIPAL
+═══════════════════════════════════════════ */
+async function loadAll() {
+  const icon = document.getElementById('refresh-icon');
+  icon.classList.add('animate-spin');
+
+  try {
+    const thirtyDaysAgo  = new Date(); thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+    const twelveMonthsAgo = new Date(); twelveMonthsAgo.setFullYear(twelveMonthsAgo.getFullYear() - 1);
+    const d30  = thirtyDaysAgo.toISOString().split('T')[0];
+    const d12m = twelveMonthsAgo.toISOString().split('T')[0];
+
+    // Batch 1: dados mestres
+    const [
+      { data: empresas  = [] },
+      { data: usuarios  = [] },
+      { data: profissionais = [] },
+      { data: pacientes = [] },
+    ] = await Promise.all([
+      supabase.from('EMPRESA').select('ID_EMP,NOME_EMP,ATIVO_EMP,STATUS_EMP,DTCRI_EMP,PLANO:ID_PLANO(NOME_PLANO,PRECO_PLANO)'),
+      supabase.from('USUARIO').select('TIPO_USU,ATIVO_USU,ID_EMP').neq('TIPO_USU','ADMIN_GLOBAL'),
+      supabase.from('PROFISSIONAL').select('ID_PROF,ATIVO_PROF,ID_EMP,ESPECIALIDADE:ID_ESPEC(NOME_ESPEC)'),
+      supabase.from('PACIENTE').select('ID_PAC,ATIVO_PAC,EMP_PAC'),
+    ]);
+
+    // Batch 2: agendamentos
+    const [
+      { data: agend12m = [] },
+      { data: agend30d = [] },
+      { count: totalAgend = 0 },
+      { data: agendAll = [] },
+    ] = await Promise.all([
+      supabase.from('AGENDAMENTO').select('STATUS_AGD,DT_AGD,ID_EMP').gte('DT_AGD', d12m),
+      supabase.from('AGENDAMENTO').select('STATUS_AGD,DT_AGD,ID_EMP').gte('DT_AGD', d30),
+      supabase.from('AGENDAMENTO').select('*', { count:'exact', head:true }),
+      supabase.from('AGENDAMENTO').select('STATUS_AGD'),
+    ]);
+
+    renderKPIs(empresas, usuarios, profissionais, pacientes, totalAgend);
+    renderEmpresas(empresas);
+    renderUsuarios(usuarios);
+    renderProfissionais(profissionais);
+    renderMedias(empresas, usuarios, profissionais, pacientes, agend30d);
+    renderAgendamentos(agendAll, agend30d, totalAgend);
+    renderRankings(agend30d, pacientes, empresas);
+    renderAlertas(empresas, agend30d);
+    buildNovasEmpresasChart(empresas);
+    buildAgendMesChart(agend12m);
+
+    document.getElementById('last-update').textContent = new Date().toLocaleTimeString('pt-BR', { hour:'2-digit', minute:'2-digit' });
+
+  } catch (e) {
+    console.error('Erro no Dashboard Gerencial:', e);
+  } finally {
+    icon.classList.remove('animate-spin');
+  }
+}
+
+/* ═══════════════════════════════════════════
+   AUTENTICAÇÃO
+═══════════════════════════════════════════ */
+async function initAuth() {
+  const { data: { session } } = await supabase.auth.getSession();
+  if (!session) { window.location.href = '../index.html'; return false; }
+
+  const u = await getUsuarioAtual('NOME_USU,TIPO_USU,ATIVO_USU,PROF_USU', session);
+
+  if (!u || !u.ATIVO_USU) { await supabase.auth.signOut(); window.location.href = '../index.html'; return false; }
+  if (u.TIPO_USU !== 'ADMIN_GLOBAL') { window.location.href = 'dashboard.html'; return false; }
+
+  const nome = u.NOME_USU || session.user.email;
+  const ini  = initials(nome);
+  ['user-name','header-user-name'].forEach(id => { const el=document.getElementById(id); if(el) el.textContent = nome; });
+  ['user-avatar','header-avatar'].forEach(id => { const el=document.getElementById(id); if(el) el.textContent = ini; });
+  if (!u.PROF_USU) document.querySelector('a[href="consultas.html"]')?.classList.add('hidden');
+  AdminEmpresaCtx.initSelector('ADMIN_GLOBAL', session.user.id);
+  return true;
+}
+
+async function handleLogout() { await supabase.auth.signOut(); window.location.href = '../index.html'; }
+
+function toggleMenu(key) {
+  const sub  = document.getElementById('sub-' + key);
+  const chev = document.getElementById('chev-' + key);
+  if (!sub) return;
+  sub.classList.toggle('open'); chev?.classList.toggle('open');
+}
+function toggleSidebar() {
+  const sb = document.getElementById('sidebar');
+  const ov = document.getElementById('overlay');
+  sb.classList.toggle('-translate-x-full');
+  ov.classList.toggle('hidden');
+}
+document.querySelectorAll('#sidebar nav a').forEach(link => {
+  link.addEventListener('click', () => {
+    const sb = document.getElementById('sidebar');
+    const ov = document.getElementById('overlay');
+    if (sb && !sb.classList.contains('-translate-x-full')) {
+      sb.classList.add('-translate-x-full');
+      ov?.classList.add('hidden');
+    }
+  });
+});
+
+(async () => {
+  const ok = await initAuth();
+  if (ok) await loadAll();
+})();
+</script>
+<script>
+(async () => {
+  try {
+    const { data: { session } } = await supabase.auth.getSession();
+    if (!session) return;
+    const u = await getUsuarioAtual('TIPO_USU,ID_EMP', session);
+    if (u && u.ID_EMP === '22ff26b9-3839-45ed-8a1d-df4a488d3aab' && ['ADMIN_EMPRESA','SECRETARIA'].includes(u.TIPO_USU)) {
+      document.getElementById('menuDocumentosWrap')?.classList.remove('hidden');
+    }
+  } catch (_) {}
+})();
+</script>
+</body>
+</html>

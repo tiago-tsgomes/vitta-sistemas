@@ -1,0 +1,1539 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>Empresas — Vitta Sistemas</title>
+  <link rel="icon" type="image/png" href="../img/favicon.png" />
+
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            vitta: { 50:'#f0fbfd', 100:'#e0f7fa', 300:'#80deea', 400:'#4dd9ed', 500:'#2ABCD4', 600:'#1a96ac', 700:'#127a8c' }
+          },
+          fontFamily: { sans: ['Inter','system-ui','sans-serif'] }
+        }
+      }
+    }
+  </script>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+
+  <style>
+    .sidebar-nav::-webkit-scrollbar { width:3px; }
+    .sidebar-nav::-webkit-scrollbar-thumb { background:rgba(255,255,255,.1); border-radius:4px; }
+    .submenu { overflow:hidden; max-height:0; opacity:0; transition:max-height .25s ease,opacity .2s ease; }
+    .submenu.open { max-height:500px; opacity:1; }
+    .chevron { transition:transform .25s ease; display:inline-block; }
+    .chevron.open { transform:rotate(180deg); }
+    @keyframes fadeUp { from{opacity:0;transform:translateY(8px)} to{opacity:1;transform:translateY(0)} }
+    .fade-up { animation:fadeUp .35s ease forwards; }
+
+    .modal-overlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,.5); z-index:300;
+                     align-items:flex-start; justify-content:center; padding:24px 16px; overflow-y:auto; }
+    .modal-overlay.open { display:flex; }
+
+    .sec-body { transition:max-height .25s ease,opacity .2s ease; overflow:hidden; }
+    .sec-body.collapsed { max-height:0!important; opacity:0; padding-top:0!important; padding-bottom:0!important; }
+
+    .modal-scroll::-webkit-scrollbar { width:4px; }
+    .modal-scroll::-webkit-scrollbar-thumb { background:#e5e7eb; border-radius:4px; }
+
+    #toast { position:fixed; bottom:24px; right:24px; z-index:999; transition:all .3s ease; }
+    tbody tr { transition:background .15s; }
+    tbody tr:hover { background:#f9fafb; }
+  </style>
+</head>
+
+<body class="bg-[#F0F2F5] font-sans antialiased">
+<div class="flex min-h-screen">
+
+<!-- ══════════════════════════════════
+     SIDEBAR
+══════════════════════════════════ -->
+<aside id="sidebar"
+  class="fixed inset-y-0 left-0 w-[220px] bg-[#111827] flex flex-col z-30
+         -translate-x-full lg:translate-x-0 transition-transform duration-300">
+
+  <div class="flex flex-col items-center justify-center gap-1 py-4 px-5 border-b border-white/10 shrink-0">
+    <img src="../img/logo.png" alt="Vitta Sistemas" class="h-10 w-auto brightness-0 invert" />
+    <p class="text-[0.6rem] text-gray-500 tracking-wide">v1.2.1</p>
+  </div>
+
+  <nav class="flex-1 overflow-y-auto sidebar-nav py-3">
+    <p class="block text-[0.6rem] font-bold text-gray-500 uppercase tracking-widest px-4 pb-1 pt-3">Principal</p>
+
+    <a href="dashboard.html"
+       class="flex items-center gap-3 px-3 py-2.5 mx-2 rounded-xl text-[0.83rem] font-medium text-gray-400 hover:bg-white/10 hover:text-white transition-colors duration-150 cursor-pointer mb-0.5">
+      <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+        <rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/>
+        <rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/>
+      </svg>
+      Dashboard
+    </a>
+
+    <a href="agendamentos.html" class="flex items-center gap-3 px-3 py-2.5 mx-2 rounded-xl text-[0.83rem] font-medium text-gray-400 hover:bg-white/10 hover:text-white transition-colors duration-150 cursor-pointer mb-0.5">
+      <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+        <rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/>
+      </svg>
+      Agendamentos
+    </a>
+    <a href="consultas.html" class="flex items-center gap-3 px-3 py-2.5 mx-2 rounded-xl text-[0.83rem] font-medium text-gray-400 hover:bg-white/10 hover:text-white transition-colors duration-150 cursor-pointer mb-0.5">
+      <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+        <path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/>
+      </svg>
+      Consultas
+    </a>
+
+    <p class="block text-[0.6rem] font-bold text-gray-500 uppercase tracking-widest px-4 pb-1 pt-4">Cadastros</p>
+
+    <button onclick="toggleMenu('cadastros')"
+            class="w-full flex items-center gap-3 px-3 py-2.5 mx-2 rounded-xl text-[0.83rem] font-medium text-gray-400 hover:bg-white/10 hover:text-white transition-colors duration-150 cursor-pointer mb-0.5" style="width:calc(100% - 16px)">
+      <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+        <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/>
+        <path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+      </svg>
+      Cadastros
+      <svg id="chev-cadastros" class="chevron w-3.5 h-3.5 ml-auto text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+    </button>
+    <div id="sub-cadastros" class="submenu">
+      <a href="pacientes.html" class="flex items-center gap-2 pl-10 pr-3 py-2 mx-2 rounded-xl text-[0.8rem] text-gray-500 hover:bg-white/5 hover:text-gray-300 transition-colors cursor-pointer">Pacientes</a>
+      <a href="profissionais.html" class="flex items-center gap-2 pl-10 pr-3 py-2 mx-2 rounded-xl text-[0.8rem] text-gray-500 hover:bg-white/5 hover:text-gray-300 transition-colors cursor-pointer">Profissionais</a>
+      <a href="usuarios-empresa.html" class="flex items-center gap-2 pl-10 pr-3 py-2 mx-2 rounded-xl text-[0.8rem] text-gray-500 hover:bg-white/5 hover:text-gray-300 transition-colors cursor-pointer">Usuários</a>
+      <div class="hidden" id="menuDocumentosWrap"><a href="documentos.html" class="flex items-center gap-2 pl-10 pr-3 py-2 mx-2 rounded-xl text-[0.8rem] text-gray-500 hover:bg-white/5 hover:text-gray-300 transition-colors cursor-pointer w-full">Documentos</a></div>
+      <a href="leads.html" class="flex items-center gap-2 pl-10 pr-3 py-2 mx-2 rounded-xl text-[0.8rem] text-gray-500 hover:bg-white/5 hover:text-gray-300 transition-colors cursor-pointer">Leads</a>
+    </div>
+
+    <p class="block text-[0.6rem] font-bold text-gray-500 uppercase tracking-widest px-4 pb-1 pt-4">Outros Cadastros</p>
+
+    <button onclick="toggleMenu('servicos')"
+            class="w-full flex items-center gap-3 px-3 py-2.5 mx-2 rounded-xl text-[0.83rem] font-medium text-gray-400 hover:bg-white/10 hover:text-white transition-colors duration-150 cursor-pointer mb-0.5" style="width:calc(100% - 16px)">
+      <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+        <path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/>
+      </svg>
+      Outros Cadastros
+      <svg id="chev-servicos" class="chevron w-3.5 h-3.5 ml-auto text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+    </button>
+    <div id="sub-servicos" class="submenu">
+      <a href="servicos.html" class="flex items-center gap-2 pl-10 pr-3 py-2 mx-2 rounded-xl text-[0.8rem] text-gray-500 hover:bg-white/5 hover:text-gray-300 transition-colors cursor-pointer">Serviços</a>
+      <a href="salas.html" class="flex items-center gap-2 pl-10 pr-3 py-2 mx-2 rounded-xl text-[0.8rem] text-gray-500 hover:bg-white/5 hover:text-gray-300 transition-colors cursor-pointer">Salas</a>
+      <a href="especialidades.html" class="flex items-center gap-2 pl-10 pr-3 py-2 mx-2 rounded-xl text-[0.8rem] text-gray-500 hover:bg-white/5 hover:text-gray-300 transition-colors cursor-pointer">Especialidades</a>
+      <a href="grupo.html" class="flex items-center gap-2 pl-10 pr-3 py-2 mx-2 rounded-xl text-[0.8rem] text-gray-500 hover:bg-white/5 hover:text-gray-300 transition-colors cursor-pointer">Grupo</a>
+      <a href="tipospagamento.html" class="flex items-center gap-2 pl-10 pr-3 py-2 mx-2 rounded-xl text-[0.8rem] text-gray-500 hover:bg-white/5 hover:text-gray-300 transition-colors cursor-pointer">Tipos de Pagamento</a>
+      <a href="tiposacompanhamento.html" class="flex items-center gap-2 pl-10 pr-3 py-2 mx-2 rounded-xl text-[0.8rem] text-gray-500 hover:bg-white/5 hover:text-gray-300 transition-colors cursor-pointer">Tipos de Acomp.</a>
+    </div>
+
+    <p class="block text-[0.6rem] font-bold text-gray-500 uppercase tracking-widest px-4 pb-1 pt-4">Financeiro</p>
+    <button onclick="toggleMenu('financeiro')" class="w-full flex items-center gap-3 px-3 py-2.5 mx-2 rounded-xl text-[0.83rem] font-medium text-gray-400 hover:bg-white/10 hover:text-white transition-colors duration-150 cursor-pointer mb-0.5" style="width:calc(100% - 16px)">
+      <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>Financeiro
+      <svg id="chev-financeiro" class="chevron w-3.5 h-3.5 ml-auto text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+    </button>
+    <div id="sub-financeiro" class="submenu">
+      <a href="financeiro.html" class="flex items-center gap-2 pl-10 pr-3 py-2 mx-2 rounded-xl text-[0.8rem] text-gray-500 hover:bg-white/5 hover:text-gray-300 transition-colors cursor-pointer">Lançamentos</a>
+      <a href="relatorios.html" class="flex items-center gap-2 pl-10 pr-3 py-2 mx-2 rounded-xl text-[0.8rem] text-gray-500 hover:bg-white/5 hover:text-gray-300 transition-colors cursor-pointer">Relatórios</a>
+    </div>
+
+    <div id="sectionVittaBI" class="hidden">
+    <p class="block text-[0.6rem] font-bold text-gray-500 uppercase tracking-widest px-4 pb-1 pt-4">Vitta BI</p>
+    <a id="linkVittaBI" href="https://bi.vittasistemas.com.br" target="_blank" rel="noopener"
+       class="flex items-center gap-3 px-3 py-2.5 mx-2 rounded-xl text-[0.83rem] font-medium text-gray-400 hover:bg-white/10 hover:text-white transition-colors duration-150 cursor-pointer mb-0.5">
+      <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+        <path d="M3 3v18h18"/><path d="M18.7 8l-5.3 5.3-3-3L4 16.3"/>
+      </svg>
+      Vitta BI
+      <span class="ml-auto text-[0.55rem] font-bold text-violet-300 bg-violet-500/20 px-1.5 py-0.5 rounded">BI</span>
+    </a>
+    </div>
+
+    <p class="block text-[0.6rem] font-bold text-gray-500 uppercase tracking-widest px-4 pb-1 pt-4">Sistema</p>
+
+    <button onclick="toggleMenu('admin')"
+            class="w-full flex items-center gap-3 px-3 py-2.5 mx-2 rounded-xl text-[0.83rem] font-medium text-vitta-400 bg-vitta-500/10 transition-colors duration-150 cursor-pointer mb-0.5" style="width:calc(100% - 16px)">
+      <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+        <circle cx="12" cy="12" r="3"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14M4.93 4.93a10 10 0 0 0 0 14.14"/>
+      </svg>
+      Administração
+      <svg id="chev-admin" class="chevron open w-3.5 h-3.5 ml-auto text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+    </button>
+    <div id="sub-admin" class="submenu open">
+      <a href="empresas.html" class="flex items-center gap-2 pl-10 pr-3 py-2 mx-2 rounded-xl text-[0.8rem] font-semibold text-vitta-400 bg-vitta-500/10 transition-colors cursor-pointer">Empresas</a>
+      <a href="usuarios.html" class="flex items-center gap-2 pl-10 pr-3 py-2 mx-2 rounded-xl text-[0.8rem] text-gray-500 hover:bg-white/5 hover:text-gray-300 transition-colors cursor-pointer">Usuários Admin</a>
+      <a href="planos.html" class="flex items-center gap-2 pl-10 pr-3 py-2 mx-2 rounded-xl text-[0.8rem] text-gray-500 hover:bg-white/5 hover:text-gray-300 transition-colors cursor-pointer">Planos</a>
+      <a href="dashboard-gerencial.html" class="flex items-center gap-2 pl-10 pr-3 py-2 mx-2 rounded-xl text-[0.8rem] text-gray-500 hover:bg-white/5 hover:text-gray-300 transition-colors cursor-pointer">Dashboard Gerencial</a>
+      <a href="configuracoes.html" class="flex items-center gap-2 pl-10 pr-3 py-2 mx-2 rounded-xl text-[0.8rem] text-gray-500 hover:bg-white/5 hover:text-gray-300 transition-colors cursor-pointer">Configura&ccedil;&otilde;es</a>
+      <a href="logs.html" class="flex items-center gap-2 pl-10 pr-3 py-2 mx-2 rounded-xl text-[0.8rem] text-gray-500 hover:bg-white/5 hover:text-gray-300 transition-colors cursor-pointer">Log</a>
+    </div>
+
+    <div class="h-4"></div>
+  </nav>
+
+  <div class="shrink-0 border-t border-white/10 p-3">
+    <div class="group flex items-center gap-2.5 p-2.5 rounded-xl hover:bg-white/5 cursor-pointer">
+      <div id="user-avatar" class="w-8 h-8 rounded-full bg-vitta-500 flex items-center justify-center text-white text-xs font-bold shrink-0">A</div>
+      <div class="flex-1 min-w-0">
+        <p id="user-name" class="text-white text-[0.8rem] font-semibold truncate">Usuário</p>
+        <p id="user-role" class="text-gray-500 text-[0.7rem] truncate">Admin Global</p>
+      </div>
+      <button onclick="handleLogout()" title="Sair"
+              class="text-gray-600 hover:text-red-400 transition-colors opacity-0 group-hover:opacity-100">
+        <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+          <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/>
+        </svg>
+      </button>
+    </div>
+  </div>
+</aside>
+
+<!-- OVERLAY mobile -->
+<div id="overlay" class="fixed inset-0 bg-black/50 z-20 hidden lg:hidden" onclick="toggleSidebar()"></div>
+
+<!-- ══════════════════════════════════
+     WRAPPER PRINCIPAL
+══════════════════════════════════ -->
+<div class="flex-1 lg:ml-[220px] flex flex-col min-h-screen">
+
+  <!-- HEADER -->
+  <header class="sticky top-0 z-20 h-16 bg-white border-b border-gray-200 flex items-center px-5 gap-3 shadow-sm">
+    <button onclick="toggleSidebar()" class="lg:hidden p-2 rounded-lg hover:bg-gray-100 text-gray-500">
+      <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+        <line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/>
+      </svg>
+    </button>
+    <div class="flex-1">
+      <h1 class="text-[1rem] font-bold text-gray-800 leading-tight">Empresas</h1>
+      <p class="text-[0.7rem] text-gray-400 leading-tight">Gestão de Empresas · Acesso Master</p>
+    </div>
+    <div class="hidden md:flex items-center gap-2 px-3 py-2 bg-gray-50 border border-gray-200 rounded-xl">
+      <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-vitta-500 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+        <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/>
+      </svg>
+      <span id="empresa-nome" class="hidden"></span>
+    </div>
+    <!-- Badge Master -->
+    <div class="hidden sm:flex items-center gap-1.5 px-3 py-1.5 bg-amber-50 border border-amber-200 rounded-xl">
+      <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5 text-amber-500 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+        <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
+      </svg>
+      <span class="text-[0.72rem] font-bold text-amber-600">Admin Global</span>
+    </div>
+    <button class="relative p-2.5 rounded-xl hover:bg-gray-100 text-gray-500 transition-colors">
+      <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+        <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/>
+      </svg>
+      <span class="absolute top-1.5 right-1.5 w-2 h-2 bg-red-500 rounded-full border-2 border-white"></span>
+    </button>
+    <div class="flex items-center gap-2.5">
+      <div id="header-avatar" class="w-9 h-9 rounded-full bg-vitta-500 flex items-center justify-center text-white text-sm font-bold shrink-0">A</div>
+      <div class="hidden sm:block">
+        <p id="header-user-name" class="text-[0.8rem] font-semibold text-gray-800 leading-tight">Usuário</p>
+        <p id="header-user-role" class="text-[0.7rem] text-gray-400 leading-tight">Admin Global</p>
+      </div>
+    </div>
+    <button onclick="handleLogout()" class="p-2.5 rounded-xl hover:bg-red-50 text-gray-400 hover:text-red-500 transition-colors" title="Sair">
+      <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+        <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/>
+      </svg>
+    </button>
+  </header>
+
+  <!-- CONTEÚDO -->
+  <main class="flex-1 p-5 lg:p-6 space-y-5 fade-up">
+
+    <!-- Cabeçalho -->
+    <div class="flex items-start justify-between gap-4 flex-wrap">
+      <div>
+        <p class="text-[0.65rem] font-bold text-vitta-600 uppercase tracking-widest mb-0.5">Sistema · Master</p>
+        <h2 class="text-[1.4rem] font-extrabold text-gray-800 tracking-tight leading-none">Gestão de Empresas</h2>
+        <p class="text-[0.8rem] text-gray-400 mt-1">Cadastre e gerencie as clínicas do sistema</p>
+      </div>
+      <button onclick="openNewModal()"
+              class="flex items-center gap-2 px-4 py-2.5 bg-vitta-500 hover:bg-vitta-600 text-white text-sm font-semibold rounded-xl shadow-sm transition-colors">
+        <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        Nova Empresa
+      </button>
+    </div>
+
+    <!-- Stats -->
+    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+      <div class="bg-white rounded-2xl p-5 border border-gray-100 shadow-sm">
+        <div class="w-10 h-10 rounded-xl bg-vitta-50 flex items-center justify-center mb-3">
+          <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-vitta-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+        </div>
+        <p class="text-[1.65rem] font-extrabold text-gray-800 leading-none" id="statTotal">—</p>
+        <p class="text-[0.75rem] text-gray-500 mt-1">Total de Empresas</p>
+      </div>
+      <div class="bg-white rounded-2xl p-5 border border-gray-100 shadow-sm">
+        <div class="w-10 h-10 rounded-xl bg-green-50 flex items-center justify-center mb-3">
+          <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+        </div>
+        <p class="text-[1.65rem] font-extrabold text-gray-800 leading-none" id="statAtivas">—</p>
+        <p class="text-[0.75rem] text-gray-500 mt-1">Ativas</p>
+      </div>
+      <div class="bg-white rounded-2xl p-5 border border-gray-100 shadow-sm">
+        <div class="w-10 h-10 rounded-xl bg-red-50 flex items-center justify-center mb-3">
+          <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>
+        </div>
+        <p class="text-[1.65rem] font-extrabold text-gray-800 leading-none" id="statInativas">—</p>
+        <p class="text-[0.75rem] text-gray-500 mt-1">Inativas</p>
+      </div>
+    </div>
+
+    <!-- Filtros -->
+    <div class="bg-white border border-gray-100 rounded-2xl shadow-sm p-4 flex flex-wrap gap-3 items-center">
+      <div class="relative flex-1 min-w-[200px]">
+        <svg class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        <input id="filterName" type="text" placeholder="Buscar por nome ou CNPJ..."
+               class="w-full pl-9 pr-3 py-2.5 border border-gray-200 rounded-xl text-sm bg-gray-50 outline-none focus:border-vitta-500 focus:bg-white transition-colors">
+      </div>
+      <div class="h-6 w-px bg-gray-200"></div>
+      <label class="flex items-center gap-2.5 cursor-pointer select-none">
+        <div class="relative w-9 h-5">
+          <input type="checkbox" id="toggleInativas" class="sr-only peer">
+          <div class="w-9 h-5 bg-gray-300 peer-checked:bg-vitta-500 rounded-full transition-colors"></div>
+          <div class="absolute top-0.5 left-0.5 w-4 h-4 bg-white rounded-full shadow transition-transform peer-checked:translate-x-4"></div>
+        </div>
+        <span class="text-sm font-medium text-gray-600">Inativas</span>
+      </label>
+      <button onclick="clearFilters()"
+              class="flex items-center gap-1.5 px-3 py-2.5 border border-gray-200 rounded-xl text-sm text-gray-600 hover:bg-gray-50 transition-colors">
+        <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        Limpar
+      </button>
+    </div>
+
+    <!-- Tabela -->
+    <div class="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
+      <div class="px-5 py-3.5 border-b border-gray-100 text-[0.8rem] text-gray-500" id="tableCount">
+        Exibindo <strong class="text-gray-800">—</strong> empresa(s)
+      </div>
+
+      <div id="tableLoader" class="flex items-center justify-center py-16 gap-3">
+        <svg class="animate-spin w-5 h-5 text-vitta-500" fill="none" viewBox="0 0 24 24">
+          <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/>
+          <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/>
+        </svg>
+        <span class="text-sm text-gray-400">Carregando empresas...</span>
+      </div>
+
+      <div id="tableWrap" class="hidden overflow-x-auto">
+        <table class="w-full text-left text-sm">
+          <thead>
+            <tr class="bg-gray-50 border-b border-gray-100">
+              <th class="px-5 py-3 text-[0.7rem] font-bold text-gray-500 uppercase tracking-wider">Empresa</th>
+              <th class="px-4 py-3 text-[0.7rem] font-bold text-gray-500 uppercase tracking-wider text-center">Plano</th>
+              <th class="px-4 py-3 text-[0.7rem] font-bold text-gray-500 uppercase tracking-wider">CNPJ/CPF</th>
+              <th class="px-4 py-3 text-[0.7rem] font-bold text-gray-500 uppercase tracking-wider">E-mail</th>
+              <th class="px-4 py-3 text-[0.7rem] font-bold text-gray-500 uppercase tracking-wider">Telefone</th>
+              <th class="px-4 py-3 text-[0.7rem] font-bold text-gray-500 uppercase tracking-wider">Cadastro</th>
+              <th class="px-4 py-3 text-[0.7rem] font-bold text-gray-500 uppercase tracking-wider">Status</th>
+              <th class="px-4 py-3"></th>
+            </tr>
+          </thead>
+          <tbody id="empBody"></tbody>
+        </table>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<!-- ══════════════════════════════════
+     MODAL: VISUALIZAR
+══════════════════════════════════ -->
+<div class="modal-overlay" id="viewModal">
+  <div class="bg-white rounded-2xl w-full max-w-[640px] shadow-2xl mx-auto my-auto modal-scroll overflow-y-auto max-h-[90vh]">
+
+    <div class="sticky top-0 bg-white flex items-center gap-3 px-6 py-4 border-b border-gray-100 rounded-t-2xl z-10">
+      <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-vitta-500 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+        <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/>
+      </svg>
+      <h2 class="text-base font-bold text-gray-800 flex-1">Ficha da Empresa</h2>
+      <button onclick="switchToEdit()" class="flex items-center gap-1.5 px-3 py-1.5 bg-vitta-500 hover:bg-vitta-600 text-white text-xs font-semibold rounded-lg transition-colors">
+        <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+        Editar
+      </button>
+      <button onclick="closeViewModal()" class="w-8 h-8 flex items-center justify-center rounded-full bg-gray-100 hover:bg-gray-200 text-gray-500 transition-colors">
+        <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+
+    <!-- Hero -->
+    <div class="flex items-center gap-5 px-6 py-5 border-b border-gray-100">
+      <div id="vLogo" class="w-16 h-16 rounded-2xl flex items-center justify-center text-white text-2xl font-bold shrink-0 shadow-sm overflow-hidden bg-gradient-to-br from-vitta-500 to-vitta-700">
+        <span id="vLogoIni">V</span>
+        <img id="vLogoImg" class="hidden w-full h-full object-cover" src="" alt="">
+      </div>
+      <div class="flex-1 min-w-0">
+        <div class="text-xl font-extrabold text-gray-800 leading-tight" id="vNome">—</div>
+        <div class="flex flex-wrap gap-2 mt-2 items-center">
+          <span class="text-xs text-gray-400 font-mono" id="vIdShort">—</span>
+          <span id="vStatusBadge"></span>
+        </div>
+        <div class="text-sm text-gray-500 mt-1.5 font-medium" id="vCnpjHero">—</div>
+      </div>
+    </div>
+
+    <!-- Dados -->
+    <div class="px-6 py-5">
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
+        <div>
+          <p class="text-[0.65rem] font-bold uppercase tracking-wider text-gray-400 mb-1">E-mail</p>
+          <p class="text-sm font-medium text-gray-800" id="vEmail">—</p>
+        </div>
+        <div>
+          <p class="text-[0.65rem] font-bold uppercase tracking-wider text-gray-400 mb-1">Telefone</p>
+          <p class="text-sm font-medium text-gray-800" id="vTel">—</p>
+        </div>
+        <div>
+          <p class="text-[0.65rem] font-bold uppercase tracking-wider text-gray-400 mb-1">Data de Cadastro</p>
+          <p class="text-sm font-medium text-gray-800" id="vDtcri">—</p>
+        </div>
+        <div>
+          <p class="text-[0.65rem] font-bold uppercase tracking-wider text-gray-400 mb-1">Última Alteração</p>
+          <p class="text-sm font-medium text-gray-800" id="vDtalter">—</p>
+        </div>
+        <div>
+          <p class="text-[0.65rem] font-bold uppercase tracking-wider text-gray-400 mb-1">Plano</p>
+          <p class="text-sm font-medium text-gray-800" id="vPlano">—</p>
+        </div>
+        <div class="sm:col-span-2">
+          <p class="text-[0.65rem] font-bold uppercase tracking-wider text-gray-400 mb-1">Logo URL</p>
+          <p class="text-sm font-medium text-gray-800 break-all" id="vLogo2">—</p>
+        </div>
+
+        <!-- Separador Endereço -->
+        <div class="sm:col-span-2">
+          <div class="flex items-center gap-2 pt-1">
+            <div class="h-px flex-1 bg-gray-100"></div>
+            <span class="text-[0.65rem] font-bold uppercase tracking-wider text-gray-400 px-1">Endereço</span>
+            <div class="h-px flex-1 bg-gray-100"></div>
+          </div>
+        </div>
+        <div>
+          <p class="text-[0.65rem] font-bold uppercase tracking-wider text-gray-400 mb-1">CEP</p>
+          <p class="text-sm font-medium text-gray-800" id="vCep">—</p>
+        </div>
+        <div>
+          <p class="text-[0.65rem] font-bold uppercase tracking-wider text-gray-400 mb-1">UF</p>
+          <p class="text-sm font-medium text-gray-800" id="vUf">—</p>
+        </div>
+        <div class="sm:col-span-2">
+          <p class="text-[0.65rem] font-bold uppercase tracking-wider text-gray-400 mb-1">Logradouro</p>
+          <p class="text-sm font-medium text-gray-800" id="vLogradouro">—</p>
+        </div>
+        <div>
+          <p class="text-[0.65rem] font-bold uppercase tracking-wider text-gray-400 mb-1">Número</p>
+          <p class="text-sm font-medium text-gray-800" id="vNumero">—</p>
+        </div>
+        <div>
+          <p class="text-[0.65rem] font-bold uppercase tracking-wider text-gray-400 mb-1">Complemento</p>
+          <p class="text-sm font-medium text-gray-800" id="vComplemento">—</p>
+        </div>
+        <div>
+          <p class="text-[0.65rem] font-bold uppercase tracking-wider text-gray-400 mb-1">Bairro</p>
+          <p class="text-sm font-medium text-gray-800" id="vBairro">—</p>
+        </div>
+        <div>
+          <p class="text-[0.65rem] font-bold uppercase tracking-wider text-gray-400 mb-1">Cidade</p>
+          <p class="text-sm font-medium text-gray-800" id="vCidade">—</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="flex justify-end gap-3 px-6 py-4 border-t border-gray-100">
+      <button onclick="closeViewModal()" class="px-4 py-2 border border-gray-200 rounded-xl text-sm font-semibold text-gray-600 hover:bg-gray-50 transition-colors">Fechar</button>
+      <button onclick="switchToEdit()" class="px-4 py-2 bg-vitta-500 hover:bg-vitta-600 text-white text-sm font-semibold rounded-xl transition-colors">Editar Cadastro</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════
+     MODAL: FORMULÁRIO (novo / editar)
+══════════════════════════════════ -->
+<div class="modal-overlay" id="formModal">
+  <div class="bg-white rounded-2xl w-full max-w-[620px] shadow-2xl mx-auto my-auto">
+
+    <div class="sticky top-0 bg-white flex items-center gap-3 px-6 py-4 border-b border-gray-100 rounded-t-2xl z-10">
+      <span id="formIcon" class="text-xl">🏢</span>
+      <div class="flex-1">
+        <h2 id="formTitle" class="text-base font-bold text-gray-800">Nova Empresa</h2>
+        <p id="formSubtitle" class="text-xs text-gray-400"></p>
+      </div>
+      <button onclick="closeFormModal()" class="w-8 h-8 flex items-center justify-center rounded-full bg-gray-100 hover:bg-gray-200 text-gray-500 transition-colors">
+        <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+
+    <div class="overflow-y-auto modal-scroll max-h-[72vh]">
+      <input type="hidden" id="fId">
+
+      <!-- Alert -->
+      <div id="formAlert" class="mx-6 mt-4"></div>
+
+      <!-- Dados da Empresa -->
+      <div class="px-6 py-5">
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+
+          <div class="sm:col-span-2 flex flex-col gap-1.5">
+            <label class="text-xs font-semibold text-gray-600">Nome da Empresa <span class="text-red-500">*</span></label>
+            <input id="fNome" type="text" placeholder="Nome completo da empresa" required
+                   class="px-3 py-2.5 border-[1.5px] border-gray-200 rounded-xl text-sm bg-gray-50 outline-none focus:border-vitta-500 focus:bg-white transition-colors">
+          </div>
+
+          <div class="flex flex-col gap-1.5">
+            <label class="text-xs font-semibold text-gray-600">CNPJ</label>
+            <input id="fCnpj" type="text" placeholder="00.000.000/0000-00" maxlength="18"
+                   class="px-3 py-2.5 border-[1.5px] border-gray-200 rounded-xl text-sm bg-gray-50 outline-none focus:border-vitta-500 focus:bg-white transition-colors">
+          </div>
+
+          <div class="flex flex-col gap-1.5">
+            <label class="text-xs font-semibold text-gray-600">Telefone</label>
+            <input id="fTel" type="tel" placeholder="(00) 00000-0000" maxlength="15"
+                   class="px-3 py-2.5 border-[1.5px] border-gray-200 rounded-xl text-sm bg-gray-50 outline-none focus:border-vitta-500 focus:bg-white transition-colors">
+          </div>
+
+          <div class="sm:col-span-2 flex flex-col gap-1.5">
+            <label class="text-xs font-semibold text-gray-600">E-mail</label>
+            <input id="fEmail" type="email" placeholder="contato@empresa.com.br"
+                   class="px-3 py-2.5 border-[1.5px] border-gray-200 rounded-xl text-sm bg-gray-50 outline-none focus:border-vitta-500 focus:bg-white transition-colors">
+          </div>
+
+          <!-- Separador Endereço -->
+          <div class="sm:col-span-2">
+            <div class="flex items-center gap-2 pt-1">
+              <div class="h-px flex-1 bg-gray-100"></div>
+              <span class="text-[0.65rem] font-bold uppercase tracking-wider text-gray-400 px-1">Endereço</span>
+              <div class="h-px flex-1 bg-gray-100"></div>
+            </div>
+          </div>
+
+          <div class="flex flex-col gap-1.5">
+            <label class="text-xs font-semibold text-gray-600">CEP</label>
+            <div class="flex gap-2">
+              <input id="fCep" type="text" placeholder="00000-000" maxlength="9"
+                     class="flex-1 px-3 py-2.5 border-[1.5px] border-gray-200 rounded-xl text-sm bg-gray-50 outline-none focus:border-vitta-500 focus:bg-white transition-colors">
+              <button type="button" onclick="buscarCep()" id="btnBuscarCep"
+                      class="px-3 py-2.5 bg-vitta-500 hover:bg-vitta-600 text-white text-xs font-semibold rounded-xl transition-colors flex items-center gap-1.5 shrink-0">
+                <svg id="cepSpin" class="hidden animate-spin w-3.5 h-3.5" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/></svg>
+                <span id="cepBtnTxt">Buscar</span>
+              </button>
+            </div>
+          </div>
+
+          <div class="flex flex-col gap-1.5">
+            <label class="text-xs font-semibold text-gray-600">UF</label>
+            <input id="fUf" type="text" placeholder="SP" maxlength="2" readonly
+                   class="px-3 py-2.5 border-[1.5px] border-gray-200 rounded-xl text-sm bg-gray-100 outline-none text-gray-500 uppercase cursor-not-allowed">
+          </div>
+
+          <div class="sm:col-span-2 flex flex-col gap-1.5">
+            <label class="text-xs font-semibold text-gray-600">Logradouro</label>
+            <input id="fLogradouro" type="text" placeholder="Preenchido automaticamente pelo CEP"
+                   class="px-3 py-2.5 border-[1.5px] border-gray-200 rounded-xl text-sm bg-gray-50 outline-none focus:border-vitta-500 focus:bg-white transition-colors">
+          </div>
+
+          <div class="flex flex-col gap-1.5">
+            <label class="text-xs font-semibold text-gray-600">Número</label>
+            <input id="fNumero" type="text" placeholder="123"
+                   class="px-3 py-2.5 border-[1.5px] border-gray-200 rounded-xl text-sm bg-gray-50 outline-none focus:border-vitta-500 focus:bg-white transition-colors">
+          </div>
+
+          <div class="flex flex-col gap-1.5">
+            <label class="text-xs font-semibold text-gray-600">Complemento</label>
+            <input id="fComplemento" type="text" placeholder="Sala, apto..."
+                   class="px-3 py-2.5 border-[1.5px] border-gray-200 rounded-xl text-sm bg-gray-50 outline-none focus:border-vitta-500 focus:bg-white transition-colors">
+          </div>
+
+          <div class="flex flex-col gap-1.5">
+            <label class="text-xs font-semibold text-gray-600">Bairro</label>
+            <input id="fBairro" type="text" placeholder="Preenchido automaticamente"
+                   class="px-3 py-2.5 border-[1.5px] border-gray-200 rounded-xl text-sm bg-gray-50 outline-none focus:border-vitta-500 focus:bg-white transition-colors">
+          </div>
+
+          <div class="flex flex-col gap-1.5">
+            <label class="text-xs font-semibold text-gray-600">Cidade</label>
+            <input id="fCidade" type="text" placeholder="Preenchido automaticamente"
+                   class="px-3 py-2.5 border-[1.5px] border-gray-200 rounded-xl text-sm bg-gray-50 outline-none focus:border-vitta-500 focus:bg-white transition-colors">
+          </div>
+
+          <div class="sm:col-span-2 flex flex-col gap-1.5">
+            <label class="text-xs font-semibold text-gray-600">URL do Logo</label>
+            <input id="fLogo" type="url" placeholder="https://..."
+                   class="px-3 py-2.5 border-[1.5px] border-gray-200 rounded-xl text-sm bg-gray-50 outline-none focus:border-vitta-500 focus:bg-white transition-colors"
+                   oninput="previewLogo()">
+            <div class="flex items-center gap-3 mt-1.5">
+              <div id="logoPreview"
+                   class="w-12 h-12 rounded-xl bg-gradient-to-br from-vitta-500 to-vitta-700 flex items-center justify-center text-white font-bold text-base overflow-hidden shrink-0">
+                <span id="logoPreviewIni">V</span>
+                <img id="logoPreviewImg" class="hidden w-full h-full object-cover" src="" alt="">
+              </div>
+              <p class="text-xs text-gray-400">Insira uma URL para visualizar o logo</p>
+            </div>
+          </div>
+
+          <div class="sm:col-span-2 flex flex-col gap-1.5">
+            <label class="text-xs font-semibold text-gray-600">Plano</label>
+            <select id="fPlano"
+                    class="px-3 py-2.5 border-[1.5px] border-gray-200 rounded-xl text-sm bg-gray-50 outline-none focus:border-vitta-500 focus:bg-white transition-colors">
+              <option value="">Sem plano</option>
+            </select>
+          </div>
+
+          <div class="sm:col-span-2">
+            <label class="flex items-center gap-2.5 cursor-pointer select-none">
+              <div class="relative w-10 h-6">
+                <input type="checkbox" id="fBiAcesso" class="sr-only peer">
+                <div class="w-10 h-6 bg-gray-300 peer-checked:bg-violet-500 rounded-full transition-colors"></div>
+                <div class="absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full shadow transition-transform peer-checked:translate-x-4"></div>
+              </div>
+              <span class="text-sm font-semibold text-gray-700">Acesso ao Vitta BI</span>
+            </label>
+            <p class="text-xs text-gray-400 mt-1 ml-[52px]">Libera o menu Vitta BI para o Administrador da empresa.</p>
+          </div>
+
+          <div class="sm:col-span-2">
+            <label class="flex items-center gap-2.5 cursor-pointer select-none">
+              <div class="relative w-10 h-6">
+                <input type="checkbox" id="fAtivo" checked class="sr-only peer">
+                <div class="w-10 h-6 bg-gray-300 peer-checked:bg-vitta-500 rounded-full transition-colors"></div>
+                <div class="absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full shadow transition-transform peer-checked:translate-x-4"></div>
+              </div>
+              <span class="text-sm font-semibold text-gray-700">Empresa Ativa</span>
+            </label>
+          </div>
+
+          <div class="sm:col-span-2" id="fIsentoWrapper">
+            <label class="flex items-center gap-2.5 cursor-pointer select-none">
+              <div class="relative w-10 h-6">
+                <input type="checkbox" id="fIsento" class="sr-only peer">
+                <div class="w-10 h-6 bg-gray-300 peer-checked:bg-emerald-500 rounded-full transition-colors"></div>
+                <div class="absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full shadow transition-transform peer-checked:translate-x-4"></div>
+              </div>
+              <span class="text-sm font-semibold text-gray-700">Isenta de Cobrança</span>
+            </label>
+            <p class="text-xs text-gray-400 mt-1 ml-[52px]">Ao marcar, todas as cobranças pendentes da empresa no Asaas são excluídas e ela passa a ter acesso liberado, mantendo as permissões do plano atual, sem gerar boletos, faturas ou bloqueios.</p>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <div class="flex justify-end gap-3 px-6 py-4 border-t border-gray-100">
+      <button onclick="closeFormModal()" class="px-4 py-2.5 border border-gray-200 rounded-xl text-sm font-semibold text-gray-600 hover:bg-gray-50 transition-colors">Cancelar</button>
+      <button onclick="saveEmpresa()" id="btnSave"
+              class="flex items-center gap-2 px-5 py-2.5 bg-vitta-500 hover:bg-vitta-600 text-white text-sm font-semibold rounded-xl transition-colors">
+        <svg id="saveSpin" class="hidden animate-spin w-4 h-4" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/></svg>
+        <svg id="saveIcon" xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+        <span id="saveTxt">Salvar</span>
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════
+     MODAL: CONFIRMAR TOGGLE ATIVO
+══════════════════════════════════ -->
+<div class="modal-overlay" id="toggleModal">
+  <div class="bg-white rounded-2xl w-full max-w-[400px] shadow-2xl mx-auto my-auto p-6 text-center">
+    <div class="w-14 h-14 rounded-full flex items-center justify-center mx-auto mb-4 text-2xl" id="toggleIcon">🏢</div>
+    <h3 class="text-base font-bold text-gray-800 mb-2" id="toggleTitle">Inativar Empresa?</h3>
+    <p class="text-sm text-gray-500 mb-5" id="toggleMsg">A empresa será inativada e seus usuários não poderão mais acessar o sistema.</p>
+    <div class="flex gap-3">
+      <button onclick="closeToggleModal()" class="flex-1 py-2.5 border border-gray-200 rounded-xl text-sm font-semibold text-gray-600 hover:bg-gray-50 transition-colors">Cancelar</button>
+      <button onclick="confirmToggle()" id="btnToggleConfirm"
+              class="flex-1 flex items-center justify-center gap-2 py-2.5 text-white text-sm font-semibold rounded-xl transition-colors" id="btnToggleConfirm">
+        <svg id="toggleSpin" class="hidden animate-spin w-4 h-4" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/></svg>
+        <span id="toggleBtnTxt">Confirmar</span>
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════
+     MODAL: CONFIRMAR EXCLUSÃO
+══════════════════════════════════ -->
+<div class="modal-overlay" id="deleteModal">
+  <div class="bg-white rounded-2xl w-full max-w-[420px] shadow-2xl mx-auto my-auto p-6 text-center">
+    <div class="w-14 h-14 rounded-full bg-red-100 flex items-center justify-center mx-auto mb-4">
+      <svg xmlns="http://www.w3.org/2000/svg" class="w-7 h-7 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+        <polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/>
+        <path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4h6v2"/>
+      </svg>
+    </div>
+    <h3 class="text-base font-bold text-gray-800 mb-2" id="deleteTitle">Excluir Empresa?</h3>
+    <p class="text-sm text-gray-500 mb-3" id="deleteMsg">Esta ação é irreversível. A empresa será permanentemente excluída do sistema.</p>
+    <p class="text-xs text-red-500 font-semibold bg-red-50 border border-red-100 rounded-xl px-3 py-2 mb-5">Atenção: só é possível excluir empresas sem usuários ou profissionais vinculados.</p>
+    <div class="flex gap-3">
+      <button onclick="closeDeleteModal()" class="flex-1 py-2.5 border border-gray-200 rounded-xl text-sm font-semibold text-gray-600 hover:bg-gray-50 transition-colors">Cancelar</button>
+      <button onclick="confirmDelete()" id="btnDeleteConfirm"
+              class="flex-1 flex items-center justify-center gap-2 py-2.5 bg-red-500 hover:bg-red-600 text-white text-sm font-semibold rounded-xl transition-colors">
+        <svg id="deleteSpin" class="hidden animate-spin w-4 h-4" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/></svg>
+        <svg id="deleteIcon" xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4h6v2"/></svg>
+        <span id="deleteBtnTxt">Excluir</span>
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: ATUALIZAR PLANO NO ASAAS -->
+<div class="modal-overlay" id="empAsaasModal">
+  <div class="bg-white rounded-2xl w-full max-w-[440px] shadow-2xl mx-auto my-auto p-6">
+    <div class="flex items-start gap-4 mb-5">
+      <div class="w-12 h-12 rounded-xl bg-blue-50 border border-blue-100 flex items-center justify-center shrink-0">
+        <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6 text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+          <rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/>
+        </svg>
+      </div>
+      <div>
+        <h3 class="text-base font-bold text-gray-800 mb-1">Atualizar assinatura no Asaas?</h3>
+        <p class="text-sm text-gray-500 leading-relaxed">
+          O plano da empresa <strong id="empAsaasNome" class="text-gray-700"></strong> foi alterado para
+          <strong id="empAsaasPlano" class="text-gray-700"></strong>
+          <span id="empAsaasPrecoWrap"> — <strong id="empAsaasPreco" class="text-vitta-600"></strong>/mês</span>.<br><br>
+          Deseja atualizar a cobrança no Asaas para o valor do novo plano?
+        </p>
+      </div>
+    </div>
+    <div id="empAsaasResult" class="hidden mb-4 p-3 rounded-xl text-sm font-medium"></div>
+    <div class="flex gap-3">
+      <button onclick="closeEmpAsaasModal()"
+              class="flex-1 py-2.5 border border-gray-200 rounded-xl text-sm font-semibold text-gray-600 hover:bg-gray-50 transition-colors">
+        Não atualizar
+      </button>
+      <button onclick="confirmarTrocaPlanoAsaas()" id="btnEmpAsaasConfirm"
+              class="flex-1 flex items-center justify-center gap-2 py-2.5 bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold rounded-xl transition-colors">
+        <svg id="empAsaasSpin" class="hidden animate-spin w-4 h-4" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/></svg>
+        <span id="empAsaasConfirmTxt">Sim, atualizar</span>
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Toast -->
+<div id="toast" class="hidden">
+  <div id="toastMsg" class="flex items-center gap-3 px-4 py-3 rounded-xl shadow-lg text-sm font-semibold text-white min-w-[260px]">
+    <span id="toastIcon"></span><span id="toastText"></span>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<script src="../assets/js/config.js?v=2"></script>
+  <script src="../assets/js/admin-empresa-context.js?v=1"></script>
+  <script src="../assets/js/access-guard.js?v=2"></script>
+<script src="../assets/js/notifications.js?v=3"></script>
+<script>
+/* ═══════════════════════════════════════════
+   ESTADO
+═══════════════════════════════════════════ */
+let allEmpresas   = [];
+let allPlanos     = [];
+let planoMap      = {};
+let filtered      = [];
+let currentViewId = null;
+let toggleTargetId = null;
+let toggleTargetAtivo = false;
+let deleteTargetId = null;
+let deleteTargetNome = null;
+let _originalEmpPlanoId = null;
+let _empresaAsaasSubId  = null;
+let _originalIsento     = false;
+let _editEmpId          = null;
+let _editEmpNome        = null;
+
+const AV_COLORS = [
+  'bg-gradient-to-br from-vitta-500 to-vitta-700',
+  'bg-gradient-to-br from-green-400 to-green-600',
+  'bg-gradient-to-br from-purple-400 to-purple-600',
+  'bg-gradient-to-br from-amber-400 to-amber-600',
+  'bg-gradient-to-br from-blue-400 to-blue-600',
+  'bg-gradient-to-br from-rose-400 to-rose-600',
+  'bg-gradient-to-br from-indigo-400 to-indigo-600',
+];
+
+/* ═══════════════════════════════════════════
+   UTILITÁRIOS
+═══════════════════════════════════════════ */
+function avColor(name) { return AV_COLORS[(name || '').charCodeAt(0) % AV_COLORS.length]; }
+function initials(name) {
+  if (!name) return '?';
+  return name.trim().split(/\s+/).slice(0, 2).map(w => w[0]).join('').toUpperCase();
+}
+function fmtCnpj(v) {
+  return (v || '').replace(/\D/g, '')
+    .replace(/(\d{2})(\d)/, '$1.$2')
+    .replace(/(\d{3})(\d)/, '$1.$2')
+    .replace(/(\d{3})(\d)/, '$1/$2')
+    .replace(/(\d{4})(\d{1,2})$/, '$1-$2')
+    .substring(0, 18);
+}
+function fmtDoc(v) {
+  const d = (v || '').replace(/\D/g, '');
+  if (d.length === 11)
+    return d.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, '$1.$2.$3-$4');
+  return fmtCnpj(d);
+}
+function fmtTel(v) {
+  const d = (v || '').replace(/\D/g, '');
+  if (d.length === 11) return d.replace(/(\d{2})(\d{5})(\d{4})/, '($1) $2-$3');
+  if (d.length === 10) return d.replace(/(\d{2})(\d{4})(\d{4})/, '($1) $2-$3');
+  return v || '—';
+}
+function fmtCep(v) {
+  const d = (v || '').replace(/\D/g, '');
+  return d.length === 8 ? d.replace(/(\d{5})(\d{3})/, '$1-$2') : v || '—';
+}
+
+function planBadge(nome) {
+  if (!nome) return `<span class="text-[0.75rem] text-gray-300 italic">Sem plano</span>`;
+  const n = nome.toLowerCase();
+
+  if (n.includes('pro')) {
+    return `<span class="inline-flex items-center gap-1.5 text-[0.72rem] font-semibold bg-amber-50 text-amber-700 border border-amber-100 px-2.5 py-1 rounded-full whitespace-nowrap">
+      <svg class="w-3.5 h-3.5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+      ${nome}</span>`;
+  }
+  if (n.includes('essencial')) {
+    return `<span class="inline-flex items-center gap-1.5 text-[0.72rem] font-semibold bg-blue-50 text-blue-700 border border-blue-100 px-2.5 py-1 rounded-full whitespace-nowrap">
+      <svg class="w-3.5 h-3.5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+      ${nome}</span>`;
+  }
+  if (n.includes('cl') || n.includes('basic') || n.includes('básic')) {
+    return `<span class="inline-flex items-center gap-1.5 text-[0.72rem] font-semibold bg-emerald-50 text-emerald-700 border border-emerald-100 px-2.5 py-1 rounded-full whitespace-nowrap">
+      <svg class="w-3.5 h-3.5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+      ${nome}</span>`;
+  }
+  return `<span class="inline-flex items-center gap-1.5 text-[0.72rem] font-semibold bg-gray-50 text-gray-600 border border-gray-100 px-2.5 py-1 rounded-full whitespace-nowrap">${nome}</span>`;
+}
+
+function fmtDatetime(iso) {
+  if (!iso) return '—';
+  const d = new Date(iso);
+  return d.toLocaleDateString('pt-BR') + ' ' + d.toLocaleTimeString('pt-BR', { hour:'2-digit', minute:'2-digit' });
+}
+
+function showToast(msg, type = 'success') {
+  const el  = document.getElementById('toast');
+  const box = document.getElementById('toastMsg');
+  document.getElementById('toastText').textContent = msg;
+  document.getElementById('toastIcon').textContent = type === 'success' ? '✓' : type === 'error' ? '✕' : 'ℹ';
+  box.className = `flex items-center gap-3 px-4 py-3 rounded-xl shadow-lg text-sm font-semibold text-white min-w-[260px] ${
+    type === 'success' ? 'bg-green-600' : type === 'error' ? 'bg-red-500' : 'bg-vitta-600'
+  }`;
+  el.classList.remove('hidden');
+  setTimeout(() => el.classList.add('hidden'), 3500);
+}
+
+function showErr(msg) {
+  return `<div class="flex items-start gap-2 bg-red-50 text-red-700 border border-red-200 rounded-xl px-4 py-3 text-sm font-medium mb-1">
+    <span class="shrink-0 mt-0.5">⚠</span><span>${msg}</span>
+  </div>`;
+}
+
+/* ═══════════════════════════════════════════
+   SIDEBAR
+═══════════════════════════════════════════ */
+function toggleMenu(key) {
+  const sub  = document.getElementById('sub-' + key);
+  const chev = document.getElementById('chev-' + key);
+  const open = sub.classList.contains('open');
+  sub.classList.toggle('open', !open);
+  if (chev) chev.classList.toggle('open', !open);
+}
+function toggleSidebar() {
+  const sb   = document.getElementById('sidebar');
+  const ov   = document.getElementById('overlay');
+  const open = sb.classList.contains('-translate-x-full');
+  sb.classList.toggle('-translate-x-full', !open);
+  ov.classList.toggle('hidden', !open);
+}
+
+/* ═══════════════════════════════════════════
+   AUTENTICAÇÃO — somente ADMIN_GLOBAL
+═══════════════════════════════════════════ */
+async function initAuth() {
+  const { data: { session } } = await supabase.auth.getSession();
+  if (!session) { window.location.href = '../index.html'; return false; }
+
+  const u = await getUsuarioAtual('NOME_USU,TIPO_USU,ATIVO_USU,PROF_USU', session);
+
+  if (!u || !u.ATIVO_USU)      { await supabase.auth.signOut(); window.location.href = '../index.html'; return false; }
+  if (u.TIPO_USU !== 'ADMIN_GLOBAL') { window.location.href = 'dashboard.html'; return false; }
+
+  const nome = u.NOME_USU || session.user.email;
+  const ini  = nome.trim() ? initials(nome) : '?';
+  ['user-name','header-user-name'].forEach(id => document.getElementById(id).textContent = nome);
+  ['user-role','header-user-role'].forEach(id => document.getElementById(id).textContent = 'Admin Global');
+  ['user-avatar','header-avatar'].forEach(id => document.getElementById(id).textContent = ini);
+  if (!u.PROF_USU) document.querySelector('a[href="consultas.html"]')?.classList.add('hidden');
+  AdminEmpresaCtx.initSelector('ADMIN_GLOBAL', session.user.id);
+  return true;
+}
+async function handleLogout() { await supabase.auth.signOut(); window.location.href = '../index.html'; }
+
+/* ═══════════════════════════════════════════
+   CARREGAR PLANOS
+═══════════════════════════════════════════ */
+async function loadPlanos() {
+  const { data } = await supabase.from('PLANO').select('ID_PLANO,NOME_PLANO,PRECO_PLANO').eq('ATIVO_PLANO', true).order('NOME_PLANO');
+  allPlanos = data || [];
+  planoMap  = {};
+  allPlanos.forEach(p => { planoMap[p.ID_PLANO] = p; });
+  const sel = document.getElementById('fPlano');
+  sel.innerHTML = '<option value="">Sem plano</option>';
+  allPlanos.forEach(p => {
+    sel.insertAdjacentHTML('beforeend', `<option value="${p.ID_PLANO}">${p.NOME_PLANO}</option>`);
+  });
+}
+
+/* ═══════════════════════════════════════════
+   CARREGAR DADOS
+═══════════════════════════════════════════ */
+async function loadEmpresas() {
+  document.getElementById('tableLoader').classList.remove('hidden');
+  document.getElementById('tableWrap').classList.add('hidden');
+
+  const { data, error } = await supabase
+    .from('EMPRESA')
+    .select('ID_EMP,NOME_EMP,CNPJ_EMP,EMAIL_EMP,TEL_EMP,LOGO_EMP,ATIVO_EMP,DTCRI_EMP,DTALTER_EMP,ID_PLANO,PLANO(NOME_PLANO),CEP_EMP,LOGRADOURO_EMP,NUMERO_EMP,COMPLEMENTO_EMP,BAIRRO_EMP,CIDADE_EMP,UF_EMP,ASAAS_SUBSCRIPTION_ID,ISENTO_COBRANCA,BI_ACESSO_EMP')
+    .order('NOME_EMP');
+
+  if (error) { showToast('Erro ao carregar empresas.', 'error'); return; }
+  allEmpresas = data || [];
+  updateStats();
+  applyFilters();
+  document.getElementById('tableLoader').classList.add('hidden');
+  document.getElementById('tableWrap').classList.remove('hidden');
+}
+
+function updateStats() {
+  document.getElementById('statTotal').textContent   = allEmpresas.length;
+  document.getElementById('statAtivas').textContent  = allEmpresas.filter(e => e.ATIVO_EMP).length;
+  document.getElementById('statInativas').textContent = allEmpresas.filter(e => !e.ATIVO_EMP).length;
+}
+
+/* ═══════════════════════════════════════════
+   FILTROS & TABELA
+═══════════════════════════════════════════ */
+function applyFilters() {
+  const q        = document.getElementById('filterName').value.trim().toLowerCase();
+  const showInact = document.getElementById('toggleInativas').checked;
+
+  filtered = allEmpresas.filter(e => {
+    if (!showInact && !e.ATIVO_EMP) return false;
+    if (q && !e.NOME_EMP.toLowerCase().includes(q) && !(e.CNPJ_EMP || '').includes(q)) return false;
+    return true;
+  });
+  renderTable();
+}
+
+function clearFilters() {
+  document.getElementById('filterName').value = '';
+  document.getElementById('toggleInativas').checked = false;
+  applyFilters();
+}
+
+function renderTable() {
+  const tbody = document.getElementById('empBody');
+  document.getElementById('tableCount').innerHTML =
+    `Exibindo <strong class="text-gray-800">${filtered.length}</strong> empresa${filtered.length !== 1 ? 's' : ''}`;
+
+  if (!filtered.length) {
+    tbody.innerHTML = `<tr><td colspan="8" class="text-center py-14 text-gray-400 text-sm">Nenhuma empresa encontrada.</td></tr>`;
+    return;
+  }
+
+  tbody.innerHTML = filtered.map(e => {
+    const ini = initials(e.NOME_EMP);
+    const logoHtml = e.LOGO_EMP
+      ? `<img src="${e.LOGO_EMP}" class="w-full h-full object-cover" onerror="this.style.display='none';this.parentElement.querySelector('.ini').style.display='';" /><span class="ini hidden font-bold text-lg">${ini}</span>`
+      : `<span class="font-bold text-lg">${ini}</span>`;
+
+    return `
+    <tr class="border-b border-gray-50">
+      <td class="px-5 py-3.5">
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 rounded-xl ${avColor(e.NOME_EMP)} flex items-center justify-center text-white shrink-0 overflow-hidden">${logoHtml}</div>
+          <div>
+            <div class="text-[0.85rem] font-semibold text-gray-800 ${!e.ATIVO_EMP ? 'opacity-50' : ''}">${e.NOME_EMP}</div>
+          </div>
+        </div>
+      </td>
+      <td class="px-4 py-3.5 text-center">${planBadge(e.PLANO?.NOME_PLANO)}</td>
+      <td class="px-4 py-3.5 text-[0.82rem] text-gray-600">${e.CNPJ_EMP ? fmtDoc(e.CNPJ_EMP) : '—'}</td>
+      <td class="px-4 py-3.5 text-[0.82rem] text-gray-500 max-w-[180px] truncate">${e.EMAIL_EMP || '—'}</td>
+      <td class="px-4 py-3.5 text-[0.82rem] text-gray-600 whitespace-nowrap">${fmtTel(e.TEL_EMP)}</td>
+      <td class="px-4 py-3.5 text-[0.75rem] text-gray-400 whitespace-nowrap">${e.DTCRI_EMP ? new Date(e.DTCRI_EMP).toLocaleDateString('pt-BR') : '—'}</td>
+      <td class="px-4 py-3.5">
+        ${e.ATIVO_EMP
+          ? `<span class="inline-flex items-center gap-1 text-[0.72rem] font-semibold bg-green-50 text-green-700 px-2 py-0.5 rounded-full">● Ativa</span>`
+          : `<span class="inline-flex items-center gap-1 text-[0.72rem] font-semibold bg-gray-100 text-gray-500 px-2 py-0.5 rounded-full">● Inativa</span>`}
+      </td>
+      <td class="px-4 py-3.5">
+        <div class="flex items-center gap-1.5 justify-end">
+          <button onclick="openViewModal('${e.ID_EMP}')" title="Visualizar"
+                  class="w-8 h-8 flex items-center justify-center rounded-lg border border-gray-200 hover:border-vitta-400 hover:bg-vitta-50 text-gray-400 hover:text-vitta-600 transition-colors">
+            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+          </button>
+          <a href="empresa-fatura.html?id=${e.ID_EMP}" title="Faturas"
+             class="w-8 h-8 flex items-center justify-center rounded-lg border border-gray-200 hover:border-amber-400 hover:bg-amber-50 text-gray-400 hover:text-amber-600 transition-colors">
+            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>
+          </a>
+          <button onclick="openEditModal('${e.ID_EMP}')" title="Editar"
+                  class="w-8 h-8 flex items-center justify-center rounded-lg border border-gray-200 hover:border-blue-400 hover:bg-blue-50 text-gray-400 hover:text-blue-600 transition-colors">
+            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+          </button>
+          <button onclick="openToggleModal('${e.ID_EMP}','${e.NOME_EMP.replace(/'/g,"\\'")}',${e.ATIVO_EMP})"
+                  title="${e.ATIVO_EMP ? 'Inativar' : 'Ativar'}"
+                  class="w-8 h-8 flex items-center justify-center rounded-lg border transition-colors ${e.ATIVO_EMP
+                    ? 'border-gray-200 hover:border-red-400 hover:bg-red-50 text-gray-400 hover:text-red-500'
+                    : 'border-gray-200 hover:border-green-400 hover:bg-green-50 text-gray-400 hover:text-green-600'}">
+            ${e.ATIVO_EMP
+              ? `<svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>`
+              : `<svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>`}
+          </button>
+          <button onclick="openDeleteModal('${e.ID_EMP}','${e.NOME_EMP.replace(/'/g,"\\'")}', ${e.ATIVO_EMP})"
+                  title="Excluir empresa"
+                  class="w-8 h-8 flex items-center justify-center rounded-lg border border-gray-200 hover:border-red-500 hover:bg-red-50 text-gray-400 hover:text-red-600 transition-colors">
+            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4h6v2"/></svg>
+          </button>
+        </div>
+      </td>
+    </tr>`;
+  }).join('');
+}
+
+/* ═══════════════════════════════════════════
+   MODAL: VISUALIZAR
+═══════════════════════════════════════════ */
+function openViewModal(id) {
+  const e = allEmpresas.find(x => x.ID_EMP === id);
+  if (!e) return;
+  currentViewId = id;
+
+  const ini = initials(e.NOME_EMP);
+  const ini_el  = document.getElementById('vLogoIni');
+  const img_el  = document.getElementById('vLogoImg');
+  const logo_el = document.getElementById('vLogo');
+
+  logo_el.className = `w-16 h-16 rounded-2xl flex items-center justify-center text-white text-2xl font-bold shrink-0 shadow-sm overflow-hidden ${avColor(e.NOME_EMP)}`;
+  ini_el.textContent = ini;
+  ini_el.classList.remove('hidden');
+  img_el.classList.add('hidden');
+
+  if (e.LOGO_EMP) {
+    img_el.src = e.LOGO_EMP;
+    img_el.classList.remove('hidden');
+    ini_el.classList.add('hidden');
+    img_el.onerror = () => { img_el.classList.add('hidden'); ini_el.classList.remove('hidden'); };
+  }
+
+  document.getElementById('vNome').textContent    = e.NOME_EMP;
+  document.getElementById('vIdShort').textContent = '#' + e.ID_EMP.slice(0, 8).toUpperCase();
+  document.getElementById('vStatusBadge').innerHTML = e.ATIVO_EMP
+    ? `<span class="text-xs font-bold bg-green-100 text-green-700 px-2 py-0.5 rounded-full">Ativa</span>`
+    : `<span class="text-xs font-bold bg-gray-100 text-gray-500 px-2 py-0.5 rounded-full">Inativa</span>`;
+  document.getElementById('vCnpjHero').textContent = e.CNPJ_EMP ? fmtDoc(e.CNPJ_EMP) : '';
+
+  setV('vEmail',   e.EMAIL_EMP);
+  setV('vTel',     e.TEL_EMP ? fmtTel(e.TEL_EMP) : null);
+  setV('vDtcri',   e.DTCRI_EMP   ? fmtDatetime(e.DTCRI_EMP)   : null);
+  setV('vDtalter', e.DTALTER_EMP ? fmtDatetime(e.DTALTER_EMP) : null);
+  setV('vPlano',   e.PLANO?.NOME_PLANO || null);
+  setV('vLogo2',   e.LOGO_EMP);
+
+  setV('vCep',        e.CEP_EMP        ? fmtCep(e.CEP_EMP) : null);
+  setV('vUf',         e.UF_EMP         || null);
+  setV('vLogradouro', e.LOGRADOURO_EMP || null);
+  setV('vNumero',     e.NUMERO_EMP     || null);
+  setV('vComplemento',e.COMPLEMENTO_EMP|| null);
+  setV('vBairro',     e.BAIRRO_EMP     || null);
+  setV('vCidade',     e.CIDADE_EMP     || null);
+
+  document.getElementById('viewModal').classList.add('open');
+}
+
+function setV(id, val) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  if (val) { el.textContent = val; el.classList.remove('text-gray-300','italic'); }
+  else     { el.textContent = 'Não informado'; el.classList.add('text-gray-300','italic'); }
+}
+
+function closeViewModal() { document.getElementById('viewModal').classList.remove('open'); currentViewId = null; }
+function switchToEdit()   { const id = currentViewId; closeViewModal(); setTimeout(() => openEditModal(id), 60); }
+
+/* ═══════════════════════════════════════════
+   LOGO PREVIEW
+═══════════════════════════════════════════ */
+function previewLogo() {
+  const url  = document.getElementById('fLogo').value.trim();
+  const ini  = document.getElementById('logoPreviewIni');
+  const img  = document.getElementById('logoPreviewImg');
+  const nome = document.getElementById('fNome').value.trim();
+  ini.textContent = initials(nome) || 'V';
+  if (url) {
+    img.src = url;
+    img.classList.remove('hidden');
+    ini.classList.add('hidden');
+    img.onerror = () => { img.classList.add('hidden'); ini.classList.remove('hidden'); };
+  } else {
+    img.classList.add('hidden');
+    ini.classList.remove('hidden');
+  }
+}
+
+/* ═══════════════════════════════════════════
+   MODAL: FORMULÁRIO
+═══════════════════════════════════════════ */
+function openNewModal() {
+  resetForm();
+  document.getElementById('formTitle').textContent    = 'Nova Empresa';
+  document.getElementById('formSubtitle').textContent = '';
+  document.getElementById('formIcon').textContent     = '🏢';
+  document.getElementById('formModal').classList.add('open');
+}
+
+function openEditModal(id) {
+  const e = allEmpresas.find(x => x.ID_EMP === id);
+  if (!e) return;
+
+  _originalEmpPlanoId = e.ID_PLANO || null;
+  _empresaAsaasSubId  = e.ASAAS_SUBSCRIPTION_ID || null;
+  _editEmpId          = e.ID_EMP;
+  _editEmpNome        = e.NOME_EMP;
+  _originalIsento     = !!e.ISENTO_COBRANCA;
+
+  resetForm();
+  document.getElementById('fId').value = e.ID_EMP;
+  document.getElementById('formTitle').textContent    = 'Editar Empresa';
+  document.getElementById('formSubtitle').textContent = e.NOME_EMP;
+  document.getElementById('formIcon').textContent     = '✏️';
+
+  document.getElementById('fNome').value  = e.NOME_EMP  || '';
+  document.getElementById('fCnpj').value  = e.CNPJ_EMP  ? fmtCnpj(e.CNPJ_EMP) : '';
+  document.getElementById('fTel').value   = e.TEL_EMP   || '';
+  document.getElementById('fEmail').value = e.EMAIL_EMP || '';
+  document.getElementById('fLogo').value  = e.LOGO_EMP  || '';
+  document.getElementById('fPlano').value = e.ID_PLANO  || '';
+  document.getElementById('fBiAcesso').checked = !!e.BI_ACESSO_EMP;
+  document.getElementById('fAtivo').checked = !!e.ATIVO_EMP;
+  document.getElementById('fIsento').checked = !!e.ISENTO_COBRANCA;
+  document.getElementById('fCep').value         = e.CEP_EMP        ? fmtCep(e.CEP_EMP) : '';
+  document.getElementById('fLogradouro').value  = e.LOGRADOURO_EMP || '';
+  document.getElementById('fNumero').value      = e.NUMERO_EMP     || '';
+  document.getElementById('fComplemento').value = e.COMPLEMENTO_EMP|| '';
+  document.getElementById('fBairro').value      = e.BAIRRO_EMP     || '';
+  document.getElementById('fCidade').value      = e.CIDADE_EMP     || '';
+  document.getElementById('fUf').value          = e.UF_EMP         || '';
+  previewLogo();
+
+  document.getElementById('formModal').classList.add('open');
+}
+
+function closeFormModal() { document.getElementById('formModal').classList.remove('open'); }
+
+function resetForm() {
+  document.getElementById('fId').value    = '';
+  document.getElementById('fNome').value  = '';
+  document.getElementById('fCnpj').value  = '';
+  document.getElementById('fTel').value   = '';
+  document.getElementById('fEmail').value = '';
+  document.getElementById('fLogo').value  = '';
+  document.getElementById('fPlano').value = '';
+  document.getElementById('fBiAcesso').checked = false;
+  document.getElementById('fAtivo').checked = true;
+  document.getElementById('fIsento').checked = false;
+  document.getElementById('formAlert').innerHTML = '';
+  document.getElementById('logoPreviewIni').textContent = 'V';
+  document.getElementById('logoPreviewIni').classList.remove('hidden');
+  document.getElementById('logoPreviewImg').classList.add('hidden');
+  document.getElementById('logoPreviewImg').src = '';
+  document.getElementById('fCep').value         = '';
+  document.getElementById('fLogradouro').value  = '';
+  document.getElementById('fNumero').value      = '';
+  document.getElementById('fComplemento').value = '';
+  document.getElementById('fBairro').value      = '';
+  document.getElementById('fCidade').value      = '';
+  document.getElementById('fUf').value          = '';
+}
+
+/* ═══════════════════════════════════════════
+   SALVAR
+═══════════════════════════════════════════ */
+async function saveEmpresa() {
+  const alertEl = document.getElementById('formAlert');
+  alertEl.innerHTML = '';
+  const nome = document.getElementById('fNome').value.trim();
+  if (!nome) { alertEl.innerHTML = showErr('Informe o nome da empresa.'); alertEl.scrollIntoView({ behavior:'smooth', block:'center' }); return; }
+
+  setSaveLoading(true);
+  try {
+    const planoId = document.getElementById('fPlano').value || null;
+    const isentoCobranca = document.getElementById('fIsento').checked;
+    const editId = document.getElementById('fId').value;
+    // Ativando isenção agora: quem grava ISENTO_COBRANCA=true é a função
+    // isentar-empresa, pois ela também cancela a assinatura e exclui as
+    // cobranças pendentes no Asaas — gravar aqui deixaria o flag ligado
+    // sem essa limpeza caso a chamada à função falhe.
+    const ativandoIsencao = !!(editId && isentoCobranca && !_originalIsento);
+    const payload = {
+      NOME_EMP:   nome,
+      CNPJ_EMP:   document.getElementById('fCnpj').value.replace(/\D/g,'') || null,
+      TEL_EMP:    document.getElementById('fTel').value.replace(/\D/g,'')  || null,
+      EMAIL_EMP:  document.getElementById('fEmail').value.trim()           || null,
+      LOGO_EMP:   document.getElementById('fLogo').value.trim()            || null,
+      ID_PLANO:   planoId,
+      BI_ACESSO_EMP:   document.getElementById('fBiAcesso').checked,
+      ATIVO_EMP:       document.getElementById('fAtivo').checked,
+      ISENTO_COBRANCA: ativandoIsencao ? _originalIsento : isentoCobranca,
+      DTALTER_EMP:     new Date().toISOString(),
+      CEP_EMP:         document.getElementById('fCep').value.replace(/\D/g,'')            || null,
+      LOGRADOURO_EMP:  document.getElementById('fLogradouro').value.trim()                || null,
+      NUMERO_EMP:      document.getElementById('fNumero').value.trim()                    || null,
+      COMPLEMENTO_EMP: document.getElementById('fComplemento').value.trim()               || null,
+      BAIRRO_EMP:      document.getElementById('fBairro').value.trim()                    || null,
+      CIDADE_EMP:      document.getElementById('fCidade').value.trim()                    || null,
+      UF_EMP:          document.getElementById('fUf').value.trim().toUpperCase()          || null,
+    };
+
+    if (editId) {
+      const { error } = await supabase.from('EMPRESA').update(payload).eq('ID_EMP', editId);
+      if (error) throw new Error('Erro ao atualizar: ' + error.message);
+    } else {
+      const { error } = await supabase.from('EMPRESA').insert(payload);
+      if (error) throw new Error('Erro ao criar empresa: ' + error.message);
+    }
+
+    let avisoIsencao = '';
+    if (ativandoIsencao) {
+      const { data: { session } } = await supabase.auth.getSession();
+      const resp = await fetch(`${SUPABASE_URL}/functions/v1/isentar-empresa`, {
+        method:  'POST',
+        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${session.access_token}` },
+        body:    JSON.stringify({ empresaId: editId }),
+      });
+      const result = await resp.json();
+      if (!resp.ok) throw new Error(result.erro || 'Erro ao isentar empresa de cobrança no Asaas.');
+      avisoIsencao = ` Cobranças pendentes removidas no Asaas: ${result.cobrancasExcluidas ?? 0}.`;
+    }
+
+    closeFormModal();
+    showToast((editId ? 'Empresa atualizada com sucesso!' : 'Empresa cadastrada com sucesso!') + avisoIsencao);
+    await loadEmpresas();
+
+    if (editId && planoId && planoId !== _originalEmpPlanoId && _empresaAsaasSubId && !ativandoIsencao) {
+      const plano = planoMap[planoId];
+      document.getElementById('empAsaasNome').textContent  = _editEmpNome || '';
+      document.getElementById('empAsaasPlano').textContent = plano?.NOME_PLANO || '';
+      const precoWrap = document.getElementById('empAsaasPrecoWrap');
+      if (plano?.PRECO_PLANO != null) {
+        document.getElementById('empAsaasPreco').textContent =
+          'R$ ' + Number(plano.PRECO_PLANO).toLocaleString('pt-BR', { minimumFractionDigits: 2 });
+        precoWrap.classList.remove('hidden');
+      } else {
+        precoWrap.classList.add('hidden');
+      }
+      document.getElementById('empAsaasResult').classList.add('hidden');
+      document.getElementById('empAsaasResult').textContent = '';
+      document.getElementById('btnEmpAsaasConfirm').disabled = false;
+      document.getElementById('empAsaasSpin').classList.add('hidden');
+      document.getElementById('empAsaasConfirmTxt').textContent = 'Sim, atualizar';
+      document.getElementById('empAsaasModal').classList.add('open');
+    }
+  } catch (e) {
+    console.error('saveEmpresa:', e);
+    alertEl.innerHTML = showErr(e.message || 'Erro inesperado. Tente novamente.');
+    alertEl.scrollIntoView({ behavior:'smooth', block:'center' });
+  } finally {
+    setSaveLoading(false);
+  }
+}
+
+function setSaveLoading(on) {
+  document.getElementById('btnSave').disabled = on;
+  document.getElementById('saveSpin').classList.toggle('hidden', !on);
+  document.getElementById('saveIcon').classList.toggle('hidden',  on);
+  document.getElementById('saveTxt').textContent = on ? 'Salvando...' : 'Salvar';
+}
+
+/* ═══════════════════════════════════════════
+   MODAL: ATUALIZAR PLANO ASAAS
+═══════════════════════════════════════════ */
+function closeEmpAsaasModal() {
+  document.getElementById('empAsaasModal').classList.remove('open');
+}
+
+async function confirmarTrocaPlanoAsaas() {
+  const btn     = document.getElementById('btnEmpAsaasConfirm');
+  const spin    = document.getElementById('empAsaasSpin');
+  const txtEl   = document.getElementById('empAsaasConfirmTxt');
+  const resultEl = document.getElementById('empAsaasResult');
+
+  btn.disabled = true;
+  spin.classList.remove('hidden');
+  txtEl.textContent = 'Atualizando...';
+  resultEl.classList.add('hidden');
+
+  try {
+    const { data: { session } } = await supabase.auth.getSession();
+    const resp = await fetch(`${SUPABASE_URL}/functions/v1/atualizar-assinatura-empresa`, {
+      method:  'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${session.access_token}` },
+      body:    JSON.stringify({ empresa_id: _editEmpId }),
+    });
+    const result = await resp.json();
+
+    if (resp.ok && result.sucesso) {
+      resultEl.textContent = '✓ Assinatura atualizada no Asaas com sucesso!';
+      resultEl.className   = 'mb-4 p-3 rounded-xl text-sm font-medium bg-green-50 text-green-700 border border-green-100';
+      resultEl.classList.remove('hidden');
+      setTimeout(closeEmpAsaasModal, 2000);
+    } else {
+      throw new Error(result.erro || 'Erro ao atualizar assinatura.');
+    }
+  } catch (e) {
+    resultEl.textContent = '✗ ' + (e.message || 'Erro inesperado.');
+    resultEl.className   = 'mb-4 p-3 rounded-xl text-sm font-medium bg-red-50 text-red-700 border border-red-100';
+    resultEl.classList.remove('hidden');
+    btn.disabled = false;
+    spin.classList.add('hidden');
+    txtEl.textContent = 'Tentar novamente';
+  }
+}
+
+/* ═══════════════════════════════════════════
+   MODAL: TOGGLE ATIVO
+═══════════════════════════════════════════ */
+function openToggleModal(id, nome, ativo) {
+  toggleTargetId    = id;
+  toggleTargetAtivo = ativo;
+
+  const isDeactivating = ativo;
+  document.getElementById('toggleIcon').textContent   = isDeactivating ? '⚠️' : '✅';
+  document.getElementById('toggleTitle').textContent  = isDeactivating ? `Inativar "${nome}"?` : `Ativar "${nome}"?`;
+  document.getElementById('toggleMsg').textContent    = isDeactivating
+    ? 'A empresa será inativada. Os usuários vinculados não conseguirão acessar o sistema.'
+    : 'A empresa será reativada e seus usuários poderão acessar o sistema novamente.';
+  document.getElementById('toggleBtnTxt').textContent = isDeactivating ? 'Inativar' : 'Ativar';
+
+  const btn = document.getElementById('btnToggleConfirm');
+  btn.className = `flex-1 flex items-center justify-center gap-2 py-2.5 text-white text-sm font-semibold rounded-xl transition-colors ${
+    isDeactivating ? 'bg-red-500 hover:bg-red-600' : 'bg-green-600 hover:bg-green-700'
+  }`;
+
+  document.getElementById('toggleModal').classList.add('open');
+}
+
+function closeToggleModal() { document.getElementById('toggleModal').classList.remove('open'); toggleTargetId = null; }
+
+async function confirmToggle() {
+  if (!toggleTargetId) return;
+  document.getElementById('toggleSpin').classList.remove('hidden');
+  document.getElementById('btnToggleConfirm').disabled = true;
+
+  const estáInativando = toggleTargetAtivo; // true = estamos inativando
+
+  try {
+    const { data: { session } } = await supabase.auth.getSession();
+
+    if (estáInativando) {
+      // Cancela a assinatura no Asaas
+      const resp = await fetch(`${SUPABASE_URL}/functions/v1/cancelar-assinatura`, {
+        method:  'POST',
+        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${session.access_token}` },
+        body:    JSON.stringify({ empresaId: toggleTargetId }),
+      });
+      const result = await resp.json();
+      if (!resp.ok && !result.aviso) throw new Error(result.erro || 'Erro ao cancelar assinatura no Asaas.');
+    } else {
+      // Cria nova assinatura no Asaas (vencimento em 30 dias)
+      const resp = await fetch(`${SUPABASE_URL}/functions/v1/reativar-assinatura`, {
+        method:  'POST',
+        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${session.access_token}` },
+        body:    JSON.stringify({ empresaId: toggleTargetId }),
+      });
+      const result = await resp.json();
+      if (!resp.ok && !result.aviso) throw new Error(result.erro || 'Erro ao criar assinatura no Asaas.');
+    }
+
+    const { error } = await supabase.from('EMPRESA')
+      .update({ ATIVO_EMP: !toggleTargetAtivo, DTALTER_EMP: new Date().toISOString() })
+      .eq('ID_EMP', toggleTargetId);
+    if (error) throw new Error(error.message);
+
+    closeToggleModal();
+    showToast(estáInativando
+      ? 'Empresa inativada e assinatura cancelada no Asaas.'
+      : 'Empresa ativada! Nova assinatura criada no Asaas com vencimento em 30 dias.');
+    await loadEmpresas();
+  } catch (e) {
+    showToast('Erro: ' + e.message, 'error');
+    closeToggleModal();
+  } finally {
+    document.getElementById('toggleSpin').classList.add('hidden');
+    document.getElementById('btnToggleConfirm').disabled = false;
+  }
+}
+
+/* ═══════════════════════════════════════════
+   MODAL: EXCLUIR EMPRESA
+═══════════════════════════════════════════ */
+function openDeleteModal(id, nome, ativo) {
+  if (ativo) {
+    showToast('Inative a empresa antes de excluí-la.', 'error');
+    return;
+  }
+  deleteTargetId   = id;
+  deleteTargetNome = nome;
+  document.getElementById('deleteTitle').textContent = `Excluir "${nome}"?`;
+  document.getElementById('deleteModal').classList.add('open');
+}
+
+function closeDeleteModal() {
+  document.getElementById('deleteModal').classList.remove('open');
+  deleteTargetId   = null;
+  deleteTargetNome = null;
+}
+
+async function confirmDelete() {
+  if (!deleteTargetId) return;
+  document.getElementById('deleteSpin').classList.remove('hidden');
+  document.getElementById('deleteIcon').classList.add('hidden');
+  document.getElementById('deleteBtnTxt').textContent = 'Excluindo...';
+  document.getElementById('btnDeleteConfirm').disabled = true;
+
+  try {
+    const { error } = await supabase.from('EMPRESA').delete().eq('ID_EMP', deleteTargetId);
+    if (error) throw new Error(error.message);
+    closeDeleteModal();
+    showToast('Empresa excluída com sucesso!');
+    await loadEmpresas();
+  } catch (e) {
+    closeDeleteModal();
+    const msg = e.message.includes('foreign key') || e.message.includes('violates')
+      ? 'Não é possível excluir: a empresa possui registros vinculados (usuários, profissionais ou pacientes).'
+      : 'Erro ao excluir: ' + e.message;
+    showToast(msg, 'error');
+  } finally {
+    document.getElementById('deleteSpin').classList.add('hidden');
+    document.getElementById('deleteIcon').classList.remove('hidden');
+    document.getElementById('deleteBtnTxt').textContent = 'Excluir';
+    document.getElementById('btnDeleteConfirm').disabled = false;
+  }
+}
+
+/* ═══════════════════════════════════════════
+   BUSCA DE CEP (ViaCEP)
+═══════════════════════════════════════════ */
+async function buscarCep() {
+  const cep = document.getElementById('fCep').value.replace(/\D/g, '');
+  if (cep.length !== 8) { showToast('Informe um CEP válido com 8 dígitos.', 'error'); return; }
+
+  const spin = document.getElementById('cepSpin');
+  const btn  = document.getElementById('btnBuscarCep');
+  const txt  = document.getElementById('cepBtnTxt');
+  spin.classList.remove('hidden');
+  btn.disabled = true;
+  txt.textContent = 'Buscando...';
+
+  try {
+    const res  = await fetch(`https://viacep.com.br/ws/${cep}/json/`);
+    const data = await res.json();
+    if (data.erro) { showToast('CEP não encontrado.', 'error'); return; }
+    document.getElementById('fLogradouro').value = data.logradouro || '';
+    document.getElementById('fBairro').value     = data.bairro     || '';
+    document.getElementById('fCidade').value     = data.localidade || '';
+    document.getElementById('fUf').value         = data.uf         || '';
+    document.getElementById('fNumero').focus();
+    showToast('Endereço preenchido com sucesso!', 'success');
+  } catch {
+    showToast('Erro ao buscar CEP. Verifique sua conexão.', 'error');
+  } finally {
+    spin.classList.add('hidden');
+    btn.disabled = false;
+    txt.textContent = 'Buscar';
+  }
+}
+
+/* ═══════════════════════════════════════════
+   MÁSCARAS
+═══════════════════════════════════════════ */
+document.getElementById('fCnpj').addEventListener('input', function () {
+  this.value = fmtCnpj(this.value);
+});
+document.getElementById('fTel').addEventListener('input', function () {
+  const d = this.value.replace(/\D/g, '');
+  this.value = d.length <= 10
+    ? d.replace(/(\d{2})(\d{4})(\d{0,4})/, '($1) $2-$3').trimEnd()
+    : d.replace(/(\d{2})(\d{5})(\d{0,4})/, '($1) $2-$3').trimEnd();
+});
+document.getElementById('fCep').addEventListener('input', function () {
+  const d = this.value.replace(/\D/g, '');
+  this.value = d.length > 5 ? d.replace(/(\d{5})(\d{0,3})/, '$1-$2') : d;
+  if (d.length === 8) buscarCep();
+});
+document.getElementById('fCep').addEventListener('keydown', function (e) {
+  if (e.key === 'Enter') { e.preventDefault(); buscarCep(); }
+});
+document.getElementById('fNome').addEventListener('input', () => {
+  const ini = document.getElementById('logoPreviewIni');
+  ini.textContent = initials(document.getElementById('fNome').value.trim()) || 'V';
+});
+
+/* ═══════════════════════════════════════════
+   FECHAR MODAIS NO OVERLAY
+═══════════════════════════════════════════ */
+['viewModal','formModal','toggleModal','deleteModal'].forEach(id => {
+  document.getElementById(id).addEventListener('click', e => {
+    if (e.target.id === id) {
+      if (id === 'viewModal')   closeViewModal();
+      if (id === 'formModal')   closeFormModal();
+      if (id === 'toggleModal') closeToggleModal();
+      if (id === 'deleteModal') closeDeleteModal();
+    }
+  });
+});
+
+/* ═══════════════════════════════════════════
+   FILTROS — LISTENERS
+═══════════════════════════════════════════ */
+document.getElementById('filterName').addEventListener('input', applyFilters);
+document.getElementById('toggleInativas').addEventListener('change', applyFilters);
+
+/* ═══════════════════════════════════════════
+   INICIALIZAÇÃO
+═══════════════════════════════════════════ */
+(async () => {
+  const ok = await initAuth();
+  if (ok) await Promise.all([loadPlanos(), loadEmpresas()]);
+})();
+
+document.querySelectorAll('#sidebar nav a').forEach(function(link) {
+  link.addEventListener('click', function() {
+    var sb = document.getElementById('sidebar');
+    var ov = document.getElementById('overlay');
+    if (sb && !sb.classList.contains('-translate-x-full')) {
+      sb.classList.add('-translate-x-full');
+      if (ov) ov.classList.add('hidden');
+    }
+  });
+});
+</script>
+<script>
+(async () => {
+  try {
+    const { data: { session } } = await supabase.auth.getSession();
+    if (!session) return;
+    const u = await getUsuarioAtual('TIPO_USU,ID_EMP', session);
+    if (u && u.ID_EMP === '22ff26b9-3839-45ed-8a1d-df4a488d3aab' && ['ADMIN_EMPRESA','SECRETARIA'].includes(u.TIPO_USU)) {
+      document.getElementById('menuDocumentosWrap')?.classList.remove('hidden');
+    }
+  } catch (_) {}
+})();
+</script>
+</body>
+</html>

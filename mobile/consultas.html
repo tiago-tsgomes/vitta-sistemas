@@ -1,0 +1,1391 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover"/>
+  <title>Consultas — Vitta</title>
+  <link rel="icon" type="image/png" href="../img/favicon.png"/>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>tailwind.config={theme:{extend:{colors:{vitta:{50:'#f0fbfd',100:'#e0f7fa',400:'#4dd9ed',500:'#2ABCD4',600:'#1a96ac'}},fontFamily:{sans:['Inter','system-ui','sans-serif']}}}}</script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+  <script src="../assets/js/config.js"></script>
+  <link rel="stylesheet" href="../assets/css/mobile-dark.css"/>
+  <script src="../assets/js/mobile-utils.js"></script>
+  <script src="../assets/js/ai-utils.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/pdfjs-dist@2.16.105/build/pdf.min.js"></script>
+  <script>pdfjsLib.GlobalWorkerOptions.workerSrc='https://cdn.jsdelivr.net/npm/pdfjs-dist@2.16.105/build/pdf.worker.min.js';</script>
+  <style>
+    *{-webkit-tap-highlight-color:transparent}
+    body{overscroll-behavior-y:none}
+    ::-webkit-scrollbar{display:none}
+    .safe-top{padding-top:env(safe-area-inset-top)}
+    @keyframes slideUp{from{transform:translateY(100%)}to{transform:translateY(0)}}
+    .modal-full{position:fixed;inset:0;z-index:50;background:white;display:none;flex-direction:column;padding-top:env(safe-area-inset-top);padding-bottom:env(safe-area-inset-bottom)}
+    .modal-full.open{display:flex;animation:slideUp .3s ease}
+    /* AI panel */
+    #ai-panel{transition:max-height .4s ease,opacity .3s ease;overflow:hidden;max-height:0;opacity:0}
+    #ai-panel.open{max-height:9999px;opacity:1}
+    .ai-tag{display:inline-flex;font-size:0.62rem;font-weight:600;padding:2px 7px;border-radius:999px}
+    /* Tab system */
+    .cons-tab-btn{flex:1;padding:0.6rem 0;font-size:0.78rem;font-weight:600;color:#9ca3af;border-bottom:2px solid transparent;transition:all .15s}
+    .cons-tab-btn.active{color:#2ABCD4;border-bottom-color:#2ABCD4}
+    .agd-card{border:1.5px solid #f3f4f6;cursor:pointer;transition:all .15s;background:white;border-radius:1rem;padding:0.75rem;margin-bottom:0.5rem}
+    .agd-card.selected{border-color:#2ABCD4;background:#f0fbfd}
+  </style>
+</head>
+<body class="bg-[#F0F2F5] font-sans antialiased">
+
+<!-- Deep-link loader (evita flash da tela de consultas ao abrir direto do prontuário) -->
+<div id="deeplink-loader" class="hidden fixed inset-0 z-[999] bg-white items-center justify-center">
+  <svg class="w-6 h-6 animate-spin text-vitta-500" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"/></svg>
+</div>
+<script>if(location.search.includes('openAgd=')){const l=document.getElementById('deeplink-loader');l.classList.remove('hidden');l.classList.add('flex');}</script>
+
+<!-- HEADER -->
+<header class="fixed top-0 left-0 right-0 z-20 bg-white border-b border-gray-100 safe-top">
+  <div class="h-14 flex items-center px-4 gap-3">
+    <div class="flex items-center gap-2">
+      <button onclick="navDay(-1)" class="p-1.5 rounded-lg bg-gray-100 text-gray-500">
+        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><polyline points="15 18 9 12 15 6"/></svg>
+      </button>
+      <div class="text-center cursor-pointer" onclick="goToday()">
+        <p id="date-label" class="text-[0.88rem] font-bold text-gray-800 leading-none"></p>
+        <p id="date-rel" class="text-[0.62rem] text-vitta-500 font-semibold h-3 mt-0.5"></p>
+      </div>
+      <button onclick="navDay(1)" class="p-1.5 rounded-lg bg-gray-100 text-gray-500">
+        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg>
+      </button>
+    </div>
+    <div class="flex-1"></div>
+    <button id="hdr-av" onclick="window.location.href='perfil.html'" class="w-8 h-8 rounded-full bg-vitta-500 flex items-center justify-center text-white text-xs font-bold">A</button>
+  </div>
+</header>
+
+<!-- MAIN -->
+<main style="padding-top:calc(56px + env(safe-area-inset-top));padding-bottom:calc(80px + env(safe-area-inset-bottom))" class="px-4 py-3 min-h-screen space-y-4">
+
+  <!-- Para Atender -->
+  <div>
+    <p class="text-[0.7rem] font-bold text-gray-400 uppercase tracking-wider mb-2 px-1">Para Atender</p>
+    <div id="confirmadas-list">
+      <div class="flex items-center justify-center gap-2 h-24 text-gray-400 text-sm bg-white rounded-2xl border border-gray-100">
+        <svg class="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"/></svg>
+        Carregando...
+      </div>
+    </div>
+    <button id="btn-iniciar" onclick="openAtendimento()"
+      class="w-full mt-3 py-3.5 rounded-2xl text-sm font-bold flex items-center justify-center gap-2 bg-gray-100 text-gray-400 cursor-not-allowed transition-all">
+      <svg class="w-4 h-4" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+      Iniciar Atendimento
+    </button>
+  </div>
+
+  <!-- Realizadas -->
+  <div>
+    <p class="text-[0.7rem] font-bold text-gray-400 uppercase tracking-wider mb-2 px-1">Realizadas Hoje</p>
+    <div id="realizadas-list"></div>
+  </div>
+
+</main>
+
+<!-- BOTTOM NAV -->
+<nav class="fixed bottom-0 left-0 right-0 z-20 bg-white border-t border-gray-100" style="padding-bottom:env(safe-area-inset-bottom)">
+  <div class="flex h-16">
+    <a href="dashboard.html" class="flex-1 flex flex-col items-center justify-center gap-0.5 text-gray-400">
+      <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+      <span class="text-[0.55rem] font-semibold">Início</span>
+    </a>
+    <a href="agenda.html" class="flex-1 flex flex-col items-center justify-center gap-0.5 text-gray-400">
+      <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+      <span class="text-[0.55rem] font-semibold">Agenda</span>
+    </a>
+    <a href="consultas.html" class="flex-1 flex flex-col items-center justify-center gap-0.5 text-vitta-500">
+      <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+      <span class="text-[0.55rem] font-bold">Consultas</span>
+    </a>
+    <a href="pacientes.html" class="flex-1 flex flex-col items-center justify-center gap-0.5 text-gray-400">
+      <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>
+      <span class="text-[0.55rem] font-semibold">Pacientes</span>
+    </a>
+    <a href="financeiro.html" class="flex-1 flex flex-col items-center justify-center gap-0.5 text-gray-400">
+      <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+      <span class="text-[0.55rem] font-semibold">Financeiro</span>
+    </a>
+  </div>
+</nav>
+
+<!-- ═══ MODAL ATENDIMENTO ═══ -->
+<div id="modal-atend" class="modal-full">
+  <!-- Modal header -->
+  <div class="shrink-0 px-4 py-3 border-b border-gray-100 bg-white">
+    <div class="flex items-center gap-3">
+      <button onclick="closeAtendimento()" class="p-1.5 rounded-xl bg-gray-100 text-gray-500">
+        <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg>
+      </button>
+      <div class="flex-1 min-w-0">
+        <h2 id="m-nome" class="text-[0.95rem] font-bold text-gray-800 truncate"></h2>
+        <p id="m-meta" class="text-[0.7rem] text-gray-500 truncate"></p>
+      </div>
+      <span id="m-badge" class="text-[0.65rem] font-bold text-white px-2.5 py-1 rounded-full shrink-0"></span>
+    </div>
+    <!-- Notice existente -->
+    <div id="m-notice" class="hidden mt-2 text-[0.72rem] text-blue-700 bg-blue-50 rounded-xl px-3 py-1.5 font-medium">Consulta já registrada — editando existente.</div>
+    <!-- Tabs da consulta -->
+    <div class="flex mt-2 border-b border-gray-100">
+      <button id="ctab-descr" class="cons-tab-btn active" onclick="switchConsTab('descr')">Descrição</button>
+      <button id="ctab-dados" class="cons-tab-btn" onclick="switchConsTab('dados')">Dados Clínicos</button>
+    </div>
+  </div>
+
+  <!-- Modal body (scrollable) -->
+  <div class="flex-1 overflow-y-auto">
+
+    <!-- ── Pane: Descrição ── -->
+    <div id="cpane-descr" class="p-4 space-y-3">
+      <!-- Queixa Principal -->
+      <div>
+        <p class="text-[0.68rem] font-bold text-gray-400 uppercase tracking-wider mb-1.5">Queixa Principal</p>
+        <input id="f-queixa" type="text" placeholder="Ex: Dor de cabeça há 3 dias, tontura…" maxlength="200" class="w-full py-2.5 px-3.5 text-sm border border-gray-200 rounded-xl outline-none focus:border-vitta-500"/>
+      </div>
+
+      <!-- AI Summary button -->
+      <div class="flex items-center justify-between">
+        <p class="text-[0.68rem] font-bold text-gray-400 uppercase tracking-wider">Descrição da Consulta</p>
+        <button id="btn-ai" onclick="toggleAI()"
+          class="flex items-center gap-1.5 text-[0.72rem] font-semibold px-2.5 py-1 rounded-lg border border-violet-200 text-violet-600 bg-white transition-all">
+          <svg class="w-3 h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L9.5 9.5 2 12l7.5 2.5L12 22l2.5-7.5L22 12l-7.5-2.5z"/></svg>
+          Resumo IA
+        </button>
+      </div>
+
+      <!-- AI Panel -->
+      <div id="ai-panel">
+        <div class="rounded-2xl border border-violet-200 bg-gradient-to-br from-violet-50 to-blue-50 overflow-hidden">
+          <div class="flex items-center justify-between px-3.5 py-2.5 border-b border-violet-100 bg-violet-100/40">
+            <div class="flex items-center gap-2">
+              <div class="w-5 h-5 rounded-md bg-violet-500 flex items-center justify-center shrink-0"><svg class="w-3 h-3 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 2L9.5 9.5 2 12l7.5 2.5L12 22l2.5-7.5L22 12l-7.5-2.5z"/></svg></div>
+              <span class="text-[0.75rem] font-bold text-violet-800">Resumo IA</span>
+              <span id="ai-badge-count" class="hidden ai-tag bg-violet-100 text-violet-600"></span>
+            </div>
+            <div class="flex items-center gap-2">
+              <button id="btn-ai-refresh" onclick="refreshAI()" class="hidden text-violet-400 p-0.5" title="Atualizar análise">
+                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
+              </button>
+              <button onclick="toggleAI()" class="text-gray-400 p-0.5"><svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+            </div>
+          </div>
+          <div id="ai-panel-body" class="p-3.5 space-y-3 text-[0.78rem] text-gray-700 leading-relaxed"></div>
+          <div class="px-3.5 py-2 bg-violet-50/50 border-t border-violet-100">
+            <p id="ai-mobile-footer" class="text-[0.62rem] text-gray-400">Resumo gerado por IA — Valide com o histórico completo.</p>
+          </div>
+        </div>
+      </div>
+
+      <textarea id="f-descricao" rows="8"
+        placeholder="Descreva a consulta: queixas, histórico, exame físico, diagnóstico, conduta…"
+        class="w-full py-3 px-3.5 text-sm border border-gray-200 rounded-2xl outline-none focus:border-vitta-500 resize-none"></textarea>
+
+      <!-- Diagnóstico -->
+      <div class="flex items-center gap-2 pt-1">
+        <div class="w-7 h-7 rounded-lg bg-amber-100 flex items-center justify-center shrink-0">
+          <svg class="w-4 h-4 text-amber-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="2" ry="2"/></svg>
+        </div>
+        <p class="text-[0.72rem] font-bold text-gray-500 uppercase tracking-wider">Diagnóstico</p>
+      </div>
+
+      <!-- CID-10 -->
+      <div>
+        <p class="text-[0.68rem] font-bold text-gray-400 uppercase tracking-wider mb-1.5">Código do Diagnóstico (CID-10)</p>
+        <input id="f-cid" type="text" placeholder="Ex: F41.1, J18.9…" maxlength="20" class="w-full py-2.5 px-3 text-sm border border-gray-200 rounded-xl outline-none focus:border-vitta-500 font-mono"/>
+      </div>
+
+      <!-- Hipótese -->
+      <div>
+        <p class="text-[0.68rem] font-bold text-gray-400 uppercase tracking-wider mb-1.5">Hipótese Diagnóstica</p>
+        <textarea id="f-hipotese" rows="3" placeholder="Descreva a hipótese ou diagnóstico…" class="w-full py-2.5 px-3 text-sm border border-gray-200 rounded-xl outline-none focus:border-vitta-500 resize-none"></textarea>
+      </div>
+
+      <!-- Conduta -->
+      <div class="flex items-center gap-2 pt-1">
+        <div class="w-7 h-7 rounded-lg bg-emerald-100 flex items-center justify-center shrink-0">
+          <svg class="w-4 h-4 text-emerald-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+        </div>
+        <p class="text-[0.72rem] font-bold text-gray-500 uppercase tracking-wider">Conduta</p>
+      </div>
+
+      <div>
+        <div class="flex items-center justify-between mb-1.5">
+          <p class="text-[0.85rem] font-semibold text-gray-600">Receitas</p>
+          <button type="button" onclick="addDocumentoItem('RECEITA')" class="flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-[0.68rem] font-semibold border border-vitta-200 text-vitta-700 active:bg-vitta-50">
+            <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M5 12h14"/></svg>
+            Nova Receita
+          </button>
+        </div>
+        <div id="lista-receitas" class="space-y-2">
+          <p class="text-[0.72rem] text-gray-400 italic py-1">Nenhuma receita adicionada.</p>
+        </div>
+      </div>
+
+      <div>
+        <div class="flex items-center justify-between mb-1.5">
+          <p class="text-[0.85rem] font-semibold text-gray-600">Solicitações de Exames</p>
+          <button type="button" onclick="addDocumentoItem('EXAME')" class="flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-[0.68rem] font-semibold border border-vitta-200 text-vitta-700 active:bg-vitta-50">
+            <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M5 12h14"/></svg>
+            Novo Exame
+          </button>
+        </div>
+        <div id="lista-exames" class="space-y-2">
+          <p class="text-[0.72rem] text-gray-400 italic py-1">Nenhuma solicitação de exames adicionada.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── Pane: Dados Clínicos ── -->
+    <div id="cpane-dados" class="hidden p-4 space-y-4">
+      <!-- Sinais Vitais -->
+      <div>
+        <p class="text-[0.68rem] font-bold text-gray-400 uppercase tracking-wider mb-2">Sinais Vitais</p>
+        <div class="grid grid-cols-2 gap-2">
+          <div><p class="text-[0.65rem] text-gray-400 mb-1">Peso (kg)</p><input id="sv-peso" type="number" step="0.1" placeholder="—" oninput="calcIMC()" class="w-full py-2.5 px-3 text-sm border border-gray-200 rounded-xl outline-none focus:border-vitta-500"/></div>
+          <div><p class="text-[0.65rem] text-gray-400 mb-1">Altura (cm)</p><input id="sv-altura" type="number" placeholder="—" oninput="calcIMC()" class="w-full py-2.5 px-3 text-sm border border-gray-200 rounded-xl outline-none focus:border-vitta-500"/></div>
+          <div><p class="text-[0.65rem] text-gray-400 mb-1">IMC</p><input id="sv-imc" type="text" readonly placeholder="—" class="w-full py-2.5 px-3 text-sm border border-gray-200 rounded-xl outline-none bg-gray-50 text-gray-500 font-semibold"/></div>
+          <div><p class="text-[0.65rem] text-gray-400 mb-1">Temp (°C)</p><input id="sv-temp" type="number" step="0.1" placeholder="—" class="w-full py-2.5 px-3 text-sm border border-gray-200 rounded-xl outline-none focus:border-vitta-500"/></div>
+          <div><p class="text-[0.65rem] text-gray-400 mb-1">PA Sist.</p><input id="sv-pa-sist" type="number" placeholder="—" class="w-full py-2.5 px-3 text-sm border border-gray-200 rounded-xl outline-none focus:border-vitta-500"/></div>
+          <div><p class="text-[0.65rem] text-gray-400 mb-1">PA Diast.</p><input id="sv-pa-diast" type="number" placeholder="—" class="w-full py-2.5 px-3 text-sm border border-gray-200 rounded-xl outline-none focus:border-vitta-500"/></div>
+          <div><p class="text-[0.65rem] text-gray-400 mb-1">FC (bpm)</p><input id="sv-fc" type="number" placeholder="—" class="w-full py-2.5 px-3 text-sm border border-gray-200 rounded-xl outline-none focus:border-vitta-500"/></div>
+          <div><p class="text-[0.65rem] text-gray-400 mb-1">SpO₂ (%)</p><input id="sv-spo2" type="number" placeholder="—" class="w-full py-2.5 px-3 text-sm border border-gray-200 rounded-xl outline-none focus:border-vitta-500"/></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal footer -->
+  <div class="shrink-0 px-4 py-3 border-t border-gray-100 bg-white flex gap-2.5">
+    <button onclick="salvarAtendimento(true)" class="flex-1 py-3 border border-gray-200 rounded-2xl text-sm font-semibold text-gray-600 active:bg-gray-50">Rascunho</button>
+    <button onclick="salvarAtendimento(false)" class="flex-1 py-3 bg-vitta-500 text-white rounded-2xl text-sm font-bold active:bg-vitta-600 shadow-sm">Finalizar</button>
+  </div>
+
+  <!-- Hidden inputs -->
+  <input type="hidden" id="m-cons-id"/>
+  <input type="hidden" id="m-sv-id"/>
+  <input type="hidden" id="m-agd-id"/>
+  <input type="hidden" id="m-pac-id"/>
+</div>
+
+<!-- TOAST -->
+<div id="toast" class="hidden fixed bottom-24 left-4 right-4 z-50 py-3 px-4 rounded-2xl text-sm font-semibold text-white text-center shadow-lg"></div>
+
+<!-- ═══ MODAL: PREVIEW PDF ═══ -->
+<div id="modalPdfPreview" class="fixed inset-0 bg-black/60 z-[70] hidden items-center justify-center p-4" onclick="if(event.target===this)closePdfPreview()">
+  <div class="bg-white rounded-2xl w-full max-w-3xl flex flex-col shadow-2xl" style="height:90vh" onclick="event.stopPropagation()">
+    <div class="shrink-0 px-5 py-3.5 border-b border-gray-100 flex items-center justify-between">
+      <h3 id="pdfPreviewTitle" class="text-[0.9rem] font-bold text-gray-800">Visualizar PDF</h3>
+      <button onclick="closePdfPreview()" class="p-1.5 rounded-lg active:bg-gray-100 text-gray-400">
+        <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+    <div id="pdfPreviewBody" class="flex-1 min-h-0 bg-gray-100 overflow-y-auto">
+      <div id="pdfPreviewLoading" class="h-full flex flex-col items-center justify-center gap-3 px-6 text-center">
+        <svg class="w-6 h-6 animate-spin text-vitta-500" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"/></svg>
+        <p class="text-[0.8rem] text-gray-400">Carregando PDF…</p>
+      </div>
+      <div id="pdfPreviewPages" class="flex flex-col items-center gap-3 py-3 px-2"></div>
+    </div>
+    <div class="shrink-0 px-4 py-3 border-t border-gray-100 flex items-center justify-end gap-2">
+      <button onclick="closePdfPreview()" class="px-3.5 py-2 rounded-xl text-[0.8rem] font-semibold text-gray-500 active:bg-gray-100">Fechar</button>
+      <button id="btnEnviarPdfEmail" onclick="enviarPdfPreviewPorEmail()" class="flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-[0.8rem] font-semibold text-vitta-600 border border-vitta-200 active:bg-vitta-50">
+        <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path d="M22 6l-10 7L2 6"/><rect x="2" y="4" width="20" height="16" rx="2"/></svg>
+        Email
+      </button>
+      <button onclick="baixarPdfPreview()" class="flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-[0.8rem] font-semibold text-white bg-vitta-500 active:bg-vitta-600">
+        <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+        Baixar
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ MODAL: ENVIAR PDF POR EMAIL ═══ -->
+<div id="modalEnviarEmail" class="fixed inset-0 bg-black/60 z-[80] hidden items-center justify-center p-4" onclick="if(event.target===this)fecharModalEnviarEmail()">
+  <div class="bg-white rounded-2xl w-full max-w-[420px] shadow-2xl p-6" onclick="event.stopPropagation()">
+    <div class="w-14 h-14 rounded-full bg-vitta-50 flex items-center justify-center mx-auto mb-4">
+      <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6 text-vitta-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M22 6l-10 7L2 6"/><rect x="2" y="4" width="20" height="16" rx="2"/></svg>
+    </div>
+    <h3 class="text-base font-bold text-gray-800 text-center mb-1">Enviar por Email</h3>
+    <p id="enviarEmailDocTitulo" class="text-sm text-gray-500 text-center mb-5">Documento</p>
+    <label class="block text-xs font-semibold text-gray-500 mb-1.5">Enviar para</label>
+    <input type="email" id="inputEnviarEmailDestino" placeholder="email@paciente.com"
+           class="w-full px-3.5 py-2.5 border border-gray-200 rounded-xl text-sm text-gray-800 focus:outline-none focus:ring-2 focus:ring-vitta-200 focus:border-vitta-400 mb-5" />
+    <div class="flex gap-3">
+      <button onclick="fecharModalEnviarEmail()" class="flex-1 py-2.5 border border-gray-200 rounded-xl text-sm font-semibold text-gray-600 active:bg-gray-50">Cancelar</button>
+      <button onclick="confirmarEnvioPdfEmail()" id="btnConfirmarEnvioEmail"
+              class="flex-1 flex items-center justify-center gap-2 py-2.5 bg-vitta-500 active:bg-vitta-600 text-white text-sm font-semibold rounded-xl">
+        <svg id="enviarEmailSpin" class="hidden animate-spin w-4 h-4" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/></svg>
+        <span id="enviarEmailBtnTxt">Enviar</span>
+      </button>
+    </div>
+  </div>
+</div>
+
+<script>
+const AV_COLORS=['bg-blue-500','bg-emerald-500','bg-violet-500','bg-amber-500','bg-rose-500','bg-cyan-500'];
+const STATUS_COLORS={AGENDADO:'#3B82F6',CONFIRMADA:'#10B981',REALIZADA:'#2ABCD4',FALTA:'#EF4444'};
+let viewDate=new Date(), profId=null, idEmp=null, currentAgd=null, allAgds=[], returnPacId=null;
+let _aiPacId=null, _aiPaciente=null, _aiConsultas=[], _aiSv=[], _aiAlergias=[], _aiLoaded=false;
+let modalAgd=null, receitasState=[], examesState=[];
+
+function escHtml(s){return(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+
+function avColor(n){let h=0;for(const c of(n||''))h=(h<<5)-h+c.charCodeAt(0);return AV_COLORS[Math.abs(h)%AV_COLORS.length];}
+function initials(n){return(n||'').split(' ').filter(Boolean).slice(0,2).map(w=>w[0]).join('').toUpperCase();}
+function fmtTime(dt){return new Date(dt).toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'});}
+function calcAge(d){if(!d)return null;const dt=new Date(d),n=new Date();let a=n.getFullYear()-dt.getFullYear();if(n<new Date(n.getFullYear(),dt.getMonth(),dt.getDate()))a--;return a;}
+function showToast(msg,ok=true){const t=document.getElementById('toast');t.textContent=msg;t.className=`fixed bottom-24 left-4 right-4 z-50 py-3 px-4 rounded-2xl text-sm font-semibold text-white text-center shadow-lg ${ok?'bg-emerald-500':'bg-red-500'}`;t.classList.remove('hidden');setTimeout(()=>t.classList.add('hidden'),3000);}
+async function handleLogout(){
+  try { await Capacitor.Plugins.Preferences.remove({ key: 'vitta_session' }); } catch(e) {}
+  await supabase.auth.signOut();
+  window.location.href='../index.html';
+}
+
+function updateDateLabels(){
+  const t=new Date(),tm=new Date(t);tm.setDate(t.getDate()+1);
+  document.getElementById('date-label').textContent=viewDate.toLocaleDateString('pt-BR',{weekday:'short',day:'numeric',month:'short'}).replace(/\./g,'');
+  const same=(a,b)=>a.toDateString()===b.toDateString();
+  document.getElementById('date-rel').textContent=same(viewDate,t)?'Hoje':same(viewDate,tm)?'Amanhã':'';
+}
+function navDay(d){viewDate=new Date(viewDate);viewDate.setDate(viewDate.getDate()+d);currentAgd=null;setIniciar(false);updateDateLabels();loadAgds();}
+function goToday(){viewDate=new Date();currentAgd=null;setIniciar(false);updateDateLabels();loadAgds();}
+
+function setIniciar(on){
+  const btn=document.getElementById('btn-iniciar');
+  btn.className=`w-full mt-3 py-3.5 rounded-2xl text-sm font-bold flex items-center justify-center gap-2 transition-all ${on?'bg-vitta-500 text-white active:bg-vitta-600 shadow-sm cursor-pointer':'bg-gray-100 text-gray-400 cursor-not-allowed'}`;
+}
+
+async function loadAgds(){
+  document.getElementById('confirmadas-list').innerHTML='<div class="flex items-center justify-center gap-2 h-24 text-gray-400 text-sm bg-white rounded-2xl border border-gray-100"><svg class="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"/></svg>Carregando...</div>';
+  const d0=new Date(viewDate.getFullYear(),viewDate.getMonth(),viewDate.getDate()).toISOString();
+  const d1=new Date(viewDate.getFullYear(),viewDate.getMonth(),viewDate.getDate(),23,59,59,999).toISOString();
+  const {data}=await supabase.from('AGENDAMENTO')
+    .select('ID_AGD,DT_AGD,DT_FIM_AGD,STATUS_AGD,TIPO_AGD,PAC_AGD,PROF_AGD,ID_EMP,PACIENTE!PAC_AGD(ID_PAC,NOME_PAC,CPF_PAC,DTNASC_PAC,SEXO_PAC,TEL_PAC,EMAIL_PAC,OBS_PAC,CEP_PAC,RUA_PAC,NRO_PAC,COMPLE_PAC,BAIRRO_PAC,CIDADE_PAC,UF_PAC),PROFISSIONAL!PROF_AGD(NOME_PROF,CONSELHO_PROF,REGISTRO_PROF,ASSINATURA_PROF),SALA!SALA_AGD(NOME_SALA)')
+    .eq('ID_EMP',idEmp).eq('PROF_AGD',profId).gte('DT_AGD',d0).lte('DT_AGD',d1).order('DT_AGD');
+  allAgds=data||[];
+  renderConfirmadas(); renderRealizadas();
+}
+
+function renderConfirmadas(){
+  const el=document.getElementById('confirmadas-list');
+  const list=allAgds.filter(a=>a.STATUS_AGD==='CONFIRMADA');
+  if(!list.length){el.innerHTML='<div class="py-8 text-center text-gray-400 text-sm bg-white rounded-2xl border border-gray-100">Nenhuma consulta confirmada hoje</div>';return;}
+  el.innerHTML=list.map(a=>{
+    const pac=a.PACIENTE||{};
+    const sel=currentAgd?.ID_AGD===a.ID_AGD;
+    return `<div class="agd-card ${sel?'selected':''}" onclick="selectAgd('${a.ID_AGD}')">
+      <div class="flex items-center gap-2.5">
+        <div class="${avColor(pac.NOME_PAC)} w-9 h-9 rounded-xl flex items-center justify-center text-white text-xs font-bold shrink-0">${initials(pac.NOME_PAC)}</div>
+        <div class="flex-1 min-w-0">
+          <p class="text-[0.85rem] font-semibold text-gray-800 truncate">${pac.NOME_PAC||'—'}</p>
+          <p class="text-[0.7rem] text-gray-400">${fmtTime(a.DT_AGD)} · ${a.TIPO_AGD==='ONLINE'?'🌐 Online':'🏥 Presencial'}</p>
+        </div>
+        ${sel?'<svg class="w-5 h-5 text-vitta-500 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>':''}
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function renderRealizadas(){
+  const el=document.getElementById('realizadas-list');
+  const list=allAgds.filter(a=>a.STATUS_AGD==='REALIZADA');
+  if(!list.length){el.innerHTML='<p class="text-center text-gray-400 text-sm py-4">Nenhuma consulta realizada hoje</p>';return;}
+  el.innerHTML=list.map(a=>{
+    const pac=a.PACIENTE||{};
+    return `<div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-3.5 mb-2 flex items-center gap-2.5" onclick="openRealizadaView('${a.ID_AGD}')">
+      <div class="${avColor(pac.NOME_PAC)} w-9 h-9 rounded-xl flex items-center justify-center text-white text-xs font-bold shrink-0">${initials(pac.NOME_PAC)}</div>
+      <div class="flex-1 min-w-0">
+        <p class="text-[0.85rem] font-semibold text-gray-800 truncate">${pac.NOME_PAC||'—'}</p>
+        <p class="text-[0.7rem] text-gray-400">${fmtTime(a.DT_AGD)} · Realizada</p>
+      </div>
+      <span class="text-[0.65rem] font-bold bg-vitta-100 text-vitta-700 px-2 py-0.5 rounded-full">✓</span>
+    </div>`;
+  }).join('');
+}
+
+function selectAgd(id){
+  currentAgd=allAgds.find(a=>a.ID_AGD===id)||null;
+  setIniciar(!!currentAgd);
+  renderConfirmadas();
+}
+
+async function openAtendimentoForAgd(agd){
+  modalAgd=agd;
+  const pac=agd.PACIENTE||{};
+  const age=calcAge(pac.DTNASC_PAC);
+  document.getElementById('m-nome').textContent=pac.NOME_PAC||'—';
+  document.getElementById('m-meta').textContent=[age?age+' anos':null,fmtTime(agd.DT_AGD)+' – '+fmtTime(agd.DT_FIM_AGD)].filter(Boolean).join(' · ');
+  const badge=document.getElementById('m-badge');
+  badge.textContent=agd.STATUS_AGD==='REALIZADA'?'Realizada':'Confirmada';
+  badge.style.background=STATUS_COLORS[agd.STATUS_AGD]||'#6b7280';
+  document.getElementById('m-agd-id').value=agd.ID_AGD;
+  document.getElementById('m-pac-id').value=agd.PAC_AGD;
+  document.getElementById('m-cons-id').value='';
+  document.getElementById('m-sv-id').value='';
+  document.getElementById('f-queixa').value='';
+  document.getElementById('f-descricao').value='';
+  document.getElementById('f-cid').value='';
+  document.getElementById('f-hipotese').value='';
+  ['sv-peso','sv-altura','sv-temp','sv-pa-sist','sv-pa-diast','sv-fc','sv-spo2'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
+  calcIMC();
+  receitasState=[];examesState=[];renderReceitasList();renderExamesList();
+  document.getElementById('m-notice').classList.add('hidden');
+  // Reset painel IA para o novo paciente
+  _aiPacId=agd.PAC_AGD;
+  _aiLoaded=false;
+  _aiPaciente=null;
+  document.getElementById('ai-panel').classList.remove('open');
+  document.getElementById('ai-panel-body').innerHTML='';
+  document.getElementById('ai-badge-count').classList.add('hidden');
+  document.getElementById('btn-ai-refresh').classList.add('hidden');
+  document.getElementById('ai-mobile-footer').textContent='Resumo gerado por IA — Valide com o histórico completo.';
+  const btnAi=document.getElementById('btn-ai');
+  btnAi.className='flex items-center gap-1.5 text-[0.72rem] font-semibold px-2.5 py-1 rounded-lg border border-violet-200 text-violet-600 bg-white transition-all';
+
+  const [{data:cons},{data:sv}]=await Promise.all([
+    supabase.from('CONSULTA').select('*').eq('ID_AGD',agd.ID_AGD).maybeSingle(),
+    supabase.from('SINAL_VITAL').select('*').eq('ID_AGD',agd.ID_AGD).maybeSingle()
+  ]);
+  if(cons){
+    document.getElementById('m-cons-id').value=cons.ID_CONS;
+    document.getElementById('f-descricao').value=cons.ANAMNESE||'';
+    if(cons.QUEIXA) document.getElementById('f-queixa').value=cons.QUEIXA;
+    if(cons.CID_CONS) document.getElementById('f-cid').value=cons.CID_CONS;
+    if(cons.HIPOTESE_DIAG) document.getElementById('f-hipotese').value=cons.HIPOTESE_DIAG;
+    document.getElementById('m-notice').classList.remove('hidden');
+    const{data:docs}=await supabase.from('CONSULTA_DOCUMENTO').select('ID_DOC_CONS,TIPO,CONTEUDO,ESPECIAL_DOC_CONS').eq('ID_CONS',cons.ID_CONS).order('DTCRI_DOC_CONS');
+    (docs||[]).forEach(d=>{
+      const item={id:d.ID_DOC_CONS,conteudo:d.CONTEUDO||'',deletado:false,especial:!!d.ESPECIAL_DOC_CONS};
+      if(d.TIPO==='EXAME') examesState.push(item); else receitasState.push(item);
+    });
+    renderReceitasList();renderExamesList();
+  }
+  if(sv){
+    document.getElementById('m-sv-id').value=sv.ID_SV;
+    ['PESO_SV','ALTURA_SV','TEMP_SV','PA_SIST_SV','PA_DIAST_SV','FC_SV','SPO2_SV'].forEach((k,i)=>{
+      const ids=['sv-peso','sv-altura','sv-temp','sv-pa-sist','sv-pa-diast','sv-fc','sv-spo2'];
+      if(sv[k]!=null) document.getElementById(ids[i]).value=sv[k];
+    });
+    calcIMC();
+  }
+  switchConsTab('descr');
+  document.getElementById('modal-atend').classList.add('open');
+}
+
+function openAtendimento(){if(currentAgd)openAtendimentoForAgd(currentAgd);}
+async function openRealizadaView(id){const agd=allAgds.find(a=>a.ID_AGD===id);if(agd)await openAtendimentoForAgd(agd);}
+
+async function openAgdById(id){
+  const {data:agd}=await supabase.from('AGENDAMENTO')
+    .select('ID_AGD,DT_AGD,DT_FIM_AGD,STATUS_AGD,TIPO_AGD,PAC_AGD,PROF_AGD,ID_EMP,PACIENTE!PAC_AGD(ID_PAC,NOME_PAC,CPF_PAC,DTNASC_PAC,SEXO_PAC,TEL_PAC,EMAIL_PAC,OBS_PAC,CEP_PAC,RUA_PAC,NRO_PAC,COMPLE_PAC,BAIRRO_PAC,CIDADE_PAC,UF_PAC),PROFISSIONAL!PROF_AGD(NOME_PROF,CONSELHO_PROF,REGISTRO_PROF,ASSINATURA_PROF),SALA!SALA_AGD(NOME_SALA)')
+    .eq('ID_AGD',id).maybeSingle();
+  if(agd) await openAtendimentoForAgd(agd);
+}
+
+function closeAtendimento(){
+  if(returnPacId){window.location.href='prontuario.html?pac='+returnPacId;return;}
+  document.getElementById('modal-atend').classList.remove('open');
+}
+
+function calcIMC(){
+  const peso=parseFloat(document.getElementById('sv-peso').value);
+  const altura=parseFloat(document.getElementById('sv-altura').value);
+  const el=document.getElementById('sv-imc');
+  if(peso>0&&altura>0){
+    el.value=(peso/((altura/100)**2)).toFixed(1);
+  } else {
+    el.value='';
+  }
+}
+
+/* ── Receitas / Exames: CRUD ── */
+function escapeHtml(str){
+  return String(str==null?'':str).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+
+function addDocumentoItem(tipo){
+  const state=tipo==='EXAME'?examesState:receitasState;
+  state.push({id:null,conteudo:'',deletado:false,especial:false});
+  if(tipo==='EXAME') renderExamesList(); else renderReceitasList();
+  const containerId=tipo==='EXAME'?'lista-exames':'lista-receitas';
+  const el=document.getElementById(containerId);
+  const tas=el.querySelectorAll('textarea');
+  if(tas.length) tas[tas.length-1].focus();
+}
+
+function updateDocumentoItem(tipo,idx,valor){
+  const state=tipo==='EXAME'?examesState:receitasState;
+  if(state[idx]) state[idx].conteudo=valor;
+}
+
+function toggleDocumentoEspecial(idx){
+  if(receitasState[idx]){ receitasState[idx].especial=!receitasState[idx].especial; renderReceitasList(); }
+}
+
+function removeDocumentoItem(tipo,idx){
+  const state=tipo==='EXAME'?examesState:receitasState;
+  if(!state[idx]) return;
+  if(state[idx].id) state[idx].deletado=true; else state.splice(idx,1);
+  if(tipo==='EXAME') renderExamesList(); else renderReceitasList();
+}
+
+function renderReceitasList(){ renderDocList('lista-receitas', receitasState, 'RECEITA'); }
+function renderExamesList(){ renderDocList('lista-exames', examesState, 'EXAME'); }
+
+function renderDocList(containerId, state, tipo){
+  const el=document.getElementById(containerId);
+  const visiveis=[];
+  state.forEach((item,idx)=>{ if(!item.deletado) visiveis.push({item,idx}); });
+  if(!visiveis.length){
+    el.innerHTML=`<p class="text-[0.72rem] text-gray-400 italic py-1">Nenhum${tipo==='EXAME'?'a solicitação de exames':'a receita'} adicionada.</p>`;
+    return;
+  }
+  const label=tipo==='EXAME'?'Exame':'Receita';
+  const placeholder=tipo==='EXAME'?'Exames laboratoriais, de imagem ou outros a solicitar…':'Medicamentos, orientações e encaminhamentos…';
+  el.innerHTML=visiveis.map(({item,idx},n)=>`
+    <div class="border border-gray-200 rounded-xl p-3">
+      <div class="flex items-center justify-between mb-1.5">
+        <span class="text-[0.68rem] font-semibold text-gray-400">${label} ${n+1}</span>
+        <div class="flex items-center gap-1.5">
+          <button type="button" onclick="gerarPdfItemModal('${tipo}',${idx})" ${item.conteudo.trim()?'':'disabled'}
+            class="px-2 py-1 rounded-md text-[0.65rem] font-semibold border transition-colors ${item.conteudo.trim()?'border-emerald-200 text-emerald-700 active:bg-emerald-50':'border-gray-100 text-gray-300 cursor-not-allowed'}">
+            Visualizar PDF
+          </button>
+          <button type="button" onclick="removeDocumentoItem('${tipo}',${idx})"
+            class="px-2 py-1 rounded-md text-[0.65rem] font-semibold border border-red-100 text-red-500 active:bg-red-50 transition-colors">
+            Remover
+          </button>
+        </div>
+      </div>
+      ${tipo==='RECEITA'?`
+      <label class="flex items-center gap-1.5 mb-1.5 cursor-pointer select-none w-fit">
+        <input type="checkbox" onchange="toggleDocumentoEspecial(${idx})" ${item.especial?'checked':''}
+          class="w-3.5 h-3.5 rounded border-gray-300 text-sky-600 focus:ring-sky-500/30">
+        <span class="text-[0.68rem] font-medium text-gray-500">Receita de controle especial</span>
+      </label>`:''}
+      <textarea oninput="updateDocumentoItem('${tipo}',${idx},this.value)"
+        class="w-full py-2 px-3 text-sm border rounded-lg outline-none focus:border-vitta-500 focus:ring-2 focus:ring-vitta-500/10 transition-all ${item.especial?'border-sky-200 bg-sky-50':'border-gray-200'}"
+        style="min-height:90px;resize:vertical" placeholder="${placeholder}">${escapeHtml(item.conteudo)}</textarea>
+    </div>
+  `).join('');
+}
+
+/* ── Receitas / Exames: geração de PDF ── */
+function nomeArquivoPdf(prefixo, pacNome, indice, total){
+  const nome=(pacNome||'').trim();
+  const sufixo=(total>1)?` ${indice+1}`:'';
+  const base=nome?`${prefixo}${sufixo} - ${nome}`:`${prefixo}${sufixo}`;
+  return base.replace(/[\\/:*?"<>|]/g,'').trim()+'.pdf';
+}
+
+function gerarPdfItemModal(tipo, idx){
+  const state=tipo==='EXAME'?examesState:receitasState;
+  const item=state[idx];
+  if(!item||!item.conteudo.trim()) return;
+  const visiveis=state.filter(x=>!x.deletado);
+  const posicao=visiveis.indexOf(item);
+  const pac=modalAgd?.PACIENTE||{};
+  const prof=modalAgd?.PROFISSIONAL||{};
+  const meta={pacNome:pac.NOME_PAC||'',pacCpf:fmtCpf(pac.CPF_PAC),pacDtNasc:pac.DTNASC_PAC||'',pacSexo:pac.SEXO_PAC||'',pacEndereco:fmtEnderecoPaciente(pac),pacEmail:pac.EMAIL_PAC||'',idEmp:modalAgd?.ID_EMP||null,profNome:prof.NOME_PROF||'',profConselho:prof.CONSELHO_PROF||'',profRegistro:prof.REGISTRO_PROF||'',profAssinatura:prof.ASSINATURA_PROF||''};
+  if(tipo==='EXAME') gerarPdfExames(item.conteudo, meta, nomeArquivoPdf('Solicitação de Exames',pac.NOME_PAC,posicao,visiveis.length));
+  else if(item.especial) gerarPdfReceitaEspecial(item.conteudo, meta, nomeArquivoPdf('Receita Especial',pac.NOME_PAC,posicao,visiveis.length));
+  else gerarPdfReceita(item.conteudo, meta, nomeArquivoPdf('Receita',pac.NOME_PAC,posicao,visiveis.length));
+}
+
+const CONSELHO_TIPO_LABEL={
+  CRM:'Médico(a)', CRO:'Dentista', CRP:'Psicólogo(a)', COREN:'Enfermeiro(a)',
+  CREFITO:'Fisioterapeuta', CFF:'Farmacêutico(a)', CRN:'Nutricionista', CREF:'Educador(a) Físico(a)'
+};
+
+function parseExamesConteudo(raw){
+  const linhas=(raw||'').split('\n').map(l=>l.trim());
+  const reObs=/^(obs(erva[çc][ãa]o(es)?)?|orienta[çc][ãa]o(es)?)\s*:?\s*/i;
+  const itens=[],obs=[];
+  linhas.forEach(l=>{
+    if(!l){
+      if(itens.length && itens[itens.length-1]!=='') itens.push('');
+      return;
+    }
+    if(reObs.test(l)) obs.push(l.replace(reObs,'').trim());
+    else itens.push(l);
+  });
+  while(itens.length && itens[itens.length-1]==='') itens.pop();
+  return{itens,observacoes:obs.join(' ')};
+}
+
+const _empresaLogoCache={};
+function loadImageAsBase64(url){
+  if(!url) return Promise.resolve(null);
+  if(_empresaLogoCache[url]) return _empresaLogoCache[url];
+  const p=fetch(url)
+    .then(r=>r.blob())
+    .then(blob=>new Promise((resolve,reject)=>{
+      const reader=new FileReader();
+      reader.onload=()=>resolve(reader.result);
+      reader.onerror=reject;
+      reader.readAsDataURL(blob);
+    }))
+    .catch(()=>null);
+  _empresaLogoCache[url]=p;
+  return p;
+}
+function dataUrlImgFormat(dataUrl){
+  const m=/^data:image\/(png|jpe?g|webp)/i.exec(dataUrl||'');
+  if(!m) return 'PNG';
+  const t=m[1].toLowerCase();
+  return t==='jpg'?'JPEG':t.toUpperCase();
+}
+function getImageDimensions(dataUrl){
+  return new Promise((resolve,reject)=>{
+    const img=new Image();
+    img.onload=()=>resolve({w:img.naturalWidth,h:img.naturalHeight});
+    img.onerror=reject;
+    img.src=dataUrl;
+  });
+}
+function fitImageBox(dims,maxW,maxH){
+  if(!dims||!dims.w||!dims.h) return {w:maxW,h:maxH};
+  const ratio=Math.min(maxW/dims.w,maxH/dims.h);
+  return {w:dims.w*ratio,h:dims.h*ratio};
+}
+function drawWatermark(doc,pageW,pageH,logoData,logoDims){
+  if(!logoData) return;
+  const{w,h}=fitImageBox(logoDims,130,130);
+  const x=(pageW-w)/2, y=(pageH-h)/2;
+  doc.setGState(new doc.GState({opacity:0.06}));
+  doc.addImage(logoData,dataUrlImgFormat(logoData),x,y,w,h);
+  doc.setGState(new doc.GState({opacity:1}));
+}
+
+let _empresaPdfInfoCache=null, _empresaPdfInfoCacheId=null;
+async function loadEmpresaPdfInfo(){
+  if(!idEmp) return null;
+  if(_empresaPdfInfoCacheId===idEmp) return _empresaPdfInfoCache;
+  const{data}=await supabase.from('EMPRESA').select('NOME_EMP,LOGO_EMP,TEL_EMP,CNPJ_EMP,LOGRADOURO_EMP,NUMERO_EMP,COMPLEMENTO_EMP,BAIRRO_EMP,CIDADE_EMP,UF_EMP').eq('ID_EMP',idEmp).maybeSingle();
+  _empresaPdfInfoCache=data||null;
+  _empresaPdfInfoCacheId=idEmp;
+  return _empresaPdfInfoCache;
+}
+function fmtEnderecoEmpresa(e){
+  if(!e) return '';
+  const parts=[];
+  if(e.LOGRADOURO_EMP) parts.push(e.LOGRADOURO_EMP+(e.NUMERO_EMP?', '+e.NUMERO_EMP:''));
+  if(e.BAIRRO_EMP) parts.push(e.BAIRRO_EMP);
+  const cidadeUf=[e.CIDADE_EMP,e.UF_EMP].filter(Boolean).join('/');
+  if(cidadeUf) parts.push(cidadeUf);
+  return parts.join(' - ');
+}
+function fmtEnderecoPaciente(p){
+  if(!p) return '';
+  const parts=[];
+  if(p.RUA_PAC) parts.push(p.RUA_PAC+(p.NRO_PAC?', '+p.NRO_PAC:''));
+  if(p.COMPLE_PAC) parts.push(p.COMPLE_PAC);
+  if(p.BAIRRO_PAC) parts.push(p.BAIRRO_PAC);
+  const cidadeUf=[p.CIDADE_PAC,p.UF_PAC].filter(Boolean).join('/');
+  if(cidadeUf) parts.push(cidadeUf);
+  return parts.join(' - ');
+}
+function fmtDataNascPdf(d){
+  if(!d) return '—';
+  const dt=d.includes('T')?new Date(d):new Date(d+'T12:00');
+  return dt.toLocaleDateString('pt-BR');
+}
+function fmtDocEmpresa(v){
+  const d=(v||'').replace(/\D/g,'');
+  if(d.length===11) return d.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/,'$1.$2.$3-$4');
+  return d.replace(/(\d{2})(\d)/,'$1.$2').replace(/(\d{3})(\d)/,'$1.$2').replace(/(\d{3})(\d)/,'$1/$2').replace(/(\d{4})(\d{1,2})$/,'$1-$2').substring(0,18);
+}
+function fmtCpf(v){const d=(v||'').replace(/\D/g,'');if(d.length===11)return d.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/,'$1.$2.$3-$4');return v||'';}
+function fmtTel(v){const d=(v||'').replace(/\D/g,'');if(d.length===11)return d.replace(/(\d{2})(\d{5})(\d{4})/,'($1) $2-$3');if(d.length===10)return d.replace(/(\d{2})(\d{4})(\d{4})/,'($1) $2-$3');return v||'';}
+
+async function gerarPdfClinico(conteudo, meta, filename, opts){
+  const{jsPDF}=window.jspdf;
+  const doc=new jsPDF({unit:'mm',format:'a4'});
+  doc.setProperties({title:(filename||'documento.pdf').replace(/\.pdf$/i,'')});
+  const pageW=doc.internal.pageSize.getWidth();
+  const pageH=doc.internal.pageSize.getHeight();
+  const marginX=16;
+  const{itens,observacoes}=parseExamesConteudo(conteudo);
+  const TEAL_DARK=[18,122,140], GRAY_LABEL=[140,140,140], GRAY_TEXT=[60,60,60], GRAY_LINE=[230,230,230];
+
+  const empInfo=await loadEmpresaPdfInfo();
+  const empresaNome=empInfo?.NOME_EMP || 'Clínica';
+  const endereco=fmtEnderecoEmpresa(empInfo);
+  const telFmt=empInfo?.TEL_EMP ? fmtTel(empInfo.TEL_EMP) : '';
+  const cnpjFmt=empInfo?.CNPJ_EMP ? fmtDocEmpresa(empInfo.CNPJ_EMP) : '';
+  const logoData=await loadImageAsBase64(empInfo?.LOGO_EMP);
+  let logoDims=null;
+  if(logoData){ try{ logoDims=await getImageDimensions(logoData); }catch(e){} }
+  drawWatermark(doc,pageW,pageH,logoData,logoDims);
+
+  doc.setFillColor(TEAL_DARK[0],TEAL_DARK[1],TEAL_DARK[2]);
+  doc.rect(0,0,pageW,1.1,'F');
+  doc.setDrawColor(GRAY_LINE[0],GRAY_LINE[1],GRAY_LINE[2]);doc.setLineWidth(0.15);
+  doc.line(0,32,pageW,32);
+
+  let textX=marginX;
+  if(logoData){
+    const logoBox=fitImageBox(logoDims,18,18);
+    doc.addImage(logoData,dataUrlImgFormat(logoData),marginX,6+(18-logoBox.h)/2,logoBox.w,logoBox.h);
+    textX=marginX+22;
+  }
+
+  doc.setFont('helvetica','bold');doc.setFontSize(14);doc.setTextColor(25,25,25);
+  doc.text(empresaNome,textX,13);
+
+  let infoY=18.5;
+  doc.setFont('helvetica','normal');doc.setFontSize(7.8);doc.setTextColor(GRAY_LABEL[0],GRAY_LABEL[1],GRAY_LABEL[2]);
+  if(endereco){ doc.text(endereco,textX,infoY); infoY+=4.4; }
+  const cnpjTelLine=[cnpjFmt?('CNPJ '+cnpjFmt):'',telFmt?('Tel. '+telFmt):''].filter(Boolean).join('   •   ');
+  if(cnpjTelLine){ doc.text(cnpjTelLine,textX,infoY); infoY+=4.4; }
+
+  doc.setFont('helvetica','bold');doc.setFontSize(12);doc.setTextColor(60,60,60);
+  doc.text(opts.titulo,pageW-marginX,13,{align:'right'});
+  doc.setFont('helvetica','normal');doc.setFontSize(8);doc.setTextColor(GRAY_LABEL[0],GRAY_LABEL[1],GRAY_LABEL[2]);
+  doc.text('Emitido em '+new Date().toLocaleDateString('pt-BR'),pageW-marginX,19,{align:'right'});
+
+  let y=44;
+  doc.setFont('helvetica','bold');doc.setFontSize(9.5);doc.setTextColor(50,50,50);
+  doc.text('DADOS DO PACIENTE',marginX,y);
+  y+=5.5;
+  doc.setFont('helvetica','normal');doc.setFontSize(7);doc.setTextColor(GRAY_LABEL[0],GRAY_LABEL[1],GRAY_LABEL[2]);
+  doc.text('NOME COMPLETO',marginX,y);
+  y+=4;
+  doc.setFont('helvetica','bold');doc.setFontSize(10.5);doc.setTextColor(30,30,30);
+  doc.text(meta?.pacNome||'—',marginX,y);
+  y+=5.5;
+
+  const col2=marginX, col3=marginX+48, col4=marginX+90, col5=marginX+118;
+  doc.setFont('helvetica','normal');doc.setFontSize(7);doc.setTextColor(GRAY_LABEL[0],GRAY_LABEL[1],GRAY_LABEL[2]);
+  doc.text('CPF',col2,y);
+  doc.text('NASCIMENTO',col3,y);
+  doc.text('IDADE',col4,y);
+  doc.text('SEXO',col5,y);
+  y+=4;
+  const idade=calcAge(meta?.pacDtNasc);
+  const sexoTxt=meta?.pacSexo==='Prefiro não informar'?'Não informado':(meta?.pacSexo||'—');
+  doc.setFont('helvetica','bold');doc.setFontSize(9.5);doc.setTextColor(30,30,30);
+  doc.text(meta?.pacCpf||'—',col2,y);
+  doc.text(fmtDataNascPdf(meta?.pacDtNasc),col3,y);
+  doc.text((idade===null||idade===''||idade===undefined)?'—':idade+' anos',col4,y);
+  doc.text(sexoTxt,col5,y);
+  y+=5;
+  doc.setDrawColor(GRAY_LINE[0],GRAY_LINE[1],GRAY_LINE[2]);
+  doc.line(marginX,y,pageW-marginX,y);
+  y+=8;
+
+  doc.setFont('helvetica','bold');doc.setFontSize(9.5);doc.setTextColor(50,50,50);
+  doc.text(opts.secaoLabel,marginX,y);
+  y+=10;
+  if(!itens.length){
+    doc.setFont('helvetica','normal');doc.setFontSize(10);doc.setTextColor(150,150,150);
+    doc.text(opts.vazioMsg,marginX,y);
+    y+=8;
+  } else {
+    const maxW=pageW-marginX*2;
+    itens.forEach(item=>{
+      if(item===''){ y+=4; return; }
+      const lines=doc.splitTextToSize(item,maxW);
+      if(y>pageH-45){doc.addPage();y=20;drawWatermark(doc,pageW,pageH,logoData,logoDims);}
+      doc.setFont('helvetica','normal');doc.setFontSize(10.5);doc.setTextColor(GRAY_TEXT[0],GRAY_TEXT[1],GRAY_TEXT[2]);
+      lines.forEach((ln,i)=>doc.text(ln,marginX,y+i*5.2));
+      y+=lines.length*5.2+1.5;
+    });
+  }
+
+  if(observacoes){
+    if(y>pageH-60){doc.addPage();y=20;drawWatermark(doc,pageW,pageH,logoData,logoDims);}
+    const obsLines=doc.splitTextToSize(observacoes,pageW-marginX*2-8);
+    const boxH=15.5+obsLines.length*4.6;
+    doc.setFillColor(248,249,249);
+    doc.setDrawColor(GRAY_LINE[0],GRAY_LINE[1],GRAY_LINE[2]);
+    doc.roundedRect(marginX,y,pageW-marginX*2,boxH,2,2,'FD');
+    doc.setFont('helvetica','bold');doc.setFontSize(7.5);doc.setTextColor(GRAY_LABEL[0],GRAY_LABEL[1],GRAY_LABEL[2]);
+    doc.text('OBSERVAÇÕES / ORIENTAÇÕES CLÍNICAS',marginX+4,y+6);
+    doc.setFont('helvetica','normal');doc.setFontSize(9.5);doc.setTextColor(GRAY_TEXT[0],GRAY_TEXT[1],GRAY_TEXT[2]);
+    obsLines.forEach((ln,i)=>doc.text(ln,marginX+4,y+11.5+i*4.6));
+    y+=boxH+14;
+  } else {
+    y+=14;
+  }
+
+  const sigSpace=38;
+  if(pageH-y<sigSpace){doc.addPage();y=30;drawWatermark(doc,pageW,pageH,logoData,logoDims);}
+  y=pageH-sigSpace;
+  const sigW=74;
+  const sigX=pageW-marginX-sigW;
+  const sigImgData=await loadImageAsBase64(meta?.profAssinatura);
+  if(sigImgData){
+    try{
+      const dims=await getImageDimensions(sigImgData);
+      const maxImgW=sigW-2, maxImgH=21;
+      let imgW=maxImgW, imgH=imgW*(dims.h/dims.w);
+      if(imgH>maxImgH){ imgH=maxImgH; imgW=imgH*(dims.w/dims.h); }
+      const imgX=sigX+(sigW-imgW)/2;
+      const imgY=y-imgH-0.5;
+      doc.addImage(sigImgData,dataUrlImgFormat(sigImgData),imgX,imgY,imgW,imgH);
+    }catch(e){}
+  }
+  doc.setDrawColor(120,120,120);
+  doc.line(sigX,y,sigX+sigW,y);
+  y+=5;
+  doc.setFont('helvetica','bold');doc.setFontSize(10);doc.setTextColor(30,30,30);
+  doc.text(meta?.profNome||'',sigX+sigW/2,y,{align:'center'});
+  if(meta?.profConselho&&meta?.profRegistro){
+    y+=4.6;
+    doc.setFont('helvetica','normal');doc.setFontSize(8.5);doc.setTextColor(90,90,90);
+    doc.text(`${meta.profConselho}-${meta.profRegistro}`,sigX+sigW/2,y,{align:'center'});
+  }
+  const tipoLabel=CONSELHO_TIPO_LABEL[meta?.profConselho]||'';
+  if(tipoLabel){
+    y+=4.4;
+    doc.setFont('helvetica','normal');doc.setFontSize(8);doc.setTextColor(130,130,130);
+    doc.text(tipoLabel,sigX+sigW/2,y,{align:'center'});
+  }
+
+  const footY=pageH-18;
+  doc.setDrawColor(GRAY_LINE[0],GRAY_LINE[1],GRAY_LINE[2]);
+  doc.line(marginX,footY,pageW-marginX,footY);
+  doc.setFont('helvetica','bold');doc.setFontSize(8);doc.setTextColor(25,25,25);
+  doc.text(empresaNome,marginX,footY+5);
+  doc.setFont('helvetica','normal');doc.setFontSize(7);doc.setTextColor(140,140,140);
+  doc.text(opts.disclaimer,marginX,footY+9);
+  doc.setFont('helvetica','normal');doc.setFontSize(6.5);doc.setTextColor(170,170,170);
+  doc.text('Gerado por Vitta Sistemas',pageW-marginX,footY+9,{align:'right'});
+
+  showPdfPreview(doc,opts.previewTitulo,filename,meta);
+}
+
+function gerarPdfExames(conteudo, meta, filename){
+  return gerarPdfClinico(conteudo, meta, filename, {
+    titulo:'SOLICITAÇÃO DE EXAMES',
+    secaoLabel:'EXAMES SOLICITADOS',
+    vazioMsg:'Nenhum exame informado.',
+    disclaimer:'Este documento é uma solicitação médica e deve ser apresentado no laboratório de sua preferência.',
+    previewTitulo:'Solicitação de Exames',
+  });
+}
+
+function gerarPdfReceita(conteudo, meta, filename){
+  return gerarPdfClinico(conteudo, meta, filename, {
+    titulo:'RECEITA',
+    secaoLabel:'MEDICAMENTOS PRESCRITOS',
+    vazioMsg:'Nenhum medicamento informado.',
+    disclaimer:'Este documento é uma receita médica e deve ser apresentado na farmácia de sua preferência.',
+    previewTitulo:'Receita',
+  });
+}
+
+async function gerarPdfReceitaEspecial(conteudo, meta, filename){
+  const{jsPDF}=window.jspdf;
+  const doc=new jsPDF({unit:'mm',format:'a4'});
+  doc.setProperties({title:(filename||'documento.pdf').replace(/\.pdf$/i,'')});
+  const pageW=doc.internal.pageSize.getWidth();
+  const pageH=doc.internal.pageSize.getHeight();
+  const marginX=16;
+  const{itens,observacoes}=parseExamesConteudo(conteudo);
+  const TEAL_DARK=[18,122,140], GRAY_LABEL=[140,140,140], GRAY_TEXT=[60,60,60], GRAY_LINE=[230,230,230];
+
+  const empInfo=await loadEmpresaPdfInfo();
+  const empresaNome=empInfo?.NOME_EMP || 'Clínica';
+  const endereco=fmtEnderecoEmpresa(empInfo);
+  const telFmt=empInfo?.TEL_EMP ? fmtTel(empInfo.TEL_EMP) : '';
+  const cnpjFmt=empInfo?.CNPJ_EMP ? fmtDocEmpresa(empInfo.CNPJ_EMP) : '';
+  const logoData=await loadImageAsBase64(empInfo?.LOGO_EMP);
+  let logoDims=null;
+  if(logoData){ try{ logoDims=await getImageDimensions(logoData); }catch(e){} }
+  const sigImgData=await loadImageAsBase64(meta?.profAssinatura);
+  let sigDims=null;
+  if(sigImgData){ try{ sigDims=await getImageDimensions(sigImgData); }catch(e){} }
+
+  function desenharCabecalho(viaLabel){
+    drawWatermark(doc,pageW,pageH,logoData,logoDims);
+    doc.setFillColor(TEAL_DARK[0],TEAL_DARK[1],TEAL_DARK[2]);
+    doc.rect(0,0,pageW,1.1,'F');
+    doc.setDrawColor(GRAY_LINE[0],GRAY_LINE[1],GRAY_LINE[2]);doc.setLineWidth(0.15);
+    doc.line(0,32,pageW,32);
+    let textX=marginX;
+    if(logoData){ const logoBox=fitImageBox(logoDims,18,18); doc.addImage(logoData,dataUrlImgFormat(logoData),marginX,6+(18-logoBox.h)/2,logoBox.w,logoBox.h); textX=marginX+22; }
+    doc.setFont('helvetica','bold');doc.setFontSize(14);doc.setTextColor(25,25,25);
+    doc.text(empresaNome,textX,13);
+    let infoY=18.5;
+    doc.setFont('helvetica','normal');doc.setFontSize(7.8);doc.setTextColor(GRAY_LABEL[0],GRAY_LABEL[1],GRAY_LABEL[2]);
+    if(endereco){ doc.text(endereco,textX,infoY); infoY+=4.4; }
+    const cnpjTelLine=[cnpjFmt?('CNPJ '+cnpjFmt):'',telFmt?('Tel. '+telFmt):''].filter(Boolean).join('   •   ');
+    if(cnpjTelLine){ doc.text(cnpjTelLine,textX,infoY); infoY+=4.4; }
+    doc.setFont('helvetica','bold');doc.setFontSize(12);doc.setTextColor(60,60,60);
+    doc.text('RECEITA DE CONTROLE ESPECIAL',pageW-marginX,13,{align:'right'});
+    doc.setFont('helvetica','normal');doc.setFontSize(8);doc.setTextColor(GRAY_LABEL[0],GRAY_LABEL[1],GRAY_LABEL[2]);
+    doc.text('Emitido em '+new Date().toLocaleDateString('pt-BR'),pageW-marginX,19,{align:'right'});
+    doc.setFont('helvetica','bold');doc.setFontSize(10);doc.setTextColor(GRAY_TEXT[0],GRAY_TEXT[1],GRAY_TEXT[2]);
+    doc.text(viaLabel,pageW/2,38,{align:'center'});
+    return 46;
+  }
+
+  function desenharRodape(){
+    const footY=pageH-18;
+    doc.setDrawColor(GRAY_LINE[0],GRAY_LINE[1],GRAY_LINE[2]);
+    doc.line(marginX,footY,pageW-marginX,footY);
+    doc.setFont('helvetica','bold');doc.setFontSize(8);doc.setTextColor(25,25,25);
+    doc.text(empresaNome,marginX,footY+5);
+    doc.setFont('helvetica','normal');doc.setFontSize(7);doc.setTextColor(140,140,140);
+    doc.text('Documento de controle especial — apresente as duas vias na farmácia no momento da compra.',marginX,footY+9);
+    doc.setFont('helvetica','normal');doc.setFontSize(6.5);doc.setTextColor(170,170,170);
+    doc.text('Gerado por Vitta Sistemas',pageW-marginX,footY+9,{align:'right'});
+  }
+
+  function desenharVia(viaLabel, comCamposFarmacia){
+    let y=desenharCabecalho(viaLabel);
+    doc.setFont('helvetica','bold');doc.setFontSize(9.5);doc.setTextColor(50,50,50);
+    doc.text('DADOS DO PACIENTE',marginX,y);
+    y+=4.6;
+    doc.setFont('helvetica','normal');doc.setFontSize(6);doc.setTextColor(GRAY_LABEL[0],GRAY_LABEL[1],GRAY_LABEL[2]);
+    doc.text('NOME COMPLETO',marginX,y);
+    y+=3.3;
+    doc.setFont('helvetica','bold');doc.setFontSize(8.5);doc.setTextColor(30,30,30);
+    doc.text(meta?.pacNome||'—',marginX,y);
+    y+=4.6;
+    const col2=marginX, col3=marginX+48, col4=marginX+90, col5=marginX+118;
+    doc.setFont('helvetica','normal');doc.setFontSize(6);doc.setTextColor(GRAY_LABEL[0],GRAY_LABEL[1],GRAY_LABEL[2]);
+    doc.text('CPF',col2,y); doc.text('NASCIMENTO',col3,y); doc.text('IDADE',col4,y); doc.text('SEXO',col5,y);
+    y+=3.3;
+    const idade=calcAge(meta?.pacDtNasc);
+    const sexoTxt=meta?.pacSexo==='Prefiro não informar'?'Não informado':(meta?.pacSexo||'—');
+    doc.setFont('helvetica','bold');doc.setFontSize(7.5);doc.setTextColor(30,30,30);
+    doc.text(meta?.pacCpf||'—',col2,y);
+    doc.text(fmtDataNascPdf(meta?.pacDtNasc),col3,y);
+    doc.text((idade===null||idade===''||idade===undefined)?'—':idade+' anos',col4,y);
+    doc.text(sexoTxt,col5,y);
+    y+=4.2;
+    if(meta?.pacEndereco){
+      doc.setFont('helvetica','normal');doc.setFontSize(6);doc.setTextColor(GRAY_LABEL[0],GRAY_LABEL[1],GRAY_LABEL[2]);
+      doc.text('ENDEREÇO',col2,y);
+      y+=3.3;
+      doc.setFont('helvetica','bold');doc.setFontSize(7.5);doc.setTextColor(30,30,30);
+      const endLines=doc.splitTextToSize(meta.pacEndereco,pageW-marginX*2);
+      endLines.forEach((ln,i)=>doc.text(ln,col2,y+i*3.6));
+      y+=endLines.length*3.6+1;
+    }
+    doc.setDrawColor(GRAY_LINE[0],GRAY_LINE[1],GRAY_LINE[2]);
+    doc.line(marginX,y,pageW-marginX,y);
+    y+=6.5;
+
+    doc.setFont('helvetica','bold');doc.setFontSize(9.5);doc.setTextColor(50,50,50);
+    doc.text('MEDICAMENTOS PRESCRITOS',marginX,y);
+    y+=10;
+    if(!itens.length){
+      doc.setFont('helvetica','normal');doc.setFontSize(10);doc.setTextColor(150,150,150);
+      doc.text('Nenhum medicamento informado.',marginX,y);
+      y+=8;
+    } else {
+      const maxW=pageW-marginX*2;
+      itens.forEach(item=>{
+        if(item===''){ y+=4; return; }
+        const lines=doc.splitTextToSize(item,maxW);
+        if(y>pageH-45){doc.addPage();drawWatermark(doc,pageW,pageH,logoData,logoDims);y=20;}
+        doc.setFont('helvetica','normal');doc.setFontSize(10.5);doc.setTextColor(GRAY_TEXT[0],GRAY_TEXT[1],GRAY_TEXT[2]);
+        lines.forEach((ln,i)=>doc.text(ln,marginX,y+i*5.2));
+        y+=lines.length*5.2+1.5;
+      });
+    }
+    if(observacoes){
+      if(y>pageH-60){doc.addPage();drawWatermark(doc,pageW,pageH,logoData,logoDims);y=20;}
+      const obsLines=doc.splitTextToSize(observacoes,pageW-marginX*2-8);
+      const boxH=15.5+obsLines.length*4.6;
+      doc.setFillColor(248,249,249);
+      doc.setDrawColor(GRAY_LINE[0],GRAY_LINE[1],GRAY_LINE[2]);
+      doc.roundedRect(marginX,y,pageW-marginX*2,boxH,2,2,'FD');
+      doc.setFont('helvetica','bold');doc.setFontSize(7.5);doc.setTextColor(GRAY_LABEL[0],GRAY_LABEL[1],GRAY_LABEL[2]);
+      doc.text('OBSERVAÇÕES / ORIENTAÇÕES CLÍNICAS',marginX+4,y+6);
+      doc.setFont('helvetica','normal');doc.setFontSize(9.5);doc.setTextColor(GRAY_TEXT[0],GRAY_TEXT[1],GRAY_TEXT[2]);
+      obsLines.forEach((ln,i)=>doc.text(ln,marginX+4,y+11.5+i*4.6));
+      y+=boxH+10;
+    } else {
+      y+=6;
+    }
+
+    const boxH=52;
+    const footY=pageH-18;
+    const sigSpace=comCamposFarmacia?((pageH-footY)+4+boxH+8+14):38;
+    if(pageH-y<sigSpace){doc.addPage();drawWatermark(doc,pageW,pageH,logoData,logoDims);y=20;}
+    y=pageH-sigSpace;
+    const sigW=74;
+    const sigX=pageW-marginX-sigW;
+    if(sigImgData&&sigDims){
+      const maxImgW=sigW-2, maxImgH=21;
+      let imgW=maxImgW, imgH=imgW*(sigDims.h/sigDims.w);
+      if(imgH>maxImgH){ imgH=maxImgH; imgW=imgH*(sigDims.w/sigDims.h); }
+      const imgX=sigX+(sigW-imgW)/2;
+      const imgY=y-imgH-0.5;
+      doc.addImage(sigImgData,dataUrlImgFormat(sigImgData),imgX,imgY,imgW,imgH);
+    }
+    doc.setDrawColor(120,120,120);
+    doc.line(sigX,y,sigX+sigW,y);
+    y+=5;
+    doc.setFont('helvetica','bold');doc.setFontSize(10);doc.setTextColor(30,30,30);
+    doc.text(meta?.profNome||'',sigX+sigW/2,y,{align:'center'});
+    if(meta?.profConselho&&meta?.profRegistro){
+      y+=4.6;
+      doc.setFont('helvetica','normal');doc.setFontSize(8.5);doc.setTextColor(90,90,90);
+      doc.text(`${meta.profConselho}-${meta.profRegistro}`,sigX+sigW/2,y,{align:'center'});
+    }
+    const tipoLabel=CONSELHO_TIPO_LABEL[meta?.profConselho]||'';
+    if(tipoLabel){
+      y+=4.4;
+      doc.setFont('helvetica','normal');doc.setFontSize(8);doc.setTextColor(130,130,130);
+      doc.text(tipoLabel,sigX+sigW/2,y,{align:'center'});
+    }
+
+    if(comCamposFarmacia){
+      const boxY=footY-4-boxH;
+      doc.setDrawColor(GRAY_LINE[0],GRAY_LINE[1],GRAY_LINE[2]);
+      doc.roundedRect(marginX,boxY,pageW-marginX*2,boxH,2,2,'S');
+      const midX=marginX+(pageW-marginX*2)/2;
+      doc.line(midX,boxY,midX,boxY+boxH);
+      const campoW1=midX-marginX-8;
+
+      doc.setFont('helvetica','bold');doc.setFontSize(7.5);doc.setTextColor(GRAY_LABEL[0],GRAY_LABEL[1],GRAY_LABEL[2]);
+      doc.text('IDENTIFICAÇÃO DO COMPRADOR',marginX+4,boxY+6);
+      doc.text('IDENTIFICAÇÃO DO FORNECEDOR',midX+4,boxY+6);
+
+      doc.setDrawColor(190,190,190);
+      doc.setFont('helvetica','normal');doc.setFontSize(7.5);doc.setTextColor(GRAY_TEXT[0],GRAY_TEXT[1],GRAY_TEXT[2]);
+      const campos=['Nome:','Ident.:                              Órg. Emissor:','Endereço:','Cidade:                              UF:','Telefone:'];
+      let cy=boxY+13;
+      campos.forEach(label=>{
+        doc.text(label,marginX+4,cy);
+        doc.line(marginX+4,cy+2,marginX+4+campoW1,cy+2);
+        cy+=7.4;
+      });
+
+      doc.setFont('helvetica','normal');doc.setFontSize(7);doc.setTextColor(GRAY_LABEL[0],GRAY_LABEL[1],GRAY_LABEL[2]);
+      doc.text('Assinatura e carimbo do farmacêutico',midX+4,boxY+38);
+      doc.line(midX+4,boxY+40,pageW-marginX-4,boxY+40);
+      doc.text('Data: ____ / ____ / ________',midX+4,boxY+48);
+    }
+
+    desenharRodape();
+  }
+
+  desenharVia('1º via - Farmácia', true);
+  doc.addPage();
+  desenharVia('2º via - Paciente', false);
+
+  showPdfPreview(doc,'Receita de Controle Especial',filename,meta);
+}
+
+let _pdfPreview={blobUrl:null,filename:null,doc:null,titulo:null,meta:null};
+let _pdfPreviewTask=null;
+async function showPdfPreview(doc, titulo, filename, meta){
+  if(_pdfPreview.blobUrl) URL.revokeObjectURL(_pdfPreview.blobUrl);
+  const blobUrl=doc.output('bloburl');
+  _pdfPreview={blobUrl,filename,doc,titulo,meta};
+  document.getElementById('pdfPreviewTitle').textContent=titulo;
+  const modal=document.getElementById('modalPdfPreview');
+  modal.classList.remove('hidden');modal.classList.add('flex');
+  await renderPdfPreviewPages(blobUrl);
+}
+
+async function renderPdfPreviewPages(blobUrl){
+  const pagesEl=document.getElementById('pdfPreviewPages');
+  const loadingEl=document.getElementById('pdfPreviewLoading');
+  pagesEl.innerHTML='';
+  loadingEl.classList.remove('hidden');
+  const myTask=Symbol();
+  _pdfPreviewTask=myTask;
+  try{
+    const pdf=await pdfjsLib.getDocument(blobUrl).promise;
+    const containerW=(pagesEl.clientWidth||320)-16;
+    for(let i=1;i<=pdf.numPages;i++){
+      if(_pdfPreviewTask!==myTask) return;
+      const page=await pdf.getPage(i);
+      const baseViewport=page.getViewport({scale:1});
+      const scale=containerW/baseViewport.width;
+      const viewport=page.getViewport({scale});
+      const outputScale=window.devicePixelRatio||1;
+      const canvas=document.createElement('canvas');
+      canvas.className='shadow-sm rounded-lg bg-white';
+      canvas.width=Math.floor(viewport.width*outputScale);
+      canvas.height=Math.floor(viewport.height*outputScale);
+      canvas.style.width=Math.floor(viewport.width)+'px';
+      canvas.style.height=Math.floor(viewport.height)+'px';
+      const ctx=canvas.getContext('2d');
+      const transform=outputScale!==1?[outputScale,0,0,outputScale,0,0]:null;
+      await page.render({canvasContext:ctx,viewport,transform}).promise;
+      if(_pdfPreviewTask!==myTask) return;
+      pagesEl.appendChild(canvas);
+    }
+  }catch(e){
+    if(_pdfPreviewTask!==myTask) return;
+    pagesEl.innerHTML='<p class="text-center text-[0.8rem] text-gray-400 py-10 px-6">Não foi possível pré-visualizar o PDF. Use o botão Baixar abaixo.</p>';
+  }finally{
+    if(_pdfPreviewTask===myTask) loadingEl.classList.add('hidden');
+  }
+}
+
+function closePdfPreview(){
+  _pdfPreviewTask=null;
+  const modal=document.getElementById('modalPdfPreview');
+  modal.classList.add('hidden');modal.classList.remove('flex');
+}
+
+function baixarPdfPreview(){
+  if(!_pdfPreview.blobUrl) return;
+  const a=document.createElement('a');
+  a.href=_pdfPreview.blobUrl;
+  a.download=_pdfPreview.filename||'documento.pdf';
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+}
+
+function enviarPdfPreviewPorEmail(){
+  if(!_pdfPreview.doc){ showToast('Nenhum documento para enviar.',false); return; }
+  const meta=_pdfPreview.meta||{};
+  if(!meta.idEmp){ showToast('Não foi possível identificar a empresa deste documento.',false); return; }
+  document.getElementById('enviarEmailDocTitulo').textContent=_pdfPreview.titulo||'Documento';
+  const input=document.getElementById('inputEnviarEmailDestino');
+  input.value=meta.pacEmail||'';
+  const modal=document.getElementById('modalEnviarEmail');
+  modal.classList.remove('hidden');modal.classList.add('flex');
+  setTimeout(()=>input.focus(),50);
+}
+
+function fecharModalEnviarEmail(){
+  const modal=document.getElementById('modalEnviarEmail');
+  modal.classList.add('hidden');modal.classList.remove('flex');
+}
+
+async function confirmarEnvioPdfEmail(){
+  const email=document.getElementById('inputEnviarEmailDestino').value.trim();
+  if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){ showToast('Email inválido.',false); return; }
+  if(!_pdfPreview.doc){ showToast('Nenhum documento para enviar.',false); return; }
+  const meta=_pdfPreview.meta||{};
+
+  const btn=document.getElementById('btnConfirmarEnvioEmail');
+  const spin=document.getElementById('enviarEmailSpin');
+  const txt=document.getElementById('enviarEmailBtnTxt');
+  btn.disabled=true;spin.classList.remove('hidden');txt.textContent='Enviando...';
+
+  try{
+    const dataUri=_pdfPreview.doc.output('datauristring');
+    const pdfBase64=dataUri.substring(dataUri.indexOf(',')+1);
+    const{error}=await supabase.functions.invoke('enviar-documento-pdf-email',{
+      body:{
+        id_emp:meta.idEmp,
+        paciente_email:email,
+        paciente_nome:meta.pacNome||'',
+        tipo_documento:_pdfPreview.titulo||'Documento',
+        profissional_nome:meta.profNome||'',
+        nome_arquivo:_pdfPreview.filename||'documento.pdf',
+        pdf_base64:pdfBase64,
+      }
+    });
+    if(error) throw error;
+    showToast('Email enviado para '+email+'!');
+    fecharModalEnviarEmail();
+  }catch(e){
+    let msg=e?.message||'tente novamente.';
+    if(e?.context && typeof e.context.json==='function'){
+      try{ const body=await e.context.json(); if(body?.erro) msg=body.erro; }catch(_){}
+    }
+    showToast('Erro ao enviar email: '+msg,false);
+  }finally{
+    btn.disabled=false;spin.classList.add('hidden');txt.textContent='Enviar';
+  }
+}
+
+async function salvarDocumentos(idCons, idEmpVal){
+  const idsExcluir=[];
+  const paraInserir=[];
+  const paraAtualizar=[];
+  [['RECEITA',receitasState],['EXAME',examesState]].forEach(([tipo,state])=>{
+    state.forEach(item=>{
+      if(item.deletado){ if(item.id) idsExcluir.push(item.id); return; }
+      const conteudo=item.conteudo.trim();
+      const especial=!!item.especial;
+      if(!item.id){ if(conteudo) paraInserir.push({ID_CONS:idCons,ID_EMP:idEmpVal,TIPO:tipo,CONTEUDO:conteudo,ESPECIAL_DOC_CONS:especial}); }
+      else { paraAtualizar.push({id:item.id,conteudo,especial}); }
+    });
+  });
+  if(idsExcluir.length) await supabase.from('CONSULTA_DOCUMENTO').delete().in('ID_DOC_CONS',idsExcluir);
+  if(paraInserir.length) await supabase.from('CONSULTA_DOCUMENTO').insert(paraInserir);
+  for(const it of paraAtualizar){
+    await supabase.from('CONSULTA_DOCUMENTO').update({CONTEUDO:it.conteudo,ESPECIAL_DOC_CONS:it.especial}).eq('ID_DOC_CONS',it.id);
+  }
+}
+
+function switchConsTab(t){
+  ['descr','dados'].forEach(k=>{
+    document.getElementById('ctab-'+k).classList.toggle('active',k===t);
+    document.getElementById('cpane-'+k).classList.toggle('hidden',k!==t);
+  });
+}
+
+async function toggleAI(){
+  const panel=document.getElementById('ai-panel');
+  const btn=document.getElementById('btn-ai');
+  const open=panel.classList.contains('open');
+  panel.classList.toggle('open',!open);
+  if(!open){
+    btn.className='flex items-center gap-1.5 text-[0.72rem] font-semibold px-2.5 py-1 rounded-lg border border-violet-500 bg-violet-500 text-white transition-all';
+  } else {
+    btn.className='flex items-center gap-1.5 text-[0.72rem] font-semibold px-2.5 py-1 rounded-lg border border-violet-200 text-violet-600 bg-white transition-all';
+    return;
+  }
+
+  if(_aiLoaded) return;
+
+  const body=document.getElementById('ai-panel-body');
+  document.getElementById('ai-badge-count').classList.add('hidden');
+  body.innerHTML=`<div class="flex items-center gap-2 justify-center py-6 text-violet-500">
+    <svg class="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"/></svg>
+    <span class="text-[0.78rem] font-medium">Analisando histórico com IA…</span>
+  </div>`;
+
+  try{
+    if(!_aiPaciente && _aiPacId){
+      const [{data:pac},{data:cons},{data:sv},{data:alergs}]=await Promise.all([
+        supabase.from('PACIENTE').select('*').eq('ID_PAC',_aiPacId).single(),
+        supabase.from('CONSULTA').select('ID_CONS,DT_CONS,ID_AGD,ANAMNESE,CID_CONS,HIPOTESE_DIAG,PRESCRICAO,PROFISSIONAL!ID_PROF(NOME_PROF)').eq('ID_PAC',_aiPacId).eq('ID_PROF',profId).eq('RASCUNHO',false).order('DT_CONS',{ascending:false}),
+        supabase.from('SINAL_VITAL').select('*').eq('ID_PAC',_aiPacId).order('DT_SV',{ascending:false}),
+        supabase.from('ALERGIA').select('*').eq('ID_PAC',_aiPacId).order('DTCRI_ALERGIA',{ascending:false})
+      ]);
+      _aiPaciente=pac; _aiConsultas=cons||[]; _aiSv=sv||[]; _aiAlergias=alergs||[];
+    }
+
+    const context=VittaAI.buildContext(_aiPaciente,_aiConsultas,_aiSv,_aiAlergias);
+    const {text:summary,provider}=await VittaAI.complete(context);
+    body.innerHTML=VittaAI.renderText(summary);
+
+    const badge=document.getElementById('ai-badge-count');
+    badge.textContent=_aiConsultas.length+' consulta'+(_aiConsultas.length!==1?'s':'');
+    badge.classList.remove('hidden');
+
+    const providerName=VittaAI.PROVIDERS[provider]?.name||provider;
+    document.getElementById('ai-mobile-footer').textContent=`Gerado por ${providerName} — caráter informativo.`;
+    document.getElementById('btn-ai-refresh').classList.remove('hidden');
+    _aiLoaded=true;
+  }catch(err){
+    body.innerHTML=`<div class="flex items-center gap-2 text-red-500 py-4">
+      <svg class="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+      <span class="text-[0.78rem]">${escHtml(err.message||'Erro desconhecido')}</span>
+    </div>`;
+  }
+}
+
+async function refreshAI(){
+  _aiLoaded=false;
+  _aiPaciente=null;
+  document.getElementById('btn-ai-refresh').classList.add('hidden');
+  document.getElementById('ai-badge-count').classList.add('hidden');
+  document.getElementById('ai-mobile-footer').textContent='Resumo gerado por IA — Valide com o histórico completo.';
+  const body=document.getElementById('ai-panel-body');
+  body.innerHTML=`<div class="flex items-center gap-2 justify-center py-6 text-violet-500">
+    <svg class="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"/></svg>
+    <span class="text-[0.78rem] font-medium">Atualizando análise…</span>
+  </div>`;
+  try{
+    const [{data:pac},{data:cons},{data:sv},{data:alergs}]=await Promise.all([
+      supabase.from('PACIENTE').select('*').eq('ID_PAC',_aiPacId).single(),
+      supabase.from('CONSULTA').select('ID_CONS,DT_CONS,ID_AGD,ANAMNESE,CID_CONS,HIPOTESE_DIAG,PRESCRICAO,PROFISSIONAL!ID_PROF(NOME_PROF)').eq('ID_PAC',_aiPacId).eq('ID_PROF',profId).eq('RASCUNHO',false).order('DT_CONS',{ascending:false}),
+      supabase.from('SINAL_VITAL').select('*').eq('ID_PAC',_aiPacId).order('DT_SV',{ascending:false}),
+      supabase.from('ALERGIA').select('*').eq('ID_PAC',_aiPacId).order('DTCRI_ALERGIA',{ascending:false})
+    ]);
+    _aiPaciente=pac; _aiConsultas=cons||[]; _aiSv=sv||[]; _aiAlergias=alergs||[];
+    const context=VittaAI.buildContext(_aiPaciente,_aiConsultas,_aiSv,_aiAlergias);
+    const {text:summary,provider}=await VittaAI.complete(context);
+    body.innerHTML=VittaAI.renderText(summary);
+    const badge=document.getElementById('ai-badge-count');
+    badge.textContent=_aiConsultas.length+' consulta'+(_aiConsultas.length!==1?'s':'');
+    badge.classList.remove('hidden');
+    const providerName=VittaAI.PROVIDERS[provider]?.name||provider;
+    document.getElementById('ai-mobile-footer').textContent=`Gerado por ${providerName} — caráter informativo.`;
+    document.getElementById('btn-ai-refresh').classList.remove('hidden');
+    _aiLoaded=true;
+  }catch(err){
+    body.innerHTML=`<div class="flex items-center gap-2 text-red-500 py-4">
+      <svg class="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+      <span class="text-[0.78rem]">${escHtml(err.message||'Erro desconhecido')}</span>
+    </div>`;
+  }
+}
+
+async function salvarAtendimento(rascunho){
+  const agdId=document.getElementById('m-agd-id').value;
+  const pacId=document.getElementById('m-pac-id').value;
+  const queixa=document.getElementById('f-queixa').value.trim()||null;
+  const descricao=document.getElementById('f-descricao').value.trim()||null;
+  const cid=document.getElementById('f-cid').value.trim()||null;
+  const hipotese=document.getElementById('f-hipotese').value.trim()||null;
+  const svPeso=parseFloat(document.getElementById('sv-peso').value)||null;
+  const svAltura=parseFloat(document.getElementById('sv-altura').value)||null;
+  const svTemp=parseFloat(document.getElementById('sv-temp').value)||null;
+  const svPaSist=parseInt(document.getElementById('sv-pa-sist').value)||null;
+  const svPaDiast=parseInt(document.getElementById('sv-pa-diast').value)||null;
+  const svFc=parseInt(document.getElementById('sv-fc').value)||null;
+  const svSpo2=parseInt(document.getElementById('sv-spo2').value)||null;
+  const hasSv=svPeso||svAltura||svTemp||svPaSist||svPaDiast||svFc||svSpo2;
+
+  const payload={ID_AGD:agdId,ID_PROF:profId,ID_PAC:pacId,ID_EMP:idEmp,DT_CONS:new Date().toISOString(),QUEIXA:queixa,ANAMNESE:descricao,RASCUNHO:rascunho,CID_CONS:cid,HIPOTESE_DIAG:hipotese};
+  try{
+    const existId=document.getElementById('m-cons-id').value;
+    if(existId){
+      const {error}=await supabase.from('CONSULTA').update(payload).eq('ID_CONS',existId);
+      if(error)throw error;
+    } else {
+      const {data,error}=await supabase.from('CONSULTA').insert(payload).select().single();
+      if(error)throw error;
+      document.getElementById('m-cons-id').value=data.ID_CONS;
+    }
+    await salvarDocumentos(document.getElementById('m-cons-id').value, idEmp);
+    if(hasSv){
+      const svP={ID_AGD:agdId,ID_PAC:pacId,ID_EMP:idEmp,DT_SV:new Date().toISOString(),PESO_SV:svPeso,ALTURA_SV:svAltura,TEMP_SV:svTemp,PA_SIST_SV:svPaSist,PA_DIAST_SV:svPaDiast,FC_SV:svFc,SPO2_SV:svSpo2};
+      const existSvId=document.getElementById('m-sv-id').value;
+      if(existSvId){await supabase.from('SINAL_VITAL').update(svP).eq('ID_SV',existSvId);}
+      else{const {data:svIns}=await supabase.from('SINAL_VITAL').insert(svP).select('ID_SV').single();if(svIns)document.getElementById('m-sv-id').value=svIns.ID_SV;}
+    }
+    if(!rascunho){
+      await supabase.from('AGENDAMENTO').update({STATUS_AGD:'REALIZADA'}).eq('ID_AGD',agdId);
+      showToast('Consulta finalizada!');
+      closeAtendimento();
+      currentAgd=null;setIniciar(false);
+      await loadAgds();
+    } else {
+      showToast('Rascunho salvo!');
+    }
+  }catch(err){showToast(err.message||'Erro ao salvar',false);}
+}
+
+(async()=>{
+  const {data:{session}}=await supabase.auth.getSession();
+  if(!session){window.location.href='../index.html';return;}
+  const meta=session.user.user_metadata;
+  if(!['PROFISSIONAL','ADMIN_EMPRESA'].includes(meta.tipo_usu)){window.location.href='access-denied.html';return;}
+  const u=await getUsuarioAtual('PROF_USU,NOME_USU,ID_EMP',session);
+  if(meta.tipo_usu==='ADMIN_EMPRESA' && !u?.PROF_USU){window.location.href='access-denied.html';return;}
+  profId=u?.PROF_USU; idEmp=u?.ID_EMP||meta.id_emp;
+  document.getElementById('hdr-av').textContent=initials(u?.NOME_USU||meta.nome_usu||session.user.email);
+  updateDateLabels();
+
+  const urlParams=new URLSearchParams(location.search);
+  const openAgd=urlParams.get('openAgd');
+  returnPacId=urlParams.get('pac');
+  if(openAgd){
+    await Promise.all([loadAgds(), openAgdById(openAgd)]);
+    document.getElementById('deeplink-loader').classList.add('hidden');
+  } else {
+    await loadAgds();
+  }
+})();
+</script>
+</body>
+</html>

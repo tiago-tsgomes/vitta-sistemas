@@ -1,0 +1,1962 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>Agenda — Vitta Sistemas</title>
+  <link rel="icon" type="image/png" href="../img/favicon.png" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: { vitta: { 50:'#f0fbfd',100:'#e0f7fa',300:'#80deea',400:'#4dd9ed',500:'#2ABCD4',600:'#1a96ac',700:'#127a8c' } },
+          fontFamily: { sans: ['Inter','system-ui','sans-serif'] }
+        }
+      }
+    }
+  </script>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.15/index.global.min.css" rel="stylesheet" />
+  <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.15/index.global.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+  <script src="../assets/js/config.js?v=2"></script>
+  <script src="../assets/js/access-guard.js?v=2"></script>
+  <script src="../assets/js/admin-empresa-context.js?v=1"></script>
+  <script src="../assets/js/notifications.js?v=3"></script>
+  <style>
+    .sidebar-nav::-webkit-scrollbar { width:3px; }
+    .sidebar-nav::-webkit-scrollbar-thumb { background:rgba(255,255,255,.1); border-radius:4px; }
+    .submenu { overflow:hidden; max-height:0; opacity:0; transition:max-height .25s ease,opacity .2s ease; }
+    .submenu.open { max-height:500px; opacity:1; }
+    .chevron { transition:transform .25s ease; display:inline-block; }
+    .chevron.open { transform:rotate(180deg); }
+    .modal-overlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,.5); z-index:300; align-items:flex-start; justify-content:center; padding:24px 16px; overflow-y:auto; }
+    .modal-overlay.open { display:flex; }
+    .modal-scroll::-webkit-scrollbar { width:4px; }
+    .modal-scroll::-webkit-scrollbar-thumb { background:#e5e7eb; border-radius:4px; }
+    #toast { position:fixed; bottom:24px; right:24px; z-index:999; transition:all .3s ease; }
+    /* FullCalendar overrides */
+    .fc { font-family:'Inter',system-ui,sans-serif; }
+    .fc .fc-toolbar { display:none; }
+    .fc .fc-daygrid-day-number { font-size:0.78rem; color:#6b7280; padding:6px 8px; }
+    .fc .fc-col-header-cell-cushion { font-size:0.72rem; font-weight:700; text-transform:uppercase; letter-spacing:.05em; color:#9ca3af; padding:8px 0; }
+    .fc .fc-daygrid-day.fc-day-today { background:#f0fbfd; }
+    .fc .fc-daygrid-day.fc-day-today .fc-daygrid-day-number { color:#2ABCD4; font-weight:700; }
+    .fc .fc-event { border-radius:6px; border:none; font-size:0.75rem; font-weight:600; padding:2px 6px; cursor:pointer; }
+    .fc .fc-timegrid-slot { height:14px !important; }
+    .fc .fc-timegrid-slot-minor { border-top-style:none; }
+    .fc .fc-timegrid-slot-label { font-size:0.62rem; color:#9ca3af; vertical-align:top; padding-top:1px; }
+    .fc .fc-timegrid-slot-label-cushion { padding:0 4px; }
+    .fc-timegrid-body { overflow-y:auto !important; }
+    .fc .fc-event { padding:1px 4px; font-size:0.7rem; }
+    .fc .fc-scrollgrid { border-radius:0; border-color:#f3f4f6; }
+    .fc th { border-color:#f3f4f6; }
+    .fc td { border-color:#f3f4f6; }
+    .fc .fc-daygrid-day:hover { background:#f9fafb; }
+    .fc .fc-more-link { font-size:0.72rem; color:#2ABCD4; font-weight:600; }
+    .view-btn { transition:all .15s; }
+    .view-btn.active { background:#2ABCD4; color:#fff; }
+  </style>
+</head>
+
+<body class="bg-[#F0F2F5] font-sans antialiased">
+<div class="flex min-h-screen">
+
+<!-- ══════ SIDEBAR ══════ -->
+<aside id="sidebar" class="fixed inset-y-0 left-0 w-[220px] bg-[#111827] flex flex-col z-30 -translate-x-full lg:translate-x-0 transition-transform duration-300">
+  <div class="flex flex-col items-center justify-center gap-1 py-4 px-5 border-b border-white/10 shrink-0">
+    <img src="../img/logo.png" alt="Vitta Sistemas" class="h-10 w-auto brightness-0 invert" />
+    <p class="text-[0.6rem] text-gray-500 tracking-wide">v1.2.1</p>
+  </div>
+  <nav class="flex-1 overflow-y-auto sidebar-nav py-3">
+    <p class="block text-[0.6rem] font-bold text-gray-500 uppercase tracking-widest px-4 pb-1 pt-3">Principal</p>
+    <a href="dashboard.html" class="flex items-center gap-3 px-3 py-2.5 mx-2 rounded-xl text-[0.83rem] font-medium text-gray-400 hover:bg-white/10 hover:text-white transition-colors duration-150 mb-0.5">
+      <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>Dashboard
+    </a>
+    <a href="agendamentos.html" class="flex items-center gap-3 px-3 py-2.5 mx-2 rounded-xl text-[0.83rem] font-semibold bg-vitta-500/20 text-vitta-400 cursor-pointer mb-0.5">
+      <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>Agendamentos
+    </a>
+    <a href="consultas.html" class="flex items-center gap-3 px-3 py-2.5 mx-2 rounded-xl text-[0.83rem] font-medium text-gray-400 hover:bg-white/10 hover:text-white transition-colors duration-150 mb-0.5">
+      <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>Consultas
+    </a>
+
+    <p class="block text-[0.6rem] font-bold text-gray-500 uppercase tracking-widest px-4 pb-1 pt-4">Cadastros</p>
+    <button onclick="toggleMenu('cadastros')" class="w-full flex items-center gap-3 px-3 py-2.5 mx-2 rounded-xl text-[0.83rem] font-medium text-gray-400 hover:bg-white/10 hover:text-white transition-colors duration-150 mb-0.5" style="width:calc(100% - 16px)">
+      <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>Cadastros
+      <svg id="chev-cadastros" class="chevron w-3.5 h-3.5 ml-auto text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+    </button>
+    <div id="sub-cadastros" class="submenu">
+      <a href="pacientes.html" class="flex items-center gap-2 pl-10 pr-3 py-2 mx-2 rounded-xl text-[0.8rem] text-gray-500 hover:bg-white/5 hover:text-gray-300 transition-colors cursor-pointer">Pacientes</a>
+      <a href="profissionais.html" class="flex items-center gap-2 pl-10 pr-3 py-2 mx-2 rounded-xl text-[0.8rem] text-gray-500 hover:bg-white/5 hover:text-gray-300 transition-colors cursor-pointer">Profissionais</a>
+      <a href="usuarios-empresa.html" class="flex items-center gap-2 pl-10 pr-3 py-2 mx-2 rounded-xl text-[0.8rem] text-gray-500 hover:bg-white/5 hover:text-gray-300 transition-colors cursor-pointer">Usuários</a>
+      <div class="hidden" id="menuDocumentosWrap"><a href="documentos.html" class="flex items-center gap-2 pl-10 pr-3 py-2 mx-2 rounded-xl text-[0.8rem] text-gray-500 hover:bg-white/5 hover:text-gray-300 transition-colors cursor-pointer w-full">Documentos</a></div>
+      <a href="leads.html" class="flex items-center gap-2 pl-10 pr-3 py-2 mx-2 rounded-xl text-[0.8rem] text-gray-500 hover:bg-white/5 hover:text-gray-300 transition-colors cursor-pointer">Leads</a>
+    </div>
+
+    <p class="block text-[0.6rem] font-bold text-gray-500 uppercase tracking-widest px-4 pb-1 pt-4">Outros Cadastros</p>
+    <button onclick="toggleMenu('servicos')" class="w-full flex items-center gap-3 px-3 py-2.5 mx-2 rounded-xl text-[0.83rem] font-medium text-gray-400 hover:bg-white/10 hover:text-white transition-colors duration-150 cursor-pointer mb-0.5" style="width:calc(100% - 16px)">
+      <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>Outros Cadastros
+      <svg id="chev-servicos" class="chevron w-3.5 h-3.5 ml-auto text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+    </button>
+    <div id="sub-servicos" class="submenu">
+      <a href="servicos.html" class="flex items-center gap-2 pl-10 pr-3 py-2 mx-2 rounded-xl text-[0.8rem] text-gray-500 hover:bg-white/5 hover:text-gray-300 transition-colors cursor-pointer">Serviços</a>
+      <a href="salas.html" class="flex items-center gap-2 pl-10 pr-3 py-2 mx-2 rounded-xl text-[0.8rem] text-gray-500 hover:bg-white/5 hover:text-gray-300 transition-colors cursor-pointer">Salas</a>
+      <a href="especialidades.html" class="flex items-center gap-2 pl-10 pr-3 py-2 mx-2 rounded-xl text-[0.8rem] text-gray-500 hover:bg-white/5 hover:text-gray-300 transition-colors cursor-pointer">Especialidades</a>
+      <a href="grupo.html" class="flex items-center gap-2 pl-10 pr-3 py-2 mx-2 rounded-xl text-[0.8rem] text-gray-500 hover:bg-white/5 hover:text-gray-300 transition-colors cursor-pointer">Grupo</a>
+      <a href="tipospagamento.html" class="flex items-center gap-2 pl-10 pr-3 py-2 mx-2 rounded-xl text-[0.8rem] text-gray-500 hover:bg-white/5 hover:text-gray-300 transition-colors cursor-pointer">Tipos de Pagamento</a>
+      <a href="tiposacompanhamento.html" class="flex items-center gap-2 pl-10 pr-3 py-2 mx-2 rounded-xl text-[0.8rem] text-gray-500 hover:bg-white/5 hover:text-gray-300 transition-colors cursor-pointer">Tipos de Acomp.</a>
+    </div>
+
+    <p class="block text-[0.6rem] font-bold text-gray-500 uppercase tracking-widest px-4 pb-1 pt-4">Financeiro</p>
+    <button onclick="toggleMenu('financeiro')" class="w-full flex items-center gap-3 px-3 py-2.5 mx-2 rounded-xl text-[0.83rem] font-medium text-gray-400 hover:bg-white/10 hover:text-white transition-colors duration-150 cursor-pointer mb-0.5" style="width:calc(100% - 16px)">
+      <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>Financeiro
+      <svg id="chev-financeiro" class="chevron w-3.5 h-3.5 ml-auto text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+    </button>
+    <div id="sub-financeiro" class="submenu">
+      <a href="financeiro.html" class="flex items-center gap-2 pl-10 pr-3 py-2 mx-2 rounded-xl text-[0.8rem] text-gray-500 hover:bg-white/5 hover:text-gray-300 transition-colors cursor-pointer">Lançamentos</a>
+      <a href="relatorios.html" class="flex items-center gap-2 pl-10 pr-3 py-2 mx-2 rounded-xl text-[0.8rem] text-gray-500 hover:bg-white/5 hover:text-gray-300 transition-colors cursor-pointer">Relat&oacute;rios</a>
+    </div>
+
+
+    <div id="sectionMinhaEmpresa" class="hidden">
+    <p class="block text-[0.6rem] font-bold text-gray-500 uppercase tracking-widest px-4 pb-1 pt-4">Minha Empresa</p>
+    <button onclick="toggleMenu('minhaempresa')" class="w-full flex items-center gap-3 px-3 py-2.5 mx-2 rounded-xl text-[0.83rem] font-medium text-gray-400 hover:bg-white/10 hover:text-white transition-colors duration-150 cursor-pointer mb-0.5" style="width:calc(100% - 16px)">
+      <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>Minha Empresa
+      <svg id="chev-minhaempresa" class="chevron w-3.5 h-3.5 ml-auto text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+    </button>
+    <div id="sub-minhaempresa" class="submenu">
+      <a href="minha-empresa.html" class="flex items-center gap-2 pl-10 pr-3 py-2 mx-2 rounded-xl text-[0.8rem] text-gray-500 hover:bg-white/5 hover:text-gray-300 transition-colors cursor-pointer">Meus Dados</a>
+      <a href="faturas.html" class="flex items-center gap-2 pl-10 pr-3 py-2 mx-2 rounded-xl text-[0.8rem] text-gray-500 hover:bg-white/5 hover:text-gray-300 transition-colors cursor-pointer">Minhas Faturas</a>
+    </div>
+    </div>
+    <div id="sectionVittaBI" class="hidden">
+    <p class="block text-[0.6rem] font-bold text-gray-500 uppercase tracking-widest px-4 pb-1 pt-4">Vitta BI</p>
+    <a id="linkVittaBI" href="https://bi.vittasistemas.com.br" target="_blank" rel="noopener"
+       class="flex items-center gap-3 px-3 py-2.5 mx-2 rounded-xl text-[0.83rem] font-medium text-gray-400 hover:bg-white/10 hover:text-white transition-colors duration-150 cursor-pointer mb-0.5">
+      <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+        <path d="M3 3v18h18"/><path d="M18.7 8l-5.3 5.3-3-3L4 16.3"/>
+      </svg>
+      Vitta BI
+      <span class="ml-auto text-[0.55rem] font-bold text-violet-300 bg-violet-500/20 px-1.5 py-0.5 rounded">BI</span>
+    </a>
+    </div>
+
+    <div id="sectionAdmin" class="hidden">
+    <p class="block text-[0.6rem] font-bold text-gray-500 uppercase tracking-widest px-4 pb-1 pt-4">Sistema</p>
+    <button onclick="toggleMenu('admin')" class="w-full flex items-center gap-3 px-3 py-2.5 mx-2 rounded-xl text-[0.83rem] font-medium text-gray-400 hover:bg-white/10 hover:text-white transition-colors duration-150 mb-0.5" style="width:calc(100% - 16px)">
+      <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14M4.93 4.93a10 10 0 0 0 0 14.14"/></svg>Administração
+      <svg id="chev-admin" class="chevron w-3.5 h-3.5 ml-auto text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+    </button>
+    <div id="sub-admin" class="submenu">
+      <a href="empresas.html" class="flex items-center gap-2 pl-10 pr-3 py-2 mx-2 rounded-xl text-[0.8rem] text-gray-500 hover:bg-white/5 hover:text-gray-300 transition-colors cursor-pointer">Empresas</a>
+      <a href="usuarios.html" class="flex items-center gap-2 pl-10 pr-3 py-2 mx-2 rounded-xl text-[0.8rem] text-gray-500 hover:bg-white/5 hover:text-gray-300 transition-colors cursor-pointer">Usuários Admin</a>
+      <a href="planos.html" class="flex items-center gap-2 pl-10 pr-3 py-2 mx-2 rounded-xl text-[0.8rem] text-gray-500 hover:bg-white/5 hover:text-gray-300 transition-colors cursor-pointer">Planos</a>
+      <a href="configuracoes.html" class="flex items-center gap-2 pl-10 pr-3 py-2 mx-2 rounded-xl text-[0.8rem] text-gray-500 hover:bg-white/5 hover:text-gray-300 transition-colors cursor-pointer">Configura&ccedil;&otilde;es</a>
+      <a href="logs.html" class="flex items-center gap-2 pl-10 pr-3 py-2 mx-2 rounded-xl text-[0.8rem] text-gray-500 hover:bg-white/5 hover:text-gray-300 transition-colors cursor-pointer">Log</a>
+    </div>
+    </div>
+    <div class="h-4"></div>
+  </nav>
+  <div class="shrink-0 border-t border-white/10 p-3">
+    <div class="group flex items-center gap-2.5 p-2.5 rounded-xl hover:bg-white/5 cursor-pointer">
+      <div id="user-avatar" class="w-8 h-8 rounded-full bg-vitta-500 flex items-center justify-center text-white text-xs font-bold shrink-0">A</div>
+      <div class="flex-1 min-w-0">
+        <p id="user-name" class="text-white text-[0.8rem] font-semibold truncate">Usuário</p>
+        <p id="user-role" class="text-gray-500 text-[0.7rem] truncate">Admin</p>
+      </div>
+      <button onclick="handleLogout()" title="Sair" class="text-gray-600 hover:text-red-400 transition-colors opacity-0 group-hover:opacity-100">
+        <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+      </button>
+    </div>
+  </div>
+</aside>
+
+<div id="overlay" class="fixed inset-0 bg-black/50 z-20 hidden lg:hidden" onclick="toggleSidebar()"></div>
+
+<div class="flex-1 lg:ml-[220px] flex flex-col min-h-screen">
+  <!-- HEADER -->
+  <header class="sticky top-0 z-20 h-16 bg-white border-b border-gray-200 flex items-center px-5 gap-3 shadow-sm">
+    <button onclick="toggleSidebar()" class="lg:hidden p-2 rounded-lg hover:bg-gray-100 text-gray-500">
+      <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+        <line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/>
+      </svg>
+    </button>
+    <div class="flex-1">
+      <h1 class="text-[1rem] font-bold text-gray-800 leading-tight">Agenda</h1>
+      <p id="header-date" class="text-[0.7rem] text-gray-400 leading-tight">Calendário de consultas</p>
+    </div>
+    <div class="hidden md:flex items-center gap-2 px-3 py-2 bg-gray-50 border border-gray-200 rounded-xl">
+      <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-vitta-500 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+        <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/>
+      </svg>
+      <span id="empresa-nome" class="text-[0.78rem] font-semibold text-gray-700">Clínica</span>
+    </div>
+    <button class="relative p-2.5 rounded-xl hover:bg-gray-100 text-gray-500 transition-colors">
+      <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+        <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/>
+      </svg>
+      <span class="absolute top-1.5 right-1.5 w-2 h-2 bg-red-500 rounded-full border-2 border-white"></span>
+    </button>
+    <div class="flex items-center gap-2.5">
+      <div id="header-avatar" class="w-9 h-9 rounded-full bg-vitta-500 flex items-center justify-center text-white text-sm font-bold shrink-0">A</div>
+      <div class="hidden sm:block">
+        <p id="header-user-name" class="text-[0.8rem] font-semibold text-gray-800 leading-tight">Usuário</p>
+        <p id="header-user-role" class="text-[0.7rem] text-gray-400 leading-tight">Administrador</p>
+      </div>
+    </div>
+    <button onclick="handleLogout()" class="p-2.5 rounded-xl hover:bg-red-50 text-gray-400 hover:text-red-500 transition-colors" title="Sair">
+      <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+        <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/>
+      </svg>
+    </button>
+  </header>
+
+  <main class="flex-1 p-3 lg:p-4 flex flex-col gap-2">
+    <!-- TOOLBAR DO CALENDÁRIO -->
+    <div class="bg-white rounded-2xl shadow-sm border border-gray-100 px-3 py-2 flex flex-wrap items-center gap-2">
+      <!-- Navegação -->
+      <div class="flex items-center gap-1.5">
+        <button onclick="calNav('prev')" class="p-1.5 rounded-lg hover:bg-gray-100 text-gray-600 transition-colors">
+          <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><polyline points="15 18 9 12 15 6"/></svg>
+        </button>
+        <button onclick="calNav('today')" class="px-2.5 py-1 text-[0.8rem] font-medium border border-gray-200 rounded-lg hover:bg-gray-50 text-gray-700 transition-colors">Hoje</button>
+        <button onclick="calNav('next')" class="p-1.5 rounded-lg hover:bg-gray-100 text-gray-600 transition-colors">
+          <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg>
+        </button>
+        <h2 id="calTitle" class="text-[0.9rem] font-bold text-gray-800 ml-1 min-w-[150px]"></h2>
+      </div>
+
+      <!-- View switcher -->
+      <div class="flex items-center bg-gray-100 rounded-xl p-0.5 gap-0.5 ml-auto">
+        <button onclick="setView('dayGridMonth')" id="vMonth" class="view-btn px-2.5 py-1 rounded-lg text-[0.8rem] font-medium text-gray-600 transition-colors">Mês</button>
+        <button onclick="setView('timeGridWeek')" id="vWeek"  class="view-btn px-2.5 py-1 rounded-lg text-[0.8rem] font-medium text-gray-600 transition-colors">Semana</button>
+        <button onclick="setView('timeGridDay')"  id="vDay"   class="view-btn px-2.5 py-1 rounded-lg text-[0.8rem] font-medium text-gray-600 transition-colors">Dia</button>
+      </div>
+
+      <!-- Filtro empresa (admin_global) -->
+      <select id="filterEmpAdmin" onchange="reloadEvents()" class="hidden py-1 px-2.5 text-[0.8rem] border border-gray-200 rounded-lg outline-none focus:border-vitta-500 bg-white min-w-[150px]">
+        <option value="">Todas as empresas</option>
+      </select>
+
+      <!-- Multi-agenda -->
+      <button id="btnMultiAgd" onclick="openMultiAgenda()" class="flex items-center gap-1.5 px-3 py-1 border border-gray-200 text-gray-700 text-[0.8rem] font-semibold rounded-xl hover:bg-gray-50 transition-colors whitespace-nowrap">
+        <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="6" height="18" rx="1"/><rect x="10" y="3" width="6" height="18" rx="1"/><rect x="18" y="3" width="4" height="18" rx="1"/></svg>
+        Multi-agenda
+      </button>
+
+      <!-- Bloquear horário -->
+      <button id="btnBloqueio" onclick="openNewBloqueioModal()" class="flex items-center gap-1.5 px-3 py-1 border border-gray-200 text-gray-700 text-[0.8rem] font-semibold rounded-xl hover:bg-gray-50 transition-colors whitespace-nowrap">
+        <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="4.9" y1="4.9" x2="19.1" y2="19.1"/></svg>
+        Bloquear Horário
+      </button>
+
+      <!-- Novo agendamento -->
+      <button id="btnNovoAgd" onclick="openNewModal()" class="flex items-center gap-1.5 px-3 py-1 bg-vitta-500 text-white text-[0.8rem] font-semibold rounded-xl shadow-sm hover:bg-vitta-600 transition-colors whitespace-nowrap">
+        <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        Novo Agendamento
+      </button>
+    </div>
+
+    <!-- LEGENDA + FILTROS (linha única) -->
+    <div class="bg-white rounded-2xl shadow-sm border border-gray-100 px-3 py-1.5 flex flex-wrap items-center gap-x-3 gap-y-1.5">
+      <!-- Status -->
+      <span class="text-[0.65rem] font-bold text-gray-400 uppercase tracking-widest shrink-0">Status:</span>
+      <span id="leg-AGENDADO"   class="flex items-center gap-1 text-[0.72rem] font-medium text-gray-700 cursor-pointer select-none hover:opacity-75" onclick="filterStatus('AGENDADO')"><span class="w-2.5 h-2.5 rounded-full shrink-0" style="background:#A9A9A9"></span>Agendado</span>
+      <span id="leg-CONFIRMADA" class="flex items-center gap-1 text-[0.72rem] font-medium text-gray-700 cursor-pointer select-none hover:opacity-75" onclick="filterStatus('CONFIRMADA')"><span class="w-2.5 h-2.5 rounded-full shrink-0" style="background:#CD960B"></span>Confirmada</span>
+      <span id="leg-SEM_VALOR"  class="flex items-center gap-1 text-[0.72rem] font-medium text-gray-700 cursor-pointer select-none hover:opacity-75" onclick="filterStatus('SEM_VALOR')"><span class="w-2.5 h-2.5 rounded-full shrink-0" style="background:#6339AC"></span>Sem Valor</span>
+      <span id="leg-FALTA"      class="flex items-center gap-1 text-[0.72rem] font-medium text-gray-700 cursor-pointer select-none hover:opacity-75" onclick="filterStatus('FALTA')"><span class="w-2.5 h-2.5 rounded-full shrink-0" style="background:#FF0000"></span>Falta</span>
+      <span id="leg-REALIZADA"  class="flex items-center gap-1 text-[0.72rem] font-medium text-gray-700 cursor-pointer select-none hover:opacity-75" onclick="filterStatus('REALIZADA')"><span class="w-2.5 h-2.5 rounded-full shrink-0" style="background:#2E8B57"></span>Realizada</span>
+      <span id="leg-FEEDBACK"   class="flex items-center gap-1 text-[0.72rem] font-medium text-gray-700 cursor-pointer select-none hover:opacity-75" onclick="filterStatus('FEEDBACK')"><span class="w-2.5 h-2.5 rounded-full shrink-0" style="background:#00CED1"></span>Feedback</span>
+      <span id="leg-SEM_PGTO"   class="flex items-center gap-1 text-[0.72rem] font-medium text-gray-700 cursor-pointer select-none hover:opacity-75" onclick="filterStatus('SEM_PGTO')"><span class="w-2.5 h-2.5 rounded-full shrink-0" style="background:#0000FF"></span>Marcado p/ Pgto</span>
+      <span id="leg-BLOQUEIO" class="flex items-center gap-1 text-[0.72rem] font-medium text-gray-700 cursor-pointer select-none hover:opacity-75" onclick="toggleShowBloqueios()"><span class="w-2.5 h-2.5 rounded-full shrink-0" style="background:#656E7A"></span>Bloqueio</span>
+      <button id="btnClearFilter" onclick="clearStatusFilter()" class="hidden text-[0.68rem] text-vitta-600 hover:text-vitta-700 font-medium">✕ status</button>
+
+      <!-- Separador -->
+      <div class="w-px h-4 bg-gray-200 shrink-0 hidden sm:block"></div>
+
+      <!-- Filtros -->
+      <span class="text-[0.65rem] font-bold text-gray-400 uppercase tracking-widest shrink-0 hidden sm:block">Filtrar:</span>
+      <select id="filterProf" onchange="applyFilters()" class="py-1 px-2.5 text-[0.78rem] border border-gray-200 rounded-lg outline-none focus:border-vitta-500 bg-white min-w-[160px] text-gray-700">
+        <option value="">Todos os profissionais</option>
+      </select>
+      <select id="filterSala" onchange="applyFilters()" class="py-1 px-2.5 text-[0.78rem] border border-gray-200 rounded-lg outline-none focus:border-vitta-500 bg-white min-w-[120px] text-gray-700">
+        <option value="">Todas as salas</option>
+      </select>
+      <div class="relative flex-1 min-w-[150px]">
+        <svg xmlns="http://www.w3.org/2000/svg" class="absolute left-2.5 top-1/2 -translate-y-1/2 w-3 h-3 text-gray-400 pointer-events-none" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        <input id="filterPacTxt" type="text" placeholder="Buscar paciente…" oninput="onPacienteFilterInput()" autocomplete="off"
+          class="w-full py-1 pl-7 pr-3 text-[0.78rem] border border-gray-200 rounded-lg outline-none focus:border-vitta-500 text-gray-700" />
+        <div id="pacFilterDropdown" class="hidden absolute top-full left-0 right-0 mt-1 bg-white border border-gray-200 rounded-xl shadow-lg z-50 max-h-48 overflow-y-auto p-1"></div>
+      </div>
+      <button id="btnClearExtra" onclick="clearExtraFilters()" class="hidden text-[0.68rem] text-vitta-600 hover:text-vitta-700 font-semibold whitespace-nowrap">Limpar filtros</button>
+    </div>
+
+    <!-- CALENDÁRIO -->
+    <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-y-auto flex-1" style="min-height:520px;max-height:calc(100vh - 190px)">
+      <div id="calendar" class="p-3"></div>
+    </div>
+  </main>
+</div>
+
+<!-- ══════ MODAL AGENDAMENTO ══════ -->
+<div id="modalAgd" class="modal-overlay" onclick="if(event.target===this)closeModal()">
+  <div class="bg-white rounded-2xl shadow-xl w-full max-w-lg modal-scroll overflow-y-auto max-h-[95vh]" onclick="event.stopPropagation()">
+    <div class="flex items-center justify-between px-6 py-4 border-b border-gray-100">
+      <div>
+        <h2 id="agdTitle" class="text-[1rem] font-bold text-gray-800">Novo Agendamento</h2>
+        <p id="agdSubtitle" class="text-[0.72rem] text-gray-400">Preencha os dados da consulta</p>
+        <p id="agdSerieHint" class="hidden text-[0.72rem] text-vitta-600 font-medium mt-0.5">🔁 Parte de uma série</p>
+      </div>
+      <button onclick="closeModal()" class="text-gray-400 hover:text-gray-600 transition-colors p-1">
+        <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+
+    <form id="agdForm" onsubmit="saveAgendamento(event)" class="px-6 pb-6 pt-2 space-y-4">
+      <input type="hidden" id="fId" />
+
+      <!-- Status (edit only) -->
+      <div id="rowStatus" class="hidden">
+        <label class="block text-[0.78rem] font-semibold text-gray-600 mb-1">Status</label>
+        <select id="fStatus" onchange="onStatusChange()" class="w-full py-2.5 px-3 text-sm border border-gray-200 rounded-xl outline-none focus:border-vitta-500 bg-white">
+          <option value="AGENDADO">⚪ Agendado</option>
+          <option value="CONFIRMADA">🟠 Confirmada</option>
+          <option value="SEM_VALOR">🟣 Consulta sem Valor</option>
+          <option value="FALTA">🔴 Falta</option>
+          <option value="REALIZADA">🟢 Realizada</option>
+          <option value="FEEDBACK">🩵 Feedback</option>
+        </select>
+      </div>
+
+      <!-- Enviar para Pagamento (visível só quando REALIZADA) -->
+      <div id="rowPgto" class="hidden">
+        <label class="flex items-center gap-3 border border-gray-200 rounded-xl p-3 cursor-pointer hover:border-vitta-400 transition-colors has-[:checked]:border-vitta-500 has-[:checked]:bg-vitta-50">
+          <input type="checkbox" id="fPgto" onchange="onPgtoChange()" class="accent-vitta-500 w-4 h-4 shrink-0" />
+          <div>
+            <p class="text-[0.83rem] font-semibold text-gray-800">Enviar para Pagamento?</p>
+            <p class="text-[0.7rem] text-gray-400">Marca esta consulta como pendente de cobrança</p>
+          </div>
+        </label>
+      </div>
+
+      <!-- Valor de Consulta (visível só quando Enviar para Pagamento = true) -->
+      <div id="rowValorConsulta" class="hidden">
+        <label class="block text-[0.78rem] font-semibold text-gray-600 mb-1">Valor de Consulta <span class="text-red-500">*</span></label>
+        <div class="relative">
+          <span class="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-gray-400 pointer-events-none">R$</span>
+          <input id="fValorConsulta" type="number" min="0" step="0.01" placeholder="0,00"
+            class="w-full pl-9 pr-3 py-2.5 text-sm border border-gray-200 rounded-xl outline-none focus:border-vitta-500 focus:ring-2 focus:ring-vitta-500/20" />
+        </div>
+      </div>
+
+      <!-- Paciente -->
+      <div>
+        <label class="block text-[0.78rem] font-semibold text-gray-600 mb-1">Paciente <span class="text-red-500">*</span></label>
+        <select id="fPaciente" required onchange="onPacienteChange()" class="w-full py-2.5 px-3 text-sm border border-gray-200 rounded-xl outline-none focus:border-vitta-500 bg-white">
+          <option value="" disabled>Carregando pacientes&hellip;</option>
+        </select>
+      </div>
+
+      <!-- Profissional -->
+      <div>
+        <label class="block text-[0.78rem] font-semibold text-gray-600 mb-1">Profissional</label>
+        <div id="profLoadingHint" class="hidden text-[0.72rem] text-vitta-600 mb-1">Carregando profissionais do paciente…</div>
+        <select id="fProfissional" class="w-full py-2.5 px-3 text-sm border border-gray-200 rounded-xl outline-none focus:border-vitta-500 bg-white">
+          <option value="">Selecione o paciente primeiro…</option>
+        </select>
+        <p id="profEmptyHint" class="hidden text-[0.72rem] text-amber-600 mt-1">Nenhum profissional vinculado a este paciente. Verifique o cadastro.</p>
+        <p id="profConflictHint" class="hidden text-[0.72rem] text-red-600 mt-1">⚠ Este profissional já possui um agendamento ou bloqueio neste horário.</p>
+      </div>
+
+      <!-- Valor da Consulta (para projeção) -->
+      <div>
+        <label class="block text-[0.78rem] font-semibold text-gray-600 mb-1">Valor da Consulta (para projeção)</label>
+        <div class="relative">
+          <span class="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-gray-400 pointer-events-none">R$</span>
+          <input id="fValorPrevisto" type="number" min="0" step="0.01" placeholder="0,00"
+            class="w-full pl-9 pr-3 py-2.5 text-sm border border-gray-200 rounded-xl outline-none focus:border-vitta-500 focus:ring-2 focus:ring-vitta-500/20" />
+        </div>
+      </div>
+
+      <!-- Data/hora -->
+      <div class="grid grid-cols-2 gap-3">
+        <div>
+          <label class="block text-[0.78rem] font-semibold text-gray-600 mb-1">Início <span class="text-red-500">*</span></label>
+          <input id="fInicio" type="datetime-local" required class="w-full py-2.5 px-3 text-sm border border-gray-200 rounded-xl outline-none focus:border-vitta-500" />
+        </div>
+        <div>
+          <label class="block text-[0.78rem] font-semibold text-gray-600 mb-1">Fim <span class="text-red-500">*</span></label>
+          <input id="fFim" type="datetime-local" required class="w-full py-2.5 px-3 text-sm border border-gray-200 rounded-xl outline-none focus:border-vitta-500" />
+        </div>
+      </div>
+
+      <!-- Tipo -->
+      <div>
+        <label class="block text-[0.78rem] font-semibold text-gray-600 mb-2">Tipo de Consulta <span class="text-red-500">*</span></label>
+        <div class="flex gap-3">
+          <label class="flex-1 flex items-center gap-2.5 border border-gray-200 rounded-xl p-3 cursor-pointer hover:border-vitta-400 transition-colors has-[:checked]:border-vitta-500 has-[:checked]:bg-vitta-50">
+            <input type="radio" name="fTipo" value="PRESENCIAL" checked onchange="onTipoChange()" class="accent-vitta-500" />
+            <div>
+              <p class="text-sm font-semibold text-gray-800">Presencial</p>
+              <p class="text-[0.7rem] text-gray-400">Requer sala</p>
+            </div>
+          </label>
+          <label class="flex-1 flex items-center gap-2.5 border border-gray-200 rounded-xl p-3 cursor-pointer hover:border-vitta-400 transition-colors has-[:checked]:border-vitta-500 has-[:checked]:bg-vitta-50">
+            <input type="radio" name="fTipo" value="ONLINE" onchange="onTipoChange()" class="accent-vitta-500" />
+            <div>
+              <p class="text-sm font-semibold text-gray-800">Online</p>
+              <p class="text-[0.7rem] text-gray-400">Sem sala física</p>
+            </div>
+          </label>
+        </div>
+      </div>
+
+      <!-- Sala -->
+      <div id="rowSala">
+        <label class="block text-[0.78rem] font-semibold text-gray-600 mb-1">Sala <span id="salaRequired" class="text-red-500">*</span></label>
+        <select id="fSala" class="w-full py-2.5 px-3 text-sm border border-gray-200 rounded-xl outline-none focus:border-vitta-500 bg-white">
+          <option value="" disabled>Carregando salas&hellip;</option>
+        </select>
+      </div>
+
+      <!-- Status da conexão Google Meet (só quando ONLINE) -->
+      <div id="rowGoogleMeetStatus" class="hidden border border-gray-200 rounded-xl p-3">
+        <div id="googleMeetStatusBox" class="text-xs text-gray-400">Verificando conexão com Google Meet…</div>
+      </div>
+
+      <!-- Link da videochamada (exibido quando já existe) -->
+      <div id="rowGoogleMeetLink" class="hidden">
+        <label class="block text-[0.78rem] font-semibold text-gray-600 mb-1">Link da Videochamada</label>
+        <div class="flex items-center gap-2">
+          <input id="fGoogleMeetLink" type="text" readonly class="flex-1 py-2.5 px-3 text-sm border border-gray-200 rounded-xl bg-gray-50 text-gray-600" />
+          <button type="button" onclick="abrirLinkMeet()" class="px-3 py-2.5 border border-gray-200 rounded-xl text-xs font-semibold text-gray-600 hover:bg-gray-50 transition-colors">Abrir</button>
+          <button type="button" onclick="copiarLinkMeet()" class="px-3 py-2.5 border border-gray-200 rounded-xl text-xs font-semibold text-gray-600 hover:bg-gray-50 transition-colors">Copiar</button>
+        </div>
+      </div>
+
+      <!-- Repetir (recorrência, só em novo agendamento) -->
+      <div id="rowRepetir">
+        <label class="flex items-center gap-3 border border-gray-200 rounded-xl p-3 cursor-pointer hover:border-vitta-400 transition-colors has-[:checked]:border-vitta-500 has-[:checked]:bg-vitta-50">
+          <input type="checkbox" id="fRepetir" onchange="onRepetirChange()" class="accent-vitta-500 w-4 h-4 shrink-0" />
+          <div>
+            <p class="text-[0.83rem] font-semibold text-gray-800">Repetir agendamento</p>
+            <p class="text-[0.7rem] text-gray-400">Cria uma série de consultas recorrentes</p>
+          </div>
+        </label>
+
+        <div id="rowRepetirOpts" class="hidden mt-3 space-y-3 border border-gray-200 rounded-xl p-3">
+          <div>
+            <label class="block text-[0.78rem] font-semibold text-gray-600 mb-1">Frequência</label>
+            <select id="fRepFreq" onchange="renderRecorrenciaPreview()" class="w-full py-2.5 px-3 text-sm border border-gray-200 rounded-xl outline-none focus:border-vitta-500 bg-white">
+              <option value="SEMANAL">Semanal</option>
+              <option value="QUINZENAL">Quinzenal (a cada 2 semanas)</option>
+              <option value="MENSAL">Mensal (mesmo dia)</option>
+            </select>
+          </div>
+
+          <div>
+            <label class="block text-[0.78rem] font-semibold text-gray-600 mb-2">Repetir até</label>
+            <div class="flex items-center gap-2 mb-2">
+              <label class="flex items-center gap-2 text-[0.8rem] text-gray-700 cursor-pointer">
+                <input type="radio" name="fRepAteTipo" value="count" checked onchange="renderRecorrenciaPreview()" class="accent-vitta-500" /> Nº de sessões
+              </label>
+              <input id="fRepCount" type="number" min="2" max="52" value="8" oninput="renderRecorrenciaPreview()" class="w-20 py-1.5 px-2 text-sm border border-gray-200 rounded-lg outline-none focus:border-vitta-500" />
+            </div>
+            <div class="flex items-center gap-2">
+              <label class="flex items-center gap-2 text-[0.8rem] text-gray-700 cursor-pointer">
+                <input type="radio" name="fRepAteTipo" value="data" onchange="renderRecorrenciaPreview()" class="accent-vitta-500" /> Data final
+              </label>
+              <input id="fRepData" type="date" onchange="renderRecorrenciaPreview()" class="py-1.5 px-2 text-sm border border-gray-200 rounded-lg outline-none focus:border-vitta-500" />
+            </div>
+          </div>
+
+          <div>
+            <label class="block text-[0.78rem] font-semibold text-gray-600 mb-1">Prévia das datas</label>
+            <div id="recorrenciaPreview" class="max-h-40 overflow-y-auto space-y-1 text-[0.78rem]">
+              <p class="text-gray-400">Preencha paciente, profissional e horário para ver a prévia.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Observação -->
+      <div>
+        <label class="block text-[0.78rem] font-semibold text-gray-600 mb-1">Observação</label>
+        <textarea id="fObs" rows="2" placeholder="Observações opcionais…" class="w-full py-2.5 px-3 text-sm border border-gray-200 rounded-xl outline-none focus:border-vitta-500 resize-none"></textarea>
+      </div>
+
+      <!-- Botões -->
+      <button type="button" id="btnIrAtendimento" onclick="irParaAtendimento()" class="hidden w-full py-2.5 mb-3 bg-emerald-500 text-white rounded-xl text-sm font-semibold hover:bg-emerald-600 transition-colors flex items-center justify-center gap-2">
+        <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+        Ir para Atendimento
+      </button>
+      <div class="flex gap-3 pt-2">
+        <button type="button" id="btnDelete" onclick="confirmDelete()" class="hidden py-2.5 px-4 border border-red-200 rounded-xl text-sm font-medium text-red-600 hover:bg-red-50 transition-colors">Excluir</button>
+        <button type="button" onclick="closeModal()" class="flex-1 py-2.5 border border-gray-200 rounded-xl text-sm font-medium text-gray-600 hover:bg-gray-50 transition-colors">Cancelar</button>
+        <button type="submit" id="btnSave" class="flex-1 py-2.5 bg-vitta-500 text-white rounded-xl text-sm font-semibold hover:bg-vitta-600 transition-colors">Salvar</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- ══════ MULTI-AGENDA OVERLAY ══════ -->
+<div id="multiAgdOverlay" class="hidden fixed inset-0 bg-[#F0F2F5] z-50 flex flex-col">
+  <div class="bg-white border-b border-gray-200 h-14 flex items-center px-5 gap-4 shadow-sm shrink-0">
+    <h2 class="text-[0.95rem] font-bold text-gray-800 shrink-0">Multi-agenda</h2>
+    <div class="flex items-center gap-1">
+      <button onclick="multiNavDay(-1)" class="p-2 rounded-xl hover:bg-gray-100 text-gray-600 transition-colors">
+        <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><polyline points="15 18 9 12 15 6"/></svg>
+      </button>
+      <button onclick="multiNavDay(0)" class="px-3 py-1.5 text-[0.78rem] font-medium border border-gray-200 rounded-xl hover:bg-gray-50 text-gray-700 transition-colors">Hoje</button>
+      <button onclick="multiNavDay(1)" class="p-2 rounded-xl hover:bg-gray-100 text-gray-600 transition-colors">
+        <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg>
+      </button>
+    </div>
+    <p id="multiDayTitle" class="text-[0.88rem] font-semibold text-gray-700 truncate flex-1"></p>
+    <button onclick="closeMultiAgenda()" class="flex items-center gap-1.5 px-3 py-1.5 text-[0.78rem] font-medium border border-gray-200 rounded-xl hover:bg-gray-50 text-gray-600 transition-colors shrink-0">
+      <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      Fechar
+    </button>
+  </div>
+  <div id="multiGrid" class="flex-1 overflow-auto bg-white">
+    <div class="flex items-center justify-center h-40 text-gray-400 text-sm gap-2">
+      <svg class="w-5 h-5 animate-spin" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"/></svg>
+      Carregando…
+    </div>
+  </div>
+</div>
+
+<!-- ══════ MODAL BLOQUEIO DE AGENDA ══════ -->
+<div id="modalBloqueio" class="modal-overlay" onclick="if(event.target===this)closeBloqueioModal()">
+  <div class="bg-white rounded-2xl shadow-xl w-full max-w-md modal-scroll overflow-y-auto max-h-[95vh]" onclick="event.stopPropagation()">
+    <div class="flex items-center justify-between px-6 py-4 border-b border-gray-100">
+      <div>
+        <h2 id="blqTitle" class="text-[1rem] font-bold text-gray-800">Bloquear Horário</h2>
+        <p class="text-[0.72rem] text-gray-400">Reserva um período na agenda do profissional, sem paciente</p>
+      </div>
+      <button onclick="closeBloqueioModal()" class="text-gray-400 hover:text-gray-600 transition-colors p-1">
+        <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+
+    <form id="blqForm" onsubmit="saveBloqueio(event)" class="px-6 pb-6 pt-2 space-y-4">
+      <input type="hidden" id="fBlqId" />
+
+      <div>
+        <label class="block text-[0.78rem] font-semibold text-gray-600 mb-1">Profissional <span class="text-red-500">*</span></label>
+        <select id="fBlqProf" required class="w-full py-2.5 px-3 text-sm border border-gray-200 rounded-xl outline-none focus:border-vitta-500 bg-white">
+          <option value="" disabled selected>Selecione o profissional…</option>
+        </select>
+      </div>
+
+      <div class="grid grid-cols-2 gap-3">
+        <div>
+          <label class="block text-[0.78rem] font-semibold text-gray-600 mb-1">Início <span class="text-red-500">*</span></label>
+          <input id="fBlqInicio" type="datetime-local" required class="w-full py-2.5 px-3 text-sm border border-gray-200 rounded-xl outline-none focus:border-vitta-500" />
+        </div>
+        <div>
+          <label class="block text-[0.78rem] font-semibold text-gray-600 mb-1">Fim <span class="text-red-500">*</span></label>
+          <input id="fBlqFim" type="datetime-local" required class="w-full py-2.5 px-3 text-sm border border-gray-200 rounded-xl outline-none focus:border-vitta-500" />
+        </div>
+      </div>
+
+      <div>
+        <label class="block text-[0.78rem] font-semibold text-gray-600 mb-1">Motivo</label>
+        <input id="fBlqMotivo" type="text" placeholder="Ex: Almoço, Férias, Reunião…" class="w-full py-2.5 px-3 text-sm border border-gray-200 rounded-xl outline-none focus:border-vitta-500" />
+      </div>
+
+      <p id="blqConflictHint" class="hidden text-[0.72rem] text-red-600"></p>
+
+      <div class="flex gap-3 pt-2">
+        <button type="button" id="btnDeleteBlq" onclick="confirmDeleteBloqueio()" class="hidden py-2.5 px-4 border border-red-200 rounded-xl text-sm font-medium text-red-600 hover:bg-red-50 transition-colors">Excluir</button>
+        <button type="button" onclick="closeBloqueioModal()" class="flex-1 py-2.5 border border-gray-200 rounded-xl text-sm font-medium text-gray-600 hover:bg-gray-50 transition-colors">Cancelar</button>
+        <button type="submit" id="btnSaveBlq" class="flex-1 py-2.5 bg-gray-700 text-white rounded-xl text-sm font-semibold hover:bg-gray-800 transition-colors">Salvar Bloqueio</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- ══════ MODAL CONFIRMAÇÃO EXCLUSÃO ══════ -->
+<div id="modalConfirmDelete" class="modal-overlay" onclick="if(event.target===this)closeConfirmDelete()">
+  <div class="bg-white rounded-2xl shadow-xl w-full max-w-sm" onclick="event.stopPropagation()">
+    <div class="p-6">
+      <div class="flex items-center gap-4 mb-4">
+        <div class="w-11 h-11 rounded-full bg-red-100 flex items-center justify-center shrink-0">
+          <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>
+        </div>
+        <div>
+          <h3 id="confirmDeleteTitle" class="text-[0.95rem] font-bold text-gray-800">Excluir agendamento</h3>
+          <p class="text-[0.78rem] text-gray-400 mt-0.5">Esta ação não pode ser desfeita.</p>
+        </div>
+      </div>
+      <p id="confirmDeleteMsg" class="text-[0.83rem] text-gray-600 mb-4">Tem certeza que deseja excluir este agendamento permanentemente?</p>
+      <div id="deleteScopeOptions" class="hidden space-y-2 mb-5">
+        <label class="flex items-center gap-2 text-[0.8rem] text-gray-700 cursor-pointer">
+          <input type="radio" name="deleteScope" value="single" checked class="accent-red-500" /> Somente esta consulta
+        </label>
+        <label class="flex items-center gap-2 text-[0.8rem] text-gray-700 cursor-pointer">
+          <input type="radio" name="deleteScope" value="future" class="accent-red-500" /> Esta e as próximas da série
+        </label>
+        <label class="flex items-center gap-2 text-[0.8rem] text-gray-700 cursor-pointer">
+          <input type="radio" name="deleteScope" value="all" class="accent-red-500" /> Toda a série
+        </label>
+      </div>
+      <div class="flex gap-3">
+        <button onclick="closeConfirmDelete()" class="flex-1 py-2.5 border border-gray-200 rounded-xl text-sm font-medium text-gray-600 hover:bg-gray-50 transition-colors">Cancelar</button>
+        <button onclick="doDelete()" id="btnConfirmDelete" class="flex-1 py-2.5 bg-red-500 text-white rounded-xl text-sm font-semibold hover:bg-red-600 transition-colors">Excluir</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL RECONEXÃO GOOGLE MEET -->
+<div id="modalGoogleReconnect" class="modal-overlay" onclick="if(event.target===this)closeGoogleReconnectModal()">
+  <div class="bg-white rounded-2xl shadow-xl w-full max-w-sm" onclick="event.stopPropagation()">
+    <div class="p-6">
+      <div class="flex items-center gap-4 mb-4">
+        <div class="w-11 h-11 rounded-full bg-amber-100 flex items-center justify-center shrink-0">
+          <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-amber-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M12 9v4"/><path d="M12 17h.01"/><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0Z"/></svg>
+        </div>
+        <div>
+          <h3 class="text-[0.95rem] font-bold text-gray-800">Reconectar Google Meet</h3>
+          <p class="text-[0.78rem] text-gray-400 mt-0.5">A conexão desta empresa expirou ou foi revogada.</p>
+        </div>
+      </div>
+      <p class="text-[0.83rem] text-gray-600 mb-5">Para agendar consultas online é necessário reconectar a conta Google desta empresa. Você será redirecionado para autorizar o acesso.</p>
+      <div class="flex gap-3">
+        <button onclick="closeGoogleReconnectModal()" class="flex-1 py-2.5 border border-gray-200 rounded-xl text-sm font-medium text-gray-600 hover:bg-gray-50 transition-colors">Cancelar</button>
+        <button onclick="iniciarConexaoGoogle()" class="flex-1 py-2.5 bg-vitta-500 text-white rounded-xl text-sm font-semibold hover:bg-vitta-600 transition-colors">Reconectar</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div id="toast" class="hidden">
+  <div id="toastInner" class="flex items-center gap-3 px-4 py-3 rounded-xl shadow-lg text-sm font-medium text-white min-w-[240px]"></div>
+</div>
+
+<script>
+const STATUS_COLORS = {
+  AGENDADO: '#A9A9A9', CONFIRMADA: '#CD960B', SEM_VALOR: '#6339AC',
+  FALTA: '#FF0000', REALIZADA: '#2E8B57', FEEDBACK: '#00CED1'
+};
+function eventColor(a) {
+  if (a.STATUS_AGD === 'REALIZADA' && a.PGTO_AGD) return '#0000FF';
+  return STATUS_COLORS[a.STATUS_AGD] || '#6b7280';
+}
+const STATUS_LABELS = {
+  AGENDADO:'Agendado', CONFIRMADA:'Confirmada', SEM_VALOR:'Sem Valor',
+  FALTA:'Falta', REALIZADA:'Realizada', FEEDBACK:'Feedback', SEM_PGTO:'Marcado p/ Pagamento'
+};
+
+let calendar, currentUserMeta = null, currentProfId = null, podeIrAtendimento = false;
+let allAgendamentos = [], allPacientes = [], allProfissionais = [], allSalas = [], allBloqueios = [];
+let activeStatusFilters = new Set(), editId = null, editBlqId = null;
+let filterProfId = '', filterSalaId = '', filterPacId = '';
+let showBloqueios = true, deleteTarget = null;
+let recorrenciaOccurrences = [];
+let googleMeetStatusCache = {};
+let currentEditLinkAgd = null;
+
+function escHtml(s) {
+  return String(s ?? '').replace(/[&<>"']/g, c => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;' }[c]));
+}
+
+function toggleMenu(k) {
+  const s=document.getElementById('sub-'+k),c=document.getElementById('chev-'+k);
+  const o=s.classList.contains('open');
+  s.classList.toggle('open',!o); if(c)c.classList.toggle('open',!o);
+}
+function toggleSidebar() {
+  const sb=document.getElementById('sidebar'),ov=document.getElementById('overlay');
+  const o=sb.classList.contains('-translate-x-full');
+  sb.classList.toggle('-translate-x-full',!o); ov.classList.toggle('hidden',!o);
+}
+async function handleLogout() { await supabase.auth.signOut(); window.location.href='../index.html'; }
+
+function showToast(msg, ok=true) {
+  const t=document.getElementById('toast'), i=document.getElementById('toastInner');
+  i.textContent=msg; i.className=`flex items-center gap-3 px-4 py-3 rounded-xl shadow-lg text-sm font-medium text-white min-w-[240px] ${ok?'bg-emerald-500':'bg-red-500'}`;
+  t.classList.remove('hidden'); setTimeout(()=>t.classList.add('hidden'),3500);
+}
+
+async function initAuth() {
+  document.getElementById('header-date').textContent = 'Calendário de consultas — ' + new Date().toLocaleDateString('pt-BR', { weekday:'long', year:'numeric', month:'long', day:'numeric' });
+  const { data:{ session } } = await supabase.auth.getSession();
+  if (!session) { window.location.href='../index.html'; return false; }
+  const meta = session.user.user_metadata;
+  currentUserMeta = meta;
+  const TIPO_LABELS = { 'ADMIN_GLOBAL':'Admin Global','ADMIN_EMPRESA':'Administrador','SECRETARIA':'Secretaria','PROFISSIONAL':'Profissional' };
+  const label = TIPO_LABELS[meta.tipo_usu] || meta.tipo_usu;
+  const nome = meta.nome_usu || session.user.email;
+  const ini = nome.split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase();
+  document.getElementById('user-name').textContent = nome;
+  document.getElementById('user-role').textContent = label;
+  document.getElementById('user-avatar').textContent = ini;
+  document.getElementById('header-user-name').textContent = nome;
+  document.getElementById('header-user-role').textContent = label;
+  document.getElementById('header-avatar').textContent = ini;
+  if (meta.tipo_usu === 'ADMIN_GLOBAL') {
+    document.getElementById('empresa-nome').textContent = 'Vitta Sistemas';
+    document.getElementById('sectionAdmin').classList.remove('hidden');
+    AdminEmpresaCtx.initSelector('ADMIN_GLOBAL', session.user.id);
+  }
+  if (meta.tipo_usu === 'PROFISSIONAL') {
+    const u = await getUsuarioAtual('PROF_USU', session);
+    currentProfId = u?.PROF_USU || null;
+    if (currentProfId) setUserAvatarPhoto(currentProfId);
+    document.querySelector('a[href="profissionais.html"]')?.classList.add('hidden');
+    document.querySelector('a[href="usuarios-empresa.html"]')?.classList.add('hidden');
+    const _ss = document.getElementById('sub-servicos');
+    if (_ss) { const _b = _ss.previousElementSibling; _b?.previousElementSibling?.classList.add('hidden'); _b?.classList.add('hidden'); _ss.classList.add('hidden'); }
+  }
+  let temAcessoConsultas = meta.tipo_usu === 'PROFISSIONAL';
+  podeIrAtendimento = meta.tipo_usu === 'PROFISSIONAL';
+  if (['ADMIN_EMPRESA','ADMIN_GLOBAL'].includes(meta.tipo_usu)) {
+    const uOwn = await getUsuarioAtual('PROF_USU', session);
+    temAcessoConsultas = !!(uOwn?.PROF_USU);
+    podeIrAtendimento = temAcessoConsultas;
+  }
+  if (!temAcessoConsultas)
+    document.querySelector('a[href="consultas.html"]')?.classList.add('hidden');
+  return true;
+}
+
+async function loadDropdownData() {
+  const idEmp = AdminEmpresaCtx.resolveIdEmp(currentUserMeta?.tipo_usu, currentUserMeta?.ID_EMP || currentUserMeta?.id_emp);
+
+  if (currentUserMeta?.tipo_usu !== 'ADMIN_GLOBAL') {
+    const emp = await supabase.from('EMPRESA').select('NOME_EMP').eq('ID_EMP', idEmp).single();
+    document.getElementById('empresa-nome').textContent = emp.data?.NOME_EMP || '';
+  }
+
+  // Pacientes
+  let qPac = supabase.from('PACIENTE').select('ID_PAC,NOME_PAC').eq('ATIVO_PAC',true).order('NOME_PAC');
+  if (idEmp) qPac = qPac.eq('EMP_PAC', idEmp);
+  const { data: pacs } = await qPac;
+  allPacientes = pacs || [];
+  const selPac = document.getElementById('fPaciente');
+  selPac.innerHTML = '<option value="">Selecione o paciente&hellip;</option>';
+  allPacientes.forEach(p => selPac.insertAdjacentHTML('beforeend',`<option value="${p.ID_PAC}">${p.NOME_PAC}</option>`));
+
+  // Profissionais
+  let qProf = supabase.from('PROFISSIONAL').select('ID_PROF,NOME_PROF').eq('ATIVO_PROF',true).order('NOME_PROF');
+  if (idEmp) qProf = qProf.eq('ID_EMP', idEmp);
+  const { data: profs } = await qProf;
+  allProfissionais = profs || [];
+  const selProf = document.getElementById('fProfissional');
+  allProfissionais.forEach(p => {
+    const opt = `<option value="${p.ID_PROF}">${p.NOME_PROF}</option>`;
+    selProf.insertAdjacentHTML('beforeend', opt);
+    document.getElementById('filterProf').insertAdjacentHTML('beforeend', opt);
+    document.getElementById('fBlqProf').insertAdjacentHTML('beforeend', opt);
+  });
+
+  // Salas
+  let qSala = supabase.from('SALA').select('ID_SALA,NOME_SALA,COR_SALA').eq('ATIVO_SALA',true).order('NOME_SALA');
+  if (idEmp) qSala = qSala.eq('ID_EMP', idEmp);
+  const { data: salas } = await qSala;
+  allSalas = salas || [];
+  const selSala = document.getElementById('fSala');
+  selSala.innerHTML = '<option value="">Selecione a sala&hellip;</option>';
+  allSalas.forEach(s => {
+    const opt = `<option value="${s.ID_SALA}">${s.NOME_SALA}</option>`;
+    selSala.insertAdjacentHTML('beforeend', opt);
+    document.getElementById('filterSala').insertAdjacentHTML('beforeend', opt);
+  });
+}
+
+async function loadAgendamentos(start, end, successCb) {
+  const empId = AdminEmpresaCtx.resolveIdEmp(currentUserMeta?.tipo_usu, currentUserMeta?.ID_EMP || currentUserMeta?.id_emp);
+  let q = supabase.from('AGENDAMENTO')
+    .select('ID_AGD,DT_AGD,DT_FIM_AGD,STATUS_AGD,TIPO_AGD,OBS_AGD,PAC_AGD,PROF_AGD,SALA_AGD,ID_EMP,PGTO_AGD,VALOR_AGD,VALOR_PREVISTO_AGD,ID_SERIE,LINK_AGD,PACIENTE!PAC_AGD(NOME_PAC),PROFISSIONAL!PROF_AGD(NOME_PROF),SALA!SALA_AGD(NOME_SALA)')
+    .gte('DT_AGD', start).lte('DT_AGD', end);
+  if (empId) q = q.eq('ID_EMP', empId);
+  const { data } = await q;
+  allAgendamentos = data || [];
+  let events = allAgendamentos.map(a => ({
+    id: a.ID_AGD,
+    title: a.PACIENTE?.NOME_PAC || 'Paciente',
+    start: a.DT_AGD,
+    end:   a.DT_FIM_AGD,
+    backgroundColor: eventColor(a),
+    borderColor:     eventColor(a),
+    extendedProps: { ...a }
+  }));
+  if (activeStatusFilters.size > 0) events = events.filter(e => {
+    const a = e.extendedProps;
+    for (const f of activeStatusFilters) {
+      if (f === 'SEM_PGTO') { if (a.STATUS_AGD === 'REALIZADA' && a.PGTO_AGD) return true; }
+      else { if (a.STATUS_AGD === f) return true; }
+    }
+    return false;
+  });
+  if (filterProfId) events = events.filter(e => e.extendedProps.PROF_AGD === filterProfId);
+  if (filterSalaId) events = events.filter(e => e.extendedProps.SALA_AGD === filterSalaId);
+  if (filterPacId)  events = events.filter(e => e.extendedProps.PAC_AGD  === filterPacId);
+
+  if (showBloqueios) {
+    let qB = supabase.from('BLOQUEIO_PROF')
+      .select('ID_BLOQ,PROF_BLOQ,DT_INICIO,DT_FIM,MOTIVO_BLOQ,ID_EMP,PROFISSIONAL!PROF_BLOQ(NOME_PROF)')
+      .lt('DT_INICIO', end).gt('DT_FIM', start);
+    if (empId) qB = qB.eq('ID_EMP', empId);
+    const { data: bdata } = await qB;
+    allBloqueios = bdata || [];
+    let bEvents = allBloqueios.map(b => ({
+      id: b.ID_BLOQ,
+      title: `🚫 ${b.MOTIVO_BLOQ || 'Bloqueio'}`,
+      start: b.DT_INICIO,
+      end:   b.DT_FIM,
+      backgroundColor: '#656E7A',
+      borderColor:     '#656E7A',
+      extendedProps: { isBloqueio: true, ...b }
+    }));
+    if (filterProfId) bEvents = bEvents.filter(e => e.extendedProps.PROF_BLOQ === filterProfId);
+    events = events.concat(bEvents);
+  } else {
+    allBloqueios = [];
+  }
+
+  successCb(events);
+}
+
+function initCalendar() {
+  const el = document.getElementById('calendar');
+  calendar = new FullCalendar.Calendar(el, {
+    initialView: 'dayGridMonth',
+    headerToolbar: false,
+    locale: 'pt-br',
+    height: '100%',
+    expandRows: false,
+    eventDisplay: 'block',
+    buttonText: { today:'Hoje', month:'Mês', week:'Semana', day:'Dia' },
+    dayMaxEvents: 4,
+    nowIndicator: true,
+    slotMinTime: '06:00:00',
+    slotMaxTime: '22:00:00',
+    slotDuration: '00:30:00',
+    slotLabelInterval: '01:00:00',
+    scrollTime: '07:00:00',
+    eventTimeFormat: { hour:'2-digit', minute:'2-digit', hour12:false },
+    views: {
+      timeGridWeek: { height: 'auto' },
+      timeGridDay:  { height: 'auto' },
+    },
+    events: (info, successCb, failureCb) => loadAgendamentos(info.startStr, info.endStr, successCb),
+    datesSet: () => {
+      document.getElementById('calTitle').textContent = calendar.view.title;
+      const view = calendar.view.type;
+      document.getElementById('vMonth').classList.toggle('active', view==='dayGridMonth');
+      document.getElementById('vWeek').classList.toggle('active',  view==='timeGridWeek');
+      document.getElementById('vDay').classList.toggle('active',   view==='timeGridDay');
+    },
+    dateClick: currentProfId ? undefined : (info) => openNewModal(info.dateStr),
+    eventClick: (info) => {
+      if (info.event.extendedProps.isBloqueio) openEditBloqueioModal(info.event.id);
+      else openEditModal(info.event.id);
+    },
+    eventContent: (arg) => {
+      const s = arg.event.start;
+      const time = `${String(s.getHours()).padStart(2,'0')}:${String(s.getMinutes()).padStart(2,'0')}`;
+      if (arg.event.extendedProps.isBloqueio) {
+        const profNome = arg.event.extendedProps.PROFISSIONAL?.NOME_PROF?.split(' ')[0] || '';
+        return { html: `<div style="padding:1px 5px;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;line-height:1.3"><span style="opacity:.8;font-size:0.62rem;font-weight:700;margin-right:3px">${time}</span>${arg.event.title}${profNome ? ` · ${profNome}` : ''}</div>` };
+      }
+      const prof = arg.event.extendedProps.PROFISSIONAL?.NOME_PROF;
+      const tipo = arg.event.extendedProps.TIPO_AGD === 'ONLINE' ? '🌐 ' : '';
+      return { html: `<div style="padding:1px 5px;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;line-height:1.3"><span style="opacity:.8;font-size:0.62rem;font-weight:700;margin-right:3px">${time}</span>${tipo}${arg.event.title}${prof ? ` · ${prof.split(' ')[0]}` : ''}</div>` };
+    }
+  });
+  calendar.render();
+  document.getElementById('calTitle').textContent = calendar.view.title;
+  document.getElementById('vMonth').classList.add('active');
+}
+
+function calNav(dir) {
+  if (dir === 'today') calendar.today();
+  else if (dir === 'prev') calendar.prev();
+  else calendar.next();
+}
+function setView(v) { calendar.changeView(v); }
+async function reloadEvents() { calendar.refetchEvents(); }
+
+function filterStatus(s) {
+  if (activeStatusFilters.has(s)) activeStatusFilters.delete(s);
+  else activeStatusFilters.add(s);
+  const hasFilter = activeStatusFilters.size > 0;
+  document.getElementById('btnClearFilter').classList.toggle('hidden', !hasFilter);
+  Object.keys(STATUS_LABELS).forEach(k => {
+    const el = document.getElementById('leg-'+k);
+    if (!el) return;
+    el.classList.toggle('opacity-40', hasFilter && !activeStatusFilters.has(k));
+    el.classList.toggle('font-semibold', hasFilter && activeStatusFilters.has(k));
+  });
+  calendar.refetchEvents();
+}
+function clearStatusFilter() {
+  activeStatusFilters.clear();
+  document.getElementById('btnClearFilter').classList.add('hidden');
+  Object.keys(STATUS_LABELS).forEach(k => {
+    const el = document.getElementById('leg-'+k);
+    el?.classList.remove('opacity-40','font-semibold');
+  });
+  calendar.refetchEvents();
+}
+
+function applyFilters() {
+  filterProfId = document.getElementById('filterProf').value;
+  filterSalaId = document.getElementById('filterSala').value;
+  updateClearExtraBtn();
+  calendar.refetchEvents();
+}
+function updateClearExtraBtn() {
+  document.getElementById('btnClearExtra').classList.toggle('hidden', !filterProfId && !filterSalaId && !filterPacId);
+}
+function clearExtraFilters() {
+  filterProfId = ''; filterSalaId = ''; filterPacId = '';
+  document.getElementById('filterProf').value = '';
+  document.getElementById('filterSala').value = '';
+  document.getElementById('filterPacTxt').value = '';
+  document.getElementById('pacFilterDropdown').classList.add('hidden');
+  updateClearExtraBtn();
+  calendar.refetchEvents();
+}
+
+function onPacienteFilterInput() {
+  filterPacId = '';
+  const q = document.getElementById('filterPacTxt').value.trim().toLowerCase();
+  const dd = document.getElementById('pacFilterDropdown');
+  if (!q) { dd.classList.add('hidden'); updateClearExtraBtn(); calendar.refetchEvents(); return; }
+  const matches = allPacientes.filter(p => p.NOME_PAC.toLowerCase().includes(q)).slice(0, 8);
+  if (!matches.length) { dd.classList.add('hidden'); return; }
+  dd.innerHTML = matches.map(p =>
+    `<div class="px-3 py-2 text-sm cursor-pointer hover:bg-vitta-50 hover:text-vitta-700 transition-colors rounded-lg"
+         onmousedown="selectPacFilter('${p.ID_PAC}','${p.NOME_PAC.replace(/'/g,"\\'")}')">${p.NOME_PAC}</div>`
+  ).join('');
+  dd.classList.remove('hidden');
+}
+function selectPacFilter(id, nome) {
+  filterPacId = id;
+  document.getElementById('filterPacTxt').value = nome;
+  document.getElementById('pacFilterDropdown').classList.add('hidden');
+  updateClearExtraBtn();
+  calendar.refetchEvents();
+}
+document.addEventListener('click', e => {
+  if (!e.target.closest('#filterPacTxt') && !e.target.closest('#pacFilterDropdown'))
+    document.getElementById('pacFilterDropdown')?.classList.add('hidden');
+});
+
+async function onPacienteChange(keepProfValue) {
+  const pacId = document.getElementById('fPaciente').value;
+  const selProf = document.getElementById('fProfissional');
+  const hint = document.getElementById('profLoadingHint');
+  const emptyHint = document.getElementById('profEmptyHint');
+
+  selProf.innerHTML = '';
+  emptyHint.classList.add('hidden');
+
+  if (!pacId) {
+    selProf.innerHTML = '<option value="">Selecione o paciente primeiro…</option>';
+    return;
+  }
+
+  hint.classList.remove('hidden');
+  selProf.disabled = true;
+
+  const { data } = await supabase.from('PACIENTE_PROFISSIONAL')
+    .select('PROF_ID')
+    .eq('PAC_ID', pacId);
+
+  hint.classList.add('hidden');
+  selProf.disabled = false;
+
+  const linkedIds = new Set((data || []).map(r => r.PROF_ID));
+  const filtered = allProfissionais.filter(p => linkedIds.has(p.ID_PROF));
+
+  if (!filtered.length) {
+    selProf.innerHTML = '<option value="">Nenhum profissional vinculado</option>';
+    emptyHint.classList.remove('hidden');
+    return;
+  }
+
+  selProf.innerHTML = '<option value="">Selecione o profissional…</option>';
+  filtered.forEach(p => {
+    selProf.insertAdjacentHTML('beforeend', `<option value="${p.ID_PROF}">${p.NOME_PROF}</option>`);
+  });
+
+  if (keepProfValue && filtered.some(p => p.ID_PROF === keepProfValue)) {
+    selProf.value = keepProfValue;
+  }
+  updateAvailability();
+}
+
+function getFormEmpId() {
+  return AdminEmpresaCtx.resolveIdEmp(currentUserMeta?.tipo_usu, currentUserMeta?.ID_EMP || currentUserMeta?.id_emp);
+}
+
+function clearAvailabilityMarks(selectEl) {
+  Array.from(selectEl.options).forEach(opt => {
+    if (!opt.value) return;
+    opt.disabled = false;
+    if (opt.dataset.baseText) opt.textContent = opt.dataset.baseText;
+  });
+}
+
+function markOptionsAvailability(selectEl, occupiedSet) {
+  Array.from(selectEl.options).forEach(opt => {
+    if (!opt.value) return;
+    if (!opt.dataset.baseText) opt.dataset.baseText = opt.textContent;
+    const occupied = occupiedSet.has(opt.value);
+    opt.disabled = occupied;
+    opt.textContent = occupied ? `${opt.dataset.baseText} (ocupado)` : opt.dataset.baseText;
+  });
+}
+
+let lastOccupiedProf = new Set();
+function updateProfConflictHint() {
+  const val = document.getElementById('fProfissional').value;
+  document.getElementById('profConflictHint').classList.toggle('hidden', !(val && lastOccupiedProf.has(val)));
+}
+
+let availabilityToken = 0;
+async function updateAvailability() {
+  const token = ++availabilityToken;
+  const selSalaEl = document.getElementById('fSala');
+  const inicio = document.getElementById('fInicio').value;
+  const fim = document.getElementById('fFim').value;
+
+  if (!inicio || !fim || new Date(fim) <= new Date(inicio)) {
+    clearAvailabilityMarks(selSalaEl);
+    lastOccupiedProf = new Set();
+    updateProfConflictHint();
+    return;
+  }
+
+  const inicioISO = new Date(inicio).toISOString();
+  const fimISO = new Date(fim).toISOString();
+  const empId = getFormEmpId();
+
+  let q = supabase.from('AGENDAMENTO')
+    .select('ID_AGD,PROF_AGD,SALA_AGD')
+    .lt('DT_AGD', fimISO)
+    .gt('DT_FIM_AGD', inicioISO);
+  if (empId) q = q.eq('ID_EMP', empId);
+  if (editId) q = q.neq('ID_AGD', editId);
+
+  let qBlq = supabase.from('BLOQUEIO_PROF')
+    .select('ID_BLOQ,PROF_BLOQ')
+    .lt('DT_INICIO', fimISO)
+    .gt('DT_FIM', inicioISO);
+  if (empId) qBlq = qBlq.eq('ID_EMP', empId);
+
+  const [{ data, error }, { data: blqData, error: blqError }] = await Promise.all([q, qBlq]);
+  if (token !== availabilityToken) return; // resposta desatualizada (usuário já mudou o horário de novo)
+  if (error) { console.warn('Erro ao checar disponibilidade:', error.message); return; }
+  if (blqError) console.warn('Erro ao checar bloqueios:', blqError.message);
+
+  const occupiedSala = new Set((data || []).filter(a => a.SALA_AGD).map(a => a.SALA_AGD));
+  const occupiedProf = new Set((data || []).filter(a => a.PROF_AGD).map(a => a.PROF_AGD));
+  (blqData || []).forEach(b => occupiedProf.add(b.PROF_BLOQ));
+  lastOccupiedProf = occupiedProf;
+  markOptionsAvailability(selSalaEl, occupiedSala);
+  updateProfConflictHint();
+}
+
+function onStatusChange() {
+  const s = document.getElementById('fStatus').value;
+  const show = s === 'REALIZADA';
+  document.getElementById('rowPgto').classList.toggle('hidden', !show);
+  if (!show) document.getElementById('fPgto').checked = false;
+  onPgtoChange();
+}
+
+function onPgtoChange() {
+  const checked = document.getElementById('fPgto').checked;
+  document.getElementById('rowValorConsulta').classList.toggle('hidden', !checked);
+  document.getElementById('fValorConsulta').required = checked;
+  if (!checked) {
+    document.getElementById('fValorConsulta').value = '';
+  } else if (!document.getElementById('fValorConsulta').value) {
+    document.getElementById('fValorConsulta').value = document.getElementById('fValorPrevisto').value || '';
+  }
+}
+
+async function onTipoChange() {
+  const tipo = document.querySelector('input[name="fTipo"]:checked')?.value;
+  const rowSala = document.getElementById('rowSala');
+  const fSala   = document.getElementById('fSala');
+  rowSala.classList.toggle('hidden', tipo === 'ONLINE');
+  fSala.required = tipo === 'PRESENCIAL';
+
+  const rowStatus = document.getElementById('rowGoogleMeetStatus');
+  if (tipo === 'ONLINE') {
+    rowStatus.classList.remove('hidden');
+    await renderGoogleMeetStatus(getFormEmpId());
+  } else {
+    rowStatus.classList.add('hidden');
+  }
+}
+
+async function fetchGoogleMeetStatus(idEmp) {
+  if (!idEmp) return { status: 'desconectado', google_email: null };
+  if (googleMeetStatusCache[idEmp]) return googleMeetStatusCache[idEmp];
+  try {
+    const { data: { session } } = await supabase.auth.getSession();
+    const resp = await fetch(`${SUPABASE_URL}/functions/v1/google-meet-status?id_emp=${encodeURIComponent(idEmp)}`, {
+      headers: { Authorization: `Bearer ${session.access_token}` },
+    });
+    const data = await resp.json();
+    if (!resp.ok || !data.sucesso) return { status: 'desconectado', google_email: null };
+    googleMeetStatusCache[idEmp] = { status: data.status, google_email: data.google_email };
+    return googleMeetStatusCache[idEmp];
+  } catch (e) {
+    console.warn('Erro ao verificar status do Google Meet:', e.message);
+    return { status: 'desconectado', google_email: null };
+  }
+}
+
+async function renderGoogleMeetStatus(idEmp) {
+  const box = document.getElementById('googleMeetStatusBox');
+  if (!idEmp) {
+    box.innerHTML = '<span class="text-gray-400">Selecione a empresa para verificar a conexão com o Google Meet.</span>';
+    return;
+  }
+  box.innerHTML = '<span class="text-gray-400">Verificando conexão com Google Meet…</span>';
+  const info = await fetchGoogleMeetStatus(idEmp);
+  if (info.status === 'conectado') {
+    box.innerHTML = `<span class="text-emerald-600 font-medium">✓ Google Meet conectado${info.google_email ? ' ('+escHtml(info.google_email)+')' : ''}</span>`;
+  } else {
+    box.innerHTML = `
+      <div class="flex items-center justify-between gap-3">
+        <span class="text-amber-600 font-medium">Google Meet não conectado</span>
+        <button type="button" onclick="iniciarConexaoGoogle()" class="px-3 py-1.5 bg-vitta-500 text-white rounded-lg text-xs font-semibold hover:bg-vitta-600 transition-colors">Conectar</button>
+      </div>`;
+  }
+}
+
+function openGoogleReconnectModal() {
+  document.getElementById('modalGoogleReconnect').classList.add('open');
+}
+function closeGoogleReconnectModal() {
+  document.getElementById('modalGoogleReconnect').classList.remove('open');
+}
+
+async function iniciarConexaoGoogle() {
+  const idEmp = getFormEmpId();
+  if (!idEmp) { showToast('Selecione a empresa antes de conectar o Google Meet.', false); return; }
+  try {
+    const { data: { session } } = await supabase.auth.getSession();
+    const resp = await fetch(`${SUPABASE_URL}/functions/v1/google-oauth-start`, {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${session.access_token}`, 'Content-Type': 'application/json' },
+      body: JSON.stringify({ id_emp: idEmp }),
+    });
+    const data = await resp.json();
+    if (!resp.ok || !data.sucesso) { showToast(data.erro || 'Não foi possível iniciar a conexão com o Google.', false); return; }
+
+    closeGoogleReconnectModal();
+    const popup = window.open(data.url, 'googleMeetConnect', 'width=520,height=650');
+    if (!popup) { showToast('Permita pop-ups para conectar o Google Meet.', false); return; }
+
+    const poll = setInterval(async () => {
+      if (popup.closed) {
+        clearInterval(poll);
+        delete googleMeetStatusCache[idEmp];
+        const tipo = document.querySelector('input[name="fTipo"]:checked')?.value;
+        if (tipo === 'ONLINE') await renderGoogleMeetStatus(idEmp);
+      }
+    }, 800);
+  } catch (e) {
+    showToast('Erro ao iniciar conexão com o Google: ' + e.message, false);
+  }
+}
+
+async function criarLinkMeetGoogle(idEmp, titulo, inicioISO, fimISO) {
+  const { data: { session } } = await supabase.auth.getSession();
+  const resp = await fetch(`${SUPABASE_URL}/functions/v1/criar-link-meet`, {
+    method: 'POST',
+    headers: { Authorization: `Bearer ${session.access_token}`, 'Content-Type': 'application/json' },
+    body: JSON.stringify({ id_emp: idEmp, titulo, inicio: inicioISO, fim: fimISO }),
+  });
+  const data = await resp.json();
+  if (!resp.ok || !data.sucesso) {
+    const err = new Error(data.mensagem || data.erro || 'Falha ao criar o link do Google Meet');
+    if (data.erro === 'reconexao_necessaria') err.reconexaoNecessaria = true;
+    throw err;
+  }
+  return data.link;
+}
+
+function copiarLinkMeet() {
+  const input = document.getElementById('fGoogleMeetLink');
+  if (!input.value) return;
+  navigator.clipboard.writeText(input.value).then(() => showToast('Link copiado!')).catch(() => showToast('Não foi possível copiar o link.', false));
+}
+
+function abrirLinkMeet() {
+  const input = document.getElementById('fGoogleMeetLink');
+  if (!input.value) return;
+  window.open(input.value, '_blank', 'noopener');
+}
+
+function onRepetirChange() {
+  const on = document.getElementById('fRepetir').checked;
+  document.getElementById('rowRepetirOpts').classList.toggle('hidden', !on);
+  if (on) renderRecorrenciaPreview();
+}
+
+function generateOccurrences(inicioStr, fimStr, freq, count) {
+  const stepDays = freq === 'SEMANAL' ? 7 : freq === 'QUINZENAL' ? 14 : null;
+  const occurrences = [];
+  const inicio0 = new Date(inicioStr);
+  const fim0 = new Date(fimStr);
+  for (let i = 0; i < count; i++) {
+    let inicio, fim;
+    if (stepDays) {
+      inicio = new Date(inicio0); inicio.setDate(inicio.getDate() + stepDays * i);
+      fim = new Date(fim0); fim.setDate(fim.getDate() + stepDays * i);
+    } else {
+      inicio = new Date(inicio0); inicio.setMonth(inicio.getMonth() + i);
+      fim = new Date(fim0); fim.setMonth(fim.getMonth() + i);
+    }
+    occurrences.push({ inicio, fim });
+  }
+  return occurrences;
+}
+
+async function renderRecorrenciaPreview() {
+  const box = document.getElementById('recorrenciaPreview');
+  if (!document.getElementById('fRepetir').checked) return;
+
+  const inicio = document.getElementById('fInicio').value;
+  const fim = document.getElementById('fFim').value;
+  const profId = document.getElementById('fProfissional').value || null;
+  const tipo = document.querySelector('input[name="fTipo"]:checked')?.value;
+  const salaId = tipo === 'PRESENCIAL' ? (document.getElementById('fSala').value || null) : null;
+
+  if (!inicio || !fim || new Date(fim) <= new Date(inicio)) {
+    box.innerHTML = '<p class="text-gray-400">Preencha data/hora de início e fim válidas.</p>';
+    return;
+  }
+
+  const freq = document.getElementById('fRepFreq').value;
+  const ateTipo = document.querySelector('input[name="fRepAteTipo"]:checked')?.value;
+  let count;
+  if (ateTipo === 'data') {
+    const dataFinal = document.getElementById('fRepData').value;
+    if (!dataFinal) { box.innerHTML = '<p class="text-gray-400">Informe a data final.</p>'; return; }
+    const stepDays = freq === 'SEMANAL' ? 7 : freq === 'QUINZENAL' ? 14 : null;
+    const inicio0 = new Date(inicio);
+    const fimAlvo = new Date(dataFinal + 'T23:59:59');
+    count = 0;
+    for (let i = 0; i < 52; i++) {
+      const d = new Date(inicio0);
+      if (stepDays) d.setDate(d.getDate() + stepDays * i); else d.setMonth(d.getMonth() + i);
+      if (d > fimAlvo) break;
+      count++;
+    }
+  } else {
+    count = parseInt(document.getElementById('fRepCount').value, 10) || 0;
+  }
+  count = Math.max(2, Math.min(52, count || 0));
+
+  const occurrences = generateOccurrences(inicio, fim, freq, count);
+  box.innerHTML = '<p class="text-gray-400">Verificando conflitos…</p>';
+
+  const minInicio = occurrences[0].inicio.toISOString();
+  const maxFim = occurrences[occurrences.length - 1].fim.toISOString();
+  const empId = getFormEmpId();
+
+  let qConflict = supabase.from('AGENDAMENTO')
+    .select('DT_AGD,DT_FIM_AGD,PROF_AGD,SALA_AGD')
+    .lt('DT_AGD', maxFim)
+    .gt('DT_FIM_AGD', minInicio);
+  if (empId) qConflict = qConflict.eq('ID_EMP', empId);
+  const { data: agdConf } = await qConflict;
+
+  let qBlq = supabase.from('BLOQUEIO_PROF')
+    .select('DT_INICIO,DT_FIM,PROF_BLOQ')
+    .lt('DT_INICIO', maxFim)
+    .gt('DT_FIM', minInicio);
+  if (empId) qBlq = qBlq.eq('ID_EMP', empId);
+  const { data: blqConf } = await qBlq;
+
+  recorrenciaOccurrences = occurrences.map(o => {
+    const oInicio = o.inicio.toISOString();
+    const oFim = o.fim.toISOString();
+    let conflictMsg = null;
+    const profConflict = (agdConf || []).some(c => c.PROF_AGD === profId && c.DT_AGD < oFim && c.DT_FIM_AGD > oInicio)
+      || (blqConf || []).some(b => b.PROF_BLOQ === profId && b.DT_INICIO < oFim && b.DT_FIM > oInicio);
+    const salaConflict = salaId && (agdConf || []).some(c => c.SALA_AGD === salaId && c.DT_AGD < oFim && c.DT_FIM_AGD > oInicio);
+    if (profConflict) conflictMsg = 'Profissional ocupado';
+    else if (salaConflict) conflictMsg = 'Sala ocupada';
+    return { inicio: o.inicio, fim: o.fim, conflict: conflictMsg };
+  });
+
+  const fmt = d => d.toLocaleDateString('pt-BR', { day:'2-digit', month:'2-digit', year:'numeric' }) + ' ' + d.toLocaleTimeString('pt-BR', { hour:'2-digit', minute:'2-digit' });
+  box.innerHTML = recorrenciaOccurrences.map((o, idx) => {
+    if (o.conflict) {
+      return `<label class="flex items-center gap-2 text-red-500"><input type="checkbox" disabled class="accent-gray-300" /> ${fmt(o.inicio)} — ⚠ ${o.conflict}</label>`;
+    }
+    return `<label class="flex items-center gap-2 text-gray-700"><input type="checkbox" checked data-idx="${idx}" class="rep-occ-check accent-vitta-500" /> ${fmt(o.inicio)}</label>`;
+  }).join('');
+}
+
+function toLocalISO(dt) {
+  const d = new Date(dt);
+  const pad = n => String(n).padStart(2,'0');
+  return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
+}
+
+function openNewModal(dateStr) {
+  editId = null;
+  document.getElementById('agdTitle').textContent = 'Novo Agendamento';
+  document.getElementById('agdSubtitle').textContent = 'Preencha os dados da consulta';
+  document.getElementById('agdSerieHint').classList.add('hidden');
+  document.getElementById('btnIrAtendimento').classList.add('hidden');
+  document.getElementById('fId').value = '';
+  document.getElementById('fPaciente').value = '';
+  document.getElementById('fProfissional').innerHTML = '<option value="">Selecione o paciente primeiro…</option>';
+  document.getElementById('profEmptyHint').classList.add('hidden');
+  document.getElementById('fValorPrevisto').value = '';
+  document.getElementById('fSala').value = '';
+  document.getElementById('fObs').value = '';
+  document.querySelector('input[name="fTipo"][value="PRESENCIAL"]').checked = true;
+  document.getElementById('rowSala').classList.remove('hidden');
+  document.getElementById('fSala').required = true;
+  document.getElementById('rowGoogleMeetStatus').classList.add('hidden');
+  document.getElementById('rowGoogleMeetLink').classList.add('hidden');
+  document.getElementById('fGoogleMeetLink').value = '';
+  currentEditLinkAgd = null;
+  document.getElementById('rowStatus').classList.add('hidden');
+  document.getElementById('rowPgto').classList.add('hidden');
+  document.getElementById('fPgto').checked = false;
+  document.getElementById('rowValorConsulta').classList.add('hidden');
+  document.getElementById('fValorConsulta').value = '';
+  document.getElementById('fValorConsulta').required = false;
+  document.getElementById('btnDelete').classList.add('hidden');
+  document.getElementById('rowRepetir').classList.remove('hidden');
+  document.getElementById('fRepetir').checked = false;
+  document.getElementById('fRepetir').disabled = false;
+  document.getElementById('rowRepetirOpts').classList.add('hidden');
+  document.getElementById('fRepFreq').value = 'SEMANAL';
+  document.querySelector('input[name="fRepAteTipo"][value="count"]').checked = true;
+  document.getElementById('fRepCount').value = 8;
+  document.getElementById('fRepData').value = '';
+  // Pre-fill date if provided
+  if (dateStr) {
+    const d = new Date(dateStr + 'T08:00');
+    const e = new Date(dateStr + 'T08:00'); e.setHours(9);
+    document.getElementById('fInicio').value = toLocalISO(d);
+    document.getElementById('fFim').value    = toLocalISO(e);
+  } else {
+    document.getElementById('fInicio').value = '';
+    document.getElementById('fFim').value    = '';
+  }
+  updateAvailability();
+  document.getElementById('modalAgd').classList.add('open');
+}
+
+async function openEditModal(id) {
+  const a = allAgendamentos.find(x => x.ID_AGD === id);
+  if (!a) return;
+  editId = id;
+  document.getElementById('agdTitle').textContent = 'Editar Agendamento';
+  document.getElementById('agdSubtitle').textContent = a.PACIENTE?.NOME_PAC || '';
+  document.getElementById('agdSerieHint').classList.toggle('hidden', !a.ID_SERIE);
+  document.getElementById('fId').value = a.ID_AGD;
+  document.getElementById('rowRepetir').classList.add('hidden');
+  const selPac = document.getElementById('fPaciente');
+  selPac.value = a.PAC_AGD || '';
+  if (a.PAC_AGD && selPac.value !== a.PAC_AGD) {
+    const nomePac = a.PACIENTE?.NOME_PAC || a.PAC_AGD;
+    selPac.insertAdjacentHTML('beforeend', `<option value="${a.PAC_AGD}">${nomePac}</option>`);
+    selPac.value = a.PAC_AGD;
+  }
+  await onPacienteChange(a.PROF_AGD || '');
+  if (a.PROF_AGD && document.getElementById('fProfissional').value !== a.PROF_AGD) {
+    const selProf = document.getElementById('fProfissional');
+    const nomeProf = a.PROFISSIONAL?.NOME_PROF || a.PROF_AGD;
+    if (!selProf.querySelector(`option[value="${a.PROF_AGD}"]`)) {
+      selProf.insertAdjacentHTML('beforeend', `<option value="${a.PROF_AGD}">${nomeProf}</option>`);
+    }
+    selProf.value = a.PROF_AGD;
+    document.getElementById('profEmptyHint').classList.add('hidden');
+  }
+  document.getElementById('fValorPrevisto').value = a.VALOR_PREVISTO_AGD ?? '';
+  document.getElementById('fInicio').value = toLocalISO(a.DT_AGD);
+  document.getElementById('fFim').value    = toLocalISO(a.DT_FIM_AGD);
+  document.querySelector(`input[name="fTipo"][value="${a.TIPO_AGD}"]`).checked = true;
+  document.getElementById('fSala').value   = a.SALA_AGD || '';
+  document.getElementById('fObs').value    = a.OBS_AGD  || '';
+  document.getElementById('fStatus').value = a.STATUS_AGD;
+  document.getElementById('fPgto').checked = a.PGTO_AGD || false;
+  document.getElementById('fValorConsulta').value = a.VALOR_AGD ?? '';
+  document.getElementById('btnIrAtendimento').classList.toggle('hidden', !(podeIrAtendimento && a.STATUS_AGD === 'CONFIRMADA'));
+  onStatusChange();
+  document.getElementById('rowStatus').classList.remove('hidden');
+  document.getElementById('rowSala').classList.toggle('hidden', a.TIPO_AGD === 'ONLINE');
+  document.getElementById('fSala').required = a.TIPO_AGD === 'PRESENCIAL';
+
+  currentEditLinkAgd = a.LINK_AGD || null;
+  document.getElementById('rowGoogleMeetStatus').classList.add('hidden');
+  if (a.TIPO_AGD === 'ONLINE' && currentEditLinkAgd) {
+    document.getElementById('rowGoogleMeetLink').classList.remove('hidden');
+    document.getElementById('fGoogleMeetLink').value = currentEditLinkAgd;
+  } else {
+    document.getElementById('rowGoogleMeetLink').classList.add('hidden');
+    document.getElementById('fGoogleMeetLink').value = '';
+    if (a.TIPO_AGD === 'ONLINE') {
+      document.getElementById('rowGoogleMeetStatus').classList.remove('hidden');
+      await renderGoogleMeetStatus(a.ID_EMP || getFormEmpId());
+    }
+  }
+
+  const readOnly = !!currentProfId;
+  document.querySelectorAll('#agdForm input, #agdForm select, #agdForm textarea').forEach(el => {
+    el.disabled = readOnly;
+  });
+  document.getElementById('btnDelete').classList.toggle('hidden', readOnly);
+  document.getElementById('btnSave').classList.toggle('hidden', readOnly);
+  document.querySelector('#agdForm button[onclick="closeModal()"]').textContent = readOnly ? 'Fechar' : 'Cancelar';
+  if (readOnly) {
+    document.getElementById('agdTitle').textContent = 'Detalhes do Agendamento';
+    document.getElementById('agdSubtitle').textContent = a.PACIENTE?.NOME_PAC || '';
+  }
+
+  updateAvailability();
+  document.getElementById('modalAgd').classList.add('open');
+}
+
+function closeModal() { document.getElementById('modalAgd').classList.remove('open'); }
+
+function irParaAtendimento() {
+  const a = allAgendamentos.find(x => x.ID_AGD === editId);
+  if (!a || !a.PAC_AGD) return;
+  window.location.href = `prontuario.html?pac=${a.PAC_AGD}`;
+}
+
+async function saveAgendamento(e) {
+  e.preventDefault();
+  const btn = document.getElementById('btnSave');
+  btn.disabled = true; btn.textContent = 'Salvando…';
+  const tipo  = document.querySelector('input[name="fTipo"]:checked')?.value;
+  const inicio = document.getElementById('fInicio').value;
+  const fim    = document.getElementById('fFim').value;
+  if (new Date(fim) <= new Date(inicio)) {
+    showToast('O horário de fim deve ser depois do início', false);
+    btn.disabled=false; btn.textContent='Salvar'; return;
+  }
+  let empId = getFormEmpId();
+  const pacId  = document.getElementById('fPaciente').value    || null;
+  const profId = document.getElementById('fProfissional').value || null;
+  const salaId = tipo === 'PRESENCIAL' ? (document.getElementById('fSala').value || null) : null;
+  if (!pacId)  { showToast('Selecione o paciente',     false); btn.disabled=false; btn.textContent='Salvar'; return; }
+  if (!profId) { showToast('Selecione o profissional', false); btn.disabled=false; btn.textContent='Salvar'; return; }
+  const payload = {
+    PAC_AGD:  pacId,
+    PROF_AGD: profId,
+    SALA_AGD: salaId,
+    DT_AGD:     new Date(inicio).toISOString(),
+    DT_FIM_AGD: new Date(fim).toISOString(),
+    TIPO_AGD: tipo,
+    OBS_AGD:  document.getElementById('fObs').value.trim() || null,
+    ID_EMP:   empId,
+    PGTO_AGD: false,
+    VALOR_PREVISTO_AGD: document.getElementById('fValorPrevisto').value !== '' ? parseFloat(document.getElementById('fValorPrevisto').value) : null
+  };
+  const nomePacTitulo = allPacientes.find(p => p.ID_PAC === pacId)?.NOME_PAC || 'Consulta';
+  const VALID_STATUSES = ['AGENDADO','CONFIRMADA','SEM_VALOR','FALTA','REALIZADA','FEEDBACK'];
+  try {
+    // Verifica conflito de horário para profissional e sala antes de salvar
+    let qConflict = supabase.from('AGENDAMENTO')
+      .select('ID_AGD,PROF_AGD,SALA_AGD')
+      .lt('DT_AGD', payload.DT_FIM_AGD)
+      .gt('DT_FIM_AGD', payload.DT_AGD);
+    if (empId) qConflict = qConflict.eq('ID_EMP', empId);
+    if (editId) qConflict = qConflict.neq('ID_AGD', editId);
+    const { data: conflicts, error: confErr } = await qConflict;
+    if (confErr) throw confErr;
+    if ((conflicts || []).some(c => c.PROF_AGD === profId)) {
+      showToast('Este profissional já possui um agendamento nesse horário', false);
+      btn.disabled = false; btn.textContent = 'Salvar'; return;
+    }
+    if (salaId && (conflicts || []).some(c => c.SALA_AGD === salaId)) {
+      showToast('Esta sala já está ocupada nesse horário', false);
+      btn.disabled = false; btn.textContent = 'Salvar'; return;
+    }
+
+    let qBlqConflict = supabase.from('BLOQUEIO_PROF')
+      .select('ID_BLOQ,PROF_BLOQ')
+      .lt('DT_INICIO', payload.DT_FIM_AGD)
+      .gt('DT_FIM', payload.DT_AGD);
+    if (empId) qBlqConflict = qBlqConflict.eq('ID_EMP', empId);
+    const { data: blqConflicts, error: blqConfErr } = await qBlqConflict;
+    if (blqConfErr) throw blqConfErr;
+    if ((blqConflicts || []).some(b => b.PROF_BLOQ === profId)) {
+      showToast('Este profissional está com a agenda bloqueada nesse horário', false);
+      btn.disabled = false; btn.textContent = 'Salvar'; return;
+    }
+
+    if (!editId) {
+      payload.STATUS_AGD = 'AGENDADO';
+      if (document.getElementById('fRepetir').checked) {
+        const checks = document.querySelectorAll('#recorrenciaPreview .rep-occ-check:checked');
+        if (!checks.length) {
+          showToast('Nenhuma data válida selecionada para a série', false);
+          btn.disabled = false; btn.textContent = 'Salvar'; return;
+        }
+        const seriesId = crypto.randomUUID();
+        const rows = Array.from(checks).map(chk => {
+          const o = recorrenciaOccurrences[parseInt(chk.dataset.idx, 10)];
+          return {
+            PAC_AGD: pacId, PROF_AGD: profId, SALA_AGD: salaId,
+            DT_AGD: o.inicio.toISOString(), DT_FIM_AGD: o.fim.toISOString(),
+            TIPO_AGD: tipo, OBS_AGD: payload.OBS_AGD, ID_EMP: empId,
+            STATUS_AGD: 'AGENDADO', PGTO_AGD: false, ID_SERIE: seriesId,
+            VALOR_PREVISTO_AGD: payload.VALOR_PREVISTO_AGD
+          };
+        });
+        if (tipo === 'ONLINE') {
+          for (const row of rows) {
+            try {
+              row.LINK_AGD = await criarLinkMeetGoogle(empId, nomePacTitulo, row.DT_AGD, row.DT_FIM_AGD);
+            } catch (linkErr) {
+              btn.disabled = false; btn.textContent = 'Salvar';
+              if (linkErr.reconexaoNecessaria) { openGoogleReconnectModal(); return; }
+              showToast(linkErr.message || 'Erro ao gerar o link do Google Meet', false);
+              return;
+            }
+          }
+        }
+        const { error } = await supabase.from('AGENDAMENTO').insert(rows);
+        if (error) throw error;
+        showToast(`Série criada com ${rows.length} consulta(s)!`);
+      } else {
+        if (tipo === 'ONLINE') {
+          try {
+            payload.LINK_AGD = await criarLinkMeetGoogle(empId, nomePacTitulo, payload.DT_AGD, payload.DT_FIM_AGD);
+          } catch (linkErr) {
+            btn.disabled = false; btn.textContent = 'Salvar';
+            if (linkErr.reconexaoNecessaria) { openGoogleReconnectModal(); return; }
+            showToast(linkErr.message || 'Erro ao gerar o link do Google Meet', false);
+            return;
+          }
+        }
+        const { error } = await supabase.from('AGENDAMENTO').insert(payload);
+        if (error) throw error;
+        showToast('Agendamento criado!');
+      }
+    } else {
+      const statusVal = document.getElementById('fStatus').value;
+      if (!VALID_STATUSES.includes(statusVal)) {
+        showToast('Status inválido. Feche o modal, recarregue a página (Ctrl+Shift+R) e tente novamente.', false);
+        btn.disabled=false; btn.textContent='Salvar'; return;
+      }
+      payload.STATUS_AGD = statusVal;
+      payload.PGTO_AGD = statusVal === 'REALIZADA' ? document.getElementById('fPgto').checked : false;
+      payload.VALOR_AGD = payload.PGTO_AGD ? parseFloat(document.getElementById('fValorConsulta').value) : null;
+      if (tipo === 'ONLINE') {
+        if (currentEditLinkAgd) {
+          payload.LINK_AGD = currentEditLinkAgd;
+        } else {
+          try {
+            payload.LINK_AGD = await criarLinkMeetGoogle(empId, nomePacTitulo, payload.DT_AGD, payload.DT_FIM_AGD);
+          } catch (linkErr) {
+            btn.disabled = false; btn.textContent = 'Salvar';
+            if (linkErr.reconexaoNecessaria) { openGoogleReconnectModal(); return; }
+            showToast(linkErr.message || 'Erro ao gerar o link do Google Meet', false);
+            return;
+          }
+        }
+      } else {
+        payload.LINK_AGD = null;
+      }
+      const { error } = await supabase.from('AGENDAMENTO').update(payload).eq('ID_AGD', editId);
+      if (error) throw error;
+      showToast('Agendamento atualizado!');
+    }
+    closeModal();
+    calendar.refetchEvents();
+  } catch(err) {
+    showToast(err.message || 'Erro ao salvar', false);
+  }
+  btn.disabled=false; btn.textContent='Salvar';
+}
+
+function confirmDelete() {
+  if (!editId) return;
+  const a = allAgendamentos.find(x => x.ID_AGD === editId);
+  deleteTarget = { type: 'agendamento', id: editId, serieId: a?.ID_SERIE || null, dtAgd: a?.DT_AGD || null };
+  document.getElementById('confirmDeleteTitle').textContent = 'Excluir agendamento';
+  document.getElementById('confirmDeleteMsg').textContent = 'Tem certeza que deseja excluir este agendamento permanentemente?';
+  document.getElementById('deleteScopeOptions').classList.toggle('hidden', !deleteTarget.serieId);
+  document.querySelector('input[name="deleteScope"][value="single"]').checked = true;
+  document.getElementById('modalConfirmDelete').classList.add('open');
+}
+function closeConfirmDelete() {
+  document.getElementById('modalConfirmDelete').classList.remove('open');
+}
+async function doDelete() {
+  if (!deleteTarget) return;
+  const btn = document.getElementById('btnConfirmDelete');
+  btn.disabled = true; btn.textContent = 'Excluindo…';
+  let error;
+  if (deleteTarget.type === 'bloqueio') {
+    ({ error } = await supabase.from('BLOQUEIO_PROF').delete().eq('ID_BLOQ', deleteTarget.id));
+  } else if (deleteTarget.serieId) {
+    const scope = document.querySelector('input[name="deleteScope"]:checked')?.value || 'single';
+    if (scope === 'all') {
+      ({ error } = await supabase.from('AGENDAMENTO').delete().eq('ID_SERIE', deleteTarget.serieId));
+    } else if (scope === 'future') {
+      ({ error } = await supabase.from('AGENDAMENTO').delete().eq('ID_SERIE', deleteTarget.serieId).gte('DT_AGD', deleteTarget.dtAgd));
+    } else {
+      ({ error } = await supabase.from('AGENDAMENTO').delete().eq('ID_AGD', deleteTarget.id));
+    }
+  } else {
+    ({ error } = await supabase.from('AGENDAMENTO').delete().eq('ID_AGD', deleteTarget.id));
+  }
+  btn.disabled = false; btn.textContent = 'Excluir';
+  closeConfirmDelete();
+  if (error) { showToast(error.message, false); return; }
+  if (deleteTarget.type === 'bloqueio') {
+    showToast('Bloqueio excluído!');
+    closeBloqueioModal();
+  } else {
+    showToast('Agendamento excluído!');
+    closeModal();
+  }
+  calendar.refetchEvents();
+  deleteTarget = null;
+}
+
+// ── Bloqueio de agenda ────────────────────────────────────────────────────────
+function openNewBloqueioModal() {
+  editBlqId = null;
+  document.getElementById('blqTitle').textContent = 'Bloquear Horário';
+  document.getElementById('fBlqId').value = '';
+  document.getElementById('fBlqProf').value = '';
+  document.getElementById('fBlqInicio').value = '';
+  document.getElementById('fBlqFim').value = '';
+  document.getElementById('fBlqMotivo').value = '';
+  document.getElementById('blqConflictHint').classList.add('hidden');
+  document.getElementById('btnDeleteBlq').classList.add('hidden');
+  document.getElementById('modalBloqueio').classList.add('open');
+}
+
+function closeBloqueioModal() {
+  document.getElementById('modalBloqueio').classList.remove('open');
+}
+
+function openEditBloqueioModal(id) {
+  const b = allBloqueios.find(x => x.ID_BLOQ === id);
+  if (!b) return;
+  editBlqId = id;
+  document.getElementById('blqTitle').textContent = 'Editar Bloqueio';
+  document.getElementById('fBlqId').value = b.ID_BLOQ;
+  document.getElementById('fBlqProf').value = b.PROF_BLOQ || '';
+  document.getElementById('fBlqInicio').value = toLocalISO(b.DT_INICIO);
+  document.getElementById('fBlqFim').value = toLocalISO(b.DT_FIM);
+  document.getElementById('fBlqMotivo').value = b.MOTIVO_BLOQ || '';
+  document.getElementById('blqConflictHint').classList.add('hidden');
+  document.getElementById('btnDeleteBlq').classList.remove('hidden');
+  document.getElementById('modalBloqueio').classList.add('open');
+}
+
+function confirmDeleteBloqueio() {
+  if (!editBlqId) return;
+  deleteTarget = { type: 'bloqueio', id: editBlqId };
+  document.getElementById('confirmDeleteTitle').textContent = 'Excluir bloqueio';
+  document.getElementById('confirmDeleteMsg').textContent = 'Tem certeza que deseja excluir este bloqueio de agenda?';
+  document.getElementById('deleteScopeOptions').classList.add('hidden');
+  document.getElementById('modalConfirmDelete').classList.add('open');
+}
+
+async function saveBloqueio(e) {
+  e.preventDefault();
+  const btn = document.getElementById('btnSaveBlq');
+  btn.disabled = true; btn.textContent = 'Salvando…';
+  const hint = document.getElementById('blqConflictHint');
+  hint.classList.add('hidden');
+
+  const profId = document.getElementById('fBlqProf').value;
+  const inicio = document.getElementById('fBlqInicio').value;
+  const fim = document.getElementById('fBlqFim').value;
+  const motivo = document.getElementById('fBlqMotivo').value.trim() || null;
+
+  if (!profId) { showToast('Selecione o profissional', false); btn.disabled=false; btn.textContent='Salvar Bloqueio'; return; }
+  if (!inicio || !fim || new Date(fim) <= new Date(inicio)) {
+    showToast('O horário de fim deve ser depois do início', false);
+    btn.disabled=false; btn.textContent='Salvar Bloqueio'; return;
+  }
+
+  const inicioISO = new Date(inicio).toISOString();
+  const fimISO = new Date(fim).toISOString();
+  const empId = getFormEmpId();
+
+  try {
+    let qAgd = supabase.from('AGENDAMENTO')
+      .select('ID_AGD')
+      .eq('PROF_AGD', profId)
+      .lt('DT_AGD', fimISO)
+      .gt('DT_FIM_AGD', inicioISO);
+    if (empId) qAgd = qAgd.eq('ID_EMP', empId);
+    const { data: agdConf, error: agdErr } = await qAgd;
+    if (agdErr) throw agdErr;
+    if ((agdConf || []).length) {
+      hint.textContent = '⚠ Este profissional já possui consulta(s) marcada(s) nesse horário.';
+      hint.classList.remove('hidden');
+      btn.disabled=false; btn.textContent='Salvar Bloqueio'; return;
+    }
+
+    let qBlq = supabase.from('BLOQUEIO_PROF')
+      .select('ID_BLOQ')
+      .eq('PROF_BLOQ', profId)
+      .lt('DT_INICIO', fimISO)
+      .gt('DT_FIM', inicioISO);
+    if (empId) qBlq = qBlq.eq('ID_EMP', empId);
+    if (editBlqId) qBlq = qBlq.neq('ID_BLOQ', editBlqId);
+    const { data: blqConf, error: blqErr } = await qBlq;
+    if (blqErr) throw blqErr;
+    if ((blqConf || []).length) {
+      hint.textContent = '⚠ Já existe um bloqueio para este profissional nesse horário.';
+      hint.classList.remove('hidden');
+      btn.disabled=false; btn.textContent='Salvar Bloqueio'; return;
+    }
+
+    const payload = { PROF_BLOQ: profId, DT_INICIO: inicioISO, DT_FIM: fimISO, MOTIVO_BLOQ: motivo, ID_EMP: empId };
+    if (editBlqId) {
+      const { error } = await supabase.from('BLOQUEIO_PROF').update(payload).eq('ID_BLOQ', editBlqId);
+      if (error) throw error;
+      showToast('Bloqueio atualizado!');
+    } else {
+      const { error } = await supabase.from('BLOQUEIO_PROF').insert(payload);
+      if (error) throw error;
+      showToast('Horário bloqueado!');
+    }
+    closeBloqueioModal();
+    calendar.refetchEvents();
+  } catch (err) {
+    showToast(err.message || 'Erro ao salvar bloqueio', false);
+  }
+  btn.disabled=false; btn.textContent='Salvar Bloqueio';
+}
+
+function toggleShowBloqueios() {
+  showBloqueios = !showBloqueios;
+  document.getElementById('leg-BLOQUEIO').classList.toggle('opacity-40', !showBloqueios);
+  calendar.refetchEvents();
+}
+
+(async () => {
+  const ok = await initAuth();
+  if (!ok) return;
+  if (currentUserMeta?.tipo_usu === 'ADMIN_GLOBAL' && !AdminEmpresaCtx.get()) {
+    AdminEmpresaCtx.renderBloqueio(['main']);
+    return;
+  }
+  await loadDropdownData();
+  if (currentProfId) {
+    const selProf = document.getElementById('filterProf');
+    selProf.value = currentProfId;
+    selProf.disabled = true;
+    filterProfId = currentProfId;
+    document.getElementById('btnNovoAgd').classList.add('hidden');
+    document.getElementById('btnMultiAgd').classList.add('hidden');
+    document.getElementById('btnBloqueio').classList.add('hidden');
+  }
+  initCalendar();
+
+  const params = new URLSearchParams(window.location.search);
+  const googleMeetResult = params.get('google_meet');
+  if (googleMeetResult) {
+    if (googleMeetResult === 'conectado') {
+      showToast('Google Meet conectado com sucesso!');
+    } else {
+      showToast('Não foi possível conectar o Google Meet. Tente novamente.', false);
+    }
+    googleMeetStatusCache = {};
+    params.delete('google_meet');
+    params.delete('motivo');
+    const newQuery = params.toString();
+    window.history.replaceState({}, '', window.location.pathname + (newQuery ? '?' + newQuery : ''));
+    if (window.opener) setTimeout(() => window.close(), 1200);
+  }
+})();
+
+document.getElementById('fInicio').addEventListener('change', updateAvailability);
+document.getElementById('fFim').addEventListener('change', updateAvailability);
+document.getElementById('fProfissional').addEventListener('change', updateProfConflictHint);
+
+['fInicio','fFim','fPaciente','fProfissional','fSala'].forEach(id => {
+  document.getElementById(id).addEventListener('change', () => {
+    if (document.getElementById('fRepetir').checked) renderRecorrenciaPreview();
+  });
+});
+document.querySelectorAll('input[name="fTipo"]').forEach(el => {
+  el.addEventListener('change', () => {
+    if (document.getElementById('fRepetir').checked) renderRecorrenciaPreview();
+  });
+});
+
+// ── Multi-agenda ─────────────────────────────────────────────────────────────
+let multiDate = new Date();
+const MULTI_HS = 7, MULTI_HE = 23, MULTI_HH = 72;
+const MULTI_TH = (MULTI_HE - MULTI_HS) * MULTI_HH; // 936px total height
+
+function openMultiAgenda() {
+  multiDate = new Date(); multiDate.setHours(0,0,0,0);
+  document.getElementById('multiAgdOverlay').classList.remove('hidden');
+  loadMultiAgenda();
+}
+function closeMultiAgenda() {
+  document.getElementById('multiAgdOverlay').classList.add('hidden');
+}
+function multiNavDay(offset) {
+  if (offset === 0) { multiDate = new Date(); multiDate.setHours(0,0,0,0); }
+  else multiDate = new Date(multiDate.getTime() + offset * 86400000);
+  loadMultiAgenda();
+}
+async function openEditModalById(id) {
+  const cached = allAgendamentos.find(x => x.ID_AGD === id);
+  if (cached) { closeMultiAgenda(); openEditModal(id); return; }
+  const { data: a } = await supabase.from('AGENDAMENTO')
+    .select('ID_AGD,DT_AGD,DT_FIM_AGD,STATUS_AGD,TIPO_AGD,OBS_AGD,PAC_AGD,PROF_AGD,SALA_AGD,ID_EMP,PGTO_AGD,VALOR_AGD,VALOR_PREVISTO_AGD,ID_SERIE,LINK_AGD,PACIENTE!PAC_AGD(NOME_PAC),PROFISSIONAL!PROF_AGD(NOME_PROF),SALA!SALA_AGD(NOME_SALA)')
+    .eq('ID_AGD', id).single();
+  if (!a) return;
+  allAgendamentos.push(a);
+  closeMultiAgenda();
+  openEditModal(id);
+}
+async function loadMultiAgenda() {
+  document.getElementById('multiGrid').innerHTML = '<div style="display:flex;align-items:center;justify-content:center;height:160px;color:#9ca3af;font-size:0.85rem;gap:8px"><svg style="width:20px;height:20px;animation:spin 1s linear infinite" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle opacity=".25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/><path opacity=".75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"/></svg>Carregando…</div>';
+  const raw = multiDate.toLocaleDateString('pt-BR', {weekday:'long',day:'numeric',month:'long',year:'numeric'});
+  document.getElementById('multiDayTitle').textContent = raw.charAt(0).toUpperCase() + raw.slice(1);
+  const empId = AdminEmpresaCtx.resolveIdEmp(currentUserMeta?.tipo_usu, currentUserMeta?.ID_EMP || currentUserMeta?.id_emp);
+  const d0 = new Date(multiDate), d1 = new Date(multiDate); d1.setDate(d1.getDate()+1);
+  let q = supabase.from('AGENDAMENTO')
+    .select('ID_AGD,DT_AGD,DT_FIM_AGD,STATUS_AGD,TIPO_AGD,PAC_AGD,PROF_AGD,PGTO_AGD,PACIENTE!PAC_AGD(NOME_PAC),PROFISSIONAL!PROF_AGD(NOME_PROF)')
+    .gte('DT_AGD', d0.toISOString()).lt('DT_AGD', d1.toISOString()).order('DT_AGD');
+  if (empId) q = q.eq('ID_EMP', empId);
+  const { data } = await q;
+  renderMultiGrid(data || []);
+}
+function computeLayout(appts) {
+  if (!appts.length) return [];
+  const items = appts.map(a => ({
+    a,
+    start: new Date(a.DT_AGD),
+    end: a.DT_FIM_AGD ? new Date(a.DT_FIM_AGD) : new Date(new Date(a.DT_AGD).getTime() + 30*60000),
+    col: 0, totalCols: 1
+  }));
+  items.sort((x, y) => x.start - y.start);
+  const colEnds = [];
+  for (const item of items) {
+    let c = -1;
+    for (let i = 0; i < colEnds.length; i++) {
+      if (colEnds[i] <= item.start) { c = i; break; }
+    }
+    if (c === -1) c = colEnds.length;
+    item.col = c;
+    colEnds[c] = item.end;
+  }
+  for (const item of items) {
+    let maxCol = item.col;
+    for (const other of items) {
+      if (other !== item && other.start < item.end && other.end > item.start) {
+        maxCol = Math.max(maxCol, other.col);
+      }
+    }
+    item.totalCols = maxCol + 1;
+  }
+  return items;
+}
+
+function renderMultiGrid(agds) {
+  const HS=MULTI_HS, HE=MULTI_HE, HH=MULTI_HH, TH=MULTI_TH, PW=192;
+  const profMap = new Map(allProfissionais.map(p=>[p.ID_PROF, p.NOME_PROF]));
+  agds.forEach(a=>{ if(a.PROF_AGD && a.PROFISSIONAL && !profMap.has(a.PROF_AGD)) profMap.set(a.PROF_AGD, a.PROFISSIONAL.NOME_PROF); });
+  const profs = Array.from(profMap.entries()).map(([id,nome])=>({id,nome}));
+  if (!profs.length) {
+    document.getElementById('multiGrid').innerHTML='<div style="display:flex;align-items:center;justify-content:center;height:160px;color:#9ca3af;font-size:0.85rem">Nenhum profissional cadastrado</div>';
+    return;
+  }
+  const agdByProf={};
+  profs.forEach(p=>agdByProf[p.id]=[]);
+  agds.forEach(a=>{ if(a.PROF_AGD && agdByProf[a.PROF_AGD]) agdByProf[a.PROF_AGD].push(a); });
+
+  let timeLbls='';
+  for(let h=HS; h<=HE; h++) {
+    const t=(h-HS)*HH;
+    timeLbls+=`<div style="position:absolute;top:${t-8}px;left:0;right:0;padding:0 6px;text-align:right"><span style="font-size:0.62rem;color:#9ca3af;font-weight:600">${String(h).padStart(2,'0')}:00</span></div>`;
+  }
+
+  const profHdrs=profs.map(p=>{
+    const ini=p.nome.trim().split(/\s+/).map(w=>w[0]).join('').slice(0,2).toUpperCase();
+    return `<div style="width:${PW}px;flex-shrink:0;padding:0 12px;height:48px;display:flex;align-items:center;gap:8px;border-left:1px solid #f3f4f6"><div style="width:26px;height:26px;border-radius:50%;background:#2ABCD4;color:white;font-size:0.6rem;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0">${ini}</div><span style="font-size:0.78rem;font-weight:600;color:#374151;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${p.nome.split(/\s+/).slice(0,2).join(' ')}</span></div>`;
+  }).join('');
+
+  const profCols=profs.map(p=>{
+    let lines='';
+    for(let h=HS; h<=HE; h++){
+      const t=(h-HS)*HH;
+      lines+=`<div style="position:absolute;top:${t}px;left:0;right:0;border-top:1px solid #f3f4f6"></div>`;
+      if(h<HE) lines+=`<div style="position:absolute;top:${t+HH/2}px;left:0;right:0;border-top:1px dashed #f9fafb"></div>`;
+    }
+    const layout=computeLayout(agdByProf[p.id]||[]);
+    const blocks=layout.map(({a,col,totalCols})=>{
+      const s=new Date(a.DT_AGD), e=a.DT_FIM_AGD?new Date(a.DT_FIM_AGD):new Date(s.getTime()+30*60000);
+      const sm=(s.getHours()-HS)*60+s.getMinutes(), em=(e.getHours()-HS)*60+e.getMinutes();
+      const top=Math.max(0,sm*HH/60), bh=Math.max(20,Math.min((em-sm)*HH/60,TH-top));
+      const clr=eventColor(a);
+      const nm=(a.PACIENTE?.NOME_PAC||'—').split(' ')[0];
+      const ts=s.toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'});
+      const slotW=(PW-6)/totalCols, left=3+col*slotW, width=slotW-2;
+      return `<div onclick="openEditModalById('${a.ID_AGD}')" style="position:absolute;left:${left}px;width:${width}px;top:${top}px;height:${bh}px;background:${clr};border-radius:5px;padding:3px 6px;cursor:pointer;overflow:hidden" title="${a.PACIENTE?.NOME_PAC||'—'} — ${ts}"><p style="font-size:0.65rem;font-weight:700;color:white;line-height:1.3;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${nm}</p>${bh>30?`<p style="font-size:0.58rem;color:rgba(255,255,255,.85);line-height:1.2">${ts}</p>`:''}</div>`;
+    }).join('');
+    return `<div style="width:${PW}px;flex-shrink:0;border-left:1px solid #f3f4f6;position:relative;height:${TH}px">${lines}${blocks}</div>`;
+  }).join('');
+
+  document.getElementById('multiGrid').innerHTML=`<div style="min-width:max-content"><div style="position:sticky;top:0;z-index:20;display:flex;background:white;border-bottom:2px solid #e5e7eb;box-shadow:0 1px 3px rgba(0,0,0,.05)"><div style="width:56px;flex-shrink:0;height:48px;border-right:1px solid #e5e7eb"></div><div style="display:flex">${profHdrs}</div></div><div style="display:flex"><div style="position:sticky;left:0;z-index:10;width:56px;flex-shrink:0;background:#fafafa;border-right:1px solid #e5e7eb;height:${TH}px">${timeLbls}</div><div style="display:flex">${profCols}</div></div></div>`;
+}
+
+document.querySelectorAll('#sidebar nav a').forEach(function(link) {
+  link.addEventListener('click', function() {
+    var sb = document.getElementById('sidebar');
+    var ov = document.getElementById('overlay');
+    if (sb && !sb.classList.contains('-translate-x-full')) {
+      sb.classList.add('-translate-x-full');
+      if (ov) ov.classList.add('hidden');
+    }
+  });
+});
+</script>
+<script>
+(async () => {
+  try {
+    const { data: { session } } = await supabase.auth.getSession();
+    if (['ADMIN_EMPRESA'].includes(session?.user?.user_metadata?.tipo_usu)) {
+      const el = document.getElementById('sectionMinhaEmpresa');
+      if (el) el.classList.remove('hidden');
+    }
+  } catch (_) {}
+})();
+</script>
+<script>
+(async () => {
+  try {
+    const { data: { session } } = await supabase.auth.getSession();
+    if (!session) return;
+    const u = await getUsuarioAtual('TIPO_USU,ID_EMP', session);
+    if (u && u.ID_EMP === '22ff26b9-3839-45ed-8a1d-df4a488d3aab' && ['ADMIN_EMPRESA','SECRETARIA'].includes(u.TIPO_USU)) {
+      document.getElementById('menuDocumentosWrap')?.classList.remove('hidden');
+    }
+  } catch (_) {}
+})();
+</script>
+</body>
+</html>

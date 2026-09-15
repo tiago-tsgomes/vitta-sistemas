@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover"/>
+  <title>Meu Perfil — Vitta</title>
+  <link rel="icon" type="image/png" href="../img/favicon.png"/>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>tailwind.config={theme:{extend:{colors:{vitta:{50:'#f0fbfd',100:'#e0f7fa',400:'#4dd9ed',500:'#2ABCD4',600:'#1a96ac',700:'#127a8c'}},fontFamily:{sans:['Inter','system-ui','sans-serif']}}}}</script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+  <script src="../assets/js/config.js"></script>
+  <link rel="stylesheet" href="../assets/css/mobile-dark.css"/>
+  <script src="../assets/js/mobile-utils.js"></script>
+  <style>
+    *{-webkit-tap-highlight-color:transparent}
+    body{overscroll-behavior-y:none}
+    ::-webkit-scrollbar{display:none}
+    .safe-top{padding-top:env(safe-area-inset-top)}
+    @keyframes fadeUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+    .fade-up{animation:fadeUp .25s ease forwards}
+  </style>
+</head>
+<body class="bg-[#F0F2F5] font-sans antialiased">
+
+<!-- HEADER -->
+<header class="fixed top-0 left-0 right-0 z-20 bg-white border-b border-gray-100 safe-top">
+  <div class="h-14 flex items-center px-4 gap-3">
+    <button id="btn-back" onclick="history.back()" class="p-1.5 rounded-xl bg-gray-100 text-gray-500 shrink-0">
+      <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><polyline points="15 18 9 12 15 6"/></svg>
+    </button>
+    <div class="flex-1 min-w-0">
+      <h1 class="text-[0.95rem] font-bold text-gray-800">Meu Perfil</h1>
+      <p id="hdr-sub" class="text-[0.65rem] text-gray-400">Dados da conta</p>
+    </div>
+    <button id="btn-dark-toggle" class="w-8 h-8 rounded-xl bg-gray-100 text-gray-500 flex items-center justify-center shrink-0"></button>
+  </div>
+</header>
+
+<!-- Loading -->
+<div id="loading-state" style="padding-top:calc(56px + env(safe-area-inset-top))" class="flex items-center justify-center gap-2 min-h-screen text-gray-400 text-sm">
+  <svg class="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"/></svg>
+  Carregando...
+</div>
+
+<!-- MAIN -->
+<main id="main-content" class="hidden px-4 space-y-3" style="padding-top:calc(72px + env(safe-area-inset-top));padding-bottom:calc(32px + env(safe-area-inset-bottom))">
+
+  <!-- Avatar + nome -->
+  <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-5 fade-up flex items-center gap-4">
+    <div id="usr-av" class="w-16 h-16 rounded-2xl bg-vitta-500 flex items-center justify-center text-white text-2xl font-bold shrink-0">?</div>
+    <div class="flex-1 min-w-0">
+      <h2 id="usr-nome" class="text-[1.05rem] font-extrabold text-gray-800 truncate"></h2>
+      <p id="usr-email" class="text-[0.72rem] text-gray-400 mt-0.5 truncate"></p>
+      <span id="usr-tipo-badge" class="inline-block mt-1 text-[0.65rem] font-bold px-2 py-0.5 rounded-full"></span>
+    </div>
+  </div>
+
+  <!-- Dados gerais -->
+  <div class="bg-white rounded-2xl border border-gray-100 shadow-sm fade-up" style="animation-delay:.05s">
+    <div class="px-4 pt-4 pb-2 border-b border-gray-50">
+      <p class="text-[0.65rem] font-bold text-gray-400 uppercase tracking-wider flex items-center gap-1.5">
+        <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+        Dados Gerais
+      </p>
+    </div>
+    <div class="divide-y divide-gray-50">
+      <div id="row-nome-usu" class="hidden px-4 py-3 flex items-start gap-3">
+        <p class="text-[0.72rem] text-gray-400 w-24 shrink-0 pt-0.5">Nome</p>
+        <p id="val-nome-usu" class="text-[0.85rem] font-semibold text-gray-800 flex-1"></p>
+      </div>
+      <div id="row-email-usu" class="hidden px-4 py-3 flex items-start gap-3">
+        <p class="text-[0.72rem] text-gray-400 w-24 shrink-0 pt-0.5">E-mail</p>
+        <p id="val-email-usu" class="text-[0.85rem] font-semibold text-gray-800 flex-1 break-all"></p>
+      </div>
+      <div id="row-tipo-usu" class="hidden px-4 py-3 flex items-start gap-3">
+        <p class="text-[0.72rem] text-gray-400 w-24 shrink-0 pt-0.5">Perfil</p>
+        <p id="val-tipo-usu" class="text-[0.85rem] font-semibold text-gray-800 flex-1"></p>
+      </div>
+      <div id="row-espec-usu" class="hidden px-4 py-3 flex items-start gap-3">
+        <p class="text-[0.72rem] text-gray-400 w-24 shrink-0 pt-0.5">Especialidade</p>
+        <p id="val-espec-usu" class="text-[0.85rem] font-semibold text-gray-800 flex-1"></p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Dados da empresa -->
+  <div id="section-emp" class="hidden bg-white rounded-2xl border border-gray-100 shadow-sm fade-up" style="animation-delay:.1s">
+    <div class="px-4 pt-4 pb-2 border-b border-gray-50">
+      <p class="text-[0.65rem] font-bold text-gray-400 uppercase tracking-wider flex items-center gap-1.5">
+        <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>
+        Dados da Empresa
+      </p>
+    </div>
+    <div class="divide-y divide-gray-50">
+      <div id="row-nome-emp" class="hidden px-4 py-3 flex items-start gap-3">
+        <p class="text-[0.72rem] text-gray-400 w-24 shrink-0 pt-0.5">Nome</p>
+        <p id="val-nome-emp" class="text-[0.85rem] font-semibold text-gray-800 flex-1"></p>
+      </div>
+      <div id="row-tel-emp" class="hidden px-4 py-3 flex items-start gap-3">
+        <p class="text-[0.72rem] text-gray-400 w-24 shrink-0 pt-0.5">Telefone</p>
+        <p id="val-tel-emp" class="text-[0.85rem] font-semibold text-gray-800 flex-1"></p>
+      </div>
+      <div id="row-cidade-emp" class="hidden px-4 py-3 flex items-start gap-3">
+        <p class="text-[0.72rem] text-gray-400 w-24 shrink-0 pt-0.5">Cidade</p>
+        <p id="val-cidade-emp" class="text-[0.85rem] font-semibold text-gray-800 flex-1"></p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Botão sair -->
+  <div class="fade-up" style="animation-delay:.15s">
+    <button onclick="handleLogout()" class="w-full flex items-center justify-center gap-2 bg-red-50 text-red-600 font-bold text-[0.9rem] rounded-2xl py-4 active:bg-red-100 transition-colors border border-red-100">
+      <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+      Sair da conta
+    </button>
+  </div>
+
+</main>
+
+<script>
+const TIPO_LABELS={ADMIN_GLOBAL:'Admin Global',ADMIN_EMPRESA:'Administrador',SECRETARIA:'Secretaria',PROFISSIONAL:'Profissional',USUARIO:'Usuário'};
+const TIPO_BADGE_CLASS={ADMIN_GLOBAL:'bg-violet-100 text-violet-700',ADMIN_EMPRESA:'bg-blue-100 text-blue-700',SECRETARIA:'bg-amber-100 text-amber-700',PROFISSIONAL:'bg-vitta-100 text-vitta-700',USUARIO:'bg-gray-100 text-gray-600'};
+const AV_COLORS=['bg-blue-500','bg-emerald-500','bg-violet-500','bg-amber-500','bg-rose-500','bg-cyan-500'];
+
+function avColor(n){let h=0;for(const c of(n||''))h=(h<<5)-h+c.charCodeAt(0);return AV_COLORS[Math.abs(h)%AV_COLORS.length];}
+function initials(n){return(n||'').split(' ').filter(Boolean).slice(0,2).map(w=>w[0]).join('').toUpperCase();}
+
+function setRow(rowId, valId, value) {
+  if (!value) return;
+  document.getElementById(rowId).classList.remove('hidden');
+  document.getElementById(valId).textContent = value;
+}
+
+function fmtTel(t) {
+  if (!t) return '';
+  const d = t.replace(/\D/g, '');
+  if (d.length === 11) return `(${d.slice(0,2)}) ${d.slice(2,7)}-${d.slice(7)}`;
+  if (d.length === 10) return `(${d.slice(0,2)}) ${d.slice(2,6)}-${d.slice(6)}`;
+  return t;
+}
+
+async function handleLogout() {
+  try { await Capacitor.Plugins.Preferences.remove({ key: 'vitta_session' }); } catch(e) {}
+  await supabase.auth.signOut();
+  window.location.href = '../index.html';
+}
+
+setupDarkToggle();
+
+(async () => {
+  const { data: { session } } = await supabase.auth.getSession();
+  if (!session) { window.location.href = '../index.html'; return; }
+
+  const meta = session.user.user_metadata;
+  const tipo = meta.tipo_usu || 'USUARIO';
+  const email = session.user.email;
+
+  const u = await getUsuarioAtual('NOME_USU,ID_EMP,PROF_USU', session);
+
+  const nome = u?.NOME_USU || meta.nome_usu || email;
+  const idEmp = u?.ID_EMP || meta.id_emp;
+  const profId = u?.PROF_USU;
+
+  // Avatar
+  const av = document.getElementById('usr-av');
+  av.textContent = initials(nome);
+  av.className = `w-16 h-16 rounded-2xl ${avColor(nome)} flex items-center justify-center text-white text-2xl font-bold shrink-0`;
+
+  document.getElementById('usr-nome').textContent = nome;
+  document.getElementById('usr-email').textContent = email;
+  document.getElementById('hdr-sub').textContent = TIPO_LABELS[tipo] || tipo;
+
+  const badge = document.getElementById('usr-tipo-badge');
+  badge.textContent = TIPO_LABELS[tipo] || tipo;
+  badge.className = `inline-block mt-1 text-[0.65rem] font-bold px-2 py-0.5 rounded-full ${TIPO_BADGE_CLASS[tipo] || 'bg-gray-100 text-gray-600'}`;
+
+  // Dados usuário
+  setRow('row-nome-usu', 'val-nome-usu', nome);
+  setRow('row-email-usu', 'val-email-usu', email);
+  setRow('row-tipo-usu', 'val-tipo-usu', TIPO_LABELS[tipo] || tipo);
+
+  // Especialidade do profissional
+  if (profId) {
+    const { data: prof } = await supabase.from('PROFISSIONAL')
+      .select('ESPECIAL_PROF')
+      .eq('ID_PROF', profId).single();
+
+    if (prof) setRow('row-espec-usu', 'val-espec-usu', prof.ESPECIAL_PROF);
+  }
+
+  // Dados da empresa
+  if (idEmp) {
+    const { data: emp } = await supabase.from('EMPRESA')
+      .select('NOME_EMP,TEL_EMP,CIDADE_EMP,UF_EMP')
+      .eq('ID_EMP', idEmp).single();
+
+    if (emp) {
+      document.getElementById('section-emp').classList.remove('hidden');
+      setRow('row-nome-emp', 'val-nome-emp', emp.NOME_EMP);
+      setRow('row-tel-emp', 'val-tel-emp', fmtTel(emp.TEL_EMP));
+      const cidade = [emp.CIDADE_EMP, emp.UF_EMP].filter(Boolean).join(' — ');
+      setRow('row-cidade-emp', 'val-cidade-emp', cidade);
+    }
+  }
+
+  document.getElementById('loading-state').classList.add('hidden');
+  document.getElementById('main-content').classList.remove('hidden');
+})();
+</script>
+</body>
+</html>

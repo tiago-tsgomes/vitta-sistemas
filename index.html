@@ -1,0 +1,627 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>Login — Vitta Sistemas</title>
+  <link rel="icon" type="image/png" href="img/favicon.png" />
+  <script>
+    // Se o Supabase redirecionar um link de recuperação de senha para esta página,
+    // encaminhar para a tela correta preservando o hash com os tokens.
+    (function() {
+      const hash = window.location.hash;
+      if (hash && hash.includes('type=recovery')) {
+        window.location.replace('pages/redefinir-senha.html' + hash);
+      }
+    })();
+  </script>
+
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            vitta: {
+              50:  '#f0fbfd',
+              100: '#e0f7fa',
+              400: '#4dd9ed',
+              500: '#2ABCD4',
+              600: '#1a96ac',
+              700: '#127a8c',
+            }
+          },
+          fontFamily: {
+            sans: ['Inter', 'system-ui', 'sans-serif'],
+          },
+          boxShadow: {
+            'vitta': '0 4px 20px rgba(42,188,212,0.35)',
+            'vitta-lg': '0 6px 28px rgba(42,188,212,0.45)',
+          }
+        }
+      }
+    }
+  </script>
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+
+  <style type="text/tailwindcss">
+    @layer components {
+      .field-input {
+        @apply w-full pl-11 pr-4 py-3 border-[1.5px] border-gray-200 rounded-xl text-sm text-gray-700 bg-white outline-none
+               placeholder:text-gray-400 transition-all duration-200
+               focus:border-vitta-500 focus:shadow-[0_0_0_3px_rgba(42,188,212,0.15)];
+      }
+      .field-input-pw {
+        @apply w-full pl-11 pr-12 py-3 border-[1.5px] border-gray-200 rounded-xl text-sm text-gray-700 bg-white outline-none
+               placeholder:text-gray-400 transition-all duration-200
+               focus:border-vitta-500 focus:shadow-[0_0_0_3px_rgba(42,188,212,0.15)];
+      }
+      .btn-vitta {
+        @apply w-full py-3.5 rounded-xl font-semibold text-sm text-white
+               bg-gradient-to-r from-vitta-500 to-vitta-600
+               shadow-vitta hover:shadow-vitta-lg hover:-translate-y-0.5
+               active:translate-y-0 active:shadow-vitta
+               disabled:opacity-60 disabled:cursor-not-allowed disabled:transform-none disabled:shadow-none
+               transition-all duration-200 flex items-center justify-center gap-2;
+      }
+      .btn-outline-vitta {
+        @apply w-full py-3.5 rounded-xl font-semibold text-sm text-vitta-600
+               border-[1.5px] border-vitta-500 bg-transparent
+               hover:bg-vitta-50 transition-all duration-200
+               flex items-center justify-center gap-2;
+      }
+      .alert-error {
+        @apply flex items-start gap-2.5 p-3.5 mb-5 rounded-xl text-sm font-medium
+               bg-red-50 text-red-700 border border-red-200;
+      }
+      .alert-success {
+        @apply flex items-start gap-2.5 p-3.5 mb-5 rounded-xl text-sm font-medium
+               bg-green-50 text-green-700 border border-green-200;
+      }
+    }
+  </style>
+</head>
+
+<body class="min-h-screen flex font-sans antialiased bg-white">
+
+  <!-- ===== PAINEL ESQUERDO — MARCA ===== -->
+  <aside class="hidden lg:flex w-[44%] min-h-screen flex-col items-center justify-center p-14
+                bg-gradient-to-br from-vitta-700 via-vitta-600 to-vitta-400 relative overflow-hidden">
+
+    <!-- Círculos decorativos -->
+    <div class="absolute w-[480px] h-[480px] rounded-full bg-white/5 -bottom-40 -right-28 pointer-events-none"></div>
+    <div class="absolute w-[280px] h-[280px] rounded-full bg-white/5 -top-20 -left-20 pointer-events-none"></div>
+    <div class="absolute w-[180px] h-[180px] rounded-full bg-white/8 top-1/3 right-8 pointer-events-none"></div>
+
+    <div class="relative z-10 max-w-[340px] text-center">
+      <!-- Logo branca -->
+      <img src="img/logo.png" alt="Vitta Sistemas" class="w-56 mx-auto mb-10 brightness-0 invert" />
+
+      <h2 class="text-[1.45rem] font-bold text-white mb-3 leading-snug">
+        Sistema de Gestão Clínica
+      </h2>
+      <p class="text-white/75 text-[0.9rem] leading-relaxed">
+        Controle completo da sua clínica: agendamentos, pacientes, financeiro e muito mais — em um só lugar.
+      </p>
+
+      <!-- Features -->
+      <div class="mt-10 flex flex-col gap-4 text-left">
+
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 rounded-xl bg-white/15 flex items-center justify-center shrink-0">
+            <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+              <rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/><polyline points="9 16 11 18 15 14"/>
+            </svg>
+          </div>
+          <span class="text-white/90 text-sm">Agendamento inteligente de consultas</span>
+        </div>
+
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 rounded-xl bg-white/15 flex items-center justify-center shrink-0">
+            <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+              <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+            </svg>
+          </div>
+          <span class="text-white/90 text-sm">Gestão completa de pacientes</span>
+        </div>
+
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 rounded-xl bg-white/15 flex items-center justify-center shrink-0">
+            <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+              <polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/>
+            </svg>
+          </div>
+          <span class="text-white/90 text-sm">Relatórios e indicadores em tempo real</span>
+        </div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- ===== PAINEL DIREITO — FORMULÁRIO ===== -->
+  <main class="flex-1 min-h-screen relative flex items-center justify-center px-6 bg-white overflow-y-auto">
+    <div class="w-full max-w-[420px] py-14">
+
+      <!-- Logo colorida (visível só em mobile) -->
+      <img src="img/logo.png" alt="Vitta Sistemas" class="lg:hidden w-44 mx-auto mb-10" />
+
+      <!-- Cabeçalho -->
+      <div class="mb-8">
+        <h1 class="text-[1.85rem] font-extrabold text-gray-800 mb-1.5 tracking-tight">
+          Bem-vindo de volta
+        </h1>
+        <p class="text-gray-500 text-sm">
+          Informe suas credenciais para acessar o sistema.
+        </p>
+      </div>
+
+      <!-- Área de alertas -->
+      <div id="login-alert" role="alert" aria-live="polite"></div>
+
+      <!-- Formulário -->
+      <form id="login-form" novalidate autocomplete="on">
+
+        <!-- Campo E-mail -->
+        <div class="mb-5">
+          <label for="email" class="block text-[0.78rem] font-semibold text-gray-500 uppercase tracking-wider mb-1.5">
+            E-mail
+          </label>
+          <div class="relative">
+            <!-- Ícone envelope -->
+            <span class="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none">
+              <svg xmlns="http://www.w3.org/2000/svg" class="w-[18px] h-[18px]" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/>
+              </svg>
+            </span>
+            <input
+              type="email"
+              id="email"
+              name="email"
+              class="field-input"
+              placeholder="seu@email.com"
+              autocomplete="email"
+              required
+            />
+          </div>
+          <p id="email-erro" class="hidden mt-1.5 text-xs text-red-600 font-medium flex items-center gap-1">
+            <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+              <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
+            </svg>
+            E-mail não encontrado no sistema.
+          </p>
+        </div>
+
+        <!-- Senha + botão -->
+        <div id="password-section">
+
+        <!-- Campo Senha -->
+        <div class="mb-2">
+          <label for="password" class="block text-[0.78rem] font-semibold text-gray-500 uppercase tracking-wider mb-1.5">
+            Senha
+          </label>
+          <div class="relative">
+            <!-- Ícone cadeado -->
+            <span class="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none">
+              <svg xmlns="http://www.w3.org/2000/svg" class="w-[18px] h-[18px]" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+              </svg>
+            </span>
+            <input
+              type="password"
+              id="password"
+              name="password"
+              class="field-input-pw"
+              placeholder="••••••••"
+              autocomplete="current-password"
+              required
+            />
+            <!-- Toggle visibilidade -->
+            <button type="button" id="toggle-pw"
+              class="absolute right-3.5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-vitta-500 transition-colors"
+              aria-label="Mostrar/ocultar senha">
+              <!-- Ícone olho -->
+              <svg id="eye-icon" xmlns="http://www.w3.org/2000/svg" class="w-[18px] h-[18px]" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>
+              </svg>
+            </button>
+          </div>
+        </div>
+
+        <!-- Esqueci a senha -->
+        <div class="flex justify-end mb-6">
+          <a id="link-forgot"
+             href="pages/esqueci-senha.html"
+             style="display:none"
+             class="text-[0.82rem] text-gray-400 hover:text-vitta-600 font-medium transition-colors">
+            Esqueci minha senha
+          </a>
+        </div>
+
+        <!-- Botão entrar -->
+        <button type="submit" id="btn-login" class="btn-vitta">
+          <svg id="spinner" class="hidden w-4 h-4 animate-spin" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/>
+            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/>
+          </svg>
+          <span id="btn-login-text" class="flex items-center gap-2">
+            <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+              <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><polyline points="10 17 15 12 10 7"/><line x1="15" y1="12" x2="3" y2="12"/>
+            </svg>
+            Entrar
+          </span>
+        </button>
+
+        </div><!-- /password-section -->
+
+      </form>
+
+      <!-- Seletor de empresa (aparece só quando o e-mail tem mais de uma empresa vinculada) -->
+      <div id="empresa-selector-section" class="hidden">
+        <div class="mb-6">
+          <h1 class="text-[1.5rem] font-extrabold text-gray-800 mb-1.5 tracking-tight">Qual empresa você quer acessar?</h1>
+          <p class="text-gray-500 text-sm">Seu e-mail está vinculado a mais de uma empresa no Vitta Sistemas.</p>
+        </div>
+        <div id="empresa-selector-list" class="space-y-3"></div>
+      </div>
+
+      <!-- Ainda não tenho conta (somente na web — criação de conta não é oferecida dentro do app) -->
+      <div id="create-account-section" class="mt-4">
+        <a href="pages/cadastro.html" class="btn-outline-vitta">
+          <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="8.5" cy="7" r="4"/><line x1="20" y1="8" x2="20" y2="14"/><line x1="23" y1="11" x2="17" y2="11"/>
+          </svg>
+          Criar minha conta
+        </a>
+      </div>
+
+      <!-- Login com biometria (apenas app mobile) -->
+      <div id="biometric-section" class="hidden mt-4">
+        <div class="flex items-center gap-3 mb-4">
+          <div class="flex-1 h-px bg-gray-200"></div>
+          <span class="text-xs text-gray-400">ou</span>
+          <div class="flex-1 h-px bg-gray-200"></div>
+        </div>
+        <button id="btn-biometric" type="button"
+          class="w-full py-3.5 border-2 border-vitta-500 text-vitta-600 rounded-2xl font-bold text-sm flex items-center justify-center gap-2 active:bg-vitta-50 transition-colors">
+          <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M7.864 4.243A7.5 7.5 0 0119.5 10.5c0 2.92-.556 5.709-1.568 8.268M5.742 6.364A7.465 7.465 0 004.5 10.5a7.464 7.464 0 01-1.15 3.993m1.989 3.559A11.209 11.209 0 008.25 10.5a3.75 3.75 0 117.5 0c0 .527-.021 1.049-.064 1.565M12 10.5a14.94 14.94 0 01-3.6 9.75m6.633-4.596a18.666 18.666 0 01-2.485 5.33"/>
+          </svg>
+          Entrar com digital
+        </button>
+      </div>
+
+      <!-- Rodapé do card -->
+      <p class="mt-8 text-center text-[0.8rem] text-gray-400">
+        Problemas para acessar?
+        <a href="mailto:suporte@vittasistemas.com.br" class="text-vitta-600 font-semibold hover:text-vitta-700">
+          Fale com o suporte
+        </a>
+      </p>
+
+    </div>
+
+    <!-- Copyright fixo no rodapé -->
+    <p class="absolute bottom-4 left-0 right-0 text-center text-[0.72rem] text-gray-300">
+      © <span id="year"></span> Vitta Sistemas. Todos os direitos reservados.
+    </p>
+  </main>
+
+</body>
+
+<!-- Supabase JS -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<script src="assets/js/config.js?v=2"></script>
+<script>
+  document.getElementById('year').textContent = new Date().getFullYear();
+
+  const isMobileApp = typeof window.Capacitor !== 'undefined';
+  const currentPlatform = isMobileApp && typeof window.Capacitor.getPlatform === 'function'
+    ? window.Capacitor.getPlatform()
+    : 'web';
+  if (!isMobileApp) document.getElementById('link-forgot').style.display = '';
+
+  // App Store 3.1.3(c): o app nativo não pode oferecer criação de conta
+  // (venda direta a indivíduos). Cadastro é feito apenas pelo site.
+  if (isMobileApp) document.getElementById('create-account-section').style.display = 'none';
+  const SESSION_KEY = 'vitta_session';
+
+  async function fetchPlanAndSave(meta) {
+    const idEmp = meta.ID_EMP || meta.id_emp;
+    if (!idEmp || meta.tipo_usu === 'ADMIN_GLOBAL') return { temApp: true, temIA: true };
+    try {
+      const { data: emp } = await supabase
+        .from('EMPRESA')
+        .select('PLANO:ID_PLANO(TEM_APP_PLANO, TEM_IA_PLANO)')
+        .eq('ID_EMP', idEmp)
+        .single();
+      if (!emp?.PLANO) return null;
+      const plan = {
+        temApp: emp.PLANO.TEM_APP_PLANO === true,
+        temIA:  emp.PLANO.TEM_IA_PLANO  === true,
+      };
+      sessionStorage.setItem('vitta_plan', JSON.stringify(plan));
+      return plan;
+    } catch(_) { return null; }
+  }
+
+  // Admin com profissional vinculado (PROF_USU) também pode acessar o app mobile,
+  // com acesso de nível profissional às suas próprias consultas/pacientes.
+  async function temAcessoMobile(meta, userId) {
+    if (meta.tipo_usu === 'PROFISSIONAL') return true;
+    if (meta.tipo_usu !== 'ADMIN_EMPRESA') return false;
+    try {
+      const idEmp = meta.ID_EMP || meta.id_emp;
+      let q = supabase.from('USUARIO').select('PROF_USU').eq('AUTH_ID', userId);
+      if (idEmp) q = q.eq('ID_EMP', idEmp);
+      const { data } = await q.maybeSingle();
+      return !!data?.PROF_USU;
+    } catch(_) { return false; }
+  }
+
+  function getPlugins() {
+    return {
+      Preferences: Capacitor.Plugins.Preferences,
+      BiometricAuth: Capacitor.Plugins.BiometricAuth,
+    };
+  }
+
+  async function initBiometricLogin() {
+    if (!isMobileApp) return;
+    try {
+      const { Preferences, BiometricAuth } = getPlugins();
+      const { value } = await Preferences.get({ key: SESSION_KEY });
+      if (!value) return;
+      const info = await BiometricAuth.checkBiometry();
+      if (!info.isAvailable) return;
+      document.getElementById('biometric-section').classList.remove('hidden');
+    } catch(e) {}
+  }
+
+  async function saveSessionForBiometric(session) {
+    if (!isMobileApp || !session) return;
+    try {
+      const { Preferences, BiometricAuth } = getPlugins();
+      const info = await BiometricAuth.checkBiometry();
+      if (!info.isAvailable) return;
+      await Preferences.set({ key: SESSION_KEY, value: JSON.stringify({
+        access_token: session.access_token,
+        refresh_token: session.refresh_token,
+      })});
+    } catch(e) {}
+  }
+
+  document.getElementById('btn-biometric').addEventListener('click', async () => {
+    const alertEl = document.getElementById('login-alert');
+    try {
+      const { Preferences, BiometricAuth } = getPlugins();
+      await BiometricAuth.authenticate({
+        reason: 'Confirme sua identidade para entrar',
+        androidTitle: 'Vitta Sistemas',
+        androidSubtitle: 'Login com biometria',
+        androidConfirmationRequired: false,
+      });
+      const { value } = await Preferences.get({ key: SESSION_KEY });
+      if (!value) return;
+      const sess = JSON.parse(value);
+      const { data, error } = await supabase.auth.setSession(sess);
+      if (error) {
+        await Preferences.remove({ key: SESSION_KEY });
+        document.getElementById('biometric-section').classList.add('hidden');
+        alertEl.innerHTML = `<div class="alert-error"><span>✕</span><span>Sessão expirada. Faça login com e-mail e senha.</span></div>`;
+        return;
+      }
+      const meta = data.user.user_metadata || {};
+      if (!meta.ativo_usu) {
+        await supabase.auth.signOut();
+        await Preferences.remove({ key: SESSION_KEY });
+        alertEl.innerHTML = `<div class="alert-error"><span>✕</span><span>Usuário inativo ou sem permissão.</span></div>`;
+        return;
+      }
+      try {
+        const { error: ePlat } = await supabase.rpc('set_ultimo_acesso_plataforma', { p_plataforma: currentPlatform });
+        if (ePlat) console.warn('set_ultimo_acesso_plataforma falhou:', ePlat.message);
+        const { error: eEmp } = await supabase.rpc('set_ultimo_acesso_empresa', { p_id_emp: meta.ID_EMP || meta.id_emp || null });
+        if (eEmp) console.warn('set_ultimo_acesso_empresa falhou:', eEmp.message);
+      } catch (eLog) { console.warn('Falha ao registrar acesso biométrico:', eLog?.message || eLog); }
+
+      if (meta.force_password_change) {
+        alertEl.innerHTML = `<div class="alert-success"><span>✓</span><span>Login realizado! Redirecionando...</span></div>`;
+        setTimeout(() => window.location.href = 'pages/redefinir-senha.html?mode=force', 600);
+        return;
+      }
+
+      if (await temAcessoMobile(meta, data.user.id)) {
+        const plan = await fetchPlanAndSave(meta);
+        if (!plan?.temApp) {
+          await supabase.auth.signOut();
+          sessionStorage.removeItem('vitta_plan');
+          await Preferences.remove({ key: SESSION_KEY });
+          document.getElementById('biometric-section').classList.add('hidden');
+          alertEl.innerHTML = `<div class="alert-error"><span>✕</span><span>O plano da sua clínica não inclui acesso ao aplicativo mobile. Entre em contato com o administrador.</span></div>`;
+          return;
+        }
+        alertEl.innerHTML = `<div class="alert-success"><span>✓</span><span>Login realizado! Redirecionando...</span></div>`;
+        setTimeout(() => window.location.href = 'mobile/dashboard.html', 600);
+        return;
+      }
+      alertEl.innerHTML = `<div class="alert-success"><span>✓</span><span>Login realizado! Redirecionando...</span></div>`;
+      setTimeout(() => window.location.href = 'mobile/access-denied.html', 600);
+    } catch(e) {
+      alertEl.innerHTML = `<div class="alert-error"><span>✕</span><span>Não foi possível confirmar sua biometria. Faça login com e-mail e senha.</span></div>`;
+    }
+  });
+
+  initBiometricLogin();
+
+  const togglePw = document.getElementById('toggle-pw');
+  const pwInput  = document.getElementById('password');
+  const eyeIcon  = document.getElementById('eye-icon');
+  const EYE_OPEN = `<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>`;
+  const EYE_OFF  = `<path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/>`;
+  togglePw.addEventListener('click', () => {
+    const visible = pwInput.type === 'text';
+    pwInput.type = visible ? 'password' : 'text';
+    eyeIcon.innerHTML = visible ? EYE_OPEN : EYE_OFF;
+  });
+
+  document.getElementById('login-form').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const alertEl = document.getElementById('login-alert');
+    const btn     = document.getElementById('btn-login');
+    const spinner = document.getElementById('spinner');
+    const btnText = document.getElementById('btn-login-text');
+    const setBtn  = (on) => { btn.disabled = on; spinner.classList.toggle('hidden', !on); btnText.classList.toggle('hidden', on); };
+    const showErr = (msg) => { alertEl.innerHTML = `<div class="alert-error"><span>✕</span><span>${msg}</span></div>`; };
+
+    async function runPostLoginChecks(authData) {
+      let meta = authData.user.user_metadata || {};
+      if (!meta.ativo_usu) {
+        await supabase.auth.signOut();
+        showErr('Usuário inativo ou sem permissão. Contate o administrador.');
+        setBtn(false);
+        return;
+      }
+
+      try {
+        const { error: eEmp } = await supabase.rpc('set_ultimo_acesso_empresa', { p_id_emp: meta.ID_EMP || meta.id_emp || null });
+        if (eEmp) console.warn('set_ultimo_acesso_empresa falhou:', eEmp.message);
+      } catch (eEmp) { console.warn('set_ultimo_acesso_empresa falhou:', eEmp?.message || eEmp); }
+
+      if (meta.force_password_change) {
+        alertEl.innerHTML = `<div class="alert-success"><span>✓</span><span>Login realizado! Redirecionando...</span></div>`;
+        await saveSessionForBiometric(authData.session);
+        setTimeout(() => window.location.href = 'pages/redefinir-senha.html?mode=force', 800);
+        return;
+      }
+
+      // Verifica permissões do plano antes de redirecionar
+      if (isMobileApp && await temAcessoMobile(meta, authData.user.id)) {
+        const plan = await fetchPlanAndSave(meta);
+        if (!plan?.temApp) {
+          await supabase.auth.signOut();
+          sessionStorage.removeItem('vitta_plan');
+          showErr('O plano da sua clínica não inclui acesso ao aplicativo mobile. Entre em contato com o administrador.');
+          setBtn(false);
+          return;
+        }
+        alertEl.innerHTML = `<div class="alert-success"><span>✓</span><span>Login realizado! Redirecionando...</span></div>`;
+        await saveSessionForBiometric(authData.session);
+        setTimeout(() => window.location.href = 'mobile/dashboard.html', 800);
+        return;
+      }
+
+      alertEl.innerHTML = `<div class="alert-success"><span>✓</span><span>Login realizado! Redirecionando...</span></div>`;
+      await saveSessionForBiometric(authData.session);
+      if (isMobileApp) {
+        setTimeout(() => window.location.href = 'mobile/access-denied.html', 800);
+        return;
+      }
+      await fetchPlanAndSave(meta);
+      setTimeout(() => window.location.href = 'pages/dashboard.html', 800);
+    }
+
+    async function escolherEmpresa(empresaId, authData) {
+      try {
+        const selRes = await fetch(`${SUPABASE_URL}/functions/v1/selecionar-empresa`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${authData.session.access_token}` },
+          body: JSON.stringify({ empresaId }),
+        });
+        if (!selRes.ok) throw new Error('selecionar-empresa falhou');
+
+        const { data: refreshed, error: refreshErr } = await supabase.auth.refreshSession();
+        if (refreshErr || !refreshed?.session) throw refreshErr || new Error('Falha ao atualizar sessão');
+
+        document.getElementById('empresa-selector-section').classList.add('hidden');
+        document.getElementById('login-form').classList.remove('hidden');
+        if (!isMobileApp) document.getElementById('create-account-section').classList.remove('hidden');
+
+        await runPostLoginChecks({ user: refreshed.session.user, session: refreshed.session });
+      } catch (_) {
+        showErr('Não foi possível entrar nessa empresa agora. Tente novamente.');
+        setBtn(false);
+      }
+    }
+
+    function showEmpresaSelector(empresas, authData) {
+      document.getElementById('login-form').classList.add('hidden');
+      document.getElementById('create-account-section').classList.add('hidden');
+
+      const list = document.getElementById('empresa-selector-list');
+      list.innerHTML = '';
+      empresas.forEach((emp) => {
+        const empBtn = document.createElement('button');
+        empBtn.type = 'button';
+        empBtn.className = 'w-full text-left px-4 py-3.5 border-[1.5px] border-gray-200 rounded-xl hover:border-vitta-500 hover:bg-vitta-50 transition-colors flex items-center justify-between gap-2';
+
+        const nameSpan = document.createElement('span');
+        nameSpan.className = 'font-semibold text-gray-700 text-sm';
+        nameSpan.textContent = emp.nome;
+        empBtn.appendChild(nameSpan);
+        empBtn.insertAdjacentHTML('beforeend', '<svg class="w-4 h-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg>');
+
+        empBtn.addEventListener('click', () => { setBtn(true); escolherEmpresa(emp.id, authData); });
+        list.appendChild(empBtn);
+      });
+      document.getElementById('empresa-selector-section').classList.remove('hidden');
+    }
+
+    alertEl.innerHTML = '';
+    const email    = document.getElementById('email').value.trim();
+    const password = document.getElementById('password').value;
+
+    if (!email || !password) {
+      alertEl.innerHTML = `<div class="alert-error"><span>⚠</span><span>Preencha e-mail e senha.</span></div>`;
+      return;
+    }
+    setBtn(true);
+    try {
+      const { data: authData, error } = await supabase.auth.signInWithPassword({ email, password });
+
+      if (error) {
+        const msg = error.message || '';
+        showErr(msg.includes('Invalid login') || msg.includes('invalid_credentials')
+          ? 'E-mail ou senha incorretos. Verifique e tente novamente.'
+          : msg.includes('Email not confirmed')
+            ? 'E-mail não confirmado. Verifique sua caixa de entrada.'
+            : msg || 'Erro ao fazer login. Tente novamente em alguns instantes.');
+        setBtn(false);
+        return;
+      }
+
+      try {
+        const { error: ePlat } = await supabase.rpc('set_ultimo_acesso_plataforma', { p_plataforma: currentPlatform });
+        if (ePlat) console.warn('set_ultimo_acesso_plataforma falhou:', ePlat.message);
+      } catch (ePlat) { console.warn('set_ultimo_acesso_plataforma falhou:', ePlat?.message || ePlat); }
+
+      // E-mail vinculado a mais de uma empresa? Pergunta qual empresa acessar antes de prosseguir.
+      let empresas = [];
+      try {
+        const res = await fetch(`${SUPABASE_URL}/functions/v1/check-email-empresas`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'apikey': SUPABASE_ANON_KEY, 'Authorization': `Bearer ${SUPABASE_ANON_KEY}` },
+          body: JSON.stringify({ email }),
+        });
+        const data = await res.json();
+        empresas = data.empresas || [];
+      } catch (_) { /* se a checagem falhar, segue o login normal com a empresa da sessão */ }
+
+      if (empresas.length > 1) {
+        setBtn(false);
+        showEmpresaSelector(empresas, authData);
+        return;
+      }
+
+      await runPostLoginChecks(authData);
+    } catch (e) {
+      console.error('Erro no login:', e);
+      showErr('Erro inesperado ao fazer login: ' + (e?.message || e));
+      setBtn(false);
+    }
+  });
+</script>
+</html>

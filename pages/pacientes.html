@@ -1,0 +1,2262 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>Pacientes — Vitta Sistemas</title>
+  <link rel="icon" type="image/png" href="../img/favicon.png" />
+
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            vitta: { 50:'#f0fbfd', 100:'#e0f7fa', 300:'#80deea', 400:'#4dd9ed', 500:'#2ABCD4', 600:'#1a96ac', 700:'#127a8c' }
+          },
+          fontFamily: { sans: ['Inter','system-ui','sans-serif'] }
+        }
+      }
+    }
+  </script>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+
+  <style>
+    .sidebar-nav::-webkit-scrollbar { width:3px; }
+    .sidebar-nav::-webkit-scrollbar-thumb { background:rgba(255,255,255,.1); border-radius:4px; }
+    .submenu { overflow:hidden; max-height:0; opacity:0; transition:max-height .25s ease,opacity .2s ease; }
+    .submenu.open { max-height:500px; opacity:1; }
+    .chevron { transition:transform .25s ease; display:inline-block; }
+    .chevron.open { transform:rotate(180deg); }
+    @keyframes fadeUp { from{opacity:0;transform:translateY(8px)} to{opacity:1;transform:translateY(0)} }
+    .fade-up { animation:fadeUp .35s ease forwards; }
+
+    /* Modal overlay */
+    .modal-overlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,.5); z-index:300;
+                     align-items:flex-start; justify-content:center; padding:24px 16px; overflow-y:auto; }
+    .modal-overlay.open { display:flex; }
+
+    /* Collapsible sections */
+    .sec-body { transition:max-height .25s ease,opacity .2s ease; overflow:hidden; }
+    .sec-body.collapsed { max-height:0!important; opacity:0; padding-top:0!important; padding-bottom:0!important; }
+
+    /* Multi-select dropdown */
+    .ms-dropdown { position:absolute; top:100%; left:0; right:0; background:#fff;
+                   border:1.5px solid #2ABCD4; border-top:none; border-radius:0 0 8px 8px;
+                   max-height:180px; overflow-y:auto; z-index:50; display:none; box-shadow:0 4px 12px rgba(0,0,0,.1); }
+    .ms-dropdown.open { display:block; }
+    .ms-option { padding:8px 12px; font-size:13px; cursor:pointer; display:flex; align-items:center; gap:8px; }
+    .ms-option:hover { background:#f0fbfd; }
+    .ms-option input[type=checkbox] { accent-color:#2ABCD4; width:14px; height:14px; }
+
+    /* Scrollbar modal */
+    .modal-scroll::-webkit-scrollbar { width:4px; }
+    .modal-scroll::-webkit-scrollbar-thumb { background:#e5e7eb; border-radius:4px; }
+
+    /* Toast */
+    #toast { position:fixed; bottom:24px; right:24px; z-index:999; transition:all .3s ease; }
+
+    /* Table row hover */
+    tbody tr { transition:background .15s; }
+    tbody tr:hover { background:#f9fafb; }
+  </style>
+</head>
+
+<body class="bg-[#F0F2F5] font-sans antialiased">
+<div class="flex min-h-screen">
+
+<!-- ══════════════════════════════════
+     SIDEBAR
+══════════════════════════════════ -->
+<aside id="sidebar"
+  class="fixed inset-y-0 left-0 w-[220px] bg-[#111827] flex flex-col z-30
+         -translate-x-full lg:translate-x-0 transition-transform duration-300">
+
+  <div class="flex flex-col items-center justify-center gap-1 py-4 px-5 border-b border-white/10 shrink-0">
+    <img src="../img/logo.png" alt="Vitta Sistemas" class="h-10 w-auto brightness-0 invert" />
+    <p class="text-[0.6rem] text-gray-500 tracking-wide">v1.2.1</p>
+  </div>
+
+  <nav class="flex-1 overflow-y-auto sidebar-nav py-3">
+    <p class="block text-[0.6rem] font-bold text-gray-500 uppercase tracking-widest px-4 pb-1 pt-3">Principal</p>
+
+    <a href="dashboard.html"
+       class="flex items-center gap-3 px-3 py-2.5 mx-2 rounded-xl text-[0.83rem] font-medium text-gray-400 hover:bg-white/10 hover:text-white transition-colors duration-150 cursor-pointer mb-0.5">
+      <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+        <rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/>
+        <rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/>
+      </svg>
+      Dashboard
+    </a>
+
+    <a href="agendamentos.html"
+       class="flex items-center gap-3 px-3 py-2.5 mx-2 rounded-xl text-[0.83rem] font-medium text-gray-400 hover:bg-white/10 hover:text-white transition-colors duration-150 cursor-pointer mb-0.5">
+      <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+        <rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/>
+      </svg>
+      Agendamentos
+    </a>
+    <a href="consultas.html" class="flex items-center gap-3 px-3 py-2.5 mx-2 rounded-xl text-[0.83rem] font-medium text-gray-400 hover:bg-white/10 hover:text-white transition-colors duration-150 cursor-pointer mb-0.5">
+      <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+        <path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/>
+      </svg>
+      Consultas
+    </a>
+
+    <p class="block text-[0.6rem] font-bold text-gray-500 uppercase tracking-widest px-4 pb-1 pt-4">Cadastros</p>
+
+    <button onclick="toggleMenu('cadastros')"
+            class="w-full flex items-center gap-3 px-3 py-2.5 mx-2 rounded-xl text-[0.83rem] font-medium text-vitta-400 bg-vitta-500/10 transition-colors duration-150 cursor-pointer mb-0.5" style="width:calc(100% - 16px)">
+      <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+        <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/>
+        <path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+      </svg>
+      Cadastros
+      <svg id="chev-cadastros" class="chevron open w-3.5 h-3.5 ml-auto text-gray-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+    </button>
+    <div id="sub-cadastros" class="submenu open">
+      <a href="pacientes.html" class="flex items-center gap-2 pl-10 pr-3 py-2 mx-2 rounded-xl text-[0.8rem] font-semibold text-vitta-400 bg-vitta-500/10 transition-colors cursor-pointer">Pacientes</a>
+      <a href="profissionais.html" class="flex items-center gap-2 pl-10 pr-3 py-2 mx-2 rounded-xl text-[0.8rem] text-gray-500 hover:bg-white/5 hover:text-gray-300 transition-colors cursor-pointer">Profissionais</a>
+      <a href="usuarios-empresa.html" class="flex items-center gap-2 pl-10 pr-3 py-2 mx-2 rounded-xl text-[0.8rem] text-gray-500 hover:bg-white/5 hover:text-gray-300 transition-colors cursor-pointer">Usuários</a>
+      <div class="hidden" id="menuDocumentosWrap"><a href="documentos.html" class="flex items-center gap-2 pl-10 pr-3 py-2 mx-2 rounded-xl text-[0.8rem] text-gray-500 hover:bg-white/5 hover:text-gray-300 transition-colors cursor-pointer w-full">Documentos</a></div>
+      <a href="leads.html" class="flex items-center gap-2 pl-10 pr-3 py-2 mx-2 rounded-xl text-[0.8rem] text-gray-500 hover:bg-white/5 hover:text-gray-300 transition-colors cursor-pointer">Leads</a>
+    </div>
+
+    <p class="block text-[0.6rem] font-bold text-gray-500 uppercase tracking-widest px-4 pb-1 pt-4">Outros Cadastros</p>
+
+    <button onclick="toggleMenu('servicos')"
+            class="w-full flex items-center gap-3 px-3 py-2.5 mx-2 rounded-xl text-[0.83rem] font-medium text-gray-400 hover:bg-white/10 hover:text-white transition-colors duration-150 cursor-pointer mb-0.5" style="width:calc(100% - 16px)">
+      <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+        <path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/>
+      </svg>
+      Outros Cadastros
+      <svg id="chev-servicos" class="chevron w-3.5 h-3.5 ml-auto text-gray-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+    </button>
+    <div id="sub-servicos" class="submenu">
+      <a href="servicos.html" class="flex items-center gap-2 pl-10 pr-3 py-2 mx-2 rounded-xl text-[0.8rem] text-gray-500 hover:bg-white/5 hover:text-gray-300 transition-colors cursor-pointer">Serviços</a>
+      <a href="salas.html" class="flex items-center gap-2 pl-10 pr-3 py-2 mx-2 rounded-xl text-[0.8rem] text-gray-500 hover:bg-white/5 hover:text-gray-300 transition-colors cursor-pointer">Salas</a>
+      <a href="especialidades.html" class="flex items-center gap-2 pl-10 pr-3 py-2 mx-2 rounded-xl text-[0.8rem] text-gray-500 hover:bg-white/5 hover:text-gray-300 transition-colors cursor-pointer">Especialidades</a>
+      <a href="grupo.html" class="flex items-center gap-2 pl-10 pr-3 py-2 mx-2 rounded-xl text-[0.8rem] text-gray-500 hover:bg-white/5 hover:text-gray-300 transition-colors cursor-pointer">Grupo</a>
+      <a href="tipospagamento.html" class="flex items-center gap-2 pl-10 pr-3 py-2 mx-2 rounded-xl text-[0.8rem] text-gray-500 hover:bg-white/5 hover:text-gray-300 transition-colors cursor-pointer">Tipos de Pagamento</a>
+      <a href="tiposacompanhamento.html" class="flex items-center gap-2 pl-10 pr-3 py-2 mx-2 rounded-xl text-[0.8rem] text-gray-500 hover:bg-white/5 hover:text-gray-300 transition-colors cursor-pointer">Tipos de Acomp.</a>
+    </div>
+
+    <p class="block text-[0.6rem] font-bold text-gray-500 uppercase tracking-widest px-4 pb-1 pt-4">Financeiro</p>
+
+    <button onclick="toggleMenu('financeiro')"
+            class="w-full flex items-center gap-3 px-3 py-2.5 mx-2 rounded-xl text-[0.83rem] font-medium text-gray-400 hover:bg-white/10 hover:text-white transition-colors duration-150 cursor-pointer mb-0.5" style="width:calc(100% - 16px)">
+      <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+        <line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
+      </svg>
+      Financeiro
+      <svg id="chev-financeiro" class="chevron w-3.5 h-3.5 ml-auto text-gray-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+    </button>
+    <div id="sub-financeiro" class="submenu">
+      <a href="financeiro.html" class="flex items-center gap-2 pl-10 pr-3 py-2 mx-2 rounded-xl text-[0.8rem] text-gray-500 hover:bg-white/5 hover:text-gray-300 transition-colors cursor-pointer">Lançamentos</a>
+      <a href="relatorios.html" class="flex items-center gap-2 pl-10 pr-3 py-2 mx-2 rounded-xl text-[0.8rem] text-gray-500 hover:bg-white/5 hover:text-gray-300 transition-colors cursor-pointer">Relat&oacute;rios</a>
+    </div>
+
+    <!-- SISTEMA (apenas ADMIN_GLOBAL) -->
+
+    <div id="sectionMinhaEmpresa" class="hidden">
+    <p class="block text-[0.6rem] font-bold text-gray-500 uppercase tracking-widest px-4 pb-1 pt-4">Minha Empresa</p>
+    <button onclick="toggleMenu('minhaempresa')" class="w-full flex items-center gap-3 px-3 py-2.5 mx-2 rounded-xl text-[0.83rem] font-medium text-gray-400 hover:bg-white/10 hover:text-white transition-colors duration-150 cursor-pointer mb-0.5" style="width:calc(100% - 16px)">
+      <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>Minha Empresa
+      <svg id="chev-minhaempresa" class="chevron w-3.5 h-3.5 ml-auto text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+    </button>
+    <div id="sub-minhaempresa" class="submenu">
+      <a href="minha-empresa.html" class="flex items-center gap-2 pl-10 pr-3 py-2 mx-2 rounded-xl text-[0.8rem] text-gray-500 hover:bg-white/5 hover:text-gray-300 transition-colors cursor-pointer">Meus Dados</a>
+      <a href="faturas.html" class="flex items-center gap-2 pl-10 pr-3 py-2 mx-2 rounded-xl text-[0.8rem] text-gray-500 hover:bg-white/5 hover:text-gray-300 transition-colors cursor-pointer">Minhas Faturas</a>
+    </div>
+    </div>
+    <div id="sectionVittaBI" class="hidden">
+    <p class="block text-[0.6rem] font-bold text-gray-500 uppercase tracking-widest px-4 pb-1 pt-4">Vitta BI</p>
+    <a id="linkVittaBI" href="https://bi.vittasistemas.com.br" target="_blank" rel="noopener"
+       class="flex items-center gap-3 px-3 py-2.5 mx-2 rounded-xl text-[0.83rem] font-medium text-gray-400 hover:bg-white/10 hover:text-white transition-colors duration-150 cursor-pointer mb-0.5">
+      <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+        <path d="M3 3v18h18"/><path d="M18.7 8l-5.3 5.3-3-3L4 16.3"/>
+      </svg>
+      Vitta BI
+      <span class="ml-auto text-[0.55rem] font-bold text-violet-300 bg-violet-500/20 px-1.5 py-0.5 rounded">BI</span>
+    </a>
+    </div>
+
+    <div id="sectionAdmin" class="hidden">
+    <p class="block text-[0.6rem] font-bold text-gray-500 uppercase tracking-widest px-4 pb-1 pt-4">Sistema</p>
+    <button onclick="toggleMenu('admin')"
+            class="w-full flex items-center gap-3 px-3 py-2.5 mx-2 rounded-xl text-[0.83rem] font-medium text-gray-400 hover:bg-white/10 hover:text-white transition-colors duration-150 cursor-pointer mb-0.5" style="width:calc(100% - 16px)">
+      <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+        <circle cx="12" cy="12" r="3"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14M4.93 4.93a10 10 0 0 0 0 14.14"/>
+      </svg>
+      Administração
+      <svg id="chev-admin" class="chevron w-3.5 h-3.5 ml-auto text-gray-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+    </button>
+    <div id="sub-admin" class="submenu">
+      <a href="empresas.html" class="flex items-center gap-2 pl-10 pr-3 py-2 mx-2 rounded-xl text-[0.8rem] text-gray-500 hover:bg-white/5 hover:text-gray-300 transition-colors cursor-pointer">Empresas</a>
+      <a href="usuarios.html" class="flex items-center gap-2 pl-10 pr-3 py-2 mx-2 rounded-xl text-[0.8rem] text-gray-500 hover:bg-white/5 hover:text-gray-300 transition-colors cursor-pointer">Usuários</a>
+      <a href="planos.html" class="flex items-center gap-2 pl-10 pr-3 py-2 mx-2 rounded-xl text-[0.8rem] text-gray-500 hover:bg-white/5 hover:text-gray-300 transition-colors cursor-pointer">Planos</a>
+      <a href="configuracoes.html" class="flex items-center gap-2 pl-10 pr-3 py-2 mx-2 rounded-xl text-[0.8rem] text-gray-500 hover:bg-white/5 hover:text-gray-300 transition-colors cursor-pointer">Configura&ccedil;&otilde;es</a>
+      <a href="logs.html" class="flex items-center gap-2 pl-10 pr-3 py-2 mx-2 rounded-xl text-[0.8rem] text-gray-500 hover:bg-white/5 hover:text-gray-300 transition-colors cursor-pointer">Log</a>
+    </div>
+    </div>
+
+    <div class="h-4"></div>
+  </nav>
+
+  <div class="shrink-0 border-t border-white/10 p-3">
+    <div class="group flex items-center gap-2.5 p-2.5 rounded-xl hover:bg-white/5 cursor-pointer">
+      <div id="user-avatar" class="w-8 h-8 rounded-full bg-vitta-500 flex items-center justify-center text-white text-xs font-bold shrink-0">A</div>
+      <div class="flex-1 min-w-0">
+        <p id="user-name" class="text-white text-[0.8rem] font-semibold truncate">Usuário</p>
+        <p id="user-role" class="text-gray-500 text-[0.7rem] truncate">Administrador</p>
+      </div>
+      <button onclick="handleLogout()" title="Sair"
+              class="text-gray-600 hover:text-red-400 transition-colors opacity-0 group-hover:opacity-100">
+        <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+          <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/>
+        </svg>
+      </button>
+    </div>
+  </div>
+</aside>
+
+<!-- OVERLAY mobile -->
+<div id="overlay" class="fixed inset-0 bg-black/50 z-20 hidden lg:hidden" onclick="toggleSidebar()"></div>
+
+<!-- ══════════════════════════════════
+     WRAPPER PRINCIPAL
+══════════════════════════════════ -->
+<div class="flex-1 lg:ml-[220px] flex flex-col min-h-screen">
+
+  <!-- HEADER -->
+  <header class="sticky top-0 z-20 h-16 bg-white border-b border-gray-200 flex items-center px-5 gap-3 shadow-sm">
+    <button onclick="toggleSidebar()" class="lg:hidden p-2 rounded-lg hover:bg-gray-100 text-gray-500">
+      <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+        <line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/>
+      </svg>
+    </button>
+    <div class="flex-1">
+      <h1 class="text-[1rem] font-bold text-gray-800 leading-tight">Pacientes</h1>
+      <p id="header-date" class="text-[0.7rem] text-gray-400 leading-tight">Gestão de pacientes</p>
+    </div>
+    <div class="hidden md:flex items-center gap-2 px-3 py-2 bg-gray-50 border border-gray-200 rounded-xl">
+      <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-vitta-500 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+        <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/>
+      </svg>
+      <span id="empresa-nome" class="text-[0.78rem] font-semibold text-gray-700">Clínica</span>
+    </div>
+    <button class="relative p-2.5 rounded-xl hover:bg-gray-100 text-gray-500 transition-colors">
+      <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+        <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/>
+      </svg>
+      <span class="absolute top-1.5 right-1.5 w-2 h-2 bg-red-500 rounded-full border-2 border-white"></span>
+    </button>
+    <div class="flex items-center gap-2.5">
+      <div id="header-avatar" class="w-9 h-9 rounded-full bg-vitta-500 flex items-center justify-center text-white text-sm font-bold shrink-0">A</div>
+      <div class="hidden sm:block">
+        <p id="header-user-name" class="text-[0.8rem] font-semibold text-gray-800 leading-tight">Usuário</p>
+        <p id="header-user-role" class="text-[0.7rem] text-gray-400 leading-tight">Administrador</p>
+      </div>
+    </div>
+    <button onclick="handleLogout()" class="p-2.5 rounded-xl hover:bg-red-50 text-gray-400 hover:text-red-500 transition-colors" title="Sair">
+      <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+        <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/>
+      </svg>
+    </button>
+  </header>
+
+  <!-- CONTEÚDO -->
+  <main class="flex-1 p-5 lg:p-6 space-y-5 fade-up">
+
+    <!-- Cabeçalho da página -->
+    <div class="flex items-start justify-between gap-4 flex-wrap">
+      <div>
+        <p class="text-[0.65rem] font-bold text-vitta-600 uppercase tracking-widest mb-0.5">Gestão</p>
+        <h2 class="text-[1.4rem] font-extrabold text-gray-800 tracking-tight leading-none">Cadastro de Pacientes</h2>
+        <p class="text-[0.8rem] text-gray-400 mt-1">Gerencie os pacientes da clínica</p>
+      </div>
+      <button id="btnNovoPaciente" onclick="openNewModal()"
+              class="flex items-center gap-2 px-4 py-2.5 bg-vitta-500 hover:bg-vitta-600 text-white text-sm font-semibold rounded-xl shadow-sm transition-colors">
+        <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        Novo Paciente
+      </button>
+    </div>
+
+    <!-- Stats -->
+    <div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
+
+      <div class="bg-white rounded-2xl p-5 border border-gray-100 shadow-sm hover:shadow-md transition-shadow">
+        <div class="flex items-center gap-4">
+          <div class="w-12 h-12 rounded-2xl bg-blue-50 flex items-center justify-center shrink-0">
+            <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6 text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8">
+              <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" stroke-linecap="round"/>
+              <circle cx="9" cy="7" r="4"/>
+              <path d="M23 21v-2a4 4 0 0 0-3-3.87" stroke-linecap="round"/>
+              <path d="M16 3.13a4 4 0 0 1 0 7.75" stroke-linecap="round"/>
+            </svg>
+          </div>
+          <div>
+            <p class="text-[1.75rem] font-extrabold text-gray-800 leading-none" id="statTotal">—</p>
+            <p class="text-[0.75rem] font-medium text-gray-500 mt-1">Total de Pacientes</p>
+            <p class="text-[0.67rem] text-gray-400 mt-0.5">cadastrados na clínica</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="bg-white rounded-2xl p-5 border border-gray-100 shadow-sm hover:shadow-md transition-shadow">
+        <div class="flex items-center gap-4">
+          <div class="w-12 h-12 rounded-2xl bg-[#e0f7fa] flex items-center justify-center shrink-0">
+            <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6 text-[#2ABCD4]" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8">
+              <circle cx="9" cy="7" r="4"/>
+              <path d="M2 20c0-3.5 3.1-6 7-6s7 2.5 7 6" stroke-linecap="round"/>
+              <path d="M16 11l2 2 4-4" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </div>
+          <div>
+            <p class="text-[1.75rem] font-extrabold text-gray-800 leading-none" id="statAtivos">—</p>
+            <p class="text-[0.75rem] font-medium text-gray-500 mt-1">Ativos</p>
+            <p class="text-[0.67rem] text-gray-400 mt-0.5">em acompanhamento</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="bg-white rounded-2xl p-5 border border-gray-100 shadow-sm hover:shadow-md transition-shadow">
+        <div class="flex items-center gap-4">
+          <div class="w-12 h-12 rounded-2xl bg-red-50 flex items-center justify-center shrink-0">
+            <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6 text-red-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8">
+              <circle cx="9" cy="7" r="4"/>
+              <path d="M2 20c0-3.5 3.1-6 7-6s7 2.5 7 6" stroke-linecap="round"/>
+              <line x1="17" y1="10" x2="22" y2="15" stroke-linecap="round"/>
+              <line x1="22" y1="10" x2="17" y2="15" stroke-linecap="round"/>
+            </svg>
+          </div>
+          <div>
+            <p class="text-[1.75rem] font-extrabold text-gray-800 leading-none" id="statInativos">—</p>
+            <p class="text-[0.75rem] font-medium text-gray-500 mt-1">Inativos</p>
+            <p class="text-[0.67rem] text-gray-400 mt-0.5">fora do acompanhamento</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="bg-white rounded-2xl p-5 border border-gray-100 shadow-sm hover:shadow-md transition-shadow">
+        <div class="flex items-center gap-4">
+          <div class="w-12 h-12 rounded-2xl bg-purple-50 flex items-center justify-center shrink-0">
+            <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6 text-purple-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8">
+              <path d="M12 2a4 4 0 1 0 0 8 4 4 0 0 0 0-8z"/>
+              <path d="M4 20c0-4 3.6-7 8-7s8 3 8 7" stroke-linecap="round"/>
+              <path d="M9 6h.01M12 6h.01M15 6h.01" stroke-linecap="round"/>
+            </svg>
+          </div>
+          <div>
+            <p class="text-[1.75rem] font-extrabold text-gray-800 leading-none" id="statMenores">—</p>
+            <p class="text-[0.75rem] font-medium text-gray-500 mt-1">Menores de Idade</p>
+            <p class="text-[0.67rem] text-gray-400 mt-0.5">abaixo de 18 anos</p>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Filtros -->
+    <div class="bg-white border border-gray-100 rounded-2xl shadow-sm p-4 flex flex-wrap gap-3 items-center">
+      <div class="relative flex-1 min-w-[200px]">
+        <svg class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        <input id="filterName" type="text" placeholder="Buscar paciente..."
+               class="w-full pl-9 pr-3 py-2.5 border border-gray-200 rounded-xl text-sm bg-gray-50 outline-none focus:border-vitta-500 focus:bg-white transition-colors">
+      </div>
+      <div class="relative min-w-[180px]">
+        <svg class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+        <input id="filterContact" type="text" placeholder="E-mail ou telefone..."
+               class="w-full pl-9 pr-3 py-2.5 border border-gray-200 rounded-xl text-sm bg-gray-50 outline-none focus:border-vitta-500 focus:bg-white transition-colors">
+      </div>
+      <div id="filterProfWrap" class="relative min-w-[180px]">
+        <svg class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+        <select id="filterProf" class="w-full pl-9 pr-8 py-2.5 border border-gray-200 rounded-xl text-sm bg-gray-50 outline-none focus:border-vitta-500 focus:bg-white transition-colors appearance-none cursor-pointer">
+          <option value="">Todos os profissionais</option>
+        </select>
+        <svg class="absolute right-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-gray-400 pointer-events-none" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+      </div>
+      <div class="h-6 w-px bg-gray-200"></div>
+      <label class="flex items-center gap-2.5 cursor-pointer select-none">
+        <div class="relative w-9 h-5">
+          <input type="checkbox" id="toggleInativos" class="sr-only peer">
+          <div class="w-9 h-5 bg-gray-300 peer-checked:bg-vitta-500 rounded-full transition-colors"></div>
+          <div class="absolute top-0.5 left-0.5 w-4 h-4 bg-white rounded-full shadow transition-transform peer-checked:translate-x-4"></div>
+        </div>
+        <span class="text-sm font-medium text-gray-600">Inativos</span>
+      </label>
+      <button onclick="clearFilters()"
+              class="flex items-center gap-1.5 px-3 py-2.5 border border-gray-200 rounded-xl text-sm text-gray-600 hover:bg-gray-50 transition-colors">
+        <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        Limpar
+      </button>
+    </div>
+
+    <!-- Tabela -->
+    <div class="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
+      <div class="px-5 py-3.5 border-b border-gray-100 text-[0.8rem] text-gray-500" id="tableCount">
+        Exibindo <strong class="text-gray-800">—</strong> pacientes
+      </div>
+
+      <!-- loading -->
+      <div id="tableLoader" class="flex items-center justify-center py-16 gap-3">
+        <svg class="animate-spin w-5 h-5 text-vitta-500" fill="none" viewBox="0 0 24 24">
+          <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/>
+          <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/>
+        </svg>
+        <span class="text-sm text-gray-400">Carregando pacientes...</span>
+      </div>
+
+      <div id="tableWrap" class="hidden overflow-x-auto">
+        <table class="w-full text-left text-sm">
+          <thead>
+            <tr class="bg-gray-50 border-b border-gray-100">
+              <th class="px-5 py-3 text-[0.7rem] font-bold text-gray-500 uppercase tracking-wider">Paciente</th>
+              <th class="px-4 py-3 text-[0.7rem] font-bold text-gray-500 uppercase tracking-wider">Telefone</th>
+              <th class="px-4 py-3 text-[0.7rem] font-bold text-gray-500 uppercase tracking-wider">E-mail</th>
+              <th class="px-4 py-3 text-[0.7rem] font-bold text-gray-500 uppercase tracking-wider">Profissional(is)</th>
+              <th class="px-4 py-3 text-[0.7rem] font-bold text-gray-500 uppercase tracking-wider">Frequência</th>
+              <th class="px-4 py-3 text-[0.7rem] font-bold text-gray-500 uppercase tracking-wider">Status</th>
+              <th class="px-4 py-3"></th>
+            </tr>
+          </thead>
+          <tbody id="patientsBody"></tbody>
+        </table>
+      </div>
+
+      <!-- Paginação -->
+      <div id="pagination" class="flex items-center gap-1.5 justify-end px-5 py-3.5 border-t border-gray-100"></div>
+    </div>
+
+  </main>
+</div>
+
+<!-- ══════════════════════════════════
+     MODAL: VISUALIZAR
+══════════════════════════════════ -->
+<div class="modal-overlay" id="viewModal">
+  <div class="bg-white rounded-2xl w-full max-w-[720px] shadow-2xl mx-auto my-auto modal-scroll overflow-y-auto max-h-[90vh]">
+
+    <!-- Topbar -->
+    <div class="sticky top-0 bg-white flex items-center gap-3 px-6 py-4 border-b border-gray-100 rounded-t-2xl z-10">
+      <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-vitta-500 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+      <h2 class="text-base font-bold text-gray-800 flex-1">Ficha do Paciente</h2>
+      <button id="btnVwEdit1" onclick="switchToEdit()" class="flex items-center gap-1.5 px-3 py-1.5 bg-vitta-500 hover:bg-vitta-600 text-white text-xs font-semibold rounded-lg transition-colors">
+        <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+        Editar
+      </button>
+      <button onclick="closeViewModal()" class="w-8 h-8 flex items-center justify-center rounded-full bg-gray-100 hover:bg-gray-200 text-gray-500 transition-colors">
+        <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+
+    <!-- Hero -->
+    <div class="flex items-center gap-5 px-6 py-5 border-b border-gray-100">
+      <div id="vAvatar" class="w-16 h-16 rounded-full flex items-center justify-center text-white text-2xl font-bold shrink-0 shadow-md">AB</div>
+      <div class="flex-1 min-w-0">
+        <div class="text-xl font-extrabold text-gray-800 leading-tight" id="vNome">—</div>
+        <div class="flex flex-wrap gap-2 mt-2 items-center">
+          <span id="vStatusBadge"></span>
+          <span id="vMenorBadge"></span>
+        </div>
+        <div class="text-sm text-gray-500 mt-2" id="vProfs">—</div>
+      </div>
+    </div>
+
+    <!-- Seção: Dados Pessoais -->
+    <div class="border-b border-gray-100">
+      <button onclick="toggleViewSection(this)" class="w-full flex items-center gap-3 px-6 py-3.5 hover:bg-gray-50 transition-colors">
+        <span class="text-base">👤</span>
+        <span class="text-sm font-bold text-gray-700 flex-1 text-left">Dados Pessoais</span>
+        <svg class="w-4 h-4 text-gray-400 chevron open" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+      </button>
+      <div class="sec-body px-6 pb-5">
+        <div class="grid grid-cols-2 sm:grid-cols-3 gap-4">
+          <div><p class="text-[0.65rem] font-bold uppercase tracking-wider text-gray-400 mb-1">CPF</p><p class="text-sm font-medium text-gray-800" id="vCpf">—</p></div>
+          <div><p class="text-[0.65rem] font-bold uppercase tracking-wider text-gray-400 mb-1">Nascimento</p><p class="text-sm font-medium text-gray-800" id="vNascimento">—</p></div>
+          <div><p class="text-[0.65rem] font-bold uppercase tracking-wider text-gray-400 mb-1">Sexo</p><p class="text-sm font-medium text-gray-800" id="vSexo">—</p></div>
+          <div><p class="text-[0.65rem] font-bold uppercase tracking-wider text-gray-400 mb-1">Telefone</p><p class="text-sm font-medium text-gray-800" id="vTel">—</p></div>
+          <div class="col-span-2"><p class="text-[0.65rem] font-bold uppercase tracking-wider text-gray-400 mb-1">E-mail</p><p class="text-sm font-medium text-gray-800" id="vEmail">—</p></div>
+          <div id="vRespWrap" class="col-span-2 sm:col-span-3 hidden">
+            <div class="mt-2 pt-3 border-t border-dashed border-gray-200 grid grid-cols-2 gap-4">
+              <div><p class="text-[0.65rem] font-bold uppercase tracking-wider text-gray-400 mb-1">Nome do Responsável</p><p class="text-sm font-medium text-gray-800" id="vNomeResp">—</p></div>
+              <div><p class="text-[0.65rem] font-bold uppercase tracking-wider text-gray-400 mb-1">CPF do Responsável</p><p class="text-sm font-medium text-gray-800" id="vCpfResp">—</p></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Seção: Endereço -->
+    <div class="border-b border-gray-100">
+      <button onclick="toggleViewSection(this)" class="w-full flex items-center gap-3 px-6 py-3.5 hover:bg-gray-50 transition-colors">
+        <span class="text-base">📍</span>
+        <span class="text-sm font-bold text-gray-700 flex-1 text-left">Endereço</span>
+        <svg class="w-4 h-4 text-gray-400 chevron open" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+      </button>
+      <div class="sec-body px-6 pb-5">
+        <div class="grid grid-cols-2 sm:grid-cols-3 gap-4">
+          <div><p class="text-[0.65rem] font-bold uppercase tracking-wider text-gray-400 mb-1">CEP</p><p class="text-sm font-medium text-gray-800" id="vCep">—</p></div>
+          <div><p class="text-[0.65rem] font-bold uppercase tracking-wider text-gray-400 mb-1">Número</p><p class="text-sm font-medium text-gray-800" id="vNro">—</p></div>
+          <div class="col-span-2"><p class="text-[0.65rem] font-bold uppercase tracking-wider text-gray-400 mb-1">Logradouro</p><p class="text-sm font-medium text-gray-800" id="vRua">—</p></div>
+          <div><p class="text-[0.65rem] font-bold uppercase tracking-wider text-gray-400 mb-1">Complemento</p><p class="text-sm font-medium text-gray-800" id="vComple">—</p></div>
+          <div><p class="text-[0.65rem] font-bold uppercase tracking-wider text-gray-400 mb-1">Bairro</p><p class="text-sm font-medium text-gray-800" id="vBairro">—</p></div>
+          <div><p class="text-[0.65rem] font-bold uppercase tracking-wider text-gray-400 mb-1">Cidade / UF</p><p class="text-sm font-medium text-gray-800" id="vCidadeUf">—</p></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Seção: Dados Adicionais -->
+    <div>
+      <button onclick="toggleViewSection(this)" class="w-full flex items-center gap-3 px-6 py-3.5 hover:bg-gray-50 transition-colors">
+        <span class="text-base">📋</span>
+        <span class="text-sm font-bold text-gray-700 flex-1 text-left">Dados Adicionais</span>
+        <svg class="w-4 h-4 text-gray-400 chevron open" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+      </button>
+      <div class="sec-body px-6 pb-6">
+        <div class="grid grid-cols-2 gap-4">
+          <div><p class="text-[0.65rem] font-bold uppercase tracking-wider text-gray-400 mb-1">Grupo</p><p class="text-sm font-medium text-gray-800" id="vGrupo">—</p></div>
+          <div><p class="text-[0.65rem] font-bold uppercase tracking-wider text-gray-400 mb-1">Frequência</p><p class="text-sm font-medium text-gray-800" id="vFreq">—</p></div>
+          <div><p class="text-[0.65rem] font-bold uppercase tracking-wider text-gray-400 mb-1">Contrato</p><p class="text-sm font-medium text-gray-800" id="vContrato">—</p></div>
+          <div class="col-span-2"><p class="text-[0.65rem] font-bold uppercase tracking-wider text-gray-400 mb-1">Observações</p><p class="text-sm text-gray-700 whitespace-pre-wrap leading-relaxed" id="vObs">—</p></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="flex justify-end gap-3 px-6 py-4 border-t border-gray-100">
+      <button onclick="closeViewModal()" class="px-4 py-2 border border-gray-200 rounded-xl text-sm font-semibold text-gray-600 hover:bg-gray-50 transition-colors">Fechar</button>
+      <button id="btnVwEdit2" onclick="switchToEdit()" class="px-4 py-2 bg-vitta-500 hover:bg-vitta-600 text-white text-sm font-semibold rounded-xl transition-colors">Editar Cadastro</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════
+     MODAL: FORMULÁRIO (novo / editar)
+══════════════════════════════════ -->
+<div class="modal-overlay" id="formModal">
+  <div class="bg-white rounded-2xl w-full max-w-[780px] shadow-2xl mx-auto my-auto">
+
+    <div class="sticky top-0 bg-white flex items-center gap-3 px-6 py-4 border-b border-gray-100 rounded-t-2xl z-10">
+      <span id="formIcon" class="text-xl">👤</span>
+      <div class="flex-1">
+        <h2 id="formTitle" class="text-base font-bold text-gray-800">Novo Paciente</h2>
+        <p id="formSubtitle" class="text-xs text-gray-400"></p>
+      </div>
+      <button onclick="closeFormModal()" class="w-8 h-8 flex items-center justify-center rounded-full bg-gray-100 hover:bg-gray-200 text-gray-500 transition-colors">
+        <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+
+    <form id="patientForm" novalidate class="overflow-y-auto modal-scroll max-h-[75vh]">
+      <input type="hidden" id="fId">
+
+      <!-- Alert de validação (dentro do scroll) -->
+      <div id="formAlert" class="mx-6 mt-4"></div>
+
+      <!-- SEÇÃO: DADOS PESSOAIS -->
+      <div class="border-b border-gray-100">
+        <button type="button" onclick="toggleFormSection(this)" class="w-full flex items-center gap-3 px-6 py-3.5 hover:bg-gray-50 transition-colors">
+          <span class="text-base">👤</span><span class="text-sm font-bold text-gray-700 flex-1 text-left">Dados Pessoais</span>
+          <svg class="w-4 h-4 text-gray-400 chevron open" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+        </button>
+        <div class="sec-body px-6 pb-5">
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div class="sm:col-span-2 flex flex-col gap-1.5">
+              <label class="text-xs font-semibold text-gray-600">Nome Completo <span class="text-red-500">*</span></label>
+              <input id="fNome" type="text" placeholder="Nome completo do paciente" required
+                     class="px-3 py-2.5 border-[1.5px] border-gray-200 rounded-xl text-sm bg-gray-50 outline-none focus:border-vitta-500 focus:bg-white transition-colors">
+            </div>
+            <div class="flex flex-col gap-1.5">
+              <label class="text-xs font-semibold text-gray-600">CPF</label>
+              <input id="fCpf" type="text" placeholder="000.000.000-00" maxlength="14"
+                     class="px-3 py-2.5 border-[1.5px] border-gray-200 rounded-xl text-sm bg-gray-50 outline-none focus:border-vitta-500 focus:bg-white transition-colors">
+            </div>
+            <div class="flex flex-col gap-1.5">
+              <label class="text-xs font-semibold text-gray-600">Data de Nascimento <span class="text-red-500">*</span></label>
+              <input id="fNascimento" type="date" required
+                     class="px-3 py-2.5 border-[1.5px] border-gray-200 rounded-xl text-sm bg-gray-50 outline-none focus:border-vitta-500 focus:bg-white transition-colors">
+            </div>
+            <div class="flex flex-col gap-1.5">
+              <label class="text-xs font-semibold text-gray-600">Sexo</label>
+              <select id="fSexo" class="px-3 py-2.5 border-[1.5px] border-gray-200 rounded-xl text-sm bg-gray-50 outline-none focus:border-vitta-500 focus:bg-white transition-colors">
+                <option value="">Selecione...</option>
+                <option>Masculino</option><option>Feminino</option><option>Outro</option><option>Prefiro não informar</option>
+              </select>
+            </div>
+            <div class="flex flex-col gap-1.5">
+              <label class="text-xs font-semibold text-gray-600">Telefone <span class="text-red-500">*</span></label>
+              <input id="fTel" type="tel" placeholder="(00) 00000-0000" maxlength="15" required
+                     class="px-3 py-2.5 border-[1.5px] border-gray-200 rounded-xl text-sm bg-gray-50 outline-none focus:border-vitta-500 focus:bg-white transition-colors">
+            </div>
+            <div class="flex flex-col gap-1.5">
+              <label class="text-xs font-semibold text-gray-600">E-mail</label>
+              <input id="fEmail" type="email" placeholder="email@exemplo.com"
+                     class="px-3 py-2.5 border-[1.5px] border-gray-200 rounded-xl text-sm bg-gray-50 outline-none focus:border-vitta-500 focus:bg-white transition-colors">
+            </div>
+
+            <!-- Menor toggle -->
+            <div class="sm:col-span-2 flex items-center gap-3 py-1">
+              <label class="flex items-center gap-2.5 cursor-pointer select-none">
+                <div class="relative w-10 h-6">
+                  <input type="checkbox" id="fMenos" class="sr-only peer" onchange="toggleMenor(this.checked)">
+                  <div class="w-10 h-6 bg-gray-300 peer-checked:bg-vitta-500 rounded-full transition-colors"></div>
+                  <div class="absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full shadow transition-transform peer-checked:translate-x-4"></div>
+                </div>
+                <span class="text-sm font-semibold text-gray-700">Menor de Idade</span>
+              </label>
+              <span class="text-xs text-gray-400">Ativar para preencher os dados do responsável</span>
+            </div>
+
+            <!-- Campos do responsável (ocultos por padrão) -->
+            <div id="respFields" class="sm:col-span-2 hidden">
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-3 border-t border-dashed border-gray-200">
+                <div class="flex flex-col gap-1.5">
+                  <label class="text-xs font-semibold text-gray-600">Nome do Responsável</label>
+                  <input id="fNomeResp" type="text" placeholder="Nome completo do responsável"
+                         class="px-3 py-2.5 border-[1.5px] border-gray-200 rounded-xl text-sm bg-gray-50 outline-none focus:border-vitta-500 focus:bg-white transition-colors">
+                </div>
+                <div class="flex flex-col gap-1.5">
+                  <label class="text-xs font-semibold text-gray-600">CPF do Responsável</label>
+                  <input id="fCpfResp" type="text" placeholder="000.000.000-00" maxlength="14"
+                         class="px-3 py-2.5 border-[1.5px] border-gray-200 rounded-xl text-sm bg-gray-50 outline-none focus:border-vitta-500 focus:bg-white transition-colors">
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- SEÇÃO: ENDEREÇO -->
+      <div class="border-b border-gray-100">
+        <button type="button" onclick="toggleFormSection(this)" class="w-full flex items-center gap-3 px-6 py-3.5 hover:bg-gray-50 transition-colors">
+          <span class="text-base">📍</span><span class="text-sm font-bold text-gray-700 flex-1 text-left">Endereço</span>
+          <svg class="w-4 h-4 text-gray-400 chevron open" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+        </button>
+        <div class="sec-body px-6 pb-5">
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+            <div class="flex flex-col gap-1.5">
+              <label class="text-xs font-semibold text-gray-600">CEP</label>
+              <div class="flex gap-2 min-w-0">
+                <input id="fCep" type="text" placeholder="00000-000" maxlength="9"
+                       class="min-w-0 flex-1 px-3 py-2.5 border-[1.5px] border-gray-200 rounded-xl text-sm bg-gray-50 outline-none focus:border-vitta-500 focus:bg-white transition-colors">
+                <button type="button" onclick="buscarCEP()"
+                        class="shrink-0 px-3 py-2.5 bg-vitta-500 hover:bg-vitta-600 text-white text-xs font-semibold rounded-xl transition-colors whitespace-nowrap">Buscar</button>
+              </div>
+            </div>
+            <div class="sm:col-span-2 flex flex-col gap-1.5">
+              <label class="text-xs font-semibold text-gray-600">Rua / Av.</label>
+              <input id="fRua" type="text" placeholder="Rua"
+                     class="px-3 py-2.5 border-[1.5px] border-gray-200 rounded-xl text-sm bg-gray-50 outline-none focus:border-vitta-500 focus:bg-white transition-colors">
+            </div>
+            <div class="flex flex-col gap-1.5">
+              <label class="text-xs font-semibold text-gray-600">Número</label>
+              <input id="fNro" type="text" placeholder="Nº"
+                     class="px-3 py-2.5 border-[1.5px] border-gray-200 rounded-xl text-sm bg-gray-50 outline-none focus:border-vitta-500 focus:bg-white transition-colors">
+            </div>
+            <div class="flex flex-col gap-1.5">
+              <label class="text-xs font-semibold text-gray-600">Complemento</label>
+              <input id="fComple" type="text" placeholder="Apto, sala..."
+                     class="px-3 py-2.5 border-[1.5px] border-gray-200 rounded-xl text-sm bg-gray-50 outline-none focus:border-vitta-500 focus:bg-white transition-colors">
+            </div>
+            <div class="flex flex-col gap-1.5">
+              <label class="text-xs font-semibold text-gray-600">Bairro</label>
+              <input id="fBairro" type="text" placeholder="Bairro"
+                     class="px-3 py-2.5 border-[1.5px] border-gray-200 rounded-xl text-sm bg-gray-50 outline-none focus:border-vitta-500 focus:bg-white transition-colors">
+            </div>
+            <div class="flex flex-col gap-1.5">
+              <label class="text-xs font-semibold text-gray-600">Cidade</label>
+              <input id="fCidade" type="text" placeholder="Cidade"
+                     class="px-3 py-2.5 border-[1.5px] border-gray-200 rounded-xl text-sm bg-gray-50 outline-none focus:border-vitta-500 focus:bg-white transition-colors">
+            </div>
+            <div class="flex flex-col gap-1.5">
+              <label class="text-xs font-semibold text-gray-600">UF</label>
+              <input id="fUf" type="text" placeholder="UF" maxlength="2"
+                     class="px-3 py-2.5 border-[1.5px] border-gray-200 rounded-xl text-sm bg-gray-50 outline-none focus:border-vitta-500 focus:bg-white transition-colors uppercase">
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- SEÇÃO: DADOS ADICIONAIS -->
+      <div>
+        <button type="button" onclick="toggleFormSection(this)" class="w-full flex items-center gap-3 px-6 py-3.5 hover:bg-gray-50 transition-colors">
+          <span class="text-base">📋</span><span class="text-sm font-bold text-gray-700 flex-1 text-left">Dados Adicionais</span>
+          <svg class="w-4 h-4 text-gray-400 chevron open" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+        </button>
+        <div class="sec-body px-6 pb-6">
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+
+            <!-- Multi-select profissionais -->
+            <div class="sm:col-span-2 flex flex-col gap-1.5">
+              <label class="text-xs font-semibold text-gray-600">Profissional(is) <span class="text-red-500">*</span></label>
+              <div class="relative" id="msWrap">
+                <div id="msTrigger" onclick="toggleMsDropdown()"
+                     class="min-h-[42px] px-3 py-2 border-[1.5px] border-gray-200 rounded-xl bg-gray-50 cursor-pointer flex flex-wrap gap-1.5 items-center focus:border-vitta-500 transition-colors">
+                  <span id="msPlaceholder" class="text-sm text-gray-400">Selecione profissionais...</span>
+                </div>
+                <div class="ms-dropdown" id="msDropdown"></div>
+              </div>
+            </div>
+
+            <div class="flex flex-col gap-1.5">
+              <label class="text-xs font-semibold text-gray-600">Grupo <span class="text-red-500">*</span></label>
+              <select id="fGrupo" required class="px-3 py-2.5 border-[1.5px] border-gray-200 rounded-xl text-sm bg-gray-50 outline-none focus:border-vitta-500 focus:bg-white transition-colors">
+                <option value="">Selecione um grupo...</option>
+              </select>
+            </div>
+
+            <div class="flex flex-col gap-1.5">
+              <label class="text-xs font-semibold text-gray-600">Frequência</label>
+              <select id="fFreq" class="px-3 py-2.5 border-[1.5px] border-gray-200 rounded-xl text-sm bg-gray-50 outline-none focus:border-vitta-500 focus:bg-white transition-colors">
+                <option value="">Selecione...</option>
+                <option>Semanal</option><option>Quinzenal</option><option>Mensal</option>
+                <option>Bimestral</option><option>Trimestral</option><option>Semestral</option><option>Anual</option>
+              </select>
+            </div>
+
+            <div class="flex flex-col gap-1.5">
+              <label class="text-xs font-semibold text-gray-600">Contrato (nome do arquivo)</label>
+              <input id="fContrato" type="text" placeholder="Ex: contrato_joao.pdf"
+                     class="px-3 py-2.5 border-[1.5px] border-gray-200 rounded-xl text-sm bg-gray-50 outline-none focus:border-vitta-500 focus:bg-white transition-colors">
+            </div>
+
+            <div class="sm:col-span-2 flex flex-col gap-1.5">
+              <label class="text-xs font-semibold text-gray-600">Observações</label>
+              <textarea id="fObs" rows="3" placeholder="Observações sobre o paciente..."
+                        class="px-3 py-2.5 border-[1.5px] border-gray-200 rounded-xl text-sm bg-gray-50 outline-none focus:border-vitta-500 focus:bg-white transition-colors resize-none"></textarea>
+            </div>
+
+            <div class="sm:col-span-2 flex items-center gap-3">
+              <label class="flex items-center gap-2.5 cursor-pointer select-none">
+                <div class="relative w-10 h-6">
+                  <input type="checkbox" id="fAtivo" checked class="sr-only peer">
+                  <div class="w-10 h-6 bg-gray-300 peer-checked:bg-vitta-500 rounded-full transition-colors"></div>
+                  <div class="absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full shadow transition-transform peer-checked:translate-x-4"></div>
+                </div>
+                <span class="text-sm font-semibold text-gray-700">Paciente Ativo</span>
+              </label>
+            </div>
+          </div>
+        </div>
+      </div>
+    </form>
+
+    <div class="flex justify-end gap-3 px-6 py-4 border-t border-gray-100">
+      <button type="button" onclick="closeFormModal()" class="px-4 py-2.5 border border-gray-200 rounded-xl text-sm font-semibold text-gray-600 hover:bg-gray-50 transition-colors">Cancelar</button>
+      <button type="button" onclick="savePatient()" id="btnSave"
+              class="flex items-center gap-2 px-5 py-2.5 bg-vitta-500 hover:bg-vitta-600 text-white text-sm font-semibold rounded-xl transition-colors">
+        <svg id="saveSpin" class="hidden animate-spin w-4 h-4" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/></svg>
+        <svg id="saveIcon" xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+        <span id="saveTxt">Salvar Paciente</span>
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════
+     MODAL: CONFIRMAR EXCLUSÃO
+══════════════════════════════════ -->
+<div class="modal-overlay" id="deleteModal">
+  <div class="bg-white rounded-2xl w-full max-w-[420px] shadow-2xl mx-auto my-auto p-6">
+    <div class="w-14 h-14 rounded-full bg-red-50 flex items-center justify-center mx-auto mb-4 text-2xl">🗑️</div>
+    <h3 class="text-base font-bold text-gray-800 text-center mb-2">Excluir Paciente?</h3>
+    <p class="text-sm text-gray-500 text-center mb-5">
+      Esta ação não pode ser desfeita. O paciente <strong id="deleteNome" class="text-gray-800"></strong> será removido permanentemente.
+    </p>
+    <div class="flex gap-3">
+      <button onclick="closeDeleteModal()" class="flex-1 py-2.5 border border-gray-200 rounded-xl text-sm font-semibold text-gray-600 hover:bg-gray-50 transition-colors">Cancelar</button>
+      <button onclick="confirmDelete()" id="btnDeleteConfirm"
+              class="flex-1 flex items-center justify-center gap-2 py-2.5 bg-red-500 hover:bg-red-600 text-white text-sm font-semibold rounded-xl transition-colors">
+        <svg id="delSpin" class="hidden animate-spin w-4 h-4" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/></svg>
+        Excluir
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════
+     MODAL: AGENDAMENTO RÁPIDO
+══════════════════════════════════ -->
+<div id="modalPacAgd" class="modal-overlay" onclick="if(event.target===this)closeAgdModal()">
+  <div class="bg-white rounded-2xl shadow-xl w-full max-w-lg modal-scroll overflow-y-auto max-h-[95vh]" onclick="event.stopPropagation()">
+    <div class="flex items-center justify-between px-6 py-4 border-b border-gray-100">
+      <div>
+        <h2 class="text-[1rem] font-bold text-gray-800">Novo Agendamento</h2>
+        <p id="agdModalSubtitle" class="text-[0.72rem] text-gray-400 truncate max-w-[280px]"></p>
+      </div>
+      <button onclick="closeAgdModal()" class="text-gray-400 hover:text-gray-600 transition-colors p-1">
+        <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+
+    <form id="agdPacForm" onsubmit="saveAgd(event)" class="px-6 pb-6 pt-4 space-y-4">
+
+      <!-- Paciente (somente leitura) -->
+      <div>
+        <label class="block text-[0.78rem] font-semibold text-gray-600 mb-1">Paciente</label>
+        <div id="agdPacNome" class="w-full py-2.5 px-3 text-sm border border-gray-200 rounded-xl bg-gray-50 text-gray-700 font-medium">—</div>
+      </div>
+
+      <!-- Profissional -->
+      <div>
+        <label class="block text-[0.78rem] font-semibold text-gray-600 mb-1">Profissional <span class="text-red-500">*</span></label>
+        <select id="agdFProf" required class="w-full py-2.5 px-3 text-sm border border-gray-200 rounded-xl outline-none focus:border-vitta-500 bg-white">
+          <option value="">Selecione o profissional…</option>
+        </select>
+        <p id="agdProfEmptyHint" class="hidden text-[0.72rem] text-amber-600 mt-1">Nenhum profissional vinculado a este paciente. Verifique o cadastro.</p>
+      </div>
+
+      <!-- Data/hora -->
+      <div class="grid grid-cols-2 gap-3">
+        <div>
+          <label class="block text-[0.78rem] font-semibold text-gray-600 mb-1">Início <span class="text-red-500">*</span></label>
+          <input id="agdFInicio" type="datetime-local" required class="w-full py-2.5 px-3 text-sm border border-gray-200 rounded-xl outline-none focus:border-vitta-500" />
+        </div>
+        <div>
+          <label class="block text-[0.78rem] font-semibold text-gray-600 mb-1">Fim <span class="text-red-500">*</span></label>
+          <input id="agdFFim" type="datetime-local" required class="w-full py-2.5 px-3 text-sm border border-gray-200 rounded-xl outline-none focus:border-vitta-500" />
+        </div>
+      </div>
+
+      <!-- Tipo -->
+      <div>
+        <label class="block text-[0.78rem] font-semibold text-gray-600 mb-2">Tipo de Consulta <span class="text-red-500">*</span></label>
+        <div class="flex gap-3">
+          <label class="flex-1 flex items-center gap-2.5 border border-gray-200 rounded-xl p-3 cursor-pointer hover:border-vitta-400 transition-colors has-[:checked]:border-vitta-500 has-[:checked]:bg-vitta-50">
+            <input type="radio" name="agdFTipo" value="PRESENCIAL" checked onchange="onAgdTipoChange()" class="accent-vitta-500" />
+            <div>
+              <p class="text-sm font-semibold text-gray-800">Presencial</p>
+              <p class="text-[0.7rem] text-gray-400">Requer sala</p>
+            </div>
+          </label>
+          <label class="flex-1 flex items-center gap-2.5 border border-gray-200 rounded-xl p-3 cursor-pointer hover:border-vitta-400 transition-colors has-[:checked]:border-vitta-500 has-[:checked]:bg-vitta-50">
+            <input type="radio" name="agdFTipo" value="ONLINE" onchange="onAgdTipoChange()" class="accent-vitta-500" />
+            <div>
+              <p class="text-sm font-semibold text-gray-800">Online</p>
+              <p class="text-[0.7rem] text-gray-400">Sem sala física</p>
+            </div>
+          </label>
+        </div>
+      </div>
+
+      <!-- Sala -->
+      <div id="agdRowSala">
+        <label class="block text-[0.78rem] font-semibold text-gray-600 mb-1">Sala <span class="text-red-500">*</span></label>
+        <select id="agdFSala" required class="w-full py-2.5 px-3 text-sm border border-gray-200 rounded-xl outline-none focus:border-vitta-500 bg-white">
+          <option value="">Selecione a sala…</option>
+        </select>
+      </div>
+
+      <!-- Status da conexão Google Meet (só quando ONLINE) -->
+      <div id="agdRowGoogleMeetStatus" class="hidden border border-gray-200 rounded-xl p-3">
+        <div id="agdGoogleMeetStatusBox" class="text-xs text-gray-400">Verificando conexão com Google Meet…</div>
+      </div>
+
+      <!-- Link da videochamada (exibido quando já existe) -->
+      <div id="agdRowGoogleMeetLink" class="hidden">
+        <label class="block text-[0.78rem] font-semibold text-gray-600 mb-1">Link da Videochamada</label>
+        <div class="flex items-center gap-2">
+          <input id="agdFGoogleMeetLink" type="text" readonly class="flex-1 py-2.5 px-3 text-sm border border-gray-200 rounded-xl bg-gray-50 text-gray-600" />
+          <button type="button" onclick="abrirAgdLinkMeet()" class="px-3 py-2.5 border border-gray-200 rounded-xl text-xs font-semibold text-gray-600 hover:bg-gray-50 transition-colors">Abrir</button>
+          <button type="button" onclick="copiarAgdLinkMeet()" class="px-3 py-2.5 border border-gray-200 rounded-xl text-xs font-semibold text-gray-600 hover:bg-gray-50 transition-colors">Copiar</button>
+        </div>
+      </div>
+
+      <!-- Repetir (recorrência) -->
+      <div id="agdRowRepetir">
+        <label class="flex items-center gap-3 border border-gray-200 rounded-xl p-3 cursor-pointer hover:border-vitta-400 transition-colors has-[:checked]:border-vitta-500 has-[:checked]:bg-vitta-50">
+          <input type="checkbox" id="agdFRepetir" onchange="onAgdRepetirChange()" class="accent-vitta-500 w-4 h-4 shrink-0" />
+          <div>
+            <p class="text-[0.83rem] font-semibold text-gray-800">Repetir agendamento</p>
+            <p class="text-[0.7rem] text-gray-400">Cria uma série de consultas recorrentes</p>
+          </div>
+        </label>
+
+        <div id="agdRowRepetirOpts" class="hidden mt-3 space-y-3 border border-gray-200 rounded-xl p-3">
+          <div>
+            <label class="block text-[0.78rem] font-semibold text-gray-600 mb-1">Frequência</label>
+            <select id="agdFRepFreq" onchange="renderAgdRecorrenciaPreview()" class="w-full py-2.5 px-3 text-sm border border-gray-200 rounded-xl outline-none focus:border-vitta-500 bg-white">
+              <option value="SEMANAL">Semanal</option>
+              <option value="QUINZENAL">Quinzenal (a cada 2 semanas)</option>
+              <option value="MENSAL">Mensal (mesmo dia)</option>
+            </select>
+          </div>
+
+          <div>
+            <label class="block text-[0.78rem] font-semibold text-gray-600 mb-2">Repetir até</label>
+            <div class="flex items-center gap-2 mb-2">
+              <label class="flex items-center gap-2 text-[0.8rem] text-gray-700 cursor-pointer">
+                <input type="radio" name="agdFRepAteTipo" value="count" checked onchange="renderAgdRecorrenciaPreview()" class="accent-vitta-500" /> Nº de sessões
+              </label>
+              <input id="agdFRepCount" type="number" min="2" max="52" value="8" oninput="renderAgdRecorrenciaPreview()" class="w-20 py-1.5 px-2 text-sm border border-gray-200 rounded-lg outline-none focus:border-vitta-500" />
+            </div>
+            <div class="flex items-center gap-2">
+              <label class="flex items-center gap-2 text-[0.8rem] text-gray-700 cursor-pointer">
+                <input type="radio" name="agdFRepAteTipo" value="data" onchange="renderAgdRecorrenciaPreview()" class="accent-vitta-500" /> Data final
+              </label>
+              <input id="agdFRepData" type="date" onchange="renderAgdRecorrenciaPreview()" class="py-1.5 px-2 text-sm border border-gray-200 rounded-lg outline-none focus:border-vitta-500" />
+            </div>
+          </div>
+
+          <div>
+            <label class="block text-[0.78rem] font-semibold text-gray-600 mb-1">Prévia das datas</label>
+            <div id="agdRecorrenciaPreview" class="max-h-40 overflow-y-auto space-y-1 text-[0.78rem]">
+              <p class="text-gray-400">Preencha profissional e horário para ver a prévia.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Observação -->
+      <div>
+        <label class="block text-[0.78rem] font-semibold text-gray-600 mb-1">Observação</label>
+        <textarea id="agdFObs" rows="2" placeholder="Observações opcionais…" class="w-full py-2.5 px-3 text-sm border border-gray-200 rounded-xl outline-none focus:border-vitta-500 resize-none"></textarea>
+      </div>
+
+      <!-- Botões -->
+      <div class="flex gap-3 pt-2">
+        <button type="button" onclick="closeAgdModal()" class="flex-1 py-2.5 border border-gray-200 rounded-xl text-sm font-medium text-gray-600 hover:bg-gray-50 transition-colors">Cancelar</button>
+        <button type="submit" id="agdBtnSave" class="flex-1 py-2.5 bg-vitta-500 text-white rounded-xl text-sm font-semibold hover:bg-vitta-600 transition-colors">Salvar</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- MODAL RECONEXÃO GOOGLE MEET -->
+<div id="modalGoogleReconnect" class="modal-overlay" onclick="if(event.target===this)closeGoogleReconnectModal()">
+  <div class="bg-white rounded-2xl shadow-xl w-full max-w-sm" onclick="event.stopPropagation()">
+    <div class="p-6">
+      <div class="flex items-center gap-4 mb-4">
+        <div class="w-11 h-11 rounded-full bg-amber-100 flex items-center justify-center shrink-0">
+          <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-amber-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M12 9v4"/><path d="M12 17h.01"/><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0Z"/></svg>
+        </div>
+        <div>
+          <h3 class="text-[0.95rem] font-bold text-gray-800">Reconectar Google Meet</h3>
+          <p class="text-[0.78rem] text-gray-400 mt-0.5">A conexão desta empresa expirou ou foi revogada.</p>
+        </div>
+      </div>
+      <p class="text-[0.83rem] text-gray-600 mb-5">Para agendar consultas online é necessário reconectar a conta Google desta empresa. Você será redirecionado para autorizar o acesso.</p>
+      <div class="flex gap-3">
+        <button onclick="closeGoogleReconnectModal()" class="flex-1 py-2.5 border border-gray-200 rounded-xl text-sm font-medium text-gray-600 hover:bg-gray-50 transition-colors">Cancelar</button>
+        <button onclick="iniciarConexaoGoogleAgd()" class="flex-1 py-2.5 bg-vitta-500 text-white rounded-xl text-sm font-semibold hover:bg-vitta-600 transition-colors">Reconectar</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Toast -->
+<div id="toast" class="hidden">
+  <div id="toastMsg" class="flex items-center gap-3 px-4 py-3 rounded-xl shadow-lg text-sm font-semibold text-white min-w-[260px]">
+    <span id="toastIcon"></span><span id="toastText"></span>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<script src="../assets/js/config.js?v=2"></script>
+  <script src="../assets/js/access-guard.js?v=2"></script>
+  <script src="../assets/js/admin-empresa-context.js?v=1"></script>
+<script src="../assets/js/notifications.js?v=3"></script>
+<script>
+/* ═══════════════════════════════════════════════════
+   ESTADO
+═══════════════════════════════════════════════════ */
+const PAGE_SIZE   = 10;
+let currentPage   = 1;
+let allPatients   = [];   // pacientes da página atual carregados do banco
+let filtered      = [];   // mesma coisa que allPatients (mantido por compatibilidade com o restante do código)
+let totalCount    = 0;    // total de pacientes que batem com os filtros atuais (para paginação server-side)
+let profissionais = [];   // lista para o multi-select
+let selectedProfs = [];   // IDs selecionados no form
+let currentViewId = null;
+let deleteTargetId = null;
+let currentEmpId   = null;
+let currentProfId  = null;
+let isProfissional = false;
+let isAdminGlobal  = false;
+let ownProfissionalId = null; // profissional vinculado ao próprio usuário logado (admin com vínculo)
+let agdPacId       = null;
+let agdRecorrenciaOccurrences = [];
+let agdGoogleMeetStatusCache = {};
+
+const AV_COLORS = [
+  'bg-gradient-to-br from-vitta-500 to-vitta-700',
+  'bg-gradient-to-br from-green-400 to-green-600',
+  'bg-gradient-to-br from-purple-400 to-purple-600',
+  'bg-gradient-to-br from-amber-400 to-amber-600',
+  'bg-gradient-to-br from-blue-400 to-blue-600',
+  'bg-gradient-to-br from-rose-400 to-rose-600',
+  'bg-gradient-to-br from-indigo-400 to-indigo-600',
+];
+
+/* ═══════════════════════════════════════════════════
+   UTILITÁRIOS
+═══════════════════════════════════════════════════ */
+function avColor(name) { return AV_COLORS[(name || '').charCodeAt(0) % AV_COLORS.length]; }
+function escHtml(s) {
+  return String(s ?? '').replace(/[&<>"']/g, c => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;' }[c]));
+}
+function initials(name) {
+  if (!name) return '?';
+  return name.trim().split(/\s+/).slice(0, 2).map(w => w[0]).join('').toUpperCase();
+}
+function fmtDate(str) {
+  if (!str) return '—';
+  const [y, m, d] = str.split('-');
+  return `${d}/${m}/${y}`;
+}
+function calcAge(dateStr) {
+  if (!dateStr) return '';
+  const birth = new Date(dateStr), today = new Date();
+  let age = today.getFullYear() - birth.getFullYear();
+  if (today.getMonth() < birth.getMonth() || (today.getMonth() === birth.getMonth() && today.getDate() < birth.getDate())) age--;
+  return age;
+}
+function fmtCpf(v) { return (v||'').replace(/\D/g,'').replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, '$1.$2.$3-$4'); }
+function fmtTel(v) {
+  const d = (v||'').replace(/\D/g,'');
+  if (d.length === 11) return d.replace(/(\d{2})(\d{5})(\d{4})/, '($1) $2-$3');
+  if (d.length === 10) return d.replace(/(\d{2})(\d{4})(\d{4})/, '($1) $2-$3');
+  return v;
+}
+
+function showToast(msg, type = 'success') {
+  const el = document.getElementById('toast');
+  const box = document.getElementById('toastMsg');
+  document.getElementById('toastText').textContent = msg;
+  document.getElementById('toastIcon').textContent = type === 'success' ? '✓' : type === 'error' ? '✕' : 'ℹ';
+  box.className = `flex items-center gap-3 px-4 py-3 rounded-xl shadow-lg text-sm font-semibold text-white min-w-[260px] ${
+    type === 'success' ? 'bg-green-600' : type === 'error' ? 'bg-red-500' : 'bg-vitta-600'
+  }`;
+  el.classList.remove('hidden');
+  setTimeout(() => el.classList.add('hidden'), 3000);
+}
+
+/* ═══════════════════════════════════════════════════
+   SIDEBAR
+═══════════════════════════════════════════════════ */
+function toggleMenu(key) {
+  const sub   = document.getElementById('sub-' + key);
+  const chev  = document.getElementById('chev-' + key);
+  const open  = sub.classList.contains('open');
+  sub.classList.toggle('open', !open);
+  if (chev) chev.classList.toggle('open', !open);
+}
+function toggleSidebar() {
+  const sb = document.getElementById('sidebar');
+  const ov = document.getElementById('overlay');
+  const open = sb.classList.contains('-translate-x-full');
+  sb.classList.toggle('-translate-x-full', !open);
+  ov.classList.toggle('hidden', !open);
+}
+
+/* ═══════════════════════════════════════════════════
+   AUTENTICAÇÃO
+═══════════════════════════════════════════════════ */
+async function initAuth() {
+  document.getElementById('header-date').textContent = 'Gestão de pacientes — ' + new Date().toLocaleDateString('pt-BR', { weekday:'long', year:'numeric', month:'long', day:'numeric' });
+  const { data: { session } } = await supabase.auth.getSession();
+  if (!session) { window.location.href = '../index.html'; return false; }
+
+  const u = await getUsuarioAtual('NOME_USU,TIPO_USU,ATIVO_USU,EMPRESA(NOME_EMP),ID_EMP,PROF_USU', session);
+
+  if (!u || !u.ATIVO_USU) { await supabase.auth.signOut(); window.location.href = '../index.html'; return false; }
+
+  currentEmpId = AdminEmpresaCtx.resolveIdEmp(u.TIPO_USU, u.ID_EMP);
+  const nome = u.NOME_USU || session.user.email;
+  const ini  = nome.trim() ? initials(nome) : '?';
+  const TIPO_LABELS = { 'ADMIN_GLOBAL':'Admin Global','ADMIN_EMPRESA':'Administrador','SECRETARIA':'Secretaria','PROFISSIONAL':'Profissional','USUARIO':'Usuário' };
+  const tipo = TIPO_LABELS[u.TIPO_USU] || 'Usuário';
+
+  ['user-name','header-user-name'].forEach(id => document.getElementById(id).textContent = nome);
+  ['user-role','header-user-role'].forEach(id => document.getElementById(id).textContent = tipo);
+  ['user-avatar','header-avatar'].forEach(id => document.getElementById(id).textContent = ini);
+  document.getElementById('empresa-nome').textContent = u.EMPRESA?.NOME_EMP ?? 'Vitta Sistemas';
+  if (u.TIPO_USU === 'ADMIN_GLOBAL') {
+    isAdminGlobal = true;
+    document.getElementById('sectionAdmin').classList.remove('hidden');
+    AdminEmpresaCtx.initSelector('ADMIN_GLOBAL', session.user.id);
+  }
+  if (u.TIPO_USU === 'PROFISSIONAL') {
+    isProfissional = true;
+    currentProfId = u.PROF_USU || null;
+    if (currentProfId) setUserAvatarPhoto(currentProfId);
+    document.getElementById('btnNovoPaciente').classList.add('hidden');
+    document.getElementById('filterProfWrap')?.classList.add('hidden');
+    document.querySelector('a[href="profissionais.html"]')?.classList.add('hidden');
+    document.querySelector('a[href="usuarios-empresa.html"]')?.classList.add('hidden');
+    const _ss = document.getElementById('sub-servicos');
+    if (_ss) { const _b = _ss.previousElementSibling; _b?.previousElementSibling?.classList.add('hidden'); _b?.classList.add('hidden'); _ss.classList.add('hidden'); }
+  }
+  if (['ADMIN_EMPRESA','ADMIN_GLOBAL'].includes(u.TIPO_USU) && u.PROF_USU) {
+    ownProfissionalId = u.PROF_USU;
+  }
+  const temAcessoConsultas = u.TIPO_USU === 'PROFISSIONAL' || (['ADMIN_EMPRESA','ADMIN_GLOBAL'].includes(u.TIPO_USU) && u.PROF_USU);
+  if (!temAcessoConsultas)
+    document.querySelector('a[href="consultas.html"]')?.classList.add('hidden');
+  return true;
+}
+async function handleLogout() { await supabase.auth.signOut(); window.location.href = '../index.html'; }
+
+/* ═══════════════════════════════════════════════════
+   CARREGAR DADOS
+═══════════════════════════════════════════════════ */
+async function loadProfissionais() {
+  let q = supabase.from('PROFISSIONAL').select('ID_PROF,NOME_PROF').order('NOME_PROF');
+  if (currentEmpId) q = q.eq('ID_EMP', currentEmpId);
+  const { data } = await q;
+  profissionais = data || [];
+  buildMsDropdown();
+
+  const filterSel = document.getElementById('filterProf');
+  filterSel.innerHTML = '<option value="">Todos os profissionais</option>' +
+    profissionais.map(p => `<option value="${p.ID_PROF}">${p.NOME_PROF}</option>`).join('');
+}
+
+const PAC_SELECT_COLS = 'ID_PAC,NOME_PAC,CPF_PAC,DTNASC_PAC,SEXO_PAC,TEL_PAC,EMAIL_PAC,MENOS_PAC,NOME_RESP_PAC,CPF_RESP_PAC,CEP_PAC,RUA_PAC,NRO_PAC,COMPLE_PAC,BAIRRO_PAC,CIDADE_PAC,UF_PAC,FREQ_PAC,OBS_PAC,CONTRATO_PAC,ATIVO_PAC,DTCRI_PAC,ID_GRUPO,EMP_PAC,GRUPO(ID_GRUPO,NOME_GRUPO)';
+
+async function loadPatients() {
+  currentPage = 1;
+  await Promise.all([refreshTable(), updateStats()]);
+}
+
+// Recarrega apenas a página atual da tabela (respeitando os filtros ativos), sem afetar os cards de estatística
+async function refreshTable() {
+  document.getElementById('tableLoader').classList.remove('hidden');
+  document.getElementById('tableWrap').classList.add('hidden');
+
+  const nameQ    = document.getElementById('filterName').value.trim();
+  const contactQ = document.getElementById('filterContact').value.trim().replace(/[,()]/g, '');
+  const profQ    = document.getElementById('filterProf').value;
+  const showInact = document.getElementById('toggleInativos').checked;
+
+  const profFilterId = isProfissional ? currentProfId : (profQ || null);
+  // !inner é necessário para o filtro por profissional restringir de fato as linhas de PACIENTE
+  // (embed comum só filtra o array aninhado, mantendo o paciente na lista mesmo sem o vínculo)
+  const profEmbed = profFilterId
+    ? ',PACIENTE_PROFISSIONAL!inner(PROF_ID,PROFISSIONAL(ID_PROF,NOME_PROF))'
+    : ',PACIENTE_PROFISSIONAL(PROF_ID,PROFISSIONAL(ID_PROF,NOME_PROF))';
+
+  let q = supabase
+    .from('PACIENTE')
+    .select(PAC_SELECT_COLS + profEmbed, { count: 'exact' })
+    .order('NOME_PAC');
+
+  if (currentEmpId) q = q.eq('EMP_PAC', currentEmpId);
+  if (profFilterId) q = q.eq('PACIENTE_PROFISSIONAL.PROF_ID', profFilterId);
+  if (!showInact) q = q.eq('ATIVO_PAC', true);
+  if (nameQ) q = q.ilike('NOME_PAC', `%${nameQ}%`);
+  if (contactQ) q = q.or(`TEL_PAC.ilike.%${contactQ}%,EMAIL_PAC.ilike.%${contactQ}%`);
+
+  const start = (currentPage - 1) * PAGE_SIZE;
+  q = q.range(start, start + PAGE_SIZE - 1);
+
+  const { data, error, count } = await q;
+  if (error) {
+    showToast('Erro ao carregar pacientes.', 'error');
+    document.getElementById('tableLoader').classList.add('hidden');
+    document.getElementById('tableWrap').classList.remove('hidden');
+    return;
+  }
+
+  allPatients = (data || []).map(p => ({
+    ...p,
+    _profs: (p.PACIENTE_PROFISSIONAL || []).map(r => ({ id: r.PROF_ID, nome: r.PROFISSIONAL?.NOME_PROF || '' }))
+  }));
+  filtered   = allPatients;
+  totalCount = count || 0;
+
+  renderTable();
+  renderPagination();
+
+  document.getElementById('tableLoader').classList.add('hidden');
+  document.getElementById('tableWrap').classList.remove('hidden');
+}
+
+// Contagens sempre no escopo total do usuário (empresa/profissional vinculado), independente dos filtros de busca da tabela
+function baseStatsQuery() {
+  const embed = isProfissional ? ',PACIENTE_PROFISSIONAL!inner(PROF_ID)' : '';
+  let q = supabase.from('PACIENTE').select('ID_PAC' + embed, { count: 'exact', head: true });
+  if (currentEmpId) q = q.eq('EMP_PAC', currentEmpId);
+  if (isProfissional && currentProfId) q = q.eq('PACIENTE_PROFISSIONAL.PROF_ID', currentProfId);
+  return q;
+}
+
+async function updateStats() {
+  const [total, ativos, inativos, menores] = await Promise.all([
+    baseStatsQuery(),
+    baseStatsQuery().eq('ATIVO_PAC', true),
+    baseStatsQuery().eq('ATIVO_PAC', false),
+    baseStatsQuery().eq('MENOS_PAC', true),
+  ]);
+  document.getElementById('statTotal').textContent    = total.count ?? 0;
+  document.getElementById('statAtivos').textContent   = ativos.count ?? 0;
+  document.getElementById('statInativos').textContent = inativos.count ?? 0;
+  document.getElementById('statMenores').textContent  = menores.count ?? 0;
+}
+
+/* ═══════════════════════════════════════════════════
+   FILTROS & TABELA
+═══════════════════════════════════════════════════ */
+let _applyFiltersDebounce = null;
+function applyFilters() {
+  currentPage = 1;
+  clearTimeout(_applyFiltersDebounce);
+  _applyFiltersDebounce = setTimeout(refreshTable, 300);
+}
+
+function clearFilters() {
+  document.getElementById('filterName').value = '';
+  document.getElementById('filterContact').value = '';
+  document.getElementById('filterProf').value = '';
+  document.getElementById('toggleInativos').checked = false;
+  applyFilters();
+}
+
+function renderTable() {
+  const tbody = document.getElementById('patientsBody');
+  const slice = filtered; // já vem paginado do servidor (ver refreshTable)
+
+  document.getElementById('tableCount').innerHTML =
+    `Exibindo <strong class="text-gray-800">${totalCount}</strong> paciente${totalCount !== 1 ? 's' : ''}`;
+
+  if (!slice.length) {
+    tbody.innerHTML = `<tr><td colspan="7" class="text-center py-14 text-gray-400 text-sm">Nenhum paciente encontrado.</td></tr>`;
+    return;
+  }
+
+  tbody.innerHTML = slice.map(p => {
+    const profsStr = p._profs.length ? p._profs.map(x => x.nome).join(', ') : '—';
+    const ini  = initials(p.NOME_PAC);
+    const age  = calcAge(p.DTNASC_PAC);
+    const idShort = p.ID_PAC.slice(0, 6).toUpperCase();
+    const podeVerProntuario = isProfissional || (ownProfissionalId && p._profs.some(r => r.id === ownProfissionalId));
+    const btnProntuario = (isProfissional || ownProfissionalId)
+      ? (podeVerProntuario
+        ? `<a href="prontuario.html?pac=${p.ID_PAC}" title="Prontuário"
+                  class="w-8 h-8 flex items-center justify-center rounded-lg border border-gray-200 hover:border-vitta-400 hover:bg-vitta-50 text-gray-400 hover:text-vitta-600 transition-colors">
+            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+          </a>`
+        : `<button disabled title="Prontuário disponível apenas para pacientes vinculados a você"
+                  class="w-8 h-8 flex items-center justify-center rounded-lg border border-gray-100 text-gray-200 cursor-not-allowed">
+            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+          </button>`)
+      : '';
+    return `
+    <tr class="border-b border-gray-50">
+      <td class="px-5 py-3.5">
+        <div class="flex items-center gap-3">
+          <div class="w-9 h-9 rounded-full ${avColor(p.NOME_PAC)} flex items-center justify-center text-white text-xs font-bold shrink-0">${ini}</div>
+          <div>
+            <div class="text-[0.85rem] font-semibold text-gray-800 ${!p.ATIVO_PAC ? 'opacity-50' : ''}">${p.NOME_PAC}${p.MENOS_PAC ? ' <span class="inline-flex items-center gap-0.5 text-[0.65rem] font-bold bg-purple-100 text-purple-700 px-1.5 py-0.5 rounded-full ml-1">👶 menor</span>' : ''}</div>
+            <div class="text-[0.7rem] text-gray-400">${age ? `${age} anos` : ''}</div>
+          </div>
+        </div>
+      </td>
+      <td class="px-4 py-3.5 text-[0.82rem] text-gray-600 whitespace-nowrap">${fmtTel(p.TEL_PAC) || '—'}</td>
+      <td class="px-4 py-3.5 text-[0.82rem] text-gray-500 max-w-[180px] truncate">${p.EMAIL_PAC || '—'}</td>
+      <td class="px-4 py-3.5 text-[0.82rem] text-gray-600 max-w-[200px]">
+        <span class="truncate block" title="${profsStr}">${profsStr}</span>
+      </td>
+      <td class="px-4 py-3.5">
+        ${p.FREQ_PAC
+          ? `<span class="inline-flex text-[0.72rem] font-semibold bg-vitta-50 text-vitta-700 px-2 py-0.5 rounded-full">${p.FREQ_PAC}</span>`
+          : '<span class="text-gray-300 text-sm">—</span>'}
+      </td>
+      <td class="px-4 py-3.5">
+        ${p.ATIVO_PAC
+          ? `<span class="inline-flex items-center gap-1 text-[0.72rem] font-semibold bg-green-50 text-green-700 px-2 py-0.5 rounded-full">● Ativo</span>`
+          : `<span class="inline-flex items-center gap-1 text-[0.72rem] font-semibold bg-gray-100 text-gray-500 px-2 py-0.5 rounded-full">● Inativo</span>`}
+      </td>
+      <td class="px-4 py-3.5">
+        <div class="flex items-center gap-1.5 justify-end">
+          ${btnProntuario}
+          <button onclick="openViewModal('${p.ID_PAC}')" title="Visualizar"
+                  class="w-8 h-8 flex items-center justify-center rounded-lg border border-gray-200 hover:border-gray-400 hover:bg-gray-50 text-gray-400 hover:text-gray-600 transition-colors">
+            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+          </button>
+          <a href="documentos-paciente.html?pac=${p.ID_PAC}" title="Documentos do Paciente"
+                  class="w-8 h-8 flex items-center justify-center rounded-lg border border-gray-200 hover:border-amber-400 hover:bg-amber-50 text-gray-400 hover:text-amber-600 transition-colors">
+            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
+          </a>
+          ${isProfissional ? '' : `<button onclick="openEditModal('${p.ID_PAC}')" title="Editar"
+                  class="w-8 h-8 flex items-center justify-center rounded-lg border border-gray-200 hover:border-blue-400 hover:bg-blue-50 text-gray-400 hover:text-blue-600 transition-colors">
+            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+          </button>
+          <button onclick="openAgdModal('${p.ID_PAC}')" title="Agendar Consulta"
+                  class="w-8 h-8 flex items-center justify-center rounded-lg border border-gray-200 hover:border-vitta-400 hover:bg-vitta-50 text-gray-400 hover:text-vitta-600 transition-colors">
+            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/><line x1="12" y1="14" x2="12" y2="18"/><line x1="10" y1="16" x2="14" y2="16"/></svg>
+          </button>
+          <button onclick="openDeleteModal('${p.ID_PAC}','${p.NOME_PAC.replace(/'/g,"\\'")}' )" title="Excluir"
+                  class="w-8 h-8 flex items-center justify-center rounded-lg border border-gray-200 hover:border-red-400 hover:bg-red-50 text-gray-400 hover:text-red-500 transition-colors">
+            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4h6v2"/></svg>
+          </button>
+          `}
+        </div>
+      </td>
+    </tr>`;
+  }).join('');
+}
+
+function renderPagination() {
+  const total = Math.ceil(totalCount / PAGE_SIZE);
+  const pg = document.getElementById('pagination');
+  if (total <= 1) { pg.innerHTML = ''; return; }
+
+  const btnBase = 'min-w-[32px] h-8 rounded-lg border border-gray-200 text-xs font-semibold flex items-center justify-center px-2 transition-colors';
+  let html = `<button class="${btnBase} hover:bg-gray-50 text-gray-500" onclick="goPage(${currentPage - 1})" ${currentPage === 1 ? 'disabled' : ''}>‹</button>`;
+  for (let i = 1; i <= total; i++) {
+    if (total > 7 && i > 3 && i < total - 1 && Math.abs(i - currentPage) > 1) {
+      if (i === 4 || i === total - 2) html += `<button class="${btnBase} text-gray-400 cursor-default" disabled>…</button>`;
+      continue;
+    }
+    html += `<button class="${btnBase} ${i === currentPage ? 'bg-vitta-500 text-white border-vitta-500' : 'hover:bg-gray-50 text-gray-600'}" onclick="goPage(${i})">${i}</button>`;
+  }
+  html += `<button class="${btnBase} hover:bg-gray-50 text-gray-500" onclick="goPage(${currentPage + 1})" ${currentPage === total ? 'disabled' : ''}>›</button>`;
+  pg.innerHTML = html;
+}
+
+function goPage(n) {
+  const total = Math.ceil(totalCount / PAGE_SIZE);
+  if (n < 1 || n > total) return;
+  currentPage = n;
+  refreshTable();
+}
+
+/* ═══════════════════════════════════════════════════
+   MODAL: VISUALIZAR
+═══════════════════════════════════════════════════ */
+function openViewModal(id) {
+  const p = allPatients.find(x => x.ID_PAC === id);
+  if (!p) return;
+  currentViewId = id;
+
+  const ini = initials(p.NOME_PAC);
+  const av  = document.getElementById('vAvatar');
+  av.textContent = ini;
+  av.className   = `w-16 h-16 rounded-full flex items-center justify-center text-white text-2xl font-bold shrink-0 shadow-md ${avColor(p.NOME_PAC)}`;
+
+  document.getElementById('vNome').textContent = p.NOME_PAC;
+  document.getElementById('vStatusBadge').innerHTML = p.ATIVO_PAC
+    ? `<span class="text-xs font-bold bg-green-100 text-green-700 px-2 py-0.5 rounded-full">Ativo</span>`
+    : `<span class="text-xs font-bold bg-gray-100 text-gray-500 px-2 py-0.5 rounded-full">Inativo</span>`;
+  document.getElementById('vMenorBadge').innerHTML = p.MENOS_PAC
+    ? `<span class="text-xs font-bold bg-purple-100 text-purple-700 px-2 py-0.5 rounded-full">👶 Menor de Idade</span>`
+    : '';
+
+  const profsStr = p._profs.length ? p._profs.map(x => x.nome).join(', ') : 'Nenhum profissional vinculado';
+  document.getElementById('vProfs').textContent = '👨‍⚕️ ' + profsStr;
+
+  const age = calcAge(p.DTNASC_PAC);
+  setV('vCpf',       fmtCpf(p.CPF_PAC));
+  setV('vNascimento', p.DTNASC_PAC ? `${fmtDate(p.DTNASC_PAC)}${age ? ` (${age} anos)` : ''}` : '');
+  setV('vSexo',      p.SEXO_PAC);
+  setV('vTel',       fmtTel(p.TEL_PAC));
+  setV('vEmail',     p.EMAIL_PAC);
+
+  const respWrap = document.getElementById('vRespWrap');
+  if (p.MENOS_PAC) {
+    respWrap.classList.remove('hidden');
+    setV('vNomeResp', p.NOME_RESP_PAC);
+    setV('vCpfResp',  fmtCpf(p.CPF_RESP_PAC));
+  } else {
+    respWrap.classList.add('hidden');
+  }
+
+  setV('vCep',      p.CEP_PAC);
+  setV('vRua',      p.RUA_PAC);
+  setV('vNro',      p.NRO_PAC);
+  setV('vComple',   p.COMPLE_PAC);
+  setV('vBairro',   p.BAIRRO_PAC);
+  setV('vCidadeUf', [p.CIDADE_PAC, p.UF_PAC].filter(Boolean).join(' / '));
+  setV('vGrupo',    p.GRUPO?.NOME_GRUPO || '');
+  setV('vFreq',     p.FREQ_PAC);
+  setV('vContrato', p.CONTRATO_PAC ? `📄 ${p.CONTRATO_PAC}` : '');
+  setV('vObs',      p.OBS_PAC);
+
+  ['btnVwEdit1','btnVwEdit2'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.classList.toggle('hidden', isProfissional);
+  });
+  ['btnVwEdit1','btnVwEdit2'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.classList.toggle('hidden', isProfissional);
+  });
+
+  const vm = document.getElementById('viewModal');
+  vm.classList.add('open');
+  initSecBodies(vm);
+}
+function setV(id, val) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  if (val) { el.textContent = val; el.classList.remove('text-gray-300','italic'); }
+  else     { el.textContent = 'Não informado'; el.classList.add('text-gray-300','italic'); }
+}
+function closeViewModal() { document.getElementById('viewModal').classList.remove('open'); currentViewId = null; }
+function switchToEdit()   { const id = currentViewId; closeViewModal(); setTimeout(() => openEditModal(id), 60); }
+
+/* ═══════════════════════════════════════════════════
+   MULTI-SELECT PROFISSIONAIS
+═══════════════════════════════════════════════════ */
+function buildMsDropdown() {
+  const dd = document.getElementById('msDropdown');
+  dd.innerHTML = profissionais.length
+    ? profissionais.map(p => `
+        <label class="ms-option">
+          <input type="checkbox" value="${p.ID_PROF}" onchange="msToggle('${p.ID_PROF}','${p.NOME_PROF.replace(/'/g,"\\'")}')">
+          <span>${p.NOME_PROF}</span>
+        </label>`).join('')
+    : `<div class="px-3 py-2 text-xs text-gray-400">Nenhum profissional cadastrado</div>`;
+}
+
+function toggleMsDropdown() {
+  document.getElementById('msDropdown').classList.toggle('open');
+}
+
+function msToggle(id, nome) {
+  const idx = selectedProfs.findIndex(x => x.id === id);
+  if (idx === -1) selectedProfs.push({ id, nome });
+  else            selectedProfs.splice(idx, 1);
+  renderMsTrigger();
+}
+
+function renderMsTrigger() {
+  const trigger = document.getElementById('msTrigger');
+  const ph      = document.getElementById('msPlaceholder');
+  if (selectedProfs.length === 0) {
+    ph.classList.remove('hidden');
+    [...trigger.querySelectorAll('.ms-chip')].forEach(c => c.remove());
+  } else {
+    ph.classList.add('hidden');
+    [...trigger.querySelectorAll('.ms-chip')].forEach(c => c.remove());
+    selectedProfs.forEach(sp => {
+      const chip = document.createElement('span');
+      chip.className = 'ms-chip inline-flex items-center gap-1 bg-vitta-100 text-vitta-700 text-xs font-semibold px-2 py-0.5 rounded-full';
+      chip.innerHTML = `${sp.nome} <button type="button" onclick="msRemove('${sp.id}',event)" class="text-vitta-500 hover:text-red-500 font-bold leading-none">×</button>`;
+      trigger.insertBefore(chip, ph);
+    });
+  }
+  // Sync checkboxes
+  document.querySelectorAll('#msDropdown input[type=checkbox]').forEach(cb => {
+    cb.checked = selectedProfs.some(x => x.id === cb.value);
+  });
+}
+
+function msRemove(id, e) {
+  e.stopPropagation();
+  selectedProfs = selectedProfs.filter(x => x.id !== id);
+  renderMsTrigger();
+}
+
+function setMsProfs(profIds) {
+  selectedProfs = profIds.map(id => {
+    const p = profissionais.find(x => x.ID_PROF === id);
+    return p ? { id: p.ID_PROF, nome: p.NOME_PROF } : null;
+  }).filter(Boolean);
+  renderMsTrigger();
+}
+
+// Fechar dropdown ao clicar fora
+document.addEventListener('click', e => {
+  if (!document.getElementById('msWrap')?.contains(e.target)) {
+    document.getElementById('msDropdown')?.classList.remove('open');
+  }
+});
+
+/* ═══════════════════════════════════════════════════
+   MODAL: FORMULÁRIO
+═══════════════════════════════════════════════════ */
+function openNewModal() {
+  resetForm();
+  document.getElementById('formTitle').textContent = 'Novo Paciente';
+  document.getElementById('formSubtitle').textContent = '';
+  document.getElementById('formIcon').textContent = '👤';
+  const fm = document.getElementById('formModal');
+  fm.classList.add('open');
+  initSecBodies(fm);
+}
+
+function openEditModal(id) {
+  const p = allPatients.find(x => x.ID_PAC === id);
+  if (!p) return;
+
+  resetForm();
+  document.getElementById('fId').value     = p.ID_PAC;
+  document.getElementById('formTitle').textContent    = 'Editar Paciente';
+  document.getElementById('formSubtitle').textContent = p.NOME_PAC;
+  document.getElementById('formIcon').textContent = '✏️';
+
+  document.getElementById('fNome').value     = p.NOME_PAC || '';
+  document.getElementById('fCpf').value      = p.CPF_PAC  || '';
+  document.getElementById('fNascimento').value = p.DTNASC_PAC || '';
+  document.getElementById('fTel').value      = p.TEL_PAC  || '';
+  document.getElementById('fEmail').value    = p.EMAIL_PAC || '';
+  setSelectValue('fSexo', p.SEXO_PAC);
+
+  const menos = !!p.MENOS_PAC;
+  document.getElementById('fMenos').checked = menos;
+  document.getElementById('fNomeResp').value = p.NOME_RESP_PAC || '';
+  document.getElementById('fCpfResp').value  = p.CPF_RESP_PAC  || '';
+
+  document.getElementById('fCep').value    = p.CEP_PAC    || '';
+  document.getElementById('fRua').value    = p.RUA_PAC    || '';
+  document.getElementById('fNro').value    = p.NRO_PAC    || '';
+  document.getElementById('fComple').value = p.COMPLE_PAC || '';
+  document.getElementById('fBairro').value = p.BAIRRO_PAC || '';
+  document.getElementById('fCidade').value = p.CIDADE_PAC || '';
+  document.getElementById('fUf').value     = p.UF_PAC     || '';
+  setSelectValue('fGrupo', p.ID_GRUPO);
+  setSelectValue('fFreq', p.FREQ_PAC);
+  document.getElementById('fContrato').value = p.CONTRATO_PAC || '';
+  document.getElementById('fObs').value      = p.OBS_PAC      || '';
+  document.getElementById('fAtivo').checked  = !!p.ATIVO_PAC;
+
+  setMsProfs(p._profs.map(x => x.id));
+  const fm = document.getElementById('formModal');
+  fm.classList.add('open');
+  initSecBodies(fm);
+  toggleMenor(menos);
+}
+
+function closeFormModal() { document.getElementById('formModal').classList.remove('open'); }
+
+function resetForm() {
+  document.getElementById('patientForm').reset();
+  document.getElementById('fId').value = '';
+  document.getElementById('fAtivo').checked = true;
+  selectedProfs = [];
+  renderMsTrigger();
+  document.getElementById('respFields').classList.add('hidden');
+  document.getElementById('formAlert').innerHTML = '';
+}
+
+function setSelectValue(id, val) {
+  const sel = document.getElementById(id);
+  if (!sel || !val) return;
+  [...sel.options].forEach(o => { if (o.value === val || o.textContent === val) sel.value = o.value; });
+}
+
+function toggleMenor(on) {
+  const resp = document.getElementById('respFields');
+  resp.classList.toggle('hidden', !on);
+  // Recalcula a altura da seção colapsável pai (overflow:hidden corta os campos
+  // se o max-height fixo não for atualizado quando os campos surgem/somem)
+  const sec = resp.closest('.sec-body');
+  if (sec && !sec.classList.contains('collapsed')) {
+    sec.style.maxHeight = sec.scrollHeight + 'px';
+  }
+}
+
+/* ═══════════════════════════════════════════════════
+   SALVAR
+═══════════════════════════════════════════════════ */
+async function savePatient() {
+  const alertEl = document.getElementById('formAlert');
+  alertEl.innerHTML = '';
+
+  const nome = document.getElementById('fNome').value.trim();
+  const nasc = document.getElementById('fNascimento').value;
+  const tel  = document.getElementById('fTel').value.trim();
+  const grupo = document.getElementById('fGrupo').value;
+
+  if (!nome) { alertEl.innerHTML = err('Informe o nome completo do paciente.'); scrollToAlert(); return; }
+  if (!nasc) { alertEl.innerHTML = err('Informe a data de nascimento.');         scrollToAlert(); return; }
+  if (!tel)  { alertEl.innerHTML = err('Informe o telefone.');                   scrollToAlert(); return; }
+  if (!selectedProfs.length) { alertEl.innerHTML = err('Selecione ao menos um profissional.'); scrollToAlert(); return; }
+  if (!grupo) { alertEl.innerHTML = err('Selecione um grupo.');                  scrollToAlert(); return; }
+  if (!currentEmpId) {
+    alertEl.innerHTML = err('Nenhuma empresa vinculada ao seu usuário. Contate o administrador.');
+    scrollToAlert();
+    return;
+  }
+
+  setSaveLoading(true);
+
+  try {
+    const payload = {
+      EMP_PAC:       currentEmpId,
+      NOME_PAC:      nome,
+      CPF_PAC:       document.getElementById('fCpf').value.trim()       || null,
+      DTNASC_PAC:    nasc,
+      SEXO_PAC:      document.getElementById('fSexo').value             || null,
+      TEL_PAC:       tel,
+      EMAIL_PAC:     document.getElementById('fEmail').value.trim()     || null,
+      MENOS_PAC:     document.getElementById('fMenos').checked,
+      NOME_RESP_PAC: document.getElementById('fNomeResp').value.trim()  || null,
+      CPF_RESP_PAC:  document.getElementById('fCpfResp').value.trim()   || null,
+      CEP_PAC:       document.getElementById('fCep').value.trim()       || null,
+      RUA_PAC:       document.getElementById('fRua').value.trim()       || null,
+      NRO_PAC:       document.getElementById('fNro').value.trim()       || null,
+      COMPLE_PAC:    document.getElementById('fComple').value.trim()    || null,
+      BAIRRO_PAC:    document.getElementById('fBairro').value.trim()    || null,
+      CIDADE_PAC:    document.getElementById('fCidade').value.trim()    || null,
+      UF_PAC:        document.getElementById('fUf').value.trim().toUpperCase() || null,
+      ID_GRUPO:      document.getElementById('fGrupo').value             || null,
+      FREQ_PAC:      document.getElementById('fFreq').value             || null,
+      CONTRATO_PAC:  document.getElementById('fContrato').value.trim()  || null,
+      OBS_PAC:       document.getElementById('fObs').value.trim()       || null,
+      ATIVO_PAC:     document.getElementById('fAtivo').checked,
+      DTALTER_PAC:   new Date().toISOString(),
+    };
+
+    const editId = document.getElementById('fId').value;
+    let pacId;
+
+    if (editId) {
+      const { error } = await supabase.from('PACIENTE').update(payload).eq('ID_PAC', editId);
+      if (error) throw new Error('Erro ao atualizar: ' + error.message);
+      pacId = editId;
+    } else {
+      const { data, error } = await supabase.from('PACIENTE').insert(payload).select('ID_PAC').single();
+      if (error) throw new Error('Erro ao criar paciente: ' + error.message);
+      pacId = data.ID_PAC;
+    }
+
+    // Sincroniza profissionais (delete + insert)
+    await supabase.from('PACIENTE_PROFISSIONAL').delete().eq('PAC_ID', pacId);
+    if (selectedProfs.length) {
+      const { error: epErr } = await supabase.from('PACIENTE_PROFISSIONAL')
+        .insert(selectedProfs.map(sp => ({ PAC_ID: pacId, PROF_ID: sp.id })));
+      if (epErr) console.warn('Aviso ao vincular profissionais:', epErr.message);
+    }
+
+    closeFormModal();
+    showToast(editId ? 'Paciente atualizado com sucesso!' : 'Paciente cadastrado com sucesso!');
+    await loadPatients();
+
+  } catch (e) {
+    console.error('savePatient error:', e);
+    alertEl.innerHTML = err(e.message || 'Erro inesperado. Tente novamente.');
+    scrollToAlert();
+  } finally {
+    setSaveLoading(false);
+  }
+}
+
+function scrollToAlert() {
+  const el = document.getElementById('formAlert');
+  if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+}
+
+function err(msg) {
+  return `<div class="flex items-center gap-2 bg-red-50 text-red-700 border border-red-200 rounded-xl px-4 py-3 text-sm font-medium mb-4">⚠ ${msg}</div>`;
+}
+function setSaveLoading(on) {
+  document.getElementById('btnSave').disabled   = on;
+  document.getElementById('saveSpin').classList.toggle('hidden', !on);
+  document.getElementById('saveIcon').classList.toggle('hidden', on);
+  document.getElementById('saveTxt').textContent = on ? 'Salvando...' : 'Salvar Paciente';
+}
+
+/* ═══════════════════════════════════════════════════
+   MODAL: EXCLUIR
+═══════════════════════════════════════════════════ */
+function openDeleteModal(id, nome) {
+  deleteTargetId = id;
+  document.getElementById('deleteNome').textContent = nome;
+  document.getElementById('deleteModal').classList.add('open');
+}
+function closeDeleteModal() { document.getElementById('deleteModal').classList.remove('open'); deleteTargetId = null; }
+
+async function confirmDelete() {
+  if (!deleteTargetId) return;
+  document.getElementById('delSpin').classList.remove('hidden');
+  document.getElementById('btnDeleteConfirm').disabled = true;
+
+  const { error } = await supabase.from('PACIENTE').delete().eq('ID_PAC', deleteTargetId);
+  document.getElementById('delSpin').classList.add('hidden');
+  document.getElementById('btnDeleteConfirm').disabled = false;
+
+  if (error) { showToast('Erro ao excluir paciente.', 'error'); closeDeleteModal(); return; }
+  closeDeleteModal();
+  showToast('Paciente excluído com sucesso!');
+  await loadPatients();
+}
+
+/* ═══════════════════════════════════════════════════
+   CEP
+═══════════════════════════════════════════════════ */
+document.getElementById('fCep').addEventListener('input', function () {
+  this.value = this.value.replace(/\D/g, '').replace(/^(\d{5})(\d)/, '$1-$2').substring(0, 9);
+});
+async function buscarCEP() {
+  const cep = document.getElementById('fCep').value.replace(/\D/g, '');
+  if (cep.length !== 8) { showToast('Digite um CEP válido com 8 dígitos.', 'error'); return; }
+  try {
+    const res  = await fetch(`https://viacep.com.br/ws/${cep}/json/`);
+    const data = await res.json();
+    if (data.erro) { showToast('CEP não encontrado.', 'error'); return; }
+    document.getElementById('fRua').value    = data.logradouro || '';
+    document.getElementById('fBairro').value = data.bairro     || '';
+    document.getElementById('fCidade').value = data.localidade || '';
+    document.getElementById('fUf').value     = data.uf         || '';
+    document.getElementById('fNro').focus();
+  } catch { showToast('Não foi possível consultar o CEP.', 'error'); }
+}
+
+/* ═══════════════════════════════════════════════════
+   MÁSCARAS
+═══════════════════════════════════════════════════ */
+['fCpf','fCpfResp'].forEach(id => {
+  document.getElementById(id).addEventListener('input', function () {
+    this.value = this.value.replace(/\D/g,'')
+      .replace(/(\d{3})(\d)/,'$1.$2')
+      .replace(/(\d{3})\.(\d{3})(\d)/,'$1.$2.$3')
+      .replace(/(\d{3})\.(\d{3})\.(\d{3})(\d)/,'$1.$2.$3-$4')
+      .substring(0,14);
+  });
+});
+document.getElementById('fTel').addEventListener('input', function () {
+  const d = this.value.replace(/\D/g,'');
+  this.value = d.length <= 10
+    ? d.replace(/(\d{2})(\d{4})(\d{0,4})/,'($1) $2-$3').trim()
+    : d.replace(/(\d{2})(\d{5})(\d{0,4})/,'($1) $2-$3').trim();
+});
+
+/* ═══════════════════════════════════════════════════
+   SEÇÕES COLAPSÁVEIS
+═══════════════════════════════════════════════════ */
+function toggleViewSection(btn) {
+  const body = btn.nextElementSibling;
+  const chev = btn.querySelector('.chevron');
+  const isOpen = !body.classList.contains('collapsed');
+  body.style.maxHeight = isOpen ? '0' : body.scrollHeight + 'px';
+  body.classList.toggle('collapsed', isOpen);
+  chev.classList.toggle('open', !isOpen);
+}
+function toggleFormSection(btn) {
+  const body = btn.nextElementSibling;
+  const chev = btn.querySelector('.chevron');
+  const isOpen = !body.classList.contains('collapsed');
+  if (!isOpen) body.style.maxHeight = body.scrollHeight + 'px';
+  else         body.style.maxHeight = '0';
+  body.classList.toggle('collapsed', isOpen);
+  chev.classList.toggle('open', !isOpen);
+}
+
+// Inicializa max-height das seções abertas dentro de um modal (chamado ao abrir)
+function initSecBodies(modal) {
+  modal.querySelectorAll('.sec-body:not(.collapsed)').forEach(b => {
+    b.style.maxHeight = b.scrollHeight + 'px';
+  });
+}
+
+/* ═══════════════════════════════════════════════════
+   FECHAR MODAL AO CLICAR NO OVERLAY
+═══════════════════════════════════════════════════ */
+['viewModal','formModal','deleteModal','modalPacAgd'].forEach(id => {
+  document.getElementById(id).addEventListener('click', e => {
+    if (e.target.id === id) {
+      if (id === 'viewModal')   closeViewModal();
+      if (id === 'formModal')   closeFormModal();
+      if (id === 'deleteModal') closeDeleteModal();
+      if (id === 'modalPacAgd') closeAgdModal();
+    }
+  });
+});
+
+/* ═══════════════════════════════════════════════════
+   FILTROS — LISTENERS
+═══════════════════════════════════════════════════ */
+['filterName','filterContact'].forEach(id => document.getElementById(id).addEventListener('input', applyFilters));
+document.getElementById('filterProf').addEventListener('change', applyFilters);
+document.getElementById('toggleInativos').addEventListener('change', applyFilters);
+
+/* ═══════════════════════════════════════════════════
+   GRUPOS
+═══════════════════════════════════════════════════ */
+async function loadGrupos() {
+  let q = supabase.from('GRUPO').select('ID_GRUPO,NOME_GRUPO').eq('ATIVO_GRUPO', true).order('NOME_GRUPO');
+  if (currentEmpId) q = q.eq('ID_EMP', currentEmpId);
+  const { data } = await q;
+  const sel = document.getElementById('fGrupo');
+  (data || []).forEach(g => {
+    sel.insertAdjacentHTML('beforeend', `<option value="${g.ID_GRUPO}">${g.NOME_GRUPO}</option>`);
+  });
+}
+
+/* ═══════════════════════════════════════════════════
+   MODAL: AGENDAMENTO RÁPIDO
+═══════════════════════════════════════════════════ */
+function toLocalISOPac(dt) {
+  const d = new Date(dt);
+  const pad = n => String(n).padStart(2,'0');
+  return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
+}
+
+async function openAgdModal(pacId) {
+  const p = allPatients.find(x => x.ID_PAC === pacId);
+  if (!p) return;
+  agdPacId = pacId;
+
+  document.getElementById('agdModalSubtitle').textContent = p.NOME_PAC;
+  document.getElementById('agdPacNome').textContent = p.NOME_PAC;
+
+  // Carrega profissionais vinculados ao paciente
+  const selProf = document.getElementById('agdFProf');
+  const emptyHint = document.getElementById('agdProfEmptyHint');
+  selProf.innerHTML = '<option value="">Carregando…</option>';
+  selProf.disabled = true;
+  emptyHint.classList.add('hidden');
+
+  const { data: links } = await supabase.from('PACIENTE_PROFISSIONAL')
+    .select('PROF_ID').eq('PAC_ID', pacId);
+
+  const linkedIds = new Set((links || []).map(r => r.PROF_ID));
+  const linked = profissionais.filter(pr => linkedIds.has(pr.ID_PROF));
+
+  selProf.disabled = false;
+  if (!linked.length) {
+    selProf.innerHTML = '<option value="">Nenhum profissional vinculado</option>';
+    emptyHint.classList.remove('hidden');
+  } else {
+    selProf.innerHTML = '<option value="">Selecione o profissional…</option>';
+    linked.forEach(pr => selProf.insertAdjacentHTML('beforeend', `<option value="${pr.ID_PROF}">${pr.NOME_PROF}</option>`));
+  }
+
+  // Carrega salas da empresa do paciente
+  const empId = currentEmpId || p.EMP_PAC || null;
+  let qSala = supabase.from('SALA').select('ID_SALA,NOME_SALA').eq('ATIVO_SALA', true).order('NOME_SALA');
+  if (empId) qSala = qSala.eq('ID_EMP', empId);
+  const { data: salas } = await qSala;
+
+  const selSala = document.getElementById('agdFSala');
+  selSala.innerHTML = '<option value="">Selecione a sala…</option>';
+  (salas || []).forEach(s => selSala.insertAdjacentHTML('beforeend', `<option value="${s.ID_SALA}">${s.NOME_SALA}</option>`));
+
+  // Reset campos
+  document.getElementById('agdFInicio').value = '';
+  document.getElementById('agdFFim').value    = '';
+  document.getElementById('agdFObs').value    = '';
+  document.querySelector('input[name="agdFTipo"][value="PRESENCIAL"]').checked = true;
+  document.getElementById('agdRowSala').classList.remove('hidden');
+  document.getElementById('agdFSala').required = true;
+  document.getElementById('agdFRepetir').checked = false;
+  document.getElementById('agdRowRepetirOpts').classList.add('hidden');
+  document.getElementById('agdFRepFreq').value = 'SEMANAL';
+  document.querySelector('input[name="agdFRepAteTipo"][value="count"]').checked = true;
+  document.getElementById('agdFRepCount').value = 8;
+  document.getElementById('agdFRepData').value = '';
+  agdRecorrenciaOccurrences = [];
+  document.getElementById('agdRowGoogleMeetStatus').classList.add('hidden');
+  document.getElementById('agdRowGoogleMeetLink').classList.add('hidden');
+  document.getElementById('agdFGoogleMeetLink').value = '';
+
+  document.getElementById('modalPacAgd').classList.add('open');
+}
+
+function closeAgdModal() {
+  document.getElementById('modalPacAgd').classList.remove('open');
+  agdPacId = null;
+  agdRecorrenciaOccurrences = [];
+}
+
+function getAgdEmpId() {
+  const p = allPatients.find(x => x.ID_PAC === agdPacId);
+  return currentEmpId || p?.EMP_PAC || null;
+}
+
+async function onAgdTipoChange() {
+  const tipo = document.querySelector('input[name="agdFTipo"]:checked')?.value;
+  document.getElementById('agdRowSala').classList.toggle('hidden', tipo === 'ONLINE');
+  document.getElementById('agdFSala').required = tipo === 'PRESENCIAL';
+
+  const rowStatus = document.getElementById('agdRowGoogleMeetStatus');
+  if (tipo === 'ONLINE') {
+    rowStatus.classList.remove('hidden');
+    await renderAgdGoogleMeetStatus(getAgdEmpId());
+  } else {
+    rowStatus.classList.add('hidden');
+  }
+  if (document.getElementById('agdFRepetir').checked) renderAgdRecorrenciaPreview();
+}
+
+function onAgdRepetirChange() {
+  const on = document.getElementById('agdFRepetir').checked;
+  document.getElementById('agdRowRepetirOpts').classList.toggle('hidden', !on);
+  if (on) renderAgdRecorrenciaPreview();
+}
+
+async function fetchAgdGoogleMeetStatus(idEmp) {
+  if (!idEmp) return { status: 'desconectado', google_email: null };
+  if (agdGoogleMeetStatusCache[idEmp]) return agdGoogleMeetStatusCache[idEmp];
+  try {
+    const { data: { session } } = await supabase.auth.getSession();
+    const resp = await fetch(`${SUPABASE_URL}/functions/v1/google-meet-status?id_emp=${encodeURIComponent(idEmp)}`, {
+      headers: { Authorization: `Bearer ${session.access_token}` },
+    });
+    const data = await resp.json();
+    if (!resp.ok || !data.sucesso) return { status: 'desconectado', google_email: null };
+    agdGoogleMeetStatusCache[idEmp] = { status: data.status, google_email: data.google_email };
+    return agdGoogleMeetStatusCache[idEmp];
+  } catch (e) {
+    console.warn('Erro ao verificar status do Google Meet:', e.message);
+    return { status: 'desconectado', google_email: null };
+  }
+}
+
+async function renderAgdGoogleMeetStatus(idEmp) {
+  const box = document.getElementById('agdGoogleMeetStatusBox');
+  if (!idEmp) {
+    box.innerHTML = '<span class="text-gray-400">Selecione a empresa para verificar a conexão com o Google Meet.</span>';
+    return;
+  }
+  box.innerHTML = '<span class="text-gray-400">Verificando conexão com Google Meet…</span>';
+  const info = await fetchAgdGoogleMeetStatus(idEmp);
+  if (info.status === 'conectado') {
+    box.innerHTML = `<span class="text-emerald-600 font-medium">✓ Google Meet conectado${info.google_email ? ' ('+escHtml(info.google_email)+')' : ''}</span>`;
+  } else {
+    box.innerHTML = `
+      <div class="flex items-center justify-between gap-3">
+        <span class="text-amber-600 font-medium">Google Meet não conectado</span>
+        <button type="button" onclick="iniciarConexaoGoogleAgd()" class="px-3 py-1.5 bg-vitta-500 text-white rounded-lg text-xs font-semibold hover:bg-vitta-600 transition-colors">Conectar</button>
+      </div>`;
+  }
+}
+
+function openGoogleReconnectModal() {
+  document.getElementById('modalGoogleReconnect').classList.add('open');
+}
+function closeGoogleReconnectModal() {
+  document.getElementById('modalGoogleReconnect').classList.remove('open');
+}
+
+async function iniciarConexaoGoogleAgd() {
+  const idEmp = getAgdEmpId();
+  if (!idEmp) { showToast('Selecione a empresa antes de conectar o Google Meet.', 'error'); return; }
+  try {
+    const { data: { session } } = await supabase.auth.getSession();
+    const resp = await fetch(`${SUPABASE_URL}/functions/v1/google-oauth-start`, {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${session.access_token}`, 'Content-Type': 'application/json' },
+      body: JSON.stringify({ id_emp: idEmp }),
+    });
+    const data = await resp.json();
+    if (!resp.ok || !data.sucesso) { showToast(data.erro || 'Não foi possível iniciar a conexão com o Google.', 'error'); return; }
+
+    closeGoogleReconnectModal();
+    const popup = window.open(data.url, 'googleMeetConnect', 'width=520,height=650');
+    if (!popup) { showToast('Permita pop-ups para conectar o Google Meet.', 'error'); return; }
+
+    const poll = setInterval(async () => {
+      if (popup.closed) {
+        clearInterval(poll);
+        delete agdGoogleMeetStatusCache[idEmp];
+        const tipo = document.querySelector('input[name="agdFTipo"]:checked')?.value;
+        if (tipo === 'ONLINE') await renderAgdGoogleMeetStatus(idEmp);
+      }
+    }, 800);
+  } catch (e) {
+    showToast('Erro ao iniciar conexão com o Google: ' + e.message, 'error');
+  }
+}
+
+async function criarLinkMeetGoogle(idEmp, titulo, inicioISO, fimISO) {
+  const { data: { session } } = await supabase.auth.getSession();
+  const resp = await fetch(`${SUPABASE_URL}/functions/v1/criar-link-meet`, {
+    method: 'POST',
+    headers: { Authorization: `Bearer ${session.access_token}`, 'Content-Type': 'application/json' },
+    body: JSON.stringify({ id_emp: idEmp, titulo, inicio: inicioISO, fim: fimISO }),
+  });
+  const data = await resp.json();
+  if (!resp.ok || !data.sucesso) {
+    const err = new Error(data.mensagem || data.erro || 'Falha ao criar o link do Google Meet');
+    if (data.erro === 'reconexao_necessaria') err.reconexaoNecessaria = true;
+    throw err;
+  }
+  return data.link;
+}
+
+function copiarAgdLinkMeet() {
+  const input = document.getElementById('agdFGoogleMeetLink');
+  if (!input.value) return;
+  navigator.clipboard.writeText(input.value).then(() => showToast('Link copiado!')).catch(() => showToast('Não foi possível copiar o link.', 'error'));
+}
+
+function abrirAgdLinkMeet() {
+  const input = document.getElementById('agdFGoogleMeetLink');
+  if (!input.value) return;
+  window.open(input.value, '_blank', 'noopener');
+}
+
+function generateAgdOccurrences(inicioStr, fimStr, freq, count) {
+  const stepDays = freq === 'SEMANAL' ? 7 : freq === 'QUINZENAL' ? 14 : null;
+  const occurrences = [];
+  const inicio0 = new Date(inicioStr);
+  const fim0 = new Date(fimStr);
+  for (let i = 0; i < count; i++) {
+    let inicio, fim;
+    if (stepDays) {
+      inicio = new Date(inicio0); inicio.setDate(inicio.getDate() + stepDays * i);
+      fim = new Date(fim0); fim.setDate(fim.getDate() + stepDays * i);
+    } else {
+      inicio = new Date(inicio0); inicio.setMonth(inicio.getMonth() + i);
+      fim = new Date(fim0); fim.setMonth(fim.getMonth() + i);
+    }
+    occurrences.push({ inicio, fim });
+  }
+  return occurrences;
+}
+
+async function renderAgdRecorrenciaPreview() {
+  const box = document.getElementById('agdRecorrenciaPreview');
+  if (!document.getElementById('agdFRepetir').checked) return;
+
+  const inicio = document.getElementById('agdFInicio').value;
+  const fim = document.getElementById('agdFFim').value;
+  const profId = document.getElementById('agdFProf').value || null;
+  const tipo = document.querySelector('input[name="agdFTipo"]:checked')?.value;
+  const salaId = tipo === 'PRESENCIAL' ? (document.getElementById('agdFSala').value || null) : null;
+
+  if (!inicio || !fim || new Date(fim) <= new Date(inicio) || !profId) {
+    box.innerHTML = '<p class="text-gray-400">Preencha profissional e horário de início/fim válidos.</p>';
+    return;
+  }
+
+  const freq = document.getElementById('agdFRepFreq').value;
+  const ateTipo = document.querySelector('input[name="agdFRepAteTipo"]:checked')?.value;
+  let count;
+  if (ateTipo === 'data') {
+    const dataFinal = document.getElementById('agdFRepData').value;
+    if (!dataFinal) { box.innerHTML = '<p class="text-gray-400">Informe a data final.</p>'; return; }
+    const stepDays = freq === 'SEMANAL' ? 7 : freq === 'QUINZENAL' ? 14 : null;
+    const inicio0 = new Date(inicio);
+    const fimAlvo = new Date(dataFinal + 'T23:59:59');
+    count = 0;
+    for (let i = 0; i < 52; i++) {
+      const d = new Date(inicio0);
+      if (stepDays) d.setDate(d.getDate() + stepDays * i); else d.setMonth(d.getMonth() + i);
+      if (d > fimAlvo) break;
+      count++;
+    }
+  } else {
+    count = parseInt(document.getElementById('agdFRepCount').value, 10) || 0;
+  }
+  count = Math.max(2, Math.min(52, count || 0));
+
+  const occurrences = generateAgdOccurrences(inicio, fim, freq, count);
+  box.innerHTML = '<p class="text-gray-400">Verificando conflitos…</p>';
+
+  const minInicio = occurrences[0].inicio.toISOString();
+  const maxFim = occurrences[occurrences.length - 1].fim.toISOString();
+  const p = allPatients.find(x => x.ID_PAC === agdPacId);
+  const empId = currentEmpId || p?.EMP_PAC || null;
+
+  let qConflict = supabase.from('AGENDAMENTO')
+    .select('DT_AGD,DT_FIM_AGD,PROF_AGD,SALA_AGD')
+    .lt('DT_AGD', maxFim)
+    .gt('DT_FIM_AGD', minInicio);
+  if (empId) qConflict = qConflict.eq('ID_EMP', empId);
+  const { data: agdConf } = await qConflict;
+
+  let qBlq = supabase.from('BLOQUEIO_PROF')
+    .select('DT_INICIO,DT_FIM,PROF_BLOQ')
+    .lt('DT_INICIO', maxFim)
+    .gt('DT_FIM', minInicio);
+  if (empId) qBlq = qBlq.eq('ID_EMP', empId);
+  const { data: blqConf } = await qBlq;
+
+  agdRecorrenciaOccurrences = occurrences.map(o => {
+    const oInicio = o.inicio.toISOString();
+    const oFim = o.fim.toISOString();
+    let conflictMsg = null;
+    const profConflict = (agdConf || []).some(c => c.PROF_AGD === profId && c.DT_AGD < oFim && c.DT_FIM_AGD > oInicio)
+      || (blqConf || []).some(b => b.PROF_BLOQ === profId && b.DT_INICIO < oFim && b.DT_FIM > oInicio);
+    const salaConflict = salaId && (agdConf || []).some(c => c.SALA_AGD === salaId && c.DT_AGD < oFim && c.DT_FIM_AGD > oInicio);
+    if (profConflict) conflictMsg = 'Profissional ocupado';
+    else if (salaConflict) conflictMsg = 'Sala ocupada';
+    return { inicio: o.inicio, fim: o.fim, conflict: conflictMsg };
+  });
+
+  const fmt = d => d.toLocaleDateString('pt-BR', { day:'2-digit', month:'2-digit', year:'numeric' }) + ' ' + d.toLocaleTimeString('pt-BR', { hour:'2-digit', minute:'2-digit' });
+  box.innerHTML = agdRecorrenciaOccurrences.map((o, idx) => {
+    if (o.conflict) {
+      return `<label class="flex items-center gap-2 text-red-500"><input type="checkbox" disabled class="accent-gray-300" /> ${fmt(o.inicio)} — ⚠ ${o.conflict}</label>`;
+    }
+    return `<label class="flex items-center gap-2 text-gray-700"><input type="checkbox" checked data-idx="${idx}" class="agd-rep-occ-check accent-vitta-500" /> ${fmt(o.inicio)}</label>`;
+  }).join('');
+}
+
+async function saveAgd(e) {
+  e.preventDefault();
+  const btn = document.getElementById('agdBtnSave');
+  btn.disabled = true; btn.textContent = 'Salvando…';
+
+  const inicio = document.getElementById('agdFInicio').value;
+  const fim    = document.getElementById('agdFFim').value;
+  if (new Date(fim) <= new Date(inicio)) {
+    showToast('O horário de fim deve ser depois do início', 'error');
+    btn.disabled = false; btn.textContent = 'Salvar'; return;
+  }
+
+  const profId = document.getElementById('agdFProf').value || null;
+  if (!profId) {
+    showToast('Selecione o profissional', 'error');
+    btn.disabled = false; btn.textContent = 'Salvar'; return;
+  }
+
+  const tipo  = document.querySelector('input[name="agdFTipo"]:checked')?.value;
+  const salaId = tipo === 'PRESENCIAL' ? (document.getElementById('agdFSala').value || null) : null;
+  const p     = allPatients.find(x => x.ID_PAC === agdPacId);
+  const empId = currentEmpId || p?.EMP_PAC || null;
+
+  const payload = {
+    PAC_AGD:    agdPacId,
+    PROF_AGD:   profId,
+    SALA_AGD:   salaId,
+    DT_AGD:     new Date(inicio).toISOString(),
+    DT_FIM_AGD: new Date(fim).toISOString(),
+    TIPO_AGD:   tipo,
+    OBS_AGD:    document.getElementById('agdFObs').value.trim() || null,
+    ID_EMP:     empId,
+    STATUS_AGD: 'AGENDADO',
+    PGTO_AGD:   false
+  };
+
+  try {
+    // Verifica conflito de horário para profissional e sala antes de salvar
+    let qConflict = supabase.from('AGENDAMENTO')
+      .select('ID_AGD,PROF_AGD,SALA_AGD')
+      .lt('DT_AGD', payload.DT_FIM_AGD)
+      .gt('DT_FIM_AGD', payload.DT_AGD);
+    if (empId) qConflict = qConflict.eq('ID_EMP', empId);
+    const { data: conflicts, error: confErr } = await qConflict;
+    if (confErr) throw confErr;
+    if ((conflicts || []).some(c => c.PROF_AGD === profId)) {
+      showToast('Este profissional já possui um agendamento nesse horário', 'error');
+      btn.disabled = false; btn.textContent = 'Salvar'; return;
+    }
+    if (salaId && (conflicts || []).some(c => c.SALA_AGD === salaId)) {
+      showToast('Esta sala já está ocupada nesse horário', 'error');
+      btn.disabled = false; btn.textContent = 'Salvar'; return;
+    }
+
+    let qBlqConflict = supabase.from('BLOQUEIO_PROF')
+      .select('ID_BLOQ,PROF_BLOQ')
+      .lt('DT_INICIO', payload.DT_FIM_AGD)
+      .gt('DT_FIM', payload.DT_AGD);
+    if (empId) qBlqConflict = qBlqConflict.eq('ID_EMP', empId);
+    const { data: blqConflicts, error: blqConfErr } = await qBlqConflict;
+    if (blqConfErr) throw blqConfErr;
+    if ((blqConflicts || []).some(b => b.PROF_BLOQ === profId)) {
+      showToast('Este profissional está com a agenda bloqueada nesse horário', 'error');
+      btn.disabled = false; btn.textContent = 'Salvar'; return;
+    }
+
+    const nomePacTitulo = p?.NOME_PAC || 'Consulta';
+
+    if (document.getElementById('agdFRepetir').checked) {
+      const checks = document.querySelectorAll('#agdRecorrenciaPreview .agd-rep-occ-check:checked');
+      if (!checks.length) {
+        showToast('Nenhuma data válida selecionada para a série', 'error');
+        btn.disabled = false; btn.textContent = 'Salvar'; return;
+      }
+      const seriesId = crypto.randomUUID();
+      const rows = Array.from(checks).map(chk => {
+        const o = agdRecorrenciaOccurrences[parseInt(chk.dataset.idx, 10)];
+        return {
+          PAC_AGD: agdPacId, PROF_AGD: profId, SALA_AGD: salaId,
+          DT_AGD: o.inicio.toISOString(), DT_FIM_AGD: o.fim.toISOString(),
+          TIPO_AGD: tipo, OBS_AGD: payload.OBS_AGD, ID_EMP: empId,
+          STATUS_AGD: 'AGENDADO', PGTO_AGD: false, ID_SERIE: seriesId
+        };
+      });
+      if (tipo === 'ONLINE') {
+        for (const row of rows) {
+          try {
+            row.LINK_AGD = await criarLinkMeetGoogle(empId, nomePacTitulo, row.DT_AGD, row.DT_FIM_AGD);
+          } catch (linkErr) {
+            btn.disabled = false; btn.textContent = 'Salvar';
+            if (linkErr.reconexaoNecessaria) { openGoogleReconnectModal(); return; }
+            showToast(linkErr.message || 'Erro ao gerar o link do Google Meet', 'error');
+            return;
+          }
+        }
+      }
+      const { error } = await supabase.from('AGENDAMENTO').insert(rows);
+      if (error) throw error;
+      showToast(`Série criada com ${rows.length} consulta(s)!`);
+    } else {
+      if (tipo === 'ONLINE') {
+        try {
+          payload.LINK_AGD = await criarLinkMeetGoogle(empId, nomePacTitulo, payload.DT_AGD, payload.DT_FIM_AGD);
+        } catch (linkErr) {
+          btn.disabled = false; btn.textContent = 'Salvar';
+          if (linkErr.reconexaoNecessaria) { openGoogleReconnectModal(); return; }
+          showToast(linkErr.message || 'Erro ao gerar o link do Google Meet', 'error');
+          return;
+        }
+      }
+      const { error } = await supabase.from('AGENDAMENTO').insert(payload);
+      if (error) throw error;
+      showToast('Agendamento criado com sucesso!');
+    }
+    closeAgdModal();
+  } catch (ex) {
+    showToast(ex.message || 'Erro ao salvar', 'error');
+  }
+  btn.disabled = false; btn.textContent = 'Salvar';
+}
+
+['agdFInicio','agdFFim','agdFProf','agdFSala'].forEach(id => {
+  document.getElementById(id).addEventListener('change', () => {
+    if (document.getElementById('agdFRepetir').checked) renderAgdRecorrenciaPreview();
+  });
+});
+document.querySelectorAll('input[name="agdFTipo"]').forEach(el => {
+  el.addEventListener('change', () => {
+    if (document.getElementById('agdFRepetir').checked) renderAgdRecorrenciaPreview();
+  });
+});
+
+/* ═══════════════════════════════════════════════════
+   INICIALIZAÇÃO
+═══════════════════════════════════════════════════ */
+(async () => {
+  const ok = await initAuth();
+  if (!ok) return;
+  if (isAdminGlobal && !AdminEmpresaCtx.get()) {
+    AdminEmpresaCtx.renderBloqueio(['main']);
+    return;
+  }
+  await Promise.all([loadProfissionais(), loadGrupos(), loadPatients()]);
+})();
+
+document.querySelectorAll('#sidebar nav a').forEach(function(link) {
+  link.addEventListener('click', function() {
+    var sb = document.getElementById('sidebar');
+    var ov = document.getElementById('overlay');
+    if (sb && !sb.classList.contains('-translate-x-full')) {
+      sb.classList.add('-translate-x-full');
+      if (ov) ov.classList.add('hidden');
+    }
+  });
+});
+</script>
+<script>
+(async () => {
+  try {
+    const { data: { session } } = await supabase.auth.getSession();
+    if (['ADMIN_EMPRESA'].includes(session?.user?.user_metadata?.tipo_usu)) {
+      const el = document.getElementById('sectionMinhaEmpresa');
+      if (el) el.classList.remove('hidden');
+    }
+  } catch (_) {}
+})();
+</script>
+<script>
+(async () => {
+  try {
+    const { data: { session } } = await supabase.auth.getSession();
+    if (!session) return;
+    const u = await getUsuarioAtual('TIPO_USU,ID_EMP', session);
+    if (u && u.ID_EMP === '22ff26b9-3839-45ed-8a1d-df4a488d3aab' && ['ADMIN_EMPRESA','SECRETARIA'].includes(u.TIPO_USU)) {
+      document.getElementById('menuDocumentosWrap')?.classList.remove('hidden');
+    }
+  } catch (_) {}
+})();
+</script>
+</body>
+</html>

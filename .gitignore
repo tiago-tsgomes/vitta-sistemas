@@ -1,0 +1,25 @@
+# Sistema operacional
+.DS_Store
+
+# Dependências
+node_modules/
+
+# Projetos nativos (build local via Xcode/Android Studio, não vão pro git)
+android/
+ios/
+
+# Build antigo do Capacitor (não usado — estratégia é carregar URL hospedada)
+www/
+
+# Backups e pastas pessoais (não fazem parte do sistema)
+Arquivo.zip
+bi/Arquivo.zip
+Documentos/
+Recuperados/
+
+# Supabase local
+supabase/.temp/
+
+# Configuração local do Claude Code (específica desta máquina)
+.claude/settings.local.json
+.claude/scheduled_tasks.lock

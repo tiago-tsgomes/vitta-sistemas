@@ -1,0 +1,109 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Vitta BI</title>
+<link rel="icon" type="image/png" href="img/Icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font-family: 'Montserrat', system-ui, sans-serif;
+    background: #FAFAFC;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 40px 20px;
+  }
+  .wrap { width: 100%; max-width: 420px; text-align: center; }
+  .logo { display: flex; align-items: center; justify-content: center; gap: 10px; margin-bottom: 34px; }
+  .spinner {
+    width: 34px; height: 34px; margin: 0 auto 20px auto;
+    border: 3px solid #EFEDF9; border-top-color: #6D5DF6; border-radius: 50%;
+    animation: spin .8s linear infinite;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  p.msg { font-size: 15px; color: #9CA3AF; line-height: 1.6; margin: 0; }
+  h2.erro { font-size: 19px; font-weight: 700; color: #111827; margin: 0 0 10px 0; }
+  a.voltar {
+    display: inline-flex; margin-top: 22px; padding: 10px 20px;
+    background: #6D5DF6; color: #fff; font-size: 14px; font-weight: 600;
+    text-decoration: none; border-radius: 10px;
+  }
+  [hidden] { display: none !important; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="logo">
+    <img src="img/logo_bi.png" alt="Vitta BI" style="height:32px;width:auto;">
+  </div>
+
+  <div id="estado-carregando">
+    <div class="spinner"></div>
+    <p class="msg">Abrindo seu painel...</p>
+  </div>
+
+  <div id="estado-erro" hidden>
+    <h2 class="erro">Não foi possível entrar</h2>
+    <p class="msg">O link de acesso expirou ou já foi usado. Volte ao sistema e clique em "Vitta BI" novamente.</p>
+    <a class="voltar" id="link-voltar" href="https://app.vittasistemas.com.br">Voltar ao sistema</a>
+  </div>
+
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<script>
+/* Vitta BI — porta de entrada em bi.vittasistemas.com.br.
+   Sem token_hash na URL: já existe sessão nesta origem (visita direta
+   depois de um handoff anterior) ou não existe (visitante sem login) —
+   nos dois casos só decide entre Dashboard e voltar pro app, sem UI
+   própria. Com token_hash: veio do handoff do app principal (ver
+   initVittaBIMenu em assets/js/config.js) — troca por sessão local via
+   verifyOtp() antes de entrar. Client próprio, mesmo motivo do
+   bi-auth.js: não reusa assets/js/config.js do app principal. */
+(function () {
+  const SUPABASE_URL = 'https://ccdeuabmjwgntwssjfgo.supabase.co';
+  const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNjZGV1YWJtandnbnR3c3NqZmdvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg2NzM1MjcsImV4cCI6MjA5NDI0OTUyN30.6I2TjAzyIuoKxA1Q-lbM6ibMLVo1_CtEmEjfbjBvlUs';
+  const APP_LOGIN_URL = 'https://app.vittasistemas.com.br/index.html';
+
+  const client = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+  function mostrarErro() {
+    document.getElementById('estado-carregando').hidden = true;
+    document.getElementById('estado-erro').hidden = false;
+  }
+
+  async function boot() {
+    const params = new URLSearchParams(window.location.search);
+    const tokenHash = params.get('token_hash');
+
+    if (tokenHash) {
+      const { error } = await client.auth.verifyOtp({ token_hash: tokenHash, type: 'magiclink' });
+      // Limpa o token da URL/histórico mesmo em caso de erro, já que é
+      // de uso único e não deve ficar reutilizável num "voltar" do navegador.
+      window.history.replaceState({}, '', window.location.pathname);
+      if (error) { mostrarErro(); return; }
+      window.location.replace('pages/dashboard.html');
+      return;
+    }
+
+    const { data: { session } } = await client.auth.getSession();
+    if (session) {
+      window.location.replace('pages/dashboard.html');
+    } else {
+      window.location.replace(APP_LOGIN_URL);
+    }
+  }
+
+  boot();
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,900 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Equipe & Produtividade — Vitta BI</title>
+<link rel="icon" type="image/png" href="../img/Icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  * { box-sizing: border-box; }
+  body { margin: 0; font-family: 'Montserrat', system-ui, sans-serif; background: #FAFAFC; }
+  .bi-card { background: #FFFFFF; border: 1px solid #F1F0F7; border-radius: 16px; box-shadow: 0 2px 8px rgba(109,93,246,.04); }
+  .bi-kpi-icon { width: 36px; height: 36px; border-radius: 10px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+  .bi-delta { display: inline-flex; align-items: center; gap: 3px; font-size: 12.5px; font-weight: 600; padding: 2px 7px; border-radius: 999px; }
+  .bi-filter { font-size: 14px; font-weight: 500; color: #6B7280; background: #FFFFFF; border: 1px solid #EFEDF9; border-radius: 9px; padding: 7px 12px; display: flex; align-items: center; gap: 6px; cursor: pointer; }
+  .bi-kpi-title { display: flex; align-items: center; gap: 6px; font-size: 13px; font-weight: 600; color: #6B7280; }
+  .bi-info { position: relative; width: 15px; height: 15px; border-radius: 50%; border: 1.3px solid #CBC8DC; color: #9C99B8; background: transparent; font-size: 10.5px; font-weight: 700; display: flex; align-items: center; justify-content: center; cursor: help; flex-shrink: 0; }
+  .bi-info-tip { visibility: hidden; opacity: 0; position: absolute; top: calc(100% + 9px); right: -10px; width: 220px; background: #1F2937; color: #fff; font-size: 12.5px; font-weight: 500; line-height: 1.45; padding: 10px 12px; border-radius: 8px; box-shadow: 0 6px 20px rgba(0,0,0,.18); transition: opacity .15s ease; z-index: 30; text-align: left; pointer-events: none; }
+  .bi-info-tip::after { content: ''; position: absolute; bottom: 100%; right: 13px; border: 5px solid transparent; border-bottom-color: #1F2937; }
+  .bi-info:hover .bi-info-tip, .bi-info:focus .bi-info-tip { visibility: visible; opacity: 1; }
+  .bi-info-tip.bi-info-tip-left { left: -10px; right: auto; }
+  .bi-info-tip.bi-info-tip-left::after { left: 13px; right: auto; }
+
+  .bi-period-panel { display: none; position: absolute; top: calc(100% + 8px); left: 0; width: 250px; background: #FFFFFF; border: 1px solid #F1F0F7; border-radius: 14px; box-shadow: 0 14px 34px rgba(17,17,17,.14); z-index: 40; padding: 10px; cursor: default; }
+  .bi-period-panel.open { display: block; }
+  .bi-period-panel-title { font-size: 11.5px; font-weight: 700; color: #9C99B8; letter-spacing: .05em; text-transform: uppercase; padding: 4px 10px 8px; }
+  .bi-period-opt { display: flex; align-items: center; gap: 10px; padding: 9px 10px; border-radius: 10px; cursor: pointer; }
+  .bi-period-opt:hover { background: #F7F6FC; }
+  .bi-period-opt.active { background: #FDECEC; }
+  .bi-period-opt-icon { width: 15px; height: 15px; flex-shrink: 0; color: #9C99B8; }
+  .bi-period-opt-text { flex: 1; min-width: 0; }
+  .bi-period-opt-title { font-size: 14px; font-weight: 600; color: #111827; }
+  .bi-period-opt.active .bi-period-opt-title { color: #C0392B; }
+  .bi-period-opt-sub { font-size: 12px; color: #9CA3AF; margin-top: 1px; }
+  .bi-period-opt-check { color: #C0392B; font-size: 14.5px; flex-shrink: 0; }
+  .bi-period-opt-chevron { color: #C4C1D6; flex-shrink: 0; font-size: 15.5px; }
+  .bi-period-back { border: none; background: transparent; color: #6B7280; font-size: 16.5px; cursor: pointer; padding: 2px 6px 2px 2px; border-radius: 6px; }
+  .bi-period-back:hover { background: #F7F6FC; }
+  .bi-range-input { flex: 1; border: 1.5px solid #EFEDF9; border-radius: 10px; padding: 7px 10px; cursor: pointer; }
+  .bi-range-input.active { border-color: #E4534B; }
+  .bi-range-input-label { font-size: 10px; font-weight: 700; color: #9C99B8; text-transform: uppercase; letter-spacing: .03em; }
+  .bi-range-input-value { font-size: 13px; font-weight: 600; color: #111827; margin-top: 1px; }
+  .bi-cal-nav-btn { border: none; background: transparent; color: #6B7280; font-size: 16.5px; cursor: pointer; width: 24px; height: 24px; border-radius: 6px; }
+  .bi-cal-nav-btn:hover { background: #F7F6FC; }
+  .bi-cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 2px; }
+  .bi-cal-dow { font-size: 11px; font-weight: 700; color: #C4C1D6; text-align: center; padding: 4px 0; }
+  .bi-cal-day { font-size: 12.5px; text-align: center; padding: 7px 0; border-radius: 8px; cursor: pointer; color: #111827; }
+  .bi-cal-day:hover { background: #F7F6FC; }
+  .bi-cal-day.muted { color: #C4C1D6; }
+  .bi-cal-day.in-range { background: #FCEAEA; }
+  .bi-cal-day.range-edge { background: #E4534B !important; color: #fff; font-weight: 600; }
+  .bi-pill { font-size: 11.5px; font-weight: 600; padding: 6px 10px; border-radius: 999px; border: 1px solid #EFEDF9; background: #fff; color: #6B7280; cursor: pointer; }
+  .bi-pill:hover { background: #F7F6FC; }
+  @keyframes bi-skeleton-shimmer { 0% { background-position: 100% 50%; } 100% { background-position: 0 50%; } }
+  .bi-skeleton { display: inline-block; background: linear-gradient(90deg, #F1F0F7 25%, #E9E7F3 37%, #F1F0F7 63%); background-size: 400% 100%; border-radius: 6px; animation: bi-skeleton-shimmer 1.4s ease infinite; vertical-align: middle; }
+  @keyframes bi-spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+  .bi-spin { animation: bi-spin .8s linear infinite; transform-origin: center; }
+  #btn-atualizar:disabled { opacity: .6; cursor: default; }
+  .bi-fullscreen-backdrop { display: none; position: fixed; inset: 0; background: rgba(17,17,17,.45); z-index: 190; }
+  .bi-fullscreen-backdrop.open { display: block; }
+  .bi-card-fullscreen { position: fixed !important; inset: 20px !important; z-index: 200; margin: 0 !important; box-shadow: 0 20px 60px rgba(17,17,17,.28) !important; overflow-y: auto; }
+
+  .bi-section-title { font-size: 12px; font-weight: 700; color: #9C99B8; letter-spacing: .06em; text-transform: uppercase; margin: 6px 0 -6px 2px; }
+</style>
+</head>
+<body>
+<!-- KPIs de topo e ranking por profissional vêm de bi_equipe_resumo e
+     bi_equipe_por_profissional; produtividade por especialidade de
+     bi_equipe_especialidade; evolução mensal top-5 de bi_equipe_evolucao —
+     todas SECURITY DEFINER (p_id_emp, p_period, p_data_ini, p_data_fim), em
+     supabase/migrations/20260904250000_bi_equipe.sql, todas chamando
+     bi_check_access(p_id_emp) antes de calcular qualquer número. Implementa
+     Fase 1 a Fase 4 de PLANO_BI_EQUIPE.md — Fase 5 (visão ampla de
+     usuários/cargos/último acesso e ranking consolidado) fica de fora,
+     pendente de confirmação de escopo com o usuário, conforme o próprio
+     plano recomenda. Só profissionais com ATIVO_PROF = true entram no
+     ranking (mesmo padrão de bi_financeiro_por_profissional). Receita e
+     comissão vêm de PAGAMENTO (excluindo ESTORNADO_PGTO) atribuído via
+     AGENDAMENTO.PROF_AGD, não via PAGAMENTO.ID_PROF direto — mesma
+     convenção já usada em Financeiro, mesmo com PAGAMENTO.ID_PROF 100%
+     preenchido. PROFISSIONAL.PERC_PROF é a "porcentagem da clínica" (rótulo
+     real em profissionais.html), não a comissão do profissional — por isso
+     "comissão estimada" é calculada como receita × (1 − PERC_PROF/100);
+     profissional sem PERC_PROF configurado (ex.: Katia Medeiros) cai para
+     0%, ou seja, a estimativa mostra 100% da receita como comissão, o que
+     pode não refletir a realidade — sinalizado como ressalva na
+     documentação, não como bug. "% em rascunho" tem pouquíssimos dados hoje
+     (só 4 de 9867 CONSULTA no banco inteiro têm RASCUNHO = true), então o
+     número tende a aparecer zerado ou quase zerado para a maioria dos
+     profissionais — não é erro de cálculo. Evolução mensal por profissional
+     NÃO segue o filtro de período do topo: sempre mostra o ano corrente
+     inteiro (Jan até o mês atual), mesmo padrão já usado em
+     bi_leads_por_dimensao.evolucaoMensal. Layout replica o padrão de
+     bi/pages/agenda.html (mesmo filtro de período em painel, mesmos cards
+     de KPI, mesmos helpers de gráfico SVG de assets/js/charts.js). -->
+<div style="display:flex;height:100vh;overflow:hidden;">
+  <div id="bi-sidebar"></div>
+  <div style="flex:1;display:flex;flex-direction:column;min-width:0;background:#FAFAFC;">
+    <div id="bi-header"></div>
+
+    <main style="flex:1;overflow:auto;padding:24px 28px;display:flex;flex-direction:column;gap:20px;">
+
+      <div style="display:flex;align-items:center;gap:10px;">
+        <div class="bi-filter" id="filtro-periodo-btn" style="position:relative;">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#9CA3AF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="17" rx="2"/><path d="M3 9h18M8 2v4M16 2v4"/></svg>
+          <span id="filtro-periodo-label">Este mês</span>
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#C4C1D6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>
+
+          <div class="bi-period-panel" id="periodo-panel">
+            <div id="periodo-view-main">
+              <div class="bi-period-panel-title">Período</div>
+              <div id="periodo-opcoes"></div>
+            </div>
+
+            <div id="periodo-view-custom" style="display:none;">
+              <div style="display:flex;align-items:center;gap:2px;margin-bottom:10px;">
+                <button type="button" class="bi-period-back" id="periodo-custom-voltar">←</button>
+                <span style="font-size:13px;font-weight:700;color:#111827;">Personalizado</span>
+              </div>
+              <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px;">
+                <div class="bi-range-input active" id="range-input-ini">
+                  <div class="bi-range-input-label">Início</div>
+                  <div class="bi-range-input-value" id="range-ini-value">Selecionar</div>
+                </div>
+                <span style="color:#C4C1D6;">→</span>
+                <div class="bi-range-input" id="range-input-fim">
+                  <div class="bi-range-input-label">Fim</div>
+                  <div class="bi-range-input-value" id="range-fim-value">Selecionar</div>
+                </div>
+              </div>
+              <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;">
+                <button type="button" class="bi-cal-nav-btn" id="cal-prev">‹</button>
+                <span id="cal-month-label" style="font-size:13px;font-weight:600;color:#111827;"></span>
+                <button type="button" class="bi-cal-nav-btn" id="cal-next">›</button>
+              </div>
+              <div class="bi-cal-grid" id="cal-dow"></div>
+              <div class="bi-cal-grid" id="cal-days" style="margin-bottom:12px;"></div>
+              <div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:14px;">
+                <button type="button" class="bi-pill" data-preset="7dias">7 dias</button>
+                <button type="button" class="bi-pill" data-preset="30dias">30 dias</button>
+                <button type="button" class="bi-pill" data-preset="mes">Este mês</button>
+                <button type="button" class="bi-pill" data-preset="mes_passado">Mês passado</button>
+                <button type="button" class="bi-pill" data-preset="trimestre">Trimestre</button>
+                <button type="button" class="bi-pill" data-preset="ano">Ano (YTD)</button>
+              </div>
+              <div style="display:flex;gap:8px;">
+                <button type="button" id="periodo-custom-cancelar" style="flex:1;padding:9px;border-radius:10px;border:1px solid #EFEDF9;background:#fff;color:#6B7280;font-size:13px;font-weight:600;cursor:pointer;">Cancelar</button>
+                <button type="button" id="periodo-custom-aplicar" style="flex:1;padding:9px;border-radius:10px;border:none;background:#E4847D;color:#fff;font-size:13px;font-weight:600;cursor:pointer;">Aplicar período</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div style="flex:1;"></div>
+        <span id="bi-ultima-atualizacao" style="font-size:13px;color:#9CA3AF;"></span>
+        <button type="button" id="btn-atualizar" class="bi-filter">
+          <svg id="btn-atualizar-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#6B7280" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 4v6h-6"/><path d="M1 20v-6h6"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
+          Atualizar
+        </button>
+      </div>
+
+      <!-- ================= FASE 1 — Produtividade clínica ================= -->
+      <div class="bi-section-title">Produtividade da equipe</div>
+
+      <div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;">
+        <div class="bi-card" style="padding:14px 16px;">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">
+            <span class="bi-kpi-title">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#6D5DF6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="12" width="4" height="8" rx="1"/><rect x="10" y="7" width="4" height="13" rx="1"/><rect x="16" y="3" width="4" height="17" rx="1"/></svg>
+              Profissionais ativos
+            </span>
+            <span class="bi-info" tabindex="0">?<span class="bi-info-tip">Total de profissionais com ATIVO_PROF = true cadastrados na empresa (não depende do período).</span></span>
+          </div>
+          <div id="kpi-profissionais" style="font-size:23px;font-weight:700;color:#111827;line-height:1;">—</div>
+          <div style="font-size:13px;color:#6B7280;margin-top:5px;">cadastrados na empresa</div>
+        </div>
+
+        <div class="bi-card" style="padding:14px 16px;">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">
+            <span class="bi-kpi-title">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#22C55E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 1v22"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+              Receita total da equipe
+            </span>
+            <span class="bi-info" tabindex="0">?<span class="bi-info-tip">Soma de PAGAMENTO.VL_PGTO (excluindo estornados) atribuído via AGENDAMENTO.PROF_AGD no período. Compara com o mesmo intervalo do período anterior.</span></span>
+          </div>
+          <div id="kpi-receita" style="font-size:23px;font-weight:700;color:#111827;line-height:1;">—</div>
+          <div id="kpi-receita-sub" style="font-size:13px;color:#6B7280;margin-top:5px;">—</div>
+        </div>
+
+        <div class="bi-card" style="padding:14px 16px;">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">
+            <span class="bi-kpi-title">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#20C55E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>
+              Atendimentos realizados
+            </span>
+            <span class="bi-info" tabindex="0">?<span class="bi-info-tip">Agendamentos com STATUS_AGD = "Realizada" no período. Compara com o mesmo intervalo do período anterior.</span></span>
+          </div>
+          <div id="kpi-atendimentos" style="font-size:23px;font-weight:700;color:#111827;line-height:1;">—</div>
+          <div id="kpi-atendimentos-sub" style="font-size:13px;color:#6B7280;margin-top:5px;">—</div>
+        </div>
+      </div>
+
+      <div style="display:grid;grid-template-columns:1fr;gap:20px;flex:none;">
+        <div class="bi-card" id="card-ranking-receita" style="padding:20px 24px;display:flex;flex-direction:column;">
+          <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:8px;margin-bottom:14px;">
+            <div>
+              <span style="font-size:15.5px;font-weight:600;color:#111827;">Ranking por receita e ticket médio</span>
+              <div style="font-size:14px;color:#9CA3AF;margin-top:3px;">Profissionais ativos, ordenados por receita gerada no período</div>
+            </div>
+            <button type="button" id="btn-expandir-receita" title="Expandir" style="display:flex;align-items:center;justify-content:center;width:26px;height:26px;border-radius:8px;border:1px solid #EFEDF9;background:#fff;color:#6B7280;cursor:pointer;padding:0;flex-shrink:0;"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3H5a2 2 0 0 0-2 2v3M16 3h3a2 2 0 0 1 2 2v3M8 21H5a2 2 0 0 1-2-2v-3M16 21h3a2 2 0 0 0 2-2v-3"/></svg></button>
+          </div>
+          <div id="lista-ranking-receita" style="display:flex;flex-direction:column;">—</div>
+        </div>
+      </div>
+
+      <!-- ================= FASE 2 — Qualidade e ocupação ================= -->
+      <div class="bi-section-title" style="margin-top:6px;">Qualidade e ocupação por profissional</div>
+
+      <div style="display:grid;grid-template-columns:1fr;gap:20px;flex:none;">
+        <div class="bi-card" id="card-qualidade" style="padding:20px 24px;display:flex;flex-direction:column;">
+          <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:8px;margin-bottom:14px;">
+            <div>
+              <span style="display:flex;align-items:center;gap:6px;font-size:15.5px;font-weight:600;color:#111827;">
+                Realização, falta e consultas registradas
+                <span class="bi-info" tabindex="0">?<span class="bi-info-tip bi-info-tip-left" style="width:260px;">Taxa de realização e falta calculadas sobre o total de agendamentos do profissional no período. "% rascunho" hoje tem poucos dados no sistema (a maioria das consultas não usa esse campo), então costuma aparecer perto de zero para todo mundo — não é erro.</span></span>
+              </span>
+              <div style="font-size:14px;color:#9CA3AF;margin-top:3px;">Mesma ordem do ranking de receita, para comparar lado a lado</div>
+            </div>
+            <button type="button" id="btn-expandir-qualidade" title="Expandir" style="display:flex;align-items:center;justify-content:center;width:26px;height:26px;border-radius:8px;border:1px solid #EFEDF9;background:#fff;color:#6B7280;cursor:pointer;padding:0;flex-shrink:0;"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3H5a2 2 0 0 0-2 2v3M16 3h3a2 2 0 0 1 2 2v3M8 21H5a2 2 0 0 1-2-2v-3M16 21h3a2 2 0 0 0 2-2v-3"/></svg></button>
+          </div>
+          <div id="lista-qualidade" style="display:flex;flex-direction:column;">—</div>
+        </div>
+      </div>
+
+      <!-- ================= FASE 3 — Comissão e especialidade ================= -->
+      <div class="bi-section-title" style="margin-top:6px;">Comissão e produtividade por especialidade</div>
+
+      <div style="display:grid;grid-template-columns:1fr;gap:20px;flex:none;">
+        <div class="bi-card" id="card-comissao" style="padding:20px 24px;display:flex;flex-direction:column;">
+          <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:8px;margin-bottom:14px;">
+            <div>
+              <span style="display:flex;align-items:center;gap:6px;font-size:15.5px;font-weight:600;color:#111827;">
+                Comissão estimada por profissional
+                <span class="bi-info" tabindex="0">?<span class="bi-info-tip bi-info-tip-left" style="width:260px;">Estimativa: receita × (1 − % da clínica). Não é um lançamento contábil real. Profissional sem % da clínica cadastrado aparece com 100% de comissão estimada — vale conferir o cadastro dele em Profissionais.</span></span>
+              </span>
+              <div style="font-size:14px;color:#9CA3AF;margin-top:3px;">Valor estimado que fica com o profissional, após o repasse à clínica</div>
+            </div>
+            <button type="button" id="btn-expandir-comissao" title="Expandir" style="display:flex;align-items:center;justify-content:center;width:26px;height:26px;border-radius:8px;border:1px solid #EFEDF9;background:#fff;color:#6B7280;cursor:pointer;padding:0;flex-shrink:0;"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3H5a2 2 0 0 0-2 2v3M16 3h3a2 2 0 0 1 2 2v3M8 21H5a2 2 0 0 1-2-2v-3M16 21h3a2 2 0 0 0 2-2v-3"/></svg></button>
+          </div>
+          <div id="lista-comissao" style="display:flex;flex-direction:column;">—</div>
+        </div>
+      </div>
+
+      <div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:20px;flex:none;">
+        <div class="bi-card" style="padding:20px 24px;display:flex;flex-direction:column;">
+          <div style="margin-bottom:14px;">
+            <span style="font-size:15.5px;font-weight:600;color:#111827;">Produtividade por especialidade</span>
+            <div style="font-size:14px;color:#9CA3AF;margin-top:3px;">Receita e atendimentos agrupados por especialidade (todos os profissionais)</div>
+          </div>
+          <div id="lista-especialidade" style="display:flex;flex-direction:column;">—</div>
+        </div>
+
+        <div class="bi-card" style="padding:20px 24px;display:flex;flex-direction:column;">
+          <div style="margin-bottom:14px;">
+            <span style="display:flex;align-items:center;gap:6px;font-size:15.5px;font-weight:600;color:#111827;">
+              Evolução mensal — top 5 profissionais
+              <span class="bi-info" tabindex="0">?<span class="bi-info-tip bi-info-tip-left" style="width:250px;">Não segue o filtro de período do topo: sempre mostra o ano corrente inteiro (Jan até o mês atual), para os 5 profissionais com maior receita no ano.</span></span>
+            </span>
+            <div style="font-size:14px;color:#9CA3AF;margin-top:3px;">Receita por mês, ano corrente</div>
+          </div>
+          <div id="chart-evolucao-equipe-legend" style="margin-bottom:10px;"></div>
+          <div id="chart-evolucao-equipe-skeleton" class="bi-skeleton" style="width:100%;height:220px;display:none;"></div>
+          <svg id="chart-evolucao-equipe" width="100%" height="220"></svg>
+        </div>
+      </div>
+
+      <!-- ================= FASE 4 — Geração de negócio ================= -->
+      <div class="bi-section-title" style="margin-top:6px;">Geração de negócio (leads) por profissional</div>
+
+      <div style="display:grid;grid-template-columns:1fr;gap:20px;flex:none;">
+        <div class="bi-card" id="card-leads" style="padding:20px 24px;display:flex;flex-direction:column;">
+          <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:8px;margin-bottom:14px;">
+            <div>
+              <span style="font-size:15.5px;font-weight:600;color:#111827;">Leads, conversão e desistência</span>
+              <div style="font-size:14px;color:#9CA3AF;margin-top:3px;">Leads com profissional atribuído (LEADS.ID_PROF) no período</div>
+            </div>
+            <button type="button" id="btn-expandir-leads" title="Expandir" style="display:flex;align-items:center;justify-content:center;width:26px;height:26px;border-radius:8px;border:1px solid #EFEDF9;background:#fff;color:#6B7280;cursor:pointer;padding:0;flex-shrink:0;"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3H5a2 2 0 0 0-2 2v3M16 3h3a2 2 0 0 1 2 2v3M8 21H5a2 2 0 0 1-2-2v-3M16 21h3a2 2 0 0 0 2-2v-3"/></svg></button>
+          </div>
+          <div id="lista-leads" style="display:flex;flex-direction:column;">—</div>
+        </div>
+      </div>
+
+    </main>
+  </div>
+</div>
+<div id="fullscreen-backdrop" class="bi-fullscreen-backdrop"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<script src="../assets/js/bi-auth.js"></script>
+<script src="../assets/js/bi-menu.js"></script>
+<script src="../assets/js/charts.js"></script>
+<script>
+  let idEmp = null;
+  let periodo = 'mes';
+  let customIni = null;
+  let customFim = null;
+
+  const COMPARE_LABEL = {
+    hoje: 'ontem',
+    ontem: 'dois dias atrás',
+    '7dias': '7 dias anteriores',
+    '30dias': '30 dias anteriores',
+    mes: 'mês anterior',
+    mes_passado: 'mês anterior',
+    trimestre: 'trimestre anterior',
+    ano: 'ano anterior',
+    custom: 'período anterior equivalente',
+  };
+
+  const PERIOD_PRESETS = [
+    { value: 'hoje', label: 'Hoje' },
+    { value: 'ontem', label: 'Ontem' },
+    { value: '7dias', label: 'Últimos 7 dias' },
+    { value: '30dias', label: 'Últimos 30 dias' },
+    { value: 'mes', label: 'Este mês' },
+    { value: 'mes_passado', label: 'Mês passado' },
+    { value: 'trimestre', label: 'Trimestre' },
+    { value: 'ano', label: 'Ano (YTD)' },
+  ];
+
+  const CAL_ICON = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="17" rx="2"/><path d="M3 9h18M8 2v4M16 2v4"/></svg>';
+
+  function addDays(d, n) { const r = new Date(d); r.setDate(r.getDate() + n); return r; }
+
+  function presetRange(value) {
+    const hoje = new Date();
+    hoje.setHours(0, 0, 0, 0);
+    switch (value) {
+      case 'hoje': return { ini: hoje, fim: hoje };
+      case 'ontem': { const d = addDays(hoje, -1); return { ini: d, fim: d }; }
+      case '7dias': return { ini: addDays(hoje, -6), fim: hoje };
+      case '30dias': return { ini: addDays(hoje, -29), fim: hoje };
+      case 'mes': return { ini: new Date(hoje.getFullYear(), hoje.getMonth(), 1), fim: hoje };
+      case 'mes_passado': return { ini: new Date(hoje.getFullYear(), hoje.getMonth() - 1, 1), fim: new Date(hoje.getFullYear(), hoje.getMonth(), 0) };
+      case 'trimestre': return { ini: new Date(hoje.getFullYear(), hoje.getMonth() - 2, 1), fim: hoje };
+      case 'ano': return { ini: new Date(hoje.getFullYear(), 0, 1), fim: hoje };
+      default: return { ini: hoje, fim: hoje };
+    }
+  }
+
+  function fmtDateBR(d) {
+    return String(d.getDate()).padStart(2, '0') + '/' + String(d.getMonth() + 1).padStart(2, '0') + '/' + d.getFullYear();
+  }
+
+  function toISODate(d) {
+    return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
+  }
+
+  function sameDay(a, b) {
+    return !!a && !!b && a.getFullYear() === b.getFullYear() && a.getMonth() === b.getMonth() && a.getDate() === b.getDate();
+  }
+
+  function fmtPct(v) {
+    return (v === null || v === undefined) ? '—' : `${v}%`;
+  }
+
+  function fmtBRL(v) {
+    if (v === null || v === undefined) return '—';
+    return 'R$ ' + Number(v).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  }
+
+  function renderDeltaLine(elId, value, { invertColor = false, isPP = false } = {}) {
+    const el = document.getElementById(elId);
+    const compareLabel = COMPARE_LABEL[periodo] || 'período anterior';
+    if (value === null || value === undefined) {
+      el.textContent = `sem dados do ${compareLabel}`;
+      return;
+    }
+    const positivo = invertColor ? value <= 0 : value >= 0;
+    const color = positivo ? '#1D8A4A' : '#C0392B';
+    const arrow = value >= 0 ? '▲' : '▼';
+    const suffix = isPP ? 'p.p.' : '%';
+    el.innerHTML = `<span style="color:${color};font-weight:600;">${arrow} ${Math.abs(value)}${suffix}</span> vs ${compareLabel}`;
+  }
+
+  let profissionaisCache = [];
+
+  function skeletonListRows(n = 4) {
+    return Array.from({ length: n }).map(() => `
+      <div style="padding:9px 0;border-bottom:1px solid #E3E1EE;">
+        <div class="bi-skeleton" style="width:60%;height:14px;margin-bottom:7px;"></div>
+        <div class="bi-skeleton" style="width:100%;height:7px;"></div>
+      </div>
+    `).join('');
+  }
+
+  function setResumoLoading() {
+    document.getElementById('kpi-profissionais').innerHTML = '<span class="bi-skeleton" style="width:40px;height:22px;"></span>';
+    document.getElementById('kpi-receita').innerHTML = '<span class="bi-skeleton" style="width:90px;height:22px;"></span>';
+    document.getElementById('kpi-receita-sub').innerHTML = '<span class="bi-skeleton" style="width:130px;height:13px;"></span>';
+    document.getElementById('kpi-atendimentos').innerHTML = '<span class="bi-skeleton" style="width:64px;height:22px;"></span>';
+    document.getElementById('kpi-atendimentos-sub').innerHTML = '<span class="bi-skeleton" style="width:130px;height:13px;"></span>';
+  }
+
+  async function loadResumo() {
+    setResumoLoading();
+    const { data, error } = await BIAuth.client.rpc('bi_equipe_resumo', {
+      p_id_emp: idEmp,
+      p_period: periodo,
+      p_data_ini: periodo === 'custom' ? toISODate(customIni) : null,
+      p_data_fim: periodo === 'custom' ? toISODate(customFim) : null,
+    });
+    if (error) {
+      console.error('bi_equipe_resumo:', error);
+      document.getElementById('kpi-profissionais').textContent = '—';
+      document.getElementById('kpi-receita').textContent = '—';
+      document.getElementById('kpi-receita-sub').textContent = 'Erro ao carregar';
+      document.getElementById('kpi-atendimentos').textContent = '—';
+      document.getElementById('kpi-atendimentos-sub').textContent = 'Erro ao carregar';
+      return;
+    }
+
+    document.getElementById('kpi-profissionais').textContent = data.profissionaisAtivos;
+
+    document.getElementById('kpi-receita').textContent = fmtBRL(data.receitaTotal);
+    renderDeltaLine('kpi-receita-sub', data.receitaTotalDeltaPct);
+
+    document.getElementById('kpi-atendimentos').textContent = data.totalAtendimentos;
+    renderDeltaLine('kpi-atendimentos-sub', data.totalAtendimentosDeltaPct);
+  }
+
+  function renderRankingCard(containerId, itens, { barValue, barColor, badgeText, badgeColor, subLabel, vazio }) {
+    const container = document.getElementById(containerId);
+    if (!itens || !itens.length) {
+      container.innerHTML = `<div style="font-size:14px;color:#9CA3AF;padding:8px 0;">${vazio || 'Nenhum profissional ativo cadastrado.'}</div>`;
+      return;
+    }
+    const maxBar = Math.max(...itens.map(barValue), 1);
+    container.innerHTML = itens.map((item, idx) => {
+      const val = barValue(item);
+      const pct = Math.max(2, Math.round((val / maxBar) * 100));
+      return `
+        <div style="display:flex;align-items:center;gap:12px;padding:9px 0;border-bottom:1px solid #E3E1EE;">
+          <div style="width:18px;flex-shrink:0;font-size:12.5px;font-weight:700;color:#C4C1D6;text-align:center;">${idx + 1}</div>
+          <div style="flex:1;min-width:0;">
+            <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;">
+              <span style="font-size:15px;font-weight:600;color:#111827;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${item.nome}</span>
+              <span style="font-size:12.5px;font-weight:700;color:${badgeColor(item)};white-space:nowrap;flex-shrink:0;">${badgeText(item)}</span>
+            </div>
+            <div style="height:7px;background:#F1F0F7;border-radius:999px;margin-top:5px;overflow:hidden;">
+              <div style="height:100%;width:${pct}%;background:${barColor};border-radius:999px;"></div>
+            </div>
+            <div style="font-size:13px;color:#6B7280;margin-top:4px;">${subLabel(item)}</div>
+          </div>
+        </div>
+      `;
+    }).join('');
+  }
+
+  function renderRankingReceita(itens) {
+    renderRankingCard('lista-ranking-receita', itens, {
+      barValue: (i) => i.receita,
+      barColor: '#6D5DF6',
+      badgeText: (i) => fmtBRL(i.receita),
+      badgeColor: () => '#111827',
+      subLabel: (i) => `${i.atendimentosRealizados} atendimento${i.atendimentosRealizados === 1 ? '' : 's'} · ticket médio ${fmtBRL(i.ticketMedio)}${i.especialidade ? ' · ' + i.especialidade : ''}`,
+    });
+  }
+
+  function renderQualidade(itens) {
+    renderRankingCard('lista-qualidade', itens, {
+      barValue: (i) => i.atendimentosRealizados,
+      barColor: '#2ABCD4',
+      badgeText: (i) => `${fmtPct(i.taxaFaltaPct)} falta`,
+      badgeColor: (i) => i.taxaFaltaPct === null ? '#C4C1D6' : (i.taxaFaltaPct <= 5 ? '#1D8A4A' : i.taxaFaltaPct <= 15 ? '#B7791F' : '#C0392B'),
+      subLabel: (i) => `Realização ${fmtPct(i.taxaRealizacaoPct)} · ${i.consultasRegistradas} consulta${i.consultasRegistradas === 1 ? '' : 's'} registrada${i.consultasRegistradas === 1 ? '' : 's'} (${fmtPct(i.pctRascunho)} rascunho)`,
+    });
+  }
+
+  function renderComissao(itens) {
+    renderRankingCard('lista-comissao', itens, {
+      barValue: (i) => i.comissaoEstimada,
+      barColor: '#F0A868',
+      badgeText: (i) => fmtBRL(i.comissaoEstimada),
+      badgeColor: () => '#111827',
+      subLabel: (i) => `${i.percClinica}% repassado à clínica · receita ${fmtBRL(i.receita)}`,
+    });
+  }
+
+  function renderLeads(itens) {
+    renderRankingCard('lista-leads', itens, {
+      barValue: (i) => i.leadsTotal,
+      barColor: '#8B7FE8',
+      badgeText: (i) => `${i.leadsTotal} lead${i.leadsTotal === 1 ? '' : 's'}`,
+      badgeColor: () => '#111827',
+      subLabel: (i) => i.leadsTotal ? `Conversão ${fmtPct(i.leadsConversaoPct)} · Desistência ${fmtPct(i.leadsDesistenciaPct)}` : 'Sem leads atribuídos no período',
+    });
+  }
+
+  function setPorProfissionalLoading() {
+    ['lista-ranking-receita', 'lista-qualidade', 'lista-comissao', 'lista-leads'].forEach((id) => {
+      document.getElementById(id).innerHTML = skeletonListRows();
+    });
+  }
+
+  async function loadPorProfissional() {
+    setPorProfissionalLoading();
+    const { data, error } = await BIAuth.client.rpc('bi_equipe_por_profissional', {
+      p_id_emp: idEmp,
+      p_period: periodo,
+      p_data_ini: periodo === 'custom' ? toISODate(customIni) : null,
+      p_data_fim: periodo === 'custom' ? toISODate(customFim) : null,
+    });
+    if (error) {
+      console.error('bi_equipe_por_profissional:', error);
+      ['lista-ranking-receita', 'lista-qualidade', 'lista-comissao', 'lista-leads'].forEach((id) => {
+        document.getElementById(id).innerHTML = '<div style="font-size:14px;color:#9CA3AF;padding:8px 0;">Erro ao carregar dados.</div>';
+      });
+      return;
+    }
+
+    profissionaisCache = data.profissionais || [];
+    renderRankingReceita(profissionaisCache);
+    renderQualidade(profissionaisCache);
+    renderComissao(profissionaisCache);
+    renderLeads(profissionaisCache);
+  }
+
+  function renderListaEspecialidade(itens) {
+    const container = document.getElementById('lista-especialidade');
+    if (!itens || !itens.length) {
+      container.innerHTML = '<div style="font-size:14px;color:#9CA3AF;padding:8px 0;">Sem dados no período.</div>';
+      return;
+    }
+    const maxVal = Math.max(...itens.map((i) => i.receita), 1);
+    container.innerHTML = itens.map((item) => {
+      const pct = Math.max(2, Math.round((item.receita / maxVal) * 100));
+      return `
+        <div style="padding:9px 0;border-bottom:1px solid #E3E1EE;">
+          <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;">
+            <span style="font-size:15px;font-weight:600;color:#111827;">${item.nome}</span>
+            <span style="font-size:14px;color:#9CA3AF;">${fmtBRL(item.receita)}</span>
+          </div>
+          <div style="height:7px;background:#F1F0F7;border-radius:999px;margin-top:5px;overflow:hidden;">
+            <div style="height:100%;width:${pct}%;background:#6D5DF6;border-radius:999px;"></div>
+          </div>
+          <div style="font-size:13px;color:#6B7280;margin-top:4px;">${item.atendimentos} atendimento${item.atendimentos === 1 ? '' : 's'}</div>
+        </div>
+      `;
+    }).join('');
+  }
+
+  function setEspecialidadeLoading() {
+    document.getElementById('lista-especialidade').innerHTML = skeletonListRows();
+  }
+
+  async function loadEspecialidade() {
+    setEspecialidadeLoading();
+    const { data, error } = await BIAuth.client.rpc('bi_equipe_especialidade', {
+      p_id_emp: idEmp,
+      p_period: periodo,
+      p_data_ini: periodo === 'custom' ? toISODate(customIni) : null,
+      p_data_fim: periodo === 'custom' ? toISODate(customFim) : null,
+    });
+    if (error) {
+      console.error('bi_equipe_especialidade:', error);
+      document.getElementById('lista-especialidade').innerHTML = '<div style="font-size:14px;color:#9CA3AF;padding:8px 0;">Erro ao carregar dados.</div>';
+      return;
+    }
+    renderListaEspecialidade(data.porEspecialidade);
+  }
+
+  const MONTH_ABBR = ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'];
+  const EVOLUCAO_PALETTE = ['#6D5DF6', '#2ABCD4', '#F0A868', '#8B7FE8', '#C0392B'];
+
+  function setEvolucaoLoading() {
+    document.getElementById('chart-evolucao-equipe-legend').innerHTML = '<span class="bi-skeleton" style="width:100px;height:15px;margin-right:22px;"></span><span class="bi-skeleton" style="width:100px;height:15px;"></span>';
+    document.getElementById('chart-evolucao-equipe-skeleton').style.display = 'block';
+    document.getElementById('chart-evolucao-equipe').style.display = 'none';
+  }
+
+  async function loadEvolucao() {
+    setEvolucaoLoading();
+    const { data, error } = await BIAuth.client.rpc('bi_equipe_evolucao', {
+      p_id_emp: idEmp,
+      p_period: periodo,
+      p_data_ini: null,
+      p_data_fim: null,
+    });
+    if (error) {
+      console.error('bi_equipe_evolucao:', error);
+      document.getElementById('chart-evolucao-equipe-skeleton').style.display = 'none';
+      document.getElementById('chart-evolucao-equipe').style.display = '';
+      document.getElementById('chart-evolucao-equipe-legend').innerHTML = '';
+      return;
+    }
+
+    document.getElementById('chart-evolucao-equipe-skeleton').style.display = 'none';
+    document.getElementById('chart-evolucao-equipe').style.display = '';
+
+    const labels = [];
+    for (let m = 1; m <= data.mesAtual; m++) labels.push(MONTH_ABBR[m - 1]);
+
+    const profissionais = data.profissionais || [];
+    const series = profissionais.map((p, idx) => ({
+      name: p.nome.split(' ')[0],
+      color: EVOLUCAO_PALETTE[idx % EVOLUCAO_PALETTE.length],
+      values: (p.serie || []).map((s) => s.receita),
+    }));
+
+    BICharts.drawLineChart(document.getElementById('chart-evolucao-equipe'), {
+      labels,
+      series,
+      height: 220,
+      yFmt: BICharts.fmtBRLk,
+      niceGrid: true,
+      showEndLabels: true,
+    });
+
+    document.getElementById('chart-evolucao-equipe-legend').innerHTML = series.length
+      ? series.map((s) => `
+        <span style="display:inline-flex;align-items:center;gap:7px;font-size:15px;font-weight:700;color:#111827;margin-right:22px;">
+          <span style="width:11px;height:11px;border-radius:3px;background:${s.color};display:inline-block;"></span>${s.name}
+        </span>
+      `).join('')
+      : '<span style="font-size:14px;color:#9CA3AF;">Sem receita registrada no ano corrente.</span>';
+  }
+
+  function updateUltimaAtualizacao() {
+    const now = new Date();
+    const hh = String(now.getHours()).padStart(2, '0');
+    const mm = String(now.getMinutes()).padStart(2, '0');
+    document.getElementById('bi-ultima-atualizacao').textContent = `Atualizado às ${hh}:${mm}`;
+  }
+
+  async function refreshData({ manual = false } = {}) {
+    const btn = document.getElementById('btn-atualizar');
+    const icon = document.getElementById('btn-atualizar-icon');
+    if (manual) { btn.disabled = true; icon.classList.add('bi-spin'); }
+    await Promise.all([loadResumo(), loadPorProfissional(), loadEspecialidade(), loadEvolucao()]);
+    updateUltimaAtualizacao();
+    if (manual) { btn.disabled = false; icon.classList.remove('bi-spin'); }
+  }
+
+  function applyPeriodoLabel() {
+    const label = document.getElementById('filtro-periodo-label');
+    if (periodo === 'custom' && customIni && customFim) {
+      label.textContent = sameDay(customIni, customFim) ? fmtDateBR(customIni) : `${fmtDateBR(customIni)} → ${fmtDateBR(customFim)}`;
+    } else {
+      const preset = PERIOD_PRESETS.find((p) => p.value === periodo);
+      label.textContent = preset ? preset.label : 'Este mês';
+    }
+  }
+
+  function closePeriodoPanel() {
+    document.getElementById('periodo-panel').classList.remove('open');
+  }
+
+  function openPeriodoPanel() {
+    document.getElementById('periodo-view-custom').style.display = 'none';
+    document.getElementById('periodo-view-main').style.display = 'block';
+    renderPeriodoOpcoes();
+    document.getElementById('periodo-panel').classList.add('open');
+  }
+
+  function selecionarPeriodo(value) {
+    periodo = value;
+    customIni = null;
+    customFim = null;
+    applyPeriodoLabel();
+    closePeriodoPanel();
+    refreshData();
+  }
+
+  function renderPeriodoOpcoes() {
+    const container = document.getElementById('periodo-opcoes');
+    const rows = PERIOD_PRESETS.map((p) => {
+      const { ini, fim } = presetRange(p.value);
+      const rangeText = sameDay(ini, fim) ? fmtDateBR(ini) : `${fmtDateBR(ini)} → ${fmtDateBR(fim)}`;
+      const isActive = periodo === p.value;
+      return `
+        <div class="bi-period-opt${isActive ? ' active' : ''}" data-value="${p.value}">
+          <span class="bi-period-opt-icon">${CAL_ICON}</span>
+          <div class="bi-period-opt-text">
+            <div class="bi-period-opt-title">${p.label}</div>
+            <div class="bi-period-opt-sub">${rangeText}</div>
+          </div>
+          ${isActive ? '<span class="bi-period-opt-check">✓</span>' : ''}
+        </div>`;
+    }).join('');
+
+    const customActive = periodo === 'custom';
+    const customSub = customActive && customIni && customFim
+      ? (sameDay(customIni, customFim) ? fmtDateBR(customIni) : `${fmtDateBR(customIni)} → ${fmtDateBR(customFim)}`)
+      : 'Escolha um intervalo';
+    const customRow = `
+      <div class="bi-period-opt${customActive ? ' active' : ''}" id="periodo-opt-custom">
+        <span class="bi-period-opt-icon">${CAL_ICON}</span>
+        <div class="bi-period-opt-text">
+          <div class="bi-period-opt-title">Personalizado...</div>
+          <div class="bi-period-opt-sub">${customSub}</div>
+        </div>
+        ${customActive ? '<span class="bi-period-opt-check">✓</span>' : '<span class="bi-period-opt-chevron">›</span>'}
+      </div>`;
+
+    container.innerHTML = rows + customRow;
+    container.querySelectorAll('.bi-period-opt[data-value]').forEach((el) => {
+      el.addEventListener('click', () => selecionarPeriodo(el.dataset.value));
+    });
+    document.getElementById('periodo-opt-custom').addEventListener('click', abrirPeriodoCustom);
+  }
+
+  function renderRangeInputs() {
+    document.getElementById('range-ini-value').textContent = selStart ? fmtDateBR(selStart) : 'Selecionar';
+    document.getElementById('range-fim-value').textContent = selEnd ? fmtDateBR(selEnd) : 'Selecionar';
+    const nextIsIni = !selStart || (selStart && selEnd);
+    document.getElementById('range-input-ini').classList.toggle('active', nextIsIni);
+    document.getElementById('range-input-fim').classList.toggle('active', !nextIsIni);
+  }
+
+  let calViewDate = new Date();
+  let selStart = null;
+  let selEnd = null;
+  const DOW = ['D', 'S', 'T', 'Q', 'Q', 'S', 'S'];
+  const MONTH_NAMES = ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho', 'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'];
+
+  function renderCalendar() {
+    document.getElementById('cal-dow').innerHTML = DOW.map((d) => `<div class="bi-cal-dow">${d}</div>`).join('');
+    document.getElementById('cal-month-label').textContent = `${MONTH_NAMES[calViewDate.getMonth()]} ${calViewDate.getFullYear()}`;
+
+    const firstOfMonth = new Date(calViewDate.getFullYear(), calViewDate.getMonth(), 1);
+    const gridStart = new Date(firstOfMonth);
+    gridStart.setDate(gridStart.getDate() - firstOfMonth.getDay());
+
+    const hoje = new Date();
+    hoje.setHours(0, 0, 0, 0);
+
+    const dias = [];
+    for (let i = 0; i < 42; i++) {
+      const d = new Date(gridStart);
+      d.setDate(gridStart.getDate() + i);
+      dias.push(d);
+    }
+
+    document.getElementById('cal-days').innerHTML = dias.map((d) => {
+      const muted = d.getMonth() !== calViewDate.getMonth();
+      const inRange = selStart && selEnd && d > selStart && d < selEnd;
+      const isEdge = sameDay(d, selStart) || sameDay(d, selEnd);
+      const isToday = sameDay(d, hoje);
+      const cls = ['bi-cal-day'];
+      if (muted) cls.push('muted');
+      if (inRange) cls.push('in-range');
+      if (isEdge) cls.push('range-edge');
+      const style = isToday && !isEdge ? 'font-weight:700;text-decoration:underline;' : '';
+      return `<div class="${cls.join(' ')}" data-date="${toISODate(d)}" style="${style}">${d.getDate()}</div>`;
+    }).join('');
+
+    document.getElementById('cal-days').querySelectorAll('.bi-cal-day').forEach((el) => {
+      el.addEventListener('click', () => {
+        const [y, m, dd] = el.dataset.date.split('-').map(Number);
+        const clicked = new Date(y, m - 1, dd);
+        if (!selStart || (selStart && selEnd)) {
+          selStart = clicked;
+          selEnd = null;
+        } else if (clicked < selStart) {
+          selStart = clicked;
+        } else {
+          selEnd = clicked;
+        }
+        renderRangeInputs();
+        renderCalendar();
+      });
+    });
+  }
+
+  function abrirPeriodoCustom() {
+    document.getElementById('periodo-view-main').style.display = 'none';
+    document.getElementById('periodo-view-custom').style.display = 'block';
+    selStart = customIni || null;
+    selEnd = customFim || null;
+    calViewDate = new Date(selEnd || selStart || new Date());
+    renderRangeInputs();
+    renderCalendar();
+  }
+
+  function voltarPeriodoMain() {
+    document.getElementById('periodo-view-custom').style.display = 'none';
+    document.getElementById('periodo-view-main').style.display = 'block';
+    renderPeriodoOpcoes();
+  }
+
+  function setupPeriodoPanel() {
+    applyPeriodoLabel();
+    document.getElementById('filtro-periodo-btn').addEventListener('click', (ev) => {
+      ev.stopPropagation();
+      const panel = document.getElementById('periodo-panel');
+      panel.classList.contains('open') ? closePeriodoPanel() : openPeriodoPanel();
+    });
+    document.getElementById('periodo-panel').addEventListener('click', (ev) => ev.stopPropagation());
+    document.addEventListener('click', () => closePeriodoPanel());
+
+    document.getElementById('periodo-custom-voltar').addEventListener('click', voltarPeriodoMain);
+    document.getElementById('periodo-custom-cancelar').addEventListener('click', closePeriodoPanel);
+    document.getElementById('periodo-custom-aplicar').addEventListener('click', () => {
+      if (!selStart) return;
+      customIni = selStart;
+      customFim = selEnd || selStart;
+      periodo = 'custom';
+      applyPeriodoLabel();
+      closePeriodoPanel();
+      refreshData();
+    });
+
+    document.getElementById('cal-prev').addEventListener('click', () => {
+      calViewDate = new Date(calViewDate.getFullYear(), calViewDate.getMonth() - 1, 1);
+      renderCalendar();
+    });
+    document.getElementById('cal-next').addEventListener('click', () => {
+      calViewDate = new Date(calViewDate.getFullYear(), calViewDate.getMonth() + 1, 1);
+      renderCalendar();
+    });
+
+    document.querySelectorAll('.bi-pill').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        const { ini, fim } = presetRange(btn.dataset.preset);
+        selStart = ini;
+        selEnd = fim;
+        calViewDate = new Date(fim);
+        renderRangeInputs();
+        renderCalendar();
+      });
+    });
+  }
+
+  const ICON_EXPAND = '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3H5a2 2 0 0 0-2 2v3M16 3h3a2 2 0 0 1 2 2v3M8 21H5a2 2 0 0 1-2-2v-3M16 21h3a2 2 0 0 0 2-2v-3"/></svg>';
+  const ICON_COMPRESS = '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 3v3a2 2 0 0 1-2 2H4M21 8h-3a2 2 0 0 1-2-2V3M3 16h3a2 2 0 0 1 2 2v3M16 21v-3a2 2 0 0 1 2-2h3"/></svg>';
+  let fullscreenTarget = null;
+
+  function setCardFullscreen(target, isFull) {
+    const card = document.getElementById(target.cardId);
+    const backdrop = document.getElementById('fullscreen-backdrop');
+    const btn = document.getElementById(target.btnId);
+    card.classList.toggle('bi-card-fullscreen', isFull);
+    backdrop.classList.toggle('open', isFull);
+    document.body.style.overflow = isFull ? 'hidden' : '';
+    btn.innerHTML = isFull ? ICON_COMPRESS : ICON_EXPAND;
+    btn.title = isFull ? 'Sair da tela cheia' : 'Expandir';
+    fullscreenTarget = isFull ? target : null;
+  }
+
+  function setupCardFullscreen(target) {
+    document.getElementById(target.btnId).addEventListener('click', () => {
+      const isFull = document.getElementById(target.cardId).classList.contains('bi-card-fullscreen');
+      setCardFullscreen(target, !isFull);
+    });
+  }
+
+  function setupFullscreenBackdrop() {
+    document.getElementById('fullscreen-backdrop').addEventListener('click', () => {
+      if (fullscreenTarget) setCardFullscreen(fullscreenTarget, false);
+    });
+    document.addEventListener('keydown', (ev) => {
+      if (ev.key === 'Escape' && fullscreenTarget) setCardFullscreen(fullscreenTarget, false);
+    });
+  }
+
+  (async () => {
+    const user = await BIAuth.getCurrentUser();
+    if (!user) return;
+    idEmp = user.idEmp;
+
+    BIMenu.renderBISidebar('#bi-sidebar', { active: 'equipe', empresaNome: user.empresaNome });
+    BIMenu.renderBIHeader('#bi-header', {
+      title: 'Equipe & Produtividade',
+      subtitle: `Produtividade, qualidade e geração de negócio por profissional — ${user.empresaNome}`,
+      userName: user.userName,
+      userRole: user.userRole,
+      avatarLetter: user.avatarLetter,
+    });
+
+    if (!idEmp) {
+      console.error('Vitta BI: não foi possível identificar a empresa ativa do usuário.');
+      return;
+    }
+
+    setupPeriodoPanel();
+    setupFullscreenBackdrop();
+    setupCardFullscreen({ cardId: 'card-ranking-receita', btnId: 'btn-expandir-receita' });
+    setupCardFullscreen({ cardId: 'card-qualidade', btnId: 'btn-expandir-qualidade' });
+    setupCardFullscreen({ cardId: 'card-comissao', btnId: 'btn-expandir-comissao' });
+    setupCardFullscreen({ cardId: 'card-leads', btnId: 'btn-expandir-leads' });
+    document.getElementById('btn-atualizar').addEventListener('click', () => refreshData({ manual: true }));
+
+    refreshData();
+  })();
+</script>
+</body>
+</html>

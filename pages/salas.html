@@ -1,0 +1,696 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>Salas — Vitta Sistemas</title>
+  <link rel="icon" type="image/png" href="../img/favicon.png" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: { vitta: { 50:'#f0fbfd',100:'#e0f7fa',300:'#80deea',400:'#4dd9ed',500:'#2ABCD4',600:'#1a96ac',700:'#127a8c' } },
+          fontFamily: { sans: ['Inter','system-ui','sans-serif'] }
+        }
+      }
+    }
+  </script>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+  <script src="../assets/js/config.js?v=2"></script>
+  <script src="../assets/js/access-guard.js?v=2"></script>
+  <script src="../assets/js/admin-empresa-context.js?v=1"></script>
+  <script src="../assets/js/notifications.js?v=3"></script>
+  <style>
+    .sidebar-nav::-webkit-scrollbar { width:3px; }
+    .sidebar-nav::-webkit-scrollbar-thumb { background:rgba(255,255,255,.1); border-radius:4px; }
+    .submenu { overflow:hidden; max-height:0; opacity:0; transition:max-height .25s ease,opacity .2s ease; }
+    .submenu.open { max-height:500px; opacity:1; }
+    .chevron { transition:transform .25s ease; display:inline-block; }
+    .chevron.open { transform:rotate(180deg); }
+    @keyframes fadeUp { from{opacity:0;transform:translateY(8px)} to{opacity:1;transform:translateY(0)} }
+    .fade-up { animation:fadeUp .35s ease forwards; }
+    .modal-overlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,.5); z-index:300; align-items:flex-start; justify-content:center; padding:24px 16px; overflow-y:auto; }
+    .modal-overlay.open { display:flex; }
+    .modal-scroll::-webkit-scrollbar { width:4px; }
+    .modal-scroll::-webkit-scrollbar-thumb { background:#e5e7eb; border-radius:4px; }
+    #toast { position:fixed; bottom:24px; right:24px; z-index:999; transition:all .3s ease; }
+    tbody tr { transition:background .15s; }
+    tbody tr:hover { background:#f9fafb; }
+  </style>
+</head>
+
+<body class="bg-[#F0F2F5] font-sans antialiased">
+<div class="flex min-h-screen">
+
+<!-- ══════ SIDEBAR ══════ -->
+<aside id="sidebar" class="fixed inset-y-0 left-0 w-[220px] bg-[#111827] flex flex-col z-30 -translate-x-full lg:translate-x-0 transition-transform duration-300">
+  <div class="flex flex-col items-center justify-center gap-1 py-4 px-5 border-b border-white/10 shrink-0">
+    <img src="../img/logo.png" alt="Vitta Sistemas" class="h-10 w-auto brightness-0 invert" />
+    <p class="text-[0.6rem] text-gray-500 tracking-wide">v1.2.1</p>
+  </div>
+  <nav class="flex-1 overflow-y-auto sidebar-nav py-3">
+    <p class="block text-[0.6rem] font-bold text-gray-500 uppercase tracking-widest px-4 pb-1 pt-3">Principal</p>
+    <a href="dashboard.html" class="flex items-center gap-3 px-3 py-2.5 mx-2 rounded-xl text-[0.83rem] font-medium text-gray-400 hover:bg-white/10 hover:text-white transition-colors duration-150 mb-0.5">
+      <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>Dashboard
+    </a>
+    <a href="agendamentos.html" class="flex items-center gap-3 px-3 py-2.5 mx-2 rounded-xl text-[0.83rem] font-medium text-gray-400 hover:bg-white/10 hover:text-white transition-colors duration-150 mb-0.5">
+      <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>Agendamentos
+    </a>
+    <a href="consultas.html" class="flex items-center gap-3 px-3 py-2.5 mx-2 rounded-xl text-[0.83rem] font-medium text-gray-400 hover:bg-white/10 hover:text-white transition-colors duration-150 mb-0.5">
+      <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>Consultas
+    </a>
+
+    <p class="block text-[0.6rem] font-bold text-gray-500 uppercase tracking-widest px-4 pb-1 pt-4">Cadastros</p>
+    <button onclick="toggleMenu('cadastros')" class="w-full flex items-center gap-3 px-3 py-2.5 mx-2 rounded-xl text-[0.83rem] font-medium text-gray-400 hover:bg-white/10 hover:text-white transition-colors duration-150 mb-0.5" style="width:calc(100% - 16px)">
+      <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>Cadastros
+      <svg id="chev-cadastros" class="chevron w-3.5 h-3.5 ml-auto text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+    </button>
+    <div id="sub-cadastros" class="submenu">
+      <a href="pacientes.html" class="flex items-center gap-2 pl-10 pr-3 py-2 mx-2 rounded-xl text-[0.8rem] text-gray-500 hover:bg-white/5 hover:text-gray-300 transition-colors cursor-pointer">Pacientes</a>
+      <a href="profissionais.html" class="flex items-center gap-2 pl-10 pr-3 py-2 mx-2 rounded-xl text-[0.8rem] text-gray-500 hover:bg-white/5 hover:text-gray-300 transition-colors cursor-pointer">Profissionais</a>
+      <a href="usuarios-empresa.html" class="flex items-center gap-2 pl-10 pr-3 py-2 mx-2 rounded-xl text-[0.8rem] text-gray-500 hover:bg-white/5 hover:text-gray-300 transition-colors cursor-pointer">Usuários</a>
+      <div class="hidden" id="menuDocumentosWrap"><a href="documentos.html" class="flex items-center gap-2 pl-10 pr-3 py-2 mx-2 rounded-xl text-[0.8rem] text-gray-500 hover:bg-white/5 hover:text-gray-300 transition-colors cursor-pointer w-full">Documentos</a></div>
+      <a href="leads.html" class="flex items-center gap-2 pl-10 pr-3 py-2 mx-2 rounded-xl text-[0.8rem] text-gray-500 hover:bg-white/5 hover:text-gray-300 transition-colors cursor-pointer">Leads</a>
+    </div>
+
+    <p class="block text-[0.6rem] font-bold text-gray-500 uppercase tracking-widest px-4 pb-1 pt-4">Outros Cadastros</p>
+    <button onclick="toggleMenu('servicos')" class="w-full flex items-center gap-3 px-3 py-2.5 mx-2 rounded-xl text-[0.83rem] font-medium text-vitta-400 bg-vitta-500/10 transition-colors duration-150 cursor-pointer mb-0.5" style="width:calc(100% - 16px)">
+      <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>Outros Cadastros
+      <svg id="chev-servicos" class="chevron open w-3.5 h-3.5 ml-auto text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+    </button>
+    <div id="sub-servicos" class="submenu open">
+      <a href="servicos.html" class="flex items-center gap-2 pl-10 pr-3 py-2 mx-2 rounded-xl text-[0.8rem] text-gray-500 hover:bg-white/5 hover:text-gray-300 transition-colors cursor-pointer">Serviços</a>
+      <a href="salas.html" class="flex items-center gap-2 pl-10 pr-3 py-2 mx-2 rounded-xl text-[0.8rem] font-semibold text-vitta-400 bg-vitta-500/10 transition-colors cursor-pointer">Salas</a>
+      <a href="especialidades.html" class="flex items-center gap-2 pl-10 pr-3 py-2 mx-2 rounded-xl text-[0.8rem] text-gray-500 hover:bg-white/5 hover:text-gray-300 transition-colors cursor-pointer">Especialidades</a>
+      <a href="grupo.html" class="flex items-center gap-2 pl-10 pr-3 py-2 mx-2 rounded-xl text-[0.8rem] text-gray-500 hover:bg-white/5 hover:text-gray-300 transition-colors cursor-pointer">Grupo</a>
+      <a href="tipospagamento.html" class="flex items-center gap-2 pl-10 pr-3 py-2 mx-2 rounded-xl text-[0.8rem] text-gray-500 hover:bg-white/5 hover:text-gray-300 transition-colors cursor-pointer">Tipos de Pagamento</a>
+      <a href="tiposacompanhamento.html" class="flex items-center gap-2 pl-10 pr-3 py-2 mx-2 rounded-xl text-[0.8rem] text-gray-500 hover:bg-white/5 hover:text-gray-300 transition-colors cursor-pointer">Tipos de Acomp.</a>
+    </div>
+
+    <p class="block text-[0.6rem] font-bold text-gray-500 uppercase tracking-widest px-4 pb-1 pt-4">Financeiro</p>
+    <button onclick="toggleMenu('financeiro')" class="w-full flex items-center gap-3 px-3 py-2.5 mx-2 rounded-xl text-[0.83rem] font-medium text-gray-400 hover:bg-white/10 hover:text-white transition-colors duration-150 cursor-pointer mb-0.5" style="width:calc(100% - 16px)">
+      <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>Financeiro
+      <svg id="chev-financeiro" class="chevron w-3.5 h-3.5 ml-auto text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+    </button>
+    <div id="sub-financeiro" class="submenu">
+      <a href="financeiro.html" class="flex items-center gap-2 pl-10 pr-3 py-2 mx-2 rounded-xl text-[0.8rem] text-gray-500 hover:bg-white/5 hover:text-gray-300 transition-colors cursor-pointer">Lançamentos</a>
+      <a href="relatorios.html" class="flex items-center gap-2 pl-10 pr-3 py-2 mx-2 rounded-xl text-[0.8rem] text-gray-500 hover:bg-white/5 hover:text-gray-300 transition-colors cursor-pointer">Relat&oacute;rios</a>
+    </div>
+
+
+    <div id="sectionMinhaEmpresa" class="hidden">
+    <p class="block text-[0.6rem] font-bold text-gray-500 uppercase tracking-widest px-4 pb-1 pt-4">Minha Empresa</p>
+    <button onclick="toggleMenu('minhaempresa')" class="w-full flex items-center gap-3 px-3 py-2.5 mx-2 rounded-xl text-[0.83rem] font-medium text-gray-400 hover:bg-white/10 hover:text-white transition-colors duration-150 cursor-pointer mb-0.5" style="width:calc(100% - 16px)">
+      <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>Minha Empresa
+      <svg id="chev-minhaempresa" class="chevron w-3.5 h-3.5 ml-auto text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+    </button>
+    <div id="sub-minhaempresa" class="submenu">
+      <a href="minha-empresa.html" class="flex items-center gap-2 pl-10 pr-3 py-2 mx-2 rounded-xl text-[0.8rem] text-gray-500 hover:bg-white/5 hover:text-gray-300 transition-colors cursor-pointer">Meus Dados</a>
+      <a href="faturas.html" class="flex items-center gap-2 pl-10 pr-3 py-2 mx-2 rounded-xl text-[0.8rem] text-gray-500 hover:bg-white/5 hover:text-gray-300 transition-colors cursor-pointer">Minhas Faturas</a>
+    </div>
+    </div>
+    <div id="sectionVittaBI" class="hidden">
+    <p class="block text-[0.6rem] font-bold text-gray-500 uppercase tracking-widest px-4 pb-1 pt-4">Vitta BI</p>
+    <a id="linkVittaBI" href="https://bi.vittasistemas.com.br" target="_blank" rel="noopener"
+       class="flex items-center gap-3 px-3 py-2.5 mx-2 rounded-xl text-[0.83rem] font-medium text-gray-400 hover:bg-white/10 hover:text-white transition-colors duration-150 cursor-pointer mb-0.5">
+      <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+        <path d="M3 3v18h18"/><path d="M18.7 8l-5.3 5.3-3-3L4 16.3"/>
+      </svg>
+      Vitta BI
+      <span class="ml-auto text-[0.55rem] font-bold text-violet-300 bg-violet-500/20 px-1.5 py-0.5 rounded">BI</span>
+    </a>
+    </div>
+
+    <div id="sectionAdmin" class="hidden">
+    <p class="block text-[0.6rem] font-bold text-gray-500 uppercase tracking-widest px-4 pb-1 pt-4">Sistema</p>
+    <button onclick="toggleMenu('admin')" class="w-full flex items-center gap-3 px-3 py-2.5 mx-2 rounded-xl text-[0.83rem] font-medium text-gray-400 hover:bg-white/10 hover:text-white transition-colors duration-150 mb-0.5" style="width:calc(100% - 16px)">
+      <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14M4.93 4.93a10 10 0 0 0 0 14.14"/></svg>Administração
+      <svg id="chev-admin" class="chevron w-3.5 h-3.5 ml-auto text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+    </button>
+    <div id="sub-admin" class="submenu">
+      <a href="empresas.html" class="flex items-center gap-2 pl-10 pr-3 py-2 mx-2 rounded-xl text-[0.8rem] text-gray-500 hover:bg-white/5 hover:text-gray-300 transition-colors cursor-pointer">Empresas</a>
+      <a href="usuarios.html" class="flex items-center gap-2 pl-10 pr-3 py-2 mx-2 rounded-xl text-[0.8rem] text-gray-500 hover:bg-white/5 hover:text-gray-300 transition-colors cursor-pointer">Usuários Admin</a>
+      <a href="planos.html" class="flex items-center gap-2 pl-10 pr-3 py-2 mx-2 rounded-xl text-[0.8rem] text-gray-500 hover:bg-white/5 hover:text-gray-300 transition-colors cursor-pointer">Planos</a>
+      <a href="configuracoes.html" class="flex items-center gap-2 pl-10 pr-3 py-2 mx-2 rounded-xl text-[0.8rem] text-gray-500 hover:bg-white/5 hover:text-gray-300 transition-colors cursor-pointer">Configura&ccedil;&otilde;es</a>
+      <a href="logs.html" class="flex items-center gap-2 pl-10 pr-3 py-2 mx-2 rounded-xl text-[0.8rem] text-gray-500 hover:bg-white/5 hover:text-gray-300 transition-colors cursor-pointer">Log</a>
+    </div>
+    </div>
+    <div class="h-4"></div>
+  </nav>
+  <div class="shrink-0 border-t border-white/10 p-3">
+    <div class="group flex items-center gap-2.5 p-2.5 rounded-xl hover:bg-white/5 cursor-pointer">
+      <div id="user-avatar" class="w-8 h-8 rounded-full bg-vitta-500 flex items-center justify-center text-white text-xs font-bold shrink-0">A</div>
+      <div class="flex-1 min-w-0">
+        <p id="user-name" class="text-white text-[0.8rem] font-semibold truncate">Usuário</p>
+        <p id="user-role" class="text-gray-500 text-[0.7rem] truncate">Admin</p>
+      </div>
+      <button onclick="handleLogout()" title="Sair" class="text-gray-600 hover:text-red-400 transition-colors opacity-0 group-hover:opacity-100">
+        <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+      </button>
+    </div>
+  </div>
+</aside>
+
+<div id="overlay" class="fixed inset-0 bg-black/50 z-20 hidden lg:hidden" onclick="toggleSidebar()"></div>
+
+<div class="flex-1 lg:ml-[220px] flex flex-col min-h-screen">
+  <header class="sticky top-0 z-20 h-16 bg-white border-b border-gray-200 flex items-center px-5 gap-3 shadow-sm">
+    <button onclick="toggleSidebar()" class="lg:hidden p-2 rounded-lg hover:bg-gray-100 text-gray-500">
+      <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+        <line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/>
+      </svg>
+    </button>
+    <div class="flex-1">
+      <h1 class="text-[1rem] font-bold text-gray-800 leading-tight">Salas</h1>
+      <p id="header-date" class="text-[0.7rem] text-gray-400 leading-tight">Gestão de salas</p>
+    </div>
+    <div class="hidden md:flex items-center gap-2 px-3 py-2 bg-gray-50 border border-gray-200 rounded-xl">
+      <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-vitta-500 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+        <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/>
+      </svg>
+      <span id="empresa-nome" class="text-[0.78rem] font-semibold text-gray-700">Clínica</span>
+    </div>
+    <button class="relative p-2.5 rounded-xl hover:bg-gray-100 text-gray-500 transition-colors">
+      <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+        <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/>
+      </svg>
+      <span class="absolute top-1.5 right-1.5 w-2 h-2 bg-red-500 rounded-full border-2 border-white"></span>
+    </button>
+    <div class="flex items-center gap-2.5">
+      <div id="header-avatar" class="w-9 h-9 rounded-full bg-vitta-500 flex items-center justify-center text-white text-sm font-bold shrink-0">A</div>
+      <div class="hidden sm:block">
+        <p id="header-user-name" class="text-[0.8rem] font-semibold text-gray-800 leading-tight">Usuário</p>
+        <p id="header-user-role" class="text-[0.7rem] text-gray-400 leading-tight">Administrador</p>
+      </div>
+    </div>
+    <button onclick="handleLogout()" class="p-2.5 rounded-xl hover:bg-red-50 text-gray-400 hover:text-red-500 transition-colors" title="Sair">
+      <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+        <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/>
+      </svg>
+    </button>
+  </header>
+
+  <main class="flex-1 p-5 lg:p-6">
+    <!-- STATS -->
+    <div class="grid grid-cols-3 gap-4 mb-6">
+      <div class="bg-white rounded-2xl p-4 shadow-sm border border-gray-100">
+        <p class="text-[0.72rem] font-semibold text-gray-400 uppercase tracking-wider mb-1">Total</p>
+        <p id="statTotal" class="text-2xl font-extrabold text-gray-800">—</p>
+      </div>
+      <div class="bg-white rounded-2xl p-4 shadow-sm border border-gray-100">
+        <p class="text-[0.72rem] font-semibold text-gray-400 uppercase tracking-wider mb-1">Ativas</p>
+        <p id="statAtivas" class="text-2xl font-extrabold text-vitta-600">—</p>
+      </div>
+      <div class="bg-white rounded-2xl p-4 shadow-sm border border-gray-100">
+        <p class="text-[0.72rem] font-semibold text-gray-400 uppercase tracking-wider mb-1">Inativas</p>
+        <p id="statInat" class="text-2xl font-extrabold text-red-500">—</p>
+      </div>
+    </div>
+
+    <!-- FILTROS -->
+    <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-4 mb-4">
+      <div class="flex flex-wrap gap-3 items-center">
+        <div class="relative flex-1 min-w-[180px]">
+          <svg xmlns="http://www.w3.org/2000/svg" class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+          <input id="filterSearch" type="text" placeholder="Buscar por nome…" oninput="applyFilters()"
+            class="w-full pl-9 pr-3 py-2.5 text-sm border border-gray-200 rounded-xl outline-none focus:border-vitta-500 focus:ring-2 focus:ring-vitta-500/20" />
+        </div>
+        <select id="filterEmpAdmin" onchange="applyFilters()" class="hidden py-2.5 px-3 text-sm border border-gray-200 rounded-xl outline-none focus:border-vitta-500 bg-white min-w-[180px]">
+          <option value="">Todas as empresas</option>
+        </select>
+        <label class="flex items-center gap-2 text-sm text-gray-600 cursor-pointer select-none whitespace-nowrap">
+          <input id="toggleInativas" type="checkbox" onchange="applyFilters()" class="w-4 h-4 rounded accent-vitta-500" />
+          Ver inativas
+        </label>
+        <button onclick="openFormModal()" class="flex items-center gap-2 px-4 py-2.5 bg-vitta-500 text-white text-sm font-semibold rounded-xl shadow-sm hover:bg-vitta-600 transition-colors ml-auto whitespace-nowrap">
+          <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          Nova Sala
+        </button>
+      </div>
+    </div>
+
+    <!-- TABELA -->
+    <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+      <div class="flex items-center justify-between px-5 py-3.5 border-b border-gray-100">
+        <p id="tableCount" class="text-sm text-gray-500">Carregando…</p>
+        <button onclick="clearFilters()" class="text-[0.75rem] text-vitta-600 hover:text-vitta-700 font-medium">Limpar filtros</button>
+      </div>
+      <div id="tableLoader" class="py-16 flex items-center justify-center gap-3 text-gray-400">
+        <svg class="w-5 h-5 animate-spin" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+          <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/>
+          <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"/>
+        </svg>
+        <span class="text-sm">Carregando salas…</span>
+      </div>
+      <div id="tableWrap" class="hidden overflow-x-auto">
+        <table class="w-full text-sm">
+          <thead>
+            <tr class="border-b border-gray-100 bg-gray-50 text-[0.72rem] font-semibold text-gray-500 uppercase tracking-wider">
+              <th class="px-5 py-3 text-left">Sala</th>
+              <th class="px-5 py-3 text-left">Descrição</th>
+              <th id="colEmp" class="px-5 py-3 text-left hidden">Empresa</th>
+              <th class="px-5 py-3 text-left">Status</th>
+              <th class="px-5 py-3 text-right">Ações</th>
+            </tr>
+          </thead>
+          <tbody id="salaBody"></tbody>
+        </table>
+      </div>
+      <div id="tableEmpty" class="hidden py-16 text-center">
+        <svg xmlns="http://www.w3.org/2000/svg" class="w-10 h-10 text-gray-300 mx-auto mb-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg>
+        <p class="text-gray-400 text-sm">Nenhuma sala encontrada</p>
+      </div>
+    </div>
+
+    <!-- DISPONIBILIDADE DAS SALAS -->
+    <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden mt-4">
+      <div class="flex flex-wrap items-center justify-between gap-3 px-5 py-3.5 border-b border-gray-100">
+        <div>
+          <h2 class="text-sm font-bold text-gray-800">Disponibilidade das Salas</h2>
+          <p class="text-[0.72rem] text-gray-400 mt-0.5">Ocupação por horário do dia selecionado</p>
+        </div>
+        <div class="flex items-center gap-2">
+          <label class="text-[0.78rem] font-semibold text-gray-500">Data:</label>
+          <input type="date" id="ocupDate" onchange="loadOcupacao()" class="py-1.5 px-3 text-sm border border-gray-200 rounded-xl outline-none focus:border-vitta-500 focus:ring-2 focus:ring-vitta-500/20" />
+        </div>
+      </div>
+      <div id="ocupGrid" class="p-4 overflow-x-auto">
+        <div class="py-8 text-center text-gray-400 text-sm">Selecione uma data para ver a disponibilidade</div>
+      </div>
+    </div>
+  </main>
+</div>
+
+<!-- ══════ MODAL FORM ══════ -->
+<div id="modalForm" class="modal-overlay" onclick="if(event.target===this)closeFormModal()">
+  <div class="bg-white rounded-2xl shadow-xl w-full max-w-md modal-scroll overflow-y-auto max-h-[90vh]" onclick="event.stopPropagation()">
+    <div class="flex items-center justify-between px-6 py-4 border-b border-gray-100">
+      <div>
+        <h2 id="formTitle" class="text-[1rem] font-bold text-gray-800">Nova Sala</h2>
+        <p id="formSubtitle" class="text-[0.72rem] text-gray-400">Preencha os dados da sala</p>
+      </div>
+      <button onclick="closeFormModal()" class="text-gray-400 hover:text-gray-600 transition-colors p-1">
+        <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+    <form id="salaForm" onsubmit="saveSala(event)" class="p-6 space-y-4">
+      <input type="hidden" id="fId" />
+      <!-- Empresa (ADMIN_GLOBAL only) -->
+      <div id="rowEmpresa" class="hidden">
+        <label class="block text-[0.78rem] font-semibold text-gray-600 mb-1">Empresa <span class="text-red-500">*</span></label>
+        <select id="fEmpresa" class="w-full py-2.5 px-3 text-sm border border-gray-200 rounded-xl outline-none focus:border-vitta-500 bg-white">
+          <option value="">Selecione a empresa…</option>
+        </select>
+      </div>
+      <!-- Nome -->
+      <div>
+        <label class="block text-[0.78rem] font-semibold text-gray-600 mb-1">Nome da Sala <span class="text-red-500">*</span></label>
+        <input id="fNome" type="text" maxlength="100" placeholder="Ex.: Consultório 1" required
+          class="w-full py-2.5 px-3 text-sm border border-gray-200 rounded-xl outline-none focus:border-vitta-500 focus:ring-2 focus:ring-vitta-500/20" />
+      </div>
+      <!-- Descrição -->
+      <div>
+        <label class="block text-[0.78rem] font-semibold text-gray-600 mb-1">Descrição</label>
+        <input id="fDescr" type="text" maxlength="255" placeholder="Descrição opcional"
+          class="w-full py-2.5 px-3 text-sm border border-gray-200 rounded-xl outline-none focus:border-vitta-500 focus:ring-2 focus:ring-vitta-500/20" />
+      </div>
+      <!-- Cor -->
+      <div>
+        <label class="block text-[0.78rem] font-semibold text-gray-600 mb-1">Cor de identificação</label>
+        <div class="flex items-center gap-3">
+          <input id="fCor" type="color" value="#2ABCD4"
+            class="w-10 h-10 rounded-xl border border-gray-200 cursor-pointer p-0.5" />
+          <span class="text-sm text-gray-500">Usada no calendário de agendamentos</span>
+        </div>
+      </div>
+      <!-- Ativo (edit only) -->
+      <div id="rowAtivo" class="hidden">
+        <label class="flex items-center gap-3 cursor-pointer">
+          <input id="fAtivo" type="checkbox" class="w-4 h-4 rounded accent-vitta-500" />
+          <span class="text-sm font-medium text-gray-700">Sala ativa</span>
+        </label>
+      </div>
+      <!-- Botões -->
+      <div class="flex gap-3 pt-2">
+        <button type="button" onclick="closeFormModal()" class="flex-1 py-2.5 border border-gray-200 rounded-xl text-sm font-medium text-gray-600 hover:bg-gray-50 transition-colors">Cancelar</button>
+        <button type="submit" id="btnSave" class="flex-1 py-2.5 bg-vitta-500 text-white rounded-xl text-sm font-semibold hover:bg-vitta-600 transition-colors">Salvar</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- ══════ MODAL TOGGLE ══════ -->
+<div id="modalToggle" class="modal-overlay" onclick="if(event.target===this)closeToggleModal()">
+  <div class="bg-white rounded-2xl shadow-xl w-full max-w-sm p-6" onclick="event.stopPropagation()">
+    <h3 id="toggleTitle" class="text-[1rem] font-bold text-gray-800 mb-2">Desativar Sala</h3>
+    <p id="toggleMsg" class="text-sm text-gray-500 mb-6">Tem certeza?</p>
+    <div class="flex gap-3">
+      <button onclick="closeToggleModal()" class="flex-1 py-2.5 border border-gray-200 rounded-xl text-sm font-medium text-gray-600 hover:bg-gray-50">Cancelar</button>
+      <button id="btnToggleConfirm" onclick="confirmToggle()" class="flex-1 py-2.5 rounded-xl text-sm font-semibold text-white">Confirmar</button>
+    </div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div id="toast" class="hidden">
+  <div id="toastInner" class="flex items-center gap-3 px-4 py-3 rounded-xl shadow-lg text-sm font-medium text-white min-w-[240px]"></div>
+</div>
+
+<script>
+const STATUS_COLORS = {
+  AGENDADO:'#3B82F6', CONFIRMADA:'#10B981', SEM_VALOR:'#F59E0B',
+  FALTA:'#EF4444', REALIZADA:'#2ABCD4', FEEDBACK:'#EC4899'
+};
+const STATUS_LABELS = {
+  AGENDADO:'Agendado', CONFIRMADA:'Confirmada', SEM_VALOR:'Sem Valor',
+  FALTA:'Falta', REALIZADA:'Realizada', FEEDBACK:'Feedback'
+};
+let allSalas = [], filtered = [], editId = null, toggleTargetId = null, toggleTargetAtivo = false;
+let currentUserMeta = null, empresas = [];
+
+function toggleMenu(k) {
+  const s=document.getElementById('sub-'+k),c=document.getElementById('chev-'+k);
+  const o=s.classList.contains('open');
+  s.classList.toggle('open',!o); if(c)c.classList.toggle('open',!o);
+}
+function toggleSidebar() {
+  const sb=document.getElementById('sidebar'),ov=document.getElementById('overlay');
+  const o=sb.classList.contains('-translate-x-full');
+  sb.classList.toggle('-translate-x-full',!o); ov.classList.toggle('hidden',!o);
+}
+async function handleLogout() {
+  await supabase.auth.signOut(); window.location.href='../index.html';
+}
+
+function showToast(msg, ok=true) {
+  const t=document.getElementById('toast'), i=document.getElementById('toastInner');
+  i.textContent=msg; i.className=`flex items-center gap-3 px-4 py-3 rounded-xl shadow-lg text-sm font-medium text-white min-w-[240px] ${ok?'bg-emerald-500':'bg-red-500'}`;
+  t.classList.remove('hidden'); setTimeout(()=>t.classList.add('hidden'),3500);
+}
+
+async function initAuth() {
+  document.getElementById('header-date').textContent = 'Gestão de salas — ' + new Date().toLocaleDateString('pt-BR', { weekday:'long', year:'numeric', month:'long', day:'numeric' });
+  const { data:{ session } } = await supabase.auth.getSession();
+  if (!session) { window.location.href='../index.html'; return false; }
+  const meta = session.user.user_metadata;
+  currentUserMeta = meta;
+  if (!['ADMIN_EMPRESA','ADMIN_GLOBAL','SECRETARIA'].includes(meta.tipo_usu)) { window.location.href='dashboard.html'; return false; }
+  const TIPO_LABELS = { 'ADMIN_GLOBAL':'Admin Global','ADMIN_EMPRESA':'Administrador','SECRETARIA':'Secretaria','PROFISSIONAL':'Profissional' };
+  const label = TIPO_LABELS[meta.tipo_usu] || meta.tipo_usu;
+  const nome = meta.nome_usu || session.user.email;
+  const ini = nome.split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase();
+  document.getElementById('user-name').textContent = nome;
+  document.getElementById('user-role').textContent = label;
+  document.getElementById('user-avatar').textContent = ini;
+  document.getElementById('header-user-name').textContent = nome;
+  document.getElementById('header-user-role').textContent = label;
+  document.getElementById('header-avatar').textContent = ini;
+  if (meta.tipo_usu === 'ADMIN_GLOBAL') {
+    document.getElementById('empresa-nome').textContent = 'Vitta Sistemas';
+    document.getElementById('sectionAdmin').classList.remove('hidden');
+    AdminEmpresaCtx.initSelector('ADMIN_GLOBAL', session.user.id);
+  }
+  let temAcessoConsultas = meta.tipo_usu === 'PROFISSIONAL';
+  if (['ADMIN_EMPRESA','ADMIN_GLOBAL'].includes(meta.tipo_usu)) {
+    const uOwn = await getUsuarioAtual('PROF_USU', session);
+    temAcessoConsultas = !!(uOwn?.PROF_USU);
+  }
+  if (!temAcessoConsultas)
+    document.querySelector('a[href="consultas.html"]')?.classList.add('hidden');
+  return true;
+}
+
+async function loadEmpresas() {
+  const { data } = await supabase.from('EMPRESA').select('ID_EMP,NOME_EMP').eq('ATIVO_EMP',true).order('NOME_EMP');
+  empresas = data || [];
+  const selF = document.getElementById('filterEmpAdmin');
+  const selE = document.getElementById('fEmpresa');
+  empresas.forEach(e => {
+    selF.insertAdjacentHTML('beforeend',`<option value="${e.ID_EMP}">${e.NOME_EMP}</option>`);
+    selE.insertAdjacentHTML('beforeend',`<option value="${e.ID_EMP}">${e.NOME_EMP}</option>`);
+  });
+  if (currentUserMeta?.tipo_usu !== 'ADMIN_GLOBAL') {
+    const emp = empresas.find(e => e.ID_EMP === (currentUserMeta?.ID_EMP || currentUserMeta?.id_emp));
+    document.getElementById('empresa-nome').textContent = emp?.NOME_EMP || '';
+  }
+}
+
+async function loadSalas() {
+  let q = supabase.from('SALA').select('ID_SALA,NOME_SALA,DESCR_SALA,COR_SALA,ATIVO_SALA,DTCRI_SALA,ID_EMP,EMPRESA(NOME_EMP)').order('NOME_SALA');
+  const empId = AdminEmpresaCtx.resolveIdEmp(currentUserMeta?.tipo_usu, currentUserMeta?.ID_EMP || currentUserMeta?.id_emp);
+  if (empId) q = q.eq('ID_EMP', empId);
+  const { data, error } = await q;
+  if (error) { showToast('Erro ao carregar salas', false); return; }
+  allSalas = data || [];
+  document.getElementById('statTotal').textContent  = allSalas.length;
+  document.getElementById('statAtivas').textContent = allSalas.filter(s => s.ATIVO_SALA).length;
+  document.getElementById('statInat').textContent   = allSalas.filter(s => !s.ATIVO_SALA).length;
+  document.getElementById('tableLoader').classList.add('hidden');
+  document.getElementById('tableWrap').classList.remove('hidden');
+  applyFilters();
+}
+
+function applyFilters() {
+  const q     = document.getElementById('filterSearch').value.trim().toLowerCase();
+  const empId = document.getElementById('filterEmpAdmin').value;
+  const showI = document.getElementById('toggleInativas').checked;
+  filtered = allSalas.filter(s => {
+    if (!showI && !s.ATIVO_SALA) return false;
+    if (empId && s.ID_EMP !== empId) return false;
+    if (q && !s.NOME_SALA?.toLowerCase().includes(q) && !s.DESCR_SALA?.toLowerCase().includes(q)) return false;
+    return true;
+  });
+  renderTable();
+}
+
+function clearFilters() {
+  document.getElementById('filterSearch').value = '';
+  document.getElementById('filterEmpAdmin').value = '';
+  document.getElementById('toggleInativas').checked = false;
+  applyFilters();
+}
+
+function renderTable() {
+  const tbody = document.getElementById('salaBody');
+  document.getElementById('tableCount').innerHTML = `Exibindo <strong class="text-gray-800">${filtered.length}</strong> sala${filtered.length!==1?'s':''}`;
+  if (!filtered.length) {
+    document.getElementById('tableWrap').classList.add('hidden');
+    document.getElementById('tableEmpty').classList.remove('hidden');
+    return;
+  }
+  document.getElementById('tableWrap').classList.remove('hidden');
+  document.getElementById('tableEmpty').classList.add('hidden');
+  tbody.innerHTML = filtered.map(s => `
+    <tr class="border-b border-gray-50 fade-up">
+      <td class="px-5 py-3.5">
+        <div class="flex items-center gap-3">
+          <span class="w-5 h-5 rounded-full border-2 border-white shadow-sm shrink-0" style="background:${s.COR_SALA||'#2ABCD4'}"></span>
+          <span class="font-semibold text-gray-800 ${!s.ATIVO_SALA?'opacity-50':''}">${s.NOME_SALA}</span>
+        </div>
+      </td>
+      <td class="px-5 py-3.5 text-gray-500 text-[0.82rem]">${s.DESCR_SALA||'—'}</td>
+      <td class="px-5 py-3.5">
+        ${s.ATIVO_SALA
+          ? '<span class="inline-flex items-center gap-1 text-[0.72rem] font-bold bg-emerald-50 text-emerald-700 px-2.5 py-1 rounded-full"><span class="w-1.5 h-1.5 bg-emerald-500 rounded-full"></span>Ativa</span>'
+          : '<span class="inline-flex items-center gap-1 text-[0.72rem] font-bold bg-red-50 text-red-600 px-2.5 py-1 rounded-full"><span class="w-1.5 h-1.5 bg-red-400 rounded-full"></span>Inativa</span>'}
+      </td>
+      <td class="px-5 py-3.5 text-right">
+        <div class="flex items-center justify-end gap-1">
+          <button onclick="openEditModal('${s.ID_SALA}')" title="Editar" class="p-1.5 rounded-lg text-gray-400 hover:text-vitta-600 hover:bg-vitta-50 transition-colors">
+            <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+          </button>
+          <button onclick="openToggleModal('${s.ID_SALA}','${s.NOME_SALA.replace(/'/g,"\\'")}',${s.ATIVO_SALA})" title="${s.ATIVO_SALA?'Desativar':'Ativar'}" class="p-1.5 rounded-lg text-gray-400 hover:text-red-500 hover:bg-red-50 transition-colors">
+            <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="4.93" y1="4.93" x2="19.07" y2="19.07"/></svg>
+          </button>
+        </div>
+      </td>
+    </tr>`).join('');
+}
+
+function openFormModal() {
+  editId = null;
+  document.getElementById('formTitle').textContent = 'Nova Sala';
+  document.getElementById('formSubtitle').textContent = 'Preencha os dados da sala';
+  document.getElementById('fId').value = '';
+  document.getElementById('fNome').value = '';
+  document.getElementById('fDescr').value = '';
+  document.getElementById('fCor').value = '#2ABCD4';
+  document.getElementById('rowAtivo').classList.add('hidden');
+  document.getElementById('modalForm').classList.add('open');
+}
+
+function openEditModal(id) {
+  const s = allSalas.find(x => x.ID_SALA === id);
+  if (!s) return;
+  editId = id;
+  document.getElementById('formTitle').textContent = 'Editar Sala';
+  document.getElementById('formSubtitle').textContent = `Editando: ${s.NOME_SALA}`;
+  document.getElementById('fId').value   = s.ID_SALA;
+  document.getElementById('fNome').value = s.NOME_SALA;
+  document.getElementById('fDescr').value = s.DESCR_SALA || '';
+  document.getElementById('fCor').value  = s.COR_SALA || '#2ABCD4';
+  document.getElementById('fAtivo').checked = s.ATIVO_SALA;
+  document.getElementById('rowAtivo').classList.remove('hidden');
+  document.getElementById('modalForm').classList.add('open');
+}
+
+function closeFormModal() { document.getElementById('modalForm').classList.remove('open'); }
+
+async function saveSala(e) {
+  e.preventDefault();
+  const btn = document.getElementById('btnSave');
+  btn.disabled = true; btn.textContent = 'Salvando…';
+  const nome  = document.getElementById('fNome').value.trim();
+  const descr = document.getElementById('fDescr').value.trim();
+  const cor   = document.getElementById('fCor').value;
+  const empId = AdminEmpresaCtx.resolveIdEmp(currentUserMeta?.tipo_usu, currentUserMeta?.ID_EMP || currentUserMeta?.id_emp);
+  if (!empId) { showToast('Selecione a empresa', false); btn.disabled=false; btn.textContent='Salvar'; return; }
+  try {
+    if (!editId) {
+      const { error } = await supabase.from('SALA').insert({ ID_EMP:empId, NOME_SALA:nome, DESCR_SALA:descr||null, COR_SALA:cor });
+      if (error) throw error;
+      showToast('Sala criada com sucesso!');
+    } else {
+      const payload = { NOME_SALA:nome, DESCR_SALA:descr||null, COR_SALA:cor, ATIVO_SALA:document.getElementById('fAtivo').checked };
+      const { error } = await supabase.from('SALA').update(payload).eq('ID_SALA', editId);
+      if (error) throw error;
+      showToast('Sala atualizada!');
+    }
+    closeFormModal();
+    await loadSalas();
+  } catch(err) {
+    showToast(err.message || 'Erro ao salvar', false);
+  }
+  btn.disabled=false; btn.textContent='Salvar';
+}
+
+function openToggleModal(id, nome, ativo) {
+  toggleTargetId = id; toggleTargetAtivo = ativo;
+  document.getElementById('toggleTitle').textContent = ativo ? 'Desativar Sala' : 'Ativar Sala';
+  document.getElementById('toggleMsg').textContent   = ativo ? `Desativar "${nome}"?` : `Ativar "${nome}"?`;
+  const btn = document.getElementById('btnToggleConfirm');
+  btn.className = `flex-1 py-2.5 rounded-xl text-sm font-semibold text-white ${ativo?'bg-red-500 hover:bg-red-600':'bg-emerald-500 hover:bg-emerald-600'}`;
+  document.getElementById('modalToggle').classList.add('open');
+}
+function closeToggleModal() { document.getElementById('modalToggle').classList.remove('open'); }
+
+async function confirmToggle() {
+  const { error } = await supabase.from('SALA').update({ ATIVO_SALA:!toggleTargetAtivo }).eq('ID_SALA', toggleTargetId);
+  if (error) { showToast(error.message, false); return; }
+  showToast(toggleTargetAtivo ? 'Sala desativada!' : 'Sala ativada!');
+  closeToggleModal();
+  await loadSalas();
+}
+
+async function loadOcupacao() {
+  const dateVal = document.getElementById('ocupDate').value;
+  const grid = document.getElementById('ocupGrid');
+  if (!dateVal) { grid.innerHTML='<div class="py-8 text-center text-gray-400 text-sm">Selecione uma data para ver a disponibilidade</div>'; return; }
+  grid.innerHTML='<div class="py-8 text-center text-gray-400 text-sm flex items-center justify-center gap-2"><svg class="w-4 h-4 animate-spin" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"/></svg>Carregando…</div>';
+  const empId = AdminEmpresaCtx.resolveIdEmp(currentUserMeta?.tipo_usu, currentUserMeta?.ID_EMP || currentUserMeta?.id_emp);
+  const d0 = new Date(dateVal + 'T00:00:00');
+  const d1 = new Date(dateVal + 'T23:59:59');
+  let q = supabase.from('AGENDAMENTO')
+    .select('ID_AGD,DT_AGD,DT_FIM_AGD,STATUS_AGD,SALA_AGD,PACIENTE!PAC_AGD(NOME_PAC),PROFISSIONAL!PROF_AGD(NOME_PROF)')
+    .gte('DT_AGD', d0.toISOString()).lte('DT_AGD', d1.toISOString())
+    .not('SALA_AGD','is',null).neq('STATUS_AGD','CANCELADO');
+  if (empId) q = q.eq('ID_EMP', empId);
+  const { data } = await q;
+  renderOcupacaoGrid(dateVal, data || []);
+}
+function renderOcupacaoGrid(dateVal, agds) {
+  const grid = document.getElementById('ocupGrid');
+  const activeSalas = allSalas.filter(s => s.ATIVO_SALA);
+  if (!activeSalas.length) { grid.innerHTML='<div class="py-8 text-center text-gray-400 text-sm">Nenhuma sala ativa cadastrada</div>'; return; }
+
+  // 30-min slots 7:00 → 19:30 (26 slots)
+  const slots=[];
+  for(let h=7;h<20;h++){ slots.push({h,m:0}); slots.push({h,m:30}); }
+
+  // Build occupancy map: salaId → slotIdx → agd
+  const ocupMap={};
+  activeSalas.forEach(s=>ocupMap[s.ID_SALA]={});
+  agds.forEach(a=>{
+    if(!a.SALA_AGD || !ocupMap[a.SALA_AGD]) return;
+    const s=new Date(a.DT_AGD), e=a.DT_FIM_AGD?new Date(a.DT_FIM_AGD):new Date(s.getTime()+30*60000);
+    slots.forEach((sl,idx)=>{
+      const slS=new Date(dateVal+'T'+String(sl.h).padStart(2,'0')+':'+String(sl.m).padStart(2,'0')+':00');
+      const slE=new Date(slS.getTime()+30*60000);
+      if(s<slE && e>slS && !ocupMap[a.SALA_AGD][idx]) ocupMap[a.SALA_AGD][idx]=a;
+    });
+  });
+
+  const thStyle='padding:6px 4px;font-size:0.62rem;font-weight:600;color:#9ca3af;background:#f9fafb;text-align:center;white-space:nowrap;border:1px solid #f3f4f6;min-width:44px';
+  const headerCells=slots.map(sl=>`<th style="${thStyle}">${String(sl.h).padStart(2,'0')}:${String(sl.m).padStart(2,'0')}</th>`).join('');
+
+  const dataRows=activeSalas.map(sala=>{
+    const cells=slots.map((sl,idx)=>{
+      const occ=ocupMap[sala.ID_SALA]?.[idx];
+      if(!occ) return `<td style="border:1px solid #f9fafb;height:32px;min-width:44px;background:#fafafa"></td>`;
+      const clr=STATUS_COLORS[occ.STATUS_AGD]||'#6b7280';
+      const pac=occ.PACIENTE?.NOME_PAC||'';
+      const prof=occ.PROFISSIONAL?.NOME_PROF?.split(' ')[0]||'';
+      return `<td style="border:1px solid #f9fafb;height:32px;min-width:44px;background:${clr};cursor:pointer" title="${pac}${prof?' — '+prof:''}"></td>`;
+    }).join('');
+    return `<tr><td style="padding:6px 12px;font-size:0.78rem;font-weight:600;color:#374151;white-space:nowrap;border:1px solid #f3f4f6;background:white;position:sticky;left:0;z-index:5;min-width:130px"><div style="display:flex;align-items:center;gap:6px"><span style="width:10px;height:10px;border-radius:50%;background:${sala.COR_SALA||'#2ABCD4'};flex-shrink:0"></span>${sala.NOME_SALA}</div></td>${cells}</tr>`;
+  }).join('');
+
+  const legend=Object.entries(STATUS_COLORS).map(([s,c])=>`<span style="display:inline-flex;align-items:center;gap:5px;font-size:0.7rem;color:#6b7280"><span style="width:12px;height:12px;border-radius:3px;background:${c};flex-shrink:0"></span>${STATUS_LABELS[s]||s}</span>`).join('');
+
+  grid.innerHTML=`<div style="overflow-x:auto"><table style="border-collapse:collapse;white-space:nowrap"><thead><tr><th style="padding:6px 12px;font-size:0.72rem;font-weight:700;color:#6b7280;background:#f9fafb;text-align:left;border:1px solid #f3f4f6;position:sticky;left:0;z-index:6;min-width:130px">Sala / Horário</th>${headerCells}</tr></thead><tbody>${dataRows}</tbody></table></div><div style="display:flex;flex-wrap:wrap;gap:12px;margin-top:12px;padding-top:12px;border-top:1px solid #f3f4f6">${legend}<span style="display:inline-flex;align-items:center;gap:5px;font-size:0.7rem;color:#6b7280"><span style="width:12px;height:12px;border-radius:3px;background:#fafafa;border:1px solid #e5e7eb;flex-shrink:0"></span>Livre</span></div>`;
+}
+
+(async () => {
+  const ok = await initAuth();
+  if (!ok) return;
+  if (currentUserMeta?.tipo_usu === 'ADMIN_GLOBAL' && !AdminEmpresaCtx.get()) {
+    AdminEmpresaCtx.renderBloqueio(['main']);
+    return;
+  }
+  await loadEmpresas();
+  await loadSalas();
+  const todayStr = new Date().toISOString().split('T')[0];
+  document.getElementById('ocupDate').value = todayStr;
+  loadOcupacao();
+})();
+
+document.querySelectorAll('#sidebar nav a').forEach(function(link) {
+  link.addEventListener('click', function() {
+    var sb = document.getElementById('sidebar');
+    var ov = document.getElementById('overlay');
+    if (sb && !sb.classList.contains('-translate-x-full')) {
+      sb.classList.add('-translate-x-full');
+      if (ov) ov.classList.add('hidden');
+    }
+  });
+});
+</script>
+<script>
+(async () => {
+  try {
+    const { data: { session } } = await supabase.auth.getSession();
+    if (['ADMIN_EMPRESA'].includes(session?.user?.user_metadata?.tipo_usu)) {
+      const el = document.getElementById('sectionMinhaEmpresa');
+      if (el) el.classList.remove('hidden');
+    }
+  } catch (_) {}
+})();
+</script>
+<script>
+(async () => {
+  try {
+    const { data: { session } } = await supabase.auth.getSession();
+    if (!session) return;
+    const u = await getUsuarioAtual('TIPO_USU,ID_EMP', session);
+    if (u && u.ID_EMP === '22ff26b9-3839-45ed-8a1d-df4a488d3aab' && ['ADMIN_EMPRESA','SECRETARIA'].includes(u.TIPO_USU)) {
+      document.getElementById('menuDocumentosWrap')?.classList.remove('hidden');
+    }
+  } catch (_) {}
+})();
+</script>
+</body>
+</html>

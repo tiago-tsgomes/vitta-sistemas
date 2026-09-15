@@ -1,0 +1,977 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Leads — Vitta BI</title>
+<link rel="icon" type="image/png" href="../img/Icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  * { box-sizing: border-box; }
+  body { margin: 0; font-family: 'Montserrat', system-ui, sans-serif; background: #FAFAFC; }
+  .bi-card { background: #FFFFFF; border: 1px solid #F1F0F7; border-radius: 16px; box-shadow: 0 2px 8px rgba(109,93,246,.04); }
+  .bi-kpi-icon { width: 36px; height: 36px; border-radius: 10px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+  .bi-delta { display: inline-flex; align-items: center; gap: 3px; font-size: 12.5px; font-weight: 600; padding: 2px 7px; border-radius: 999px; }
+  .bi-filter { font-size: 14px; font-weight: 500; color: #6B7280; background: #FFFFFF; border: 1px solid #EFEDF9; border-radius: 9px; padding: 7px 12px; display: flex; align-items: center; gap: 6px; cursor: pointer; }
+  .bi-kpi-title { display: flex; align-items: center; gap: 6px; font-size: 13px; font-weight: 600; color: #6B7280; }
+  .bi-info { position: relative; width: 15px; height: 15px; border-radius: 50%; border: 1.3px solid #CBC8DC; color: #9C99B8; background: transparent; font-size: 10.5px; font-weight: 700; display: flex; align-items: center; justify-content: center; cursor: help; flex-shrink: 0; }
+  .bi-info-tip { visibility: hidden; opacity: 0; position: absolute; top: calc(100% + 9px); right: -10px; width: 220px; background: #1F2937; color: #fff; font-size: 12.5px; font-weight: 500; line-height: 1.45; padding: 10px 12px; border-radius: 8px; box-shadow: 0 6px 20px rgba(0,0,0,.18); transition: opacity .15s ease; z-index: 30; text-align: left; pointer-events: none; }
+  .bi-info-tip::after { content: ''; position: absolute; bottom: 100%; right: 13px; border: 5px solid transparent; border-bottom-color: #1F2937; }
+  .bi-info:hover .bi-info-tip, .bi-info:focus .bi-info-tip { visibility: visible; opacity: 1; }
+  .bi-info-tip.bi-info-tip-left { left: -10px; right: auto; }
+  .bi-info-tip.bi-info-tip-left::after { left: 13px; right: auto; }
+
+  .bi-period-panel { display: none; position: absolute; top: calc(100% + 8px); left: 0; width: 250px; background: #FFFFFF; border: 1px solid #F1F0F7; border-radius: 14px; box-shadow: 0 14px 34px rgba(17,17,17,.14); z-index: 40; padding: 10px; cursor: default; }
+  .bi-period-panel.open { display: block; }
+  .bi-period-panel-title { font-size: 11.5px; font-weight: 700; color: #9C99B8; letter-spacing: .05em; text-transform: uppercase; padding: 4px 10px 8px; }
+  .bi-period-opt { display: flex; align-items: center; gap: 10px; padding: 9px 10px; border-radius: 10px; cursor: pointer; }
+  .bi-period-opt:hover { background: #F7F6FC; }
+  .bi-period-opt.active { background: #FDECEC; }
+  .bi-period-opt-icon { width: 15px; height: 15px; flex-shrink: 0; color: #9C99B8; }
+  .bi-period-opt-text { flex: 1; min-width: 0; }
+  .bi-period-opt-title { font-size: 14px; font-weight: 600; color: #111827; }
+  .bi-period-opt.active .bi-period-opt-title { color: #C0392B; }
+  .bi-period-opt-sub { font-size: 12px; color: #9CA3AF; margin-top: 1px; }
+  .bi-period-opt-check { color: #C0392B; font-size: 14.5px; flex-shrink: 0; }
+  .bi-period-opt-chevron { color: #C4C1D6; flex-shrink: 0; font-size: 15.5px; }
+  .bi-period-back { border: none; background: transparent; color: #6B7280; font-size: 16.5px; cursor: pointer; padding: 2px 6px 2px 2px; border-radius: 6px; }
+  .bi-period-back:hover { background: #F7F6FC; }
+  .bi-range-input { flex: 1; border: 1.5px solid #EFEDF9; border-radius: 10px; padding: 7px 10px; cursor: pointer; }
+  .bi-range-input.active { border-color: #E4534B; }
+  .bi-range-input-label { font-size: 10px; font-weight: 700; color: #9C99B8; text-transform: uppercase; letter-spacing: .03em; }
+  .bi-range-input-value { font-size: 13px; font-weight: 600; color: #111827; margin-top: 1px; }
+  .bi-cal-nav-btn { border: none; background: transparent; color: #6B7280; font-size: 16.5px; cursor: pointer; width: 24px; height: 24px; border-radius: 6px; }
+  .bi-cal-nav-btn:hover { background: #F7F6FC; }
+  .bi-cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 2px; }
+  .bi-cal-dow { font-size: 11px; font-weight: 700; color: #C4C1D6; text-align: center; padding: 4px 0; }
+  .bi-cal-day { font-size: 12.5px; text-align: center; padding: 7px 0; border-radius: 8px; cursor: pointer; color: #111827; }
+  .bi-cal-day:hover { background: #F7F6FC; }
+  .bi-cal-day.muted { color: #C4C1D6; }
+  .bi-cal-day.in-range { background: #FCEAEA; }
+  .bi-cal-day.range-edge { background: #E4534B !important; color: #fff; font-weight: 600; }
+  .bi-pill { font-size: 11.5px; font-weight: 600; padding: 6px 10px; border-radius: 999px; border: 1px solid #EFEDF9; background: #fff; color: #6B7280; cursor: pointer; }
+  .bi-pill:hover { background: #F7F6FC; }
+  .bi-sort-toggle { display: flex; gap: 3px; background: #F7F6FC; border-radius: 8px; padding: 2px; flex-shrink: 0; }
+  .bi-sort-btn { border: none; background: transparent; font-size: 11.5px; font-weight: 600; color: #9C99B8; padding: 5px 9px; border-radius: 6px; cursor: pointer; }
+  .bi-sort-btn.active { background: #fff; color: #111827; box-shadow: 0 1px 3px rgba(17,17,17,.10); }
+  .lista-ver-todos-btn { display: block; width: 100%; text-align: center; border: none; background: transparent; color: #6D5DF6; font-size: 13px; font-weight: 600; padding: 10px 0 2px; margin-top: 4px; cursor: pointer; }
+  .lista-ver-todos-btn:hover { text-decoration: underline; }
+  @keyframes bi-skeleton-shimmer { 0% { background-position: 100% 50%; } 100% { background-position: 0 50%; } }
+  .bi-skeleton { display: inline-block; background: linear-gradient(90deg, #F1F0F7 25%, #E9E7F3 37%, #F1F0F7 63%); background-size: 400% 100%; border-radius: 6px; animation: bi-skeleton-shimmer 1.4s ease infinite; vertical-align: middle; }
+  @keyframes bi-spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+  .bi-spin { animation: bi-spin .8s linear infinite; transform-origin: center; }
+  #btn-atualizar:disabled { opacity: .6; cursor: default; }
+  .bi-fullscreen-backdrop { display: none; position: fixed; inset: 0; background: rgba(17,17,17,.45); z-index: 190; }
+  .bi-fullscreen-backdrop.open { display: block; }
+  .bi-card-fullscreen { position: fixed !important; inset: 20px !important; z-index: 200; margin: 0 !important; box-shadow: 0 20px 60px rgba(17,17,17,.28) !important; overflow-y: auto; }
+
+  .funil-stage { display: flex; flex-direction: column; align-items: center; flex: 1; min-width: 0; }
+  .funil-bar { width: 100%; border-radius: 10px; display: flex; align-items: center; justify-content: center; color: #fff; font-weight: 700; transition: width .3s ease; }
+  .funil-arrow { color: #C4C1D6; font-size: 22px; flex-shrink: 0; padding: 0 6px; }
+</style>
+</head>
+<body>
+<!-- KPIs, funil de conversão e gráficos por dimensão vêm das RPCs SECURITY
+     DEFINER bi_leads_resumo e bi_leads_por_dimensao (p_id_emp, p_period,
+     p_data_ini, p_data_fim), em supabase/migrations/20260904190000_bi_leads.sql —
+     ambas chamam bi_check_access(p_id_emp) antes de calcular qualquer número,
+     igual às RPCs de Financeiro: nunca consulta direta às tabelas
+     transacionais nem filtro client-side de empresa (regra inegociável, ver
+     Documentos/escopo-vitta-bi.md). Layout replica o padrão de
+     bi/pages/financeiro.html (mesmo filtro de período em painel, mesmos
+     cards de KPI, mesmos helpers de gráfico SVG de assets/js/charts.js).
+     "Conversão" aqui é definida como ADERIU_BLOCO_LEAD = 'Sim'. O funil
+     (Lead criado → Foi agendado → Aderiu ao bloco) e os gráficos por
+     dimensão seguem o filtro de período do topo, exceto a evolução mensal,
+     que sempre mostra o ano corrente inteiro (mesmo padrão da "Evolução
+     anual" do Financeiro). Escopo combinado por decisão do usuário em
+     04/09/2026: só KPIs + funil + gráficos por dimensão — as ideias de
+     "fase 2" do brainstorm inicial (coorte, tempo até conversão etc.) ficam
+     para depois. -->
+<div style="display:flex;height:100vh;overflow:hidden;">
+  <div id="bi-sidebar"></div>
+  <div style="flex:1;display:flex;flex-direction:column;min-width:0;background:#FAFAFC;">
+    <div id="bi-header"></div>
+
+    <main style="flex:1;overflow:auto;padding:24px 28px;display:flex;flex-direction:column;gap:20px;">
+
+      <div style="display:flex;align-items:center;gap:10px;">
+        <div class="bi-filter" id="filtro-periodo-btn" style="position:relative;">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#9CA3AF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="17" rx="2"/><path d="M3 9h18M8 2v4M16 2v4"/></svg>
+          <span id="filtro-periodo-label">Este mês</span>
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#C4C1D6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>
+
+          <div class="bi-period-panel" id="periodo-panel">
+            <div id="periodo-view-main">
+              <div class="bi-period-panel-title">Período</div>
+              <div id="periodo-opcoes"></div>
+            </div>
+
+            <div id="periodo-view-custom" style="display:none;">
+              <div style="display:flex;align-items:center;gap:2px;margin-bottom:10px;">
+                <button type="button" class="bi-period-back" id="periodo-custom-voltar">←</button>
+                <span style="font-size:13px;font-weight:700;color:#111827;">Personalizado</span>
+              </div>
+              <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px;">
+                <div class="bi-range-input active" id="range-input-ini">
+                  <div class="bi-range-input-label">Início</div>
+                  <div class="bi-range-input-value" id="range-ini-value">Selecionar</div>
+                </div>
+                <span style="color:#C4C1D6;">→</span>
+                <div class="bi-range-input" id="range-input-fim">
+                  <div class="bi-range-input-label">Fim</div>
+                  <div class="bi-range-input-value" id="range-fim-value">Selecionar</div>
+                </div>
+              </div>
+              <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;">
+                <button type="button" class="bi-cal-nav-btn" id="cal-prev">‹</button>
+                <span id="cal-month-label" style="font-size:13px;font-weight:600;color:#111827;"></span>
+                <button type="button" class="bi-cal-nav-btn" id="cal-next">›</button>
+              </div>
+              <div class="bi-cal-grid" id="cal-dow"></div>
+              <div class="bi-cal-grid" id="cal-days" style="margin-bottom:12px;"></div>
+              <div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:14px;">
+                <button type="button" class="bi-pill" data-preset="7dias">7 dias</button>
+                <button type="button" class="bi-pill" data-preset="30dias">30 dias</button>
+                <button type="button" class="bi-pill" data-preset="mes">Este mês</button>
+                <button type="button" class="bi-pill" data-preset="mes_passado">Mês passado</button>
+                <button type="button" class="bi-pill" data-preset="trimestre">Trimestre</button>
+                <button type="button" class="bi-pill" data-preset="ano">Ano (YTD)</button>
+              </div>
+              <div style="display:flex;gap:8px;">
+                <button type="button" id="periodo-custom-cancelar" style="flex:1;padding:9px;border-radius:10px;border:1px solid #EFEDF9;background:#fff;color:#6B7280;font-size:13px;font-weight:600;cursor:pointer;">Cancelar</button>
+                <button type="button" id="periodo-custom-aplicar" style="flex:1;padding:9px;border-radius:10px;border:none;background:#E4847D;color:#fff;font-size:13px;font-weight:600;cursor:pointer;">Aplicar período</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div style="flex:1;"></div>
+        <span id="bi-ultima-atualizacao" style="font-size:13px;color:#9CA3AF;"></span>
+        <button type="button" id="btn-atualizar" class="bi-filter">
+          <svg id="btn-atualizar-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#6B7280" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 4v6h-6"/><path d="M1 20v-6h6"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
+          Atualizar
+        </button>
+      </div>
+
+      <div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;">
+        <div class="bi-card" style="padding:14px 16px;">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">
+            <span class="bi-kpi-title">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#6D5DF6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 4h18l-6.5 8.5V19l-5 2v-8.5z"/></svg>
+              Total de leads
+            </span>
+            <span class="bi-info" tabindex="0">?<span class="bi-info-tip">Quantidade de leads cadastrados no período selecionado. Compara com o mesmo intervalo do período anterior.</span></span>
+          </div>
+          <div id="kpi-total" style="font-size:23px;font-weight:700;color:#111827;line-height:1;">—</div>
+          <div id="kpi-total-sub" style="font-size:13px;color:#6B7280;margin-top:5px;">—</div>
+        </div>
+
+        <div class="bi-card" style="padding:14px 16px;">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">
+            <span class="bi-kpi-title">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#1a96ac" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="17" rx="2"/><path d="M3 9h18M8 2v4M16 2v4"/></svg>
+              Taxa de agendamento
+            </span>
+            <span class="bi-info" tabindex="0">?<span class="bi-info-tip">Leads marcados como "Foi Agendado" ÷ total de leads no período.</span></span>
+          </div>
+          <div id="kpi-agendamento" style="font-size:23px;font-weight:700;color:#111827;line-height:1;">—</div>
+          <div id="kpi-agendamento-sub" style="font-size:13px;color:#6B7280;margin-top:5px;">—</div>
+        </div>
+
+        <div class="bi-card" style="padding:14px 16px;">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">
+            <span class="bi-kpi-title">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#22C55E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>
+              Conversão em bloco
+            </span>
+            <span class="bi-info" tabindex="0">?<span class="bi-info-tip">Leads com "Aderiu ao Bloco" = "Sim" ÷ total de leads no período. É a métrica de conversão geral usada nos demais gráficos.</span></span>
+          </div>
+          <div id="kpi-bloco" style="font-size:23px;font-weight:700;color:#111827;line-height:1;">—</div>
+          <div id="kpi-bloco-sub" style="font-size:13px;color:#6B7280;margin-top:5px;">—</div>
+        </div>
+
+        <div class="bi-card" style="padding:14px 16px;">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">
+            <span class="bi-kpi-title">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#22C55E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+              Conversão sobre agendados
+            </span>
+            <span class="bi-info" tabindex="0">?<span class="bi-info-tip">Leads com "Aderiu ao Bloco" = "Sim" ÷ leads que foram agendados. Mede o quanto do agendamento efetivamente vira bloco fechado.</span></span>
+          </div>
+          <div id="kpi-conversao-agendados" style="font-size:23px;font-weight:700;color:#111827;line-height:1;">—</div>
+          <div id="kpi-conversao-agendados-sub" style="font-size:13px;color:#6B7280;margin-top:5px;">—</div>
+        </div>
+
+        <div class="bi-card" style="padding:14px 16px;">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">
+            <span class="bi-kpi-title">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#C0392B" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M15 9l-6 6M9 9l6 6"/></svg>
+              Taxa de desistência
+            </span>
+            <span class="bi-info" tabindex="0">?<span class="bi-info-tip">Leads com o campo "Desistência" preenchido ÷ total de leads no período.</span></span>
+          </div>
+          <div id="kpi-desistencia" style="font-size:23px;font-weight:700;color:#111827;line-height:1;">—</div>
+          <div id="kpi-desistencia-sub" style="font-size:13px;color:#6B7280;margin-top:5px;">—</div>
+        </div>
+
+        <div class="bi-card" style="padding:14px 16px;">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">
+            <span class="bi-kpi-title">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#9CA3AF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8" r="3.2"/><path d="M3 20c0-3.3 2.7-6 6-6s6 2.7 6 6"/><path d="M17 11l3 3 5-6" stroke="#C0392B"/></svg>
+              Sem profissional definido
+            </span>
+            <span class="bi-info" tabindex="0">?<span class="bi-info-tip">Leads sem o campo "Profissional" preenchido no período — indicam falha no acompanhamento ou lead ainda não direcionado a um profissional.</span></span>
+          </div>
+          <div id="kpi-sem-prof" style="font-size:23px;font-weight:700;color:#111827;line-height:1;">—</div>
+          <div id="kpi-sem-prof-sub" style="font-size:13px;color:#6B7280;margin-top:5px;">—</div>
+        </div>
+      </div>
+
+      <div style="display:grid;grid-template-columns:1fr;gap:20px;flex:none;">
+        <div class="bi-card" id="card-funil" style="padding:24px;display:flex;flex-direction:column;">
+          <div style="margin-bottom:20px;">
+            <span style="display:flex;align-items:center;gap:6px;font-size:17.5px;font-weight:700;color:#111827;">
+              Funil de conversão
+              <span class="bi-info" tabindex="0">?<span class="bi-info-tip bi-info-tip-left" style="width:260px;">Lead criado → foi agendado → aderiu ao bloco (Sim). Cada etapa mostra o total e a taxa de conversão em relação à etapa anterior.</span></span>
+            </span>
+            <div style="font-size:14px;color:#9CA3AF;margin-top:3px;">Quantidade de leads em cada etapa, no período selecionado</div>
+          </div>
+          <div id="funil-container" style="display:flex;align-items:flex-end;gap:0;min-height:160px;">—</div>
+        </div>
+      </div>
+
+      <div style="display:grid;grid-template-columns:1fr;gap:20px;flex:none;">
+        <div class="bi-card" id="card-evolucao" style="padding:24px;display:flex;flex-direction:column;">
+          <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:18px;flex-wrap:wrap;">
+            <div>
+              <span style="display:flex;align-items:center;gap:6px;font-size:17.5px;font-weight:700;color:#111827;">
+                Evolução mensal de leads
+                <span class="bi-info" tabindex="0">?<span class="bi-info-tip bi-info-tip-left" style="width:260px;">Leads criados e convertidos (aderiu ao bloco), mês a mês, desde janeiro do ano atual. Não segue o filtro de período do topo da página.</span></span>
+              </span>
+              <div style="font-size:14px;color:#9CA3AF;margin-top:3px;">Criados vs. convertidos por mês</div>
+            </div>
+            <span id="evolucao-sub" class="bi-filter" style="cursor:default;"></span>
+          </div>
+          <div id="chart-evolucao-legend" style="margin-bottom:16px;"></div>
+          <div id="chart-evolucao-skeleton" class="bi-skeleton" style="width:100%;height:220px;display:none;"></div>
+          <svg id="chart-evolucao" width="100%" height="220"></svg>
+        </div>
+      </div>
+
+      <div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:20px;flex:none;">
+        <div class="bi-card" id="card-por-especialidade" style="padding:20px 24px;display:flex;flex-direction:column;">
+          <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:8px;margin-bottom:14px;">
+            <div>
+              <span style="font-size:15.5px;font-weight:600;color:#111827;">Por especialidade procurada</span>
+              <div style="font-size:14px;color:#9CA3AF;margin-top:3px;">Volume e taxa de conversão por especialidade (campo Procura)</div>
+            </div>
+            <div style="display:flex;align-items:center;gap:8px;flex-shrink:0;">
+              <div class="bi-sort-toggle" data-key="especialidade">
+                <button type="button" class="bi-sort-btn active" data-sort="volume">Volume</button>
+                <button type="button" class="bi-sort-btn" data-sort="conversao">Conversão</button>
+              </div>
+              <button type="button" id="btn-expandir-especialidade" title="Expandir" style="display:flex;align-items:center;justify-content:center;width:26px;height:26px;border-radius:8px;border:1px solid #EFEDF9;background:#fff;color:#6B7280;cursor:pointer;padding:0;flex-shrink:0;"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3H5a2 2 0 0 0-2 2v3M16 3h3a2 2 0 0 1 2 2v3M8 21H5a2 2 0 0 1-2-2v-3M16 21h3a2 2 0 0 0 2-2v-3"/></svg></button>
+            </div>
+          </div>
+          <div id="lista-por-especialidade" style="display:flex;flex-direction:column;">—</div>
+          <div id="footer-por-especialidade"></div>
+        </div>
+
+        <div class="bi-card" id="card-por-profissional" style="padding:20px 24px;display:flex;flex-direction:column;">
+          <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:8px;margin-bottom:14px;">
+            <div>
+              <span style="font-size:15.5px;font-weight:600;color:#111827;">Por profissional</span>
+              <div style="font-size:14px;color:#9CA3AF;margin-top:3px;">Volume e taxa de conversão de cada profissional (leads com o campo Profissional preenchido)</div>
+            </div>
+            <div style="display:flex;align-items:center;gap:8px;flex-shrink:0;">
+              <div class="bi-sort-toggle" data-key="profissional">
+                <button type="button" class="bi-sort-btn active" data-sort="volume">Volume</button>
+                <button type="button" class="bi-sort-btn" data-sort="conversao">Conversão</button>
+              </div>
+              <button type="button" id="btn-expandir-profissional" title="Expandir" style="display:flex;align-items:center;justify-content:center;width:26px;height:26px;border-radius:8px;border:1px solid #EFEDF9;background:#fff;color:#6B7280;cursor:pointer;padding:0;flex-shrink:0;"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3H5a2 2 0 0 0-2 2v3M16 3h3a2 2 0 0 1 2 2v3M8 21H5a2 2 0 0 1-2-2v-3M16 21h3a2 2 0 0 0 2-2v-3"/></svg></button>
+            </div>
+          </div>
+          <div id="lista-por-profissional" style="display:flex;flex-direction:column;">—</div>
+          <div id="footer-por-profissional"></div>
+        </div>
+      </div>
+
+      <div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:20px;flex:none;">
+        <div class="bi-card" id="card-por-abordagem" style="padding:20px 24px;display:flex;flex-direction:column;">
+          <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:8px;margin-bottom:14px;">
+            <div>
+              <span style="font-size:15.5px;font-weight:600;color:#111827;">Por abordagem</span>
+              <div style="font-size:14px;color:#9CA3AF;margin-top:3px;">Como o lead chegou até a clínica e a taxa de conversão de cada origem</div>
+            </div>
+            <div style="display:flex;align-items:center;gap:8px;flex-shrink:0;">
+              <div class="bi-sort-toggle" data-key="abordagem">
+                <button type="button" class="bi-sort-btn active" data-sort="volume">Volume</button>
+                <button type="button" class="bi-sort-btn" data-sort="conversao">Conversão</button>
+              </div>
+              <button type="button" id="btn-expandir-abordagem" title="Expandir" style="display:flex;align-items:center;justify-content:center;width:26px;height:26px;border-radius:8px;border:1px solid #EFEDF9;background:#fff;color:#6B7280;cursor:pointer;padding:0;flex-shrink:0;"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3H5a2 2 0 0 0-2 2v3M16 3h3a2 2 0 0 1 2 2v3M8 21H5a2 2 0 0 1-2-2v-3M16 21h3a2 2 0 0 0 2-2v-3"/></svg></button>
+            </div>
+          </div>
+          <div id="lista-por-abordagem" style="display:flex;flex-direction:column;">—</div>
+          <div id="footer-por-abordagem"></div>
+        </div>
+
+        <div class="bi-card" id="card-aderiu-bloco" style="padding:20px 24px;display:flex;flex-direction:column;">
+          <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:8px;margin-bottom:14px;">
+            <div>
+              <span style="font-size:15.5px;font-weight:600;color:#111827;">Desfecho (Aderiu ao bloco)</span>
+              <div style="font-size:14px;color:#9CA3AF;margin-top:3px;">Distribuição dos valores do campo "Aderiu ao Bloco" no período</div>
+            </div>
+            <button type="button" id="btn-expandir-aderiu-bloco" title="Expandir" style="display:flex;align-items:center;justify-content:center;width:26px;height:26px;border-radius:8px;border:1px solid #EFEDF9;background:#fff;color:#6B7280;cursor:pointer;padding:0;flex-shrink:0;"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3H5a2 2 0 0 0-2 2v3M16 3h3a2 2 0 0 1 2 2v3M8 21H5a2 2 0 0 1-2-2v-3M16 21h3a2 2 0 0 0 2-2v-3"/></svg></button>
+          </div>
+          <div id="lista-aderiu-bloco" style="display:flex;flex-direction:column;">—</div>
+        </div>
+      </div>
+
+      <div style="display:grid;grid-template-columns:1fr;gap:20px;flex:none;">
+        <div class="bi-card" id="card-desistencia" style="padding:20px 24px;display:flex;flex-direction:column;">
+          <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:8px;margin-bottom:14px;">
+            <div>
+              <span style="font-size:15.5px;font-weight:600;color:#111827;">Principais motivos de desistência</span>
+              <div style="font-size:14px;color:#9CA3AF;margin-top:3px;">Só considera leads com o campo "Desistência" preenchido no período</div>
+            </div>
+            <button type="button" id="btn-expandir-desistencia" title="Expandir" style="display:flex;align-items:center;justify-content:center;width:26px;height:26px;border-radius:8px;border:1px solid #EFEDF9;background:#fff;color:#6B7280;cursor:pointer;padding:0;flex-shrink:0;"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3H5a2 2 0 0 0-2 2v3M16 3h3a2 2 0 0 1 2 2v3M8 21H5a2 2 0 0 1-2-2v-3M16 21h3a2 2 0 0 0 2-2v-3"/></svg></button>
+          </div>
+          <div id="lista-desistencia" style="display:flex;flex-direction:column;">—</div>
+        </div>
+      </div>
+
+    </main>
+  </div>
+</div>
+<div id="fullscreen-backdrop" class="bi-fullscreen-backdrop"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<script src="../assets/js/bi-auth.js"></script>
+<script src="../assets/js/bi-menu.js"></script>
+<script src="../assets/js/charts.js"></script>
+<script>
+  let idEmp = null;
+  let periodo = 'mes';
+  let customIni = null;
+  let customFim = null;
+
+  const COMPARE_LABEL = {
+    hoje: 'ontem',
+    ontem: 'dois dias atrás',
+    '7dias': '7 dias anteriores',
+    '30dias': '30 dias anteriores',
+    mes: 'mês anterior',
+    mes_passado: 'mês anterior',
+    trimestre: 'trimestre anterior',
+    ano: 'ano anterior',
+    custom: 'período anterior equivalente',
+  };
+
+  const PERIOD_PRESETS = [
+    { value: 'hoje', label: 'Hoje' },
+    { value: 'ontem', label: 'Ontem' },
+    { value: '7dias', label: 'Últimos 7 dias' },
+    { value: '30dias', label: 'Últimos 30 dias' },
+    { value: 'mes', label: 'Este mês' },
+    { value: 'mes_passado', label: 'Mês passado' },
+    { value: 'trimestre', label: 'Trimestre' },
+    { value: 'ano', label: 'Ano (YTD)' },
+  ];
+
+  const CAL_ICON = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="17" rx="2"/><path d="M3 9h18M8 2v4M16 2v4"/></svg>';
+
+  function addDays(d, n) { const r = new Date(d); r.setDate(r.getDate() + n); return r; }
+
+  function presetRange(value) {
+    const hoje = new Date();
+    hoje.setHours(0, 0, 0, 0);
+    switch (value) {
+      case 'hoje': return { ini: hoje, fim: hoje };
+      case 'ontem': { const d = addDays(hoje, -1); return { ini: d, fim: d }; }
+      case '7dias': return { ini: addDays(hoje, -6), fim: hoje };
+      case '30dias': return { ini: addDays(hoje, -29), fim: hoje };
+      case 'mes': return { ini: new Date(hoje.getFullYear(), hoje.getMonth(), 1), fim: hoje };
+      case 'mes_passado': return { ini: new Date(hoje.getFullYear(), hoje.getMonth() - 1, 1), fim: new Date(hoje.getFullYear(), hoje.getMonth(), 0) };
+      case 'trimestre': return { ini: new Date(hoje.getFullYear(), hoje.getMonth() - 2, 1), fim: hoje };
+      case 'ano': return { ini: new Date(hoje.getFullYear(), 0, 1), fim: hoje };
+      default: return { ini: hoje, fim: hoje };
+    }
+  }
+
+  function fmtDateBR(d) {
+    return String(d.getDate()).padStart(2, '0') + '/' + String(d.getMonth() + 1).padStart(2, '0') + '/' + d.getFullYear();
+  }
+
+  function toISODate(d) {
+    return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
+  }
+
+  function sameDay(a, b) {
+    return !!a && !!b && a.getFullYear() === b.getFullYear() && a.getMonth() === b.getMonth() && a.getDate() === b.getDate();
+  }
+
+  function fmtPct(v) {
+    return (v === null || v === undefined) ? '—' : `${v}%`;
+  }
+
+  function renderDeltaLine(elId, value, { invertColor = false, isPP = false } = {}) {
+    const el = document.getElementById(elId);
+    const compareLabel = COMPARE_LABEL[periodo] || 'período anterior';
+    if (value === null || value === undefined) {
+      el.textContent = `sem dados do ${compareLabel}`;
+      return;
+    }
+    const positivo = invertColor ? value <= 0 : value >= 0;
+    const color = positivo ? '#1D8A4A' : '#C0392B';
+    const arrow = value >= 0 ? '▲' : '▼';
+    const suffix = isPP ? 'p.p.' : '%';
+    el.innerHTML = `<span style="color:${color};font-weight:600;">${arrow} ${Math.abs(value)}${suffix}</span> vs ${compareLabel}`;
+  }
+
+  const KPI_IDS = ['kpi-total', 'kpi-agendamento', 'kpi-bloco', 'kpi-conversao-agendados', 'kpi-desistencia', 'kpi-sem-prof'];
+
+  function setResumoLoading() {
+    KPI_IDS.forEach((id) => {
+      document.getElementById(id).innerHTML = '<span class="bi-skeleton" style="width:64px;height:22px;"></span>';
+      document.getElementById(`${id}-sub`).innerHTML = '<span class="bi-skeleton" style="width:130px;height:13px;"></span>';
+    });
+    document.getElementById('funil-container').innerHTML = '<div class="bi-skeleton" style="width:100%;height:130px;"></div>';
+  }
+
+  async function loadResumo() {
+    setResumoLoading();
+    const { data, error } = await BIAuth.client.rpc('bi_leads_resumo', {
+      p_id_emp: idEmp,
+      p_period: periodo,
+      p_data_ini: periodo === 'custom' ? toISODate(customIni) : null,
+      p_data_fim: periodo === 'custom' ? toISODate(customFim) : null,
+    });
+    if (error) {
+      console.error('bi_leads_resumo:', error);
+      KPI_IDS.forEach((id) => {
+        document.getElementById(id).textContent = '—';
+        document.getElementById(`${id}-sub`).textContent = 'Erro ao carregar';
+      });
+      document.getElementById('funil-container').textContent = 'Erro ao carregar dados.';
+      return;
+    }
+
+    document.getElementById('kpi-total').textContent = data.totalLeads;
+    renderDeltaLine('kpi-total-sub', data.totalLeadsDeltaPct);
+
+    document.getElementById('kpi-agendamento').textContent = fmtPct(data.taxaAgendamentoPct);
+    renderDeltaLine('kpi-agendamento-sub', data.taxaAgendamentoDeltaPct, { isPP: true });
+
+    document.getElementById('kpi-bloco').textContent = fmtPct(data.taxaConversaoBlocoPct);
+    renderDeltaLine('kpi-bloco-sub', data.taxaConversaoBlocoDeltaPct, { isPP: true });
+
+    document.getElementById('kpi-conversao-agendados').textContent = fmtPct(data.taxaConversaoSobreAgendadosPct);
+    renderDeltaLine('kpi-conversao-agendados-sub', data.taxaConversaoSobreAgendadosDeltaPct, { isPP: true });
+
+    document.getElementById('kpi-desistencia').textContent = fmtPct(data.taxaDesistenciaPct);
+    renderDeltaLine('kpi-desistencia-sub', data.taxaDesistenciaDeltaPct, { invertColor: true, isPP: true });
+
+    document.getElementById('kpi-sem-prof').textContent = data.semProfissionalCount;
+    document.getElementById('kpi-sem-prof-sub').innerHTML = `${fmtPct(data.semProfissionalPct)} do total`;
+
+    renderFunil(data.funil);
+  }
+
+  function renderFunil(funil) {
+    const container = document.getElementById('funil-container');
+    const stages = [
+      { label: 'Lead criado', valor: funil.criados, color: '#6D5DF6' },
+      { label: 'Foi agendado', valor: funil.agendados, color: '#2ABCD4' },
+      { label: 'Aderiu ao bloco', valor: funil.aderiuBloco, color: '#22C55E' },
+    ];
+    const max = Math.max(stages[0].valor, 1);
+
+    container.innerHTML = stages.map((s, i) => {
+      const pctDoTopo = Math.round((s.valor / max) * 100);
+      const alturaPx = Math.max(24, Math.round((pctDoTopo / 100) * 130));
+      const anterior = i > 0 ? stages[i - 1].valor : null;
+      const convPct = anterior ? (anterior === 0 ? null : Math.round((s.valor / anterior) * 1000) / 10) : null;
+      const convColor = convPct === null ? '#9CA3AF' : (convPct >= 70 ? '#1D8A4A' : convPct >= 40 ? '#B7791F' : '#C0392B');
+      const arrow = i > 0 ? `
+        <div class="funil-arrow">
+          →
+          ${convPct !== null ? `<div style="font-size:14.5px;font-weight:700;color:${convColor};text-align:center;white-space:nowrap;">${convPct}%</div>` : ''}
+        </div>` : '';
+      return `
+        ${arrow}
+        <div class="funil-stage">
+          <div class="funil-bar" style="height:${alturaPx}px;background:${s.color};">${s.valor}</div>
+          <div style="font-size:14px;font-weight:600;color:#111827;margin-top:10px;text-align:center;">${s.label}</div>
+          <div style="font-size:15.5px;font-weight:600;color:#6B7280;margin-top:2px;">${pctDoTopo}% do total</div>
+        </div>
+      `;
+    }).join('');
+  }
+
+  const MONTH_ABBR = ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'];
+
+  const LIST_LIMIT = 6;
+  const LIST_CONFIG = {
+    especialidade: { containerId: 'lista-por-especialidade', footerId: 'footer-por-especialidade', corBarra: '#8B7FE8' },
+    profissional: { containerId: 'lista-por-profissional', footerId: 'footer-por-profissional', corBarra: '#2ABCD4' },
+    abordagem: { containerId: 'lista-por-abordagem', footerId: 'footer-por-abordagem', corBarra: '#F0A868' },
+  };
+  const listaDataCache = {};
+  const listState = {
+    especialidade: { sort: 'volume', expanded: false },
+    profissional: { sort: 'volume', expanded: false },
+    abordagem: { sort: 'volume', expanded: false },
+  };
+
+  function skeletonListRows(n = 4) {
+    return Array.from({ length: n }).map(() => `
+      <div style="padding:9px 0;border-bottom:1px solid #E3E1EE;">
+        <div class="bi-skeleton" style="width:60%;height:14px;margin-bottom:7px;"></div>
+        <div class="bi-skeleton" style="width:100%;height:7px;"></div>
+      </div>
+    `).join('');
+  }
+
+  function setEvolucaoLoading() {
+    document.getElementById('chart-evolucao-legend').innerHTML = '<span class="bi-skeleton" style="width:140px;height:15px;margin-right:22px;"></span><span class="bi-skeleton" style="width:140px;height:15px;"></span>';
+    document.getElementById('evolucao-sub').textContent = '';
+    document.getElementById('chart-evolucao-skeleton').style.display = 'block';
+    document.getElementById('chart-evolucao').style.display = 'none';
+    ['lista-por-especialidade', 'lista-por-profissional', 'lista-por-abordagem'].forEach((id) => {
+      document.getElementById(id).innerHTML = skeletonListRows();
+    });
+    ['footer-por-especialidade', 'footer-por-profissional', 'footer-por-abordagem'].forEach((id) => {
+      document.getElementById(id).innerHTML = '';
+    });
+    document.getElementById('lista-aderiu-bloco').innerHTML = skeletonListRows(3);
+    document.getElementById('lista-desistencia').innerHTML = skeletonListRows(3);
+  }
+
+  async function loadEvolucao() {
+    setEvolucaoLoading();
+    const { data, error } = await BIAuth.client.rpc('bi_leads_por_dimensao', {
+      p_id_emp: idEmp,
+      p_period: periodo,
+      p_data_ini: periodo === 'custom' ? toISODate(customIni) : null,
+      p_data_fim: periodo === 'custom' ? toISODate(customFim) : null,
+    });
+    if (error) {
+      console.error('bi_leads_por_dimensao:', error);
+      document.getElementById('chart-evolucao-skeleton').style.display = 'none';
+      document.getElementById('chart-evolucao').style.display = '';
+      return;
+    }
+
+    document.getElementById('chart-evolucao-skeleton').style.display = 'none';
+    document.getElementById('chart-evolucao').style.display = '';
+
+    const meses = data.evolucaoMensal || [];
+    const labels = meses.map((m) => MONTH_ABBR[m.mes - 1]);
+    document.getElementById('evolucao-sub').textContent = labels.length ? `${labels[0]} – ${labels[labels.length - 1]} / ${data.ano}` : '';
+
+    BICharts.drawLineChart(document.getElementById('chart-evolucao'), {
+      labels,
+      series: [
+        { name: 'Leads criados', color: '#6D5DF6', values: meses.map((m) => m.total), area: true },
+        { name: 'Convertidos (bloco)', color: '#22C55E', values: meses.map((m) => m.convertidos) },
+      ],
+      height: 220,
+      yFmt: BICharts.fmtInt,
+      niceGrid: false,
+      showEndLabels: false,
+    });
+
+    document.getElementById('chart-evolucao-legend').innerHTML = [
+      { name: 'Leads criados', color: '#6D5DF6' },
+      { name: 'Convertidos (bloco)', color: '#22C55E' },
+    ].map((s) => `
+      <span style="display:inline-flex;align-items:center;gap:7px;font-size:15px;font-weight:700;color:#111827;margin-right:22px;">
+        <span style="width:11px;height:11px;border-radius:3px;background:${s.color};display:inline-block;"></span>${s.name}
+      </span>
+    `).join('');
+
+    listaDataCache.especialidade = data.porEspecialidade || [];
+    listaDataCache.profissional = data.porProfissional || [];
+    listaDataCache.abordagem = data.porAbordagem || [];
+    renderDimensionList('especialidade');
+    renderDimensionList('profissional');
+    renderDimensionList('abordagem');
+    renderListaSimples('lista-aderiu-bloco', data.distribuicaoAderiuBloco);
+    renderListaSimples('lista-desistencia', data.motivosDesistencia, { vazio: 'Nenhuma desistência registrada no período.' });
+  }
+
+  function renderListaComConversao(containerId, itens, { corBarra }) {
+    const container = document.getElementById(containerId);
+    if (!itens || !itens.length) {
+      container.innerHTML = '<div style="font-size:14px;color:#9CA3AF;padding:8px 0;">Sem dados no período.</div>';
+      return;
+    }
+    const maxTotal = Math.max(...itens.map((i) => i.total), 1);
+    container.innerHTML = itens.map((item, idx) => {
+      const pct = Math.max(2, Math.round((item.total / maxTotal) * 100));
+      const conv = item.taxaConversaoPct;
+      const convColor = conv === null ? '#C4C1D6' : (conv >= 30 ? '#1D8A4A' : conv >= 10 ? '#B7791F' : '#C0392B');
+      const convLabel = conv === null ? '' : (conv >= 30 ? 'Alta' : conv >= 10 ? 'Média' : 'Baixa');
+      return `
+        <div style="display:flex;align-items:center;gap:12px;padding:9px 0;border-bottom:1px solid #E3E1EE;">
+          <div style="width:18px;flex-shrink:0;font-size:12.5px;font-weight:700;color:#C4C1D6;text-align:center;">${idx + 1}</div>
+          <div style="flex:1;min-width:0;">
+            <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;">
+              <span style="font-size:15px;font-weight:600;color:#111827;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${item.nome}</span>
+              <span style="font-size:12.5px;font-weight:700;color:${convColor};white-space:nowrap;flex-shrink:0;">${fmtPct(conv)} conv.${convLabel ? ` · ${convLabel}` : ''}</span>
+            </div>
+            <div style="height:7px;background:#F1F0F7;border-radius:999px;margin-top:5px;overflow:hidden;">
+              <div style="height:100%;width:${pct}%;background:${corBarra};border-radius:999px;"></div>
+            </div>
+            <div style="font-size:13px;color:#6B7280;margin-top:4px;">${item.total} lead${item.total === 1 ? '' : 's'}${item.agendados !== undefined ? ` · ${item.agendados} agendado${item.agendados === 1 ? '' : 's'} (<span style="font-weight:700;color:#0E7490;">${fmtPct(item.taxaAgendamentoPct)}</span>)` : ''} · ${item.convertidos} convertido${item.convertidos === 1 ? '' : 's'}</div>
+          </div>
+        </div>
+      `;
+    }).join('');
+  }
+
+  function renderDimensionList(key) {
+    const config = LIST_CONFIG[key];
+    const state = listState[key];
+    const itens = (listaDataCache[key] || []).slice().sort((a, b) => {
+      if (state.sort === 'conversao') {
+        const ca = (a.taxaConversaoPct === null || a.taxaConversaoPct === undefined) ? -1 : a.taxaConversaoPct;
+        const cb = (b.taxaConversaoPct === null || b.taxaConversaoPct === undefined) ? -1 : b.taxaConversaoPct;
+        if (cb !== ca) return cb - ca;
+      }
+      return b.total - a.total;
+    });
+    const totalCount = itens.length;
+    const visiveis = state.expanded ? itens : itens.slice(0, LIST_LIMIT);
+    renderListaComConversao(config.containerId, visiveis, { corBarra: config.corBarra });
+    renderListaFooter(key, visiveis.length, totalCount);
+  }
+
+  function renderListaFooter(key, visibleCount, totalCount) {
+    const config = LIST_CONFIG[key];
+    const el = document.getElementById(config.footerId);
+    if (!el) return;
+    if (totalCount <= LIST_LIMIT) { el.innerHTML = ''; return; }
+    const state = listState[key];
+    const texto = state.expanded ? `Mostrando todos (${totalCount}) · Ver menos` : `Mostrando ${visibleCount} de ${totalCount} · Ver todos`;
+    el.innerHTML = `<button type="button" class="lista-ver-todos-btn">${texto}</button>`;
+    el.querySelector('button').addEventListener('click', () => {
+      state.expanded = !state.expanded;
+      renderDimensionList(key);
+    });
+  }
+
+  function renderListaSimples(containerId, itens, { vazio = 'Sem dados no período.' } = {}) {
+    const container = document.getElementById(containerId);
+    if (!itens || !itens.length) {
+      container.innerHTML = `<div style="font-size:14px;color:#9CA3AF;padding:8px 0;">${vazio}</div>`;
+      return;
+    }
+    const total = itens.reduce((s, i) => s + i.total, 0) || 1;
+    const maxTotal = Math.max(...itens.map((i) => i.total), 1);
+    container.innerHTML = itens.map((item) => {
+      const pct = Math.max(2, Math.round((item.total / maxTotal) * 100));
+      const pctDoTotal = Math.round((item.total / total) * 100);
+      return `
+        <div style="padding:9px 0;border-bottom:1px solid #E3E1EE;">
+          <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;">
+            <span style="font-size:15px;font-weight:600;color:#111827;">${item.nome}</span>
+            <span style="font-size:14px;color:#9CA3AF;">${item.total} (${pctDoTotal}%)</span>
+          </div>
+          <div style="height:7px;background:#F1F0F7;border-radius:999px;margin-top:5px;overflow:hidden;">
+            <div style="height:100%;width:${pct}%;background:#9C99B8;border-radius:999px;"></div>
+          </div>
+        </div>
+      `;
+    }).join('');
+  }
+
+  function applyPeriodoLabel() {
+    const label = document.getElementById('filtro-periodo-label');
+    if (periodo === 'custom' && customIni && customFim) {
+      label.textContent = sameDay(customIni, customFim) ? fmtDateBR(customIni) : `${fmtDateBR(customIni)} → ${fmtDateBR(customFim)}`;
+    } else {
+      const preset = PERIOD_PRESETS.find((p) => p.value === periodo);
+      label.textContent = preset ? preset.label : 'Este mês';
+    }
+  }
+
+  function closePeriodoPanel() {
+    document.getElementById('periodo-panel').classList.remove('open');
+  }
+
+  function openPeriodoPanel() {
+    document.getElementById('periodo-view-custom').style.display = 'none';
+    document.getElementById('periodo-view-main').style.display = 'block';
+    renderPeriodoOpcoes();
+    document.getElementById('periodo-panel').classList.add('open');
+  }
+
+  function updateUltimaAtualizacao() {
+    const now = new Date();
+    const hh = String(now.getHours()).padStart(2, '0');
+    const mm = String(now.getMinutes()).padStart(2, '0');
+    document.getElementById('bi-ultima-atualizacao').textContent = `Atualizado às ${hh}:${mm}`;
+  }
+
+  async function refreshData({ manual = false } = {}) {
+    const btn = document.getElementById('btn-atualizar');
+    const icon = document.getElementById('btn-atualizar-icon');
+    if (manual) { btn.disabled = true; icon.classList.add('bi-spin'); }
+    await Promise.all([loadResumo(), loadEvolucao()]);
+    updateUltimaAtualizacao();
+    if (manual) { btn.disabled = false; icon.classList.remove('bi-spin'); }
+  }
+
+  function selecionarPeriodo(value) {
+    periodo = value;
+    customIni = null;
+    customFim = null;
+    applyPeriodoLabel();
+    closePeriodoPanel();
+    refreshData();
+  }
+
+  function renderPeriodoOpcoes() {
+    const container = document.getElementById('periodo-opcoes');
+    const rows = PERIOD_PRESETS.map((p) => {
+      const { ini, fim } = presetRange(p.value);
+      const rangeText = sameDay(ini, fim) ? fmtDateBR(ini) : `${fmtDateBR(ini)} → ${fmtDateBR(fim)}`;
+      const isActive = periodo === p.value;
+      return `
+        <div class="bi-period-opt${isActive ? ' active' : ''}" data-value="${p.value}">
+          <span class="bi-period-opt-icon">${CAL_ICON}</span>
+          <div class="bi-period-opt-text">
+            <div class="bi-period-opt-title">${p.label}</div>
+            <div class="bi-period-opt-sub">${rangeText}</div>
+          </div>
+          ${isActive ? '<span class="bi-period-opt-check">✓</span>' : ''}
+        </div>`;
+    }).join('');
+
+    const customActive = periodo === 'custom';
+    const customSub = customActive && customIni && customFim
+      ? (sameDay(customIni, customFim) ? fmtDateBR(customIni) : `${fmtDateBR(customIni)} → ${fmtDateBR(customFim)}`)
+      : 'Escolha um intervalo';
+    const customRow = `
+      <div class="bi-period-opt${customActive ? ' active' : ''}" id="periodo-opt-custom">
+        <span class="bi-period-opt-icon">${CAL_ICON}</span>
+        <div class="bi-period-opt-text">
+          <div class="bi-period-opt-title">Personalizado...</div>
+          <div class="bi-period-opt-sub">${customSub}</div>
+        </div>
+        ${customActive ? '<span class="bi-period-opt-check">✓</span>' : '<span class="bi-period-opt-chevron">›</span>'}
+      </div>`;
+
+    container.innerHTML = rows + customRow;
+    container.querySelectorAll('.bi-period-opt[data-value]').forEach((el) => {
+      el.addEventListener('click', () => selecionarPeriodo(el.dataset.value));
+    });
+    document.getElementById('periodo-opt-custom').addEventListener('click', abrirPeriodoCustom);
+  }
+
+  function renderRangeInputs() {
+    document.getElementById('range-ini-value').textContent = selStart ? fmtDateBR(selStart) : 'Selecionar';
+    document.getElementById('range-fim-value').textContent = selEnd ? fmtDateBR(selEnd) : 'Selecionar';
+    const nextIsIni = !selStart || (selStart && selEnd);
+    document.getElementById('range-input-ini').classList.toggle('active', nextIsIni);
+    document.getElementById('range-input-fim').classList.toggle('active', !nextIsIni);
+  }
+
+  let calViewDate = new Date();
+  let selStart = null;
+  let selEnd = null;
+  const DOW = ['D', 'S', 'T', 'Q', 'Q', 'S', 'S'];
+  const MONTH_NAMES = ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho', 'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'];
+
+  function renderCalendar() {
+    document.getElementById('cal-dow').innerHTML = DOW.map((d) => `<div class="bi-cal-dow">${d}</div>`).join('');
+    document.getElementById('cal-month-label').textContent = `${MONTH_NAMES[calViewDate.getMonth()]} ${calViewDate.getFullYear()}`;
+
+    const firstOfMonth = new Date(calViewDate.getFullYear(), calViewDate.getMonth(), 1);
+    const gridStart = new Date(firstOfMonth);
+    gridStart.setDate(gridStart.getDate() - firstOfMonth.getDay());
+
+    const hoje = new Date();
+    hoje.setHours(0, 0, 0, 0);
+
+    const dias = [];
+    for (let i = 0; i < 42; i++) {
+      const d = new Date(gridStart);
+      d.setDate(gridStart.getDate() + i);
+      dias.push(d);
+    }
+
+    document.getElementById('cal-days').innerHTML = dias.map((d) => {
+      const muted = d.getMonth() !== calViewDate.getMonth();
+      const inRange = selStart && selEnd && d > selStart && d < selEnd;
+      const isEdge = sameDay(d, selStart) || sameDay(d, selEnd);
+      const isToday = sameDay(d, hoje);
+      const cls = ['bi-cal-day'];
+      if (muted) cls.push('muted');
+      if (inRange) cls.push('in-range');
+      if (isEdge) cls.push('range-edge');
+      const style = isToday && !isEdge ? 'font-weight:700;text-decoration:underline;' : '';
+      return `<div class="${cls.join(' ')}" data-date="${toISODate(d)}" style="${style}">${d.getDate()}</div>`;
+    }).join('');
+
+    document.getElementById('cal-days').querySelectorAll('.bi-cal-day').forEach((el) => {
+      el.addEventListener('click', () => {
+        const [y, m, dd] = el.dataset.date.split('-').map(Number);
+        const clicked = new Date(y, m - 1, dd);
+        if (!selStart || (selStart && selEnd)) {
+          selStart = clicked;
+          selEnd = null;
+        } else if (clicked < selStart) {
+          selStart = clicked;
+        } else {
+          selEnd = clicked;
+        }
+        renderRangeInputs();
+        renderCalendar();
+      });
+    });
+  }
+
+  function abrirPeriodoCustom() {
+    document.getElementById('periodo-view-main').style.display = 'none';
+    document.getElementById('periodo-view-custom').style.display = 'block';
+    selStart = customIni || null;
+    selEnd = customFim || null;
+    calViewDate = new Date(selEnd || selStart || new Date());
+    renderRangeInputs();
+    renderCalendar();
+  }
+
+  function voltarPeriodoMain() {
+    document.getElementById('periodo-view-custom').style.display = 'none';
+    document.getElementById('periodo-view-main').style.display = 'block';
+    renderPeriodoOpcoes();
+  }
+
+  function setupPeriodoPanel() {
+    applyPeriodoLabel();
+    document.getElementById('filtro-periodo-btn').addEventListener('click', (ev) => {
+      ev.stopPropagation();
+      const panel = document.getElementById('periodo-panel');
+      panel.classList.contains('open') ? closePeriodoPanel() : openPeriodoPanel();
+    });
+    document.getElementById('periodo-panel').addEventListener('click', (ev) => ev.stopPropagation());
+    document.addEventListener('click', () => closePeriodoPanel());
+
+    document.getElementById('periodo-custom-voltar').addEventListener('click', voltarPeriodoMain);
+    document.getElementById('periodo-custom-cancelar').addEventListener('click', closePeriodoPanel);
+    document.getElementById('periodo-custom-aplicar').addEventListener('click', () => {
+      if (!selStart) return;
+      customIni = selStart;
+      customFim = selEnd || selStart;
+      periodo = 'custom';
+      applyPeriodoLabel();
+      closePeriodoPanel();
+      refreshData();
+    });
+
+    document.getElementById('cal-prev').addEventListener('click', () => {
+      calViewDate = new Date(calViewDate.getFullYear(), calViewDate.getMonth() - 1, 1);
+      renderCalendar();
+    });
+    document.getElementById('cal-next').addEventListener('click', () => {
+      calViewDate = new Date(calViewDate.getFullYear(), calViewDate.getMonth() + 1, 1);
+      renderCalendar();
+    });
+
+    document.querySelectorAll('.bi-pill').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        const { ini, fim } = presetRange(btn.dataset.preset);
+        selStart = ini;
+        selEnd = fim;
+        calViewDate = new Date(fim);
+        renderRangeInputs();
+        renderCalendar();
+      });
+    });
+  }
+
+  function setupSortToggles() {
+    document.querySelectorAll('.bi-sort-toggle').forEach((toggle) => {
+      const key = toggle.dataset.key;
+      toggle.querySelectorAll('.bi-sort-btn').forEach((btn) => {
+        btn.addEventListener('click', () => {
+          if (listState[key].sort === btn.dataset.sort) return;
+          listState[key].sort = btn.dataset.sort;
+          toggle.querySelectorAll('.bi-sort-btn').forEach((b) => b.classList.toggle('active', b === btn));
+          renderDimensionList(key);
+        });
+      });
+    });
+  }
+
+  const ICON_EXPAND = '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3H5a2 2 0 0 0-2 2v3M16 3h3a2 2 0 0 1 2 2v3M8 21H5a2 2 0 0 1-2-2v-3M16 21h3a2 2 0 0 0 2-2v-3"/></svg>';
+  const ICON_COMPRESS = '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 3v3a2 2 0 0 1-2 2H4M21 8h-3a2 2 0 0 1-2-2V3M3 16h3a2 2 0 0 1 2 2v3M16 21v-3a2 2 0 0 1 2-2h3"/></svg>';
+  let fullscreenTarget = null;
+
+  function setCardFullscreen(target, isFull) {
+    const card = document.getElementById(target.cardId);
+    const backdrop = document.getElementById('fullscreen-backdrop');
+    const btn = document.getElementById(target.btnId);
+    card.classList.toggle('bi-card-fullscreen', isFull);
+    backdrop.classList.toggle('open', isFull);
+    document.body.style.overflow = isFull ? 'hidden' : '';
+    btn.innerHTML = isFull ? ICON_COMPRESS : ICON_EXPAND;
+    btn.title = isFull ? 'Sair da tela cheia' : 'Expandir';
+    fullscreenTarget = isFull ? target : null;
+  }
+
+  function setupCardFullscreen(target) {
+    document.getElementById(target.btnId).addEventListener('click', () => {
+      const isFull = document.getElementById(target.cardId).classList.contains('bi-card-fullscreen');
+      setCardFullscreen(target, !isFull);
+    });
+  }
+
+  function setupFullscreenBackdrop() {
+    document.getElementById('fullscreen-backdrop').addEventListener('click', () => {
+      if (fullscreenTarget) setCardFullscreen(fullscreenTarget, false);
+    });
+    document.addEventListener('keydown', (ev) => {
+      if (ev.key === 'Escape' && fullscreenTarget) setCardFullscreen(fullscreenTarget, false);
+    });
+  }
+
+  (async () => {
+    const user = await BIAuth.getCurrentUser();
+    if (!user) return;
+    idEmp = user.idEmp;
+
+    BIMenu.renderBISidebar('#bi-sidebar', { active: 'leads', empresaNome: user.empresaNome });
+    BIMenu.renderBIHeader('#bi-header', {
+      title: 'Leads',
+      subtitle: `Captação e conversão de leads — ${user.empresaNome}`,
+      userName: user.userName,
+      userRole: user.userRole,
+      avatarLetter: user.avatarLetter,
+    });
+
+    if (!idEmp) {
+      console.error('Vitta BI: não foi possível identificar a empresa ativa do usuário.');
+      return;
+    }
+
+    setupPeriodoPanel();
+    setupFullscreenBackdrop();
+    setupSortToggles();
+    setupCardFullscreen({ cardId: 'card-por-especialidade', btnId: 'btn-expandir-especialidade' });
+    setupCardFullscreen({ cardId: 'card-por-profissional', btnId: 'btn-expandir-profissional' });
+    setupCardFullscreen({ cardId: 'card-por-abordagem', btnId: 'btn-expandir-abordagem' });
+    setupCardFullscreen({ cardId: 'card-aderiu-bloco', btnId: 'btn-expandir-aderiu-bloco' });
+    setupCardFullscreen({ cardId: 'card-desistencia', btnId: 'btn-expandir-desistencia' });
+    document.getElementById('btn-atualizar').addEventListener('click', () => refreshData({ manual: true }));
+
+    refreshData();
+  })();
+</script>
+</body>
+</html>

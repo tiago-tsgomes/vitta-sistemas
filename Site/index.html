@@ -1,0 +1,2126 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Vitta Sistemas — Sistema de Gestão Clínica com IA</title>
+  <meta name="description" content="Sistema de gestão clínica completo com Inteligência Artificial. Agendamentos, prontuário eletrônico, financeiro e app mobile para profissionais de saúde." />
+  <link rel="icon" type="image/png" href="img/favicon.png" />
+
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            vitta: {
+              50:  '#f0fbfd',
+              100: '#e0f7fa',
+              200: '#b2ebf5',
+              400: '#4dd9ed',
+              500: '#2ABCD4',
+              600: '#1a96ac',
+              700: '#127a8c',
+              800: '#0d5f6e',
+              900: '#094a57',
+            }
+          },
+          fontFamily: {
+            sans: ['Inter', 'system-ui', 'sans-serif'],
+          },
+          animation: {
+            'float': 'float 6s ease-in-out infinite',
+            'float-delay': 'float 6s ease-in-out 2s infinite',
+            'pulse-glow': 'pulseGlow 3s ease-in-out infinite',
+            'slide-up': 'slideUp 0.6s ease-out forwards',
+            'fade-in': 'fadeIn 0.8s ease-out forwards',
+          },
+          keyframes: {
+            float: {
+              '0%, 100%': { transform: 'translateY(0)' },
+              '50%': { transform: 'translateY(-12px)' },
+            },
+            pulseGlow: {
+              '0%, 100%': { boxShadow: '0 0 20px rgba(42,188,212,0.3)' },
+              '50%': { boxShadow: '0 0 40px rgba(42,188,212,0.6)' },
+            },
+            slideUp: {
+              from: { opacity: '0', transform: 'translateY(30px)' },
+              to: { opacity: '1', transform: 'translateY(0)' },
+            },
+            fadeIn: {
+              from: { opacity: '0' },
+              to: { opacity: '1' },
+            }
+          }
+        }
+      }
+    }
+  </script>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet" />
+
+  <style>
+    html { scroll-behavior: smooth; }
+
+    .gradient-hero {
+      background: linear-gradient(135deg, #1a96ac 0%, #2ABCD4 45%, #3ecfe5 100%);
+    }
+    .gradient-ia {
+      background: linear-gradient(135deg, #0a0a1a 0%, #0d1a2e 40%, #0d3d4a 100%);
+    }
+    .glass {
+      background: rgba(255,255,255,0.08);
+      backdrop-filter: blur(12px);
+      border: 1px solid rgba(255,255,255,0.15);
+    }
+    .glass-dark {
+      background: rgba(0,0,0,0.25);
+      backdrop-filter: blur(16px);
+      border: 1px solid rgba(42,188,212,0.2);
+    }
+    .glow-text {
+      text-shadow: 0 0 30px rgba(42,188,212,0.5);
+    }
+    .card-hover {
+      transition: all 0.3s ease;
+    }
+    .card-hover:hover {
+      transform: translateY(-6px);
+      box-shadow: 0 20px 40px rgba(42,188,212,0.2);
+    }
+    .nav-link {
+      position: relative;
+      transition: color 0.2s;
+    }
+    .nav-link::after {
+      content: '';
+      position: absolute;
+      bottom: -2px; left: 0; right: 0;
+      height: 2px;
+      background: #2ABCD4;
+      transform: scaleX(0);
+      transition: transform 0.25s;
+    }
+    .nav-link:hover::after { transform: scaleX(1); }
+    .ia-glow {
+      background: linear-gradient(135deg, rgba(42,188,212,0.15), rgba(18,122,140,0.08));
+      border: 1px solid rgba(42,188,212,0.3);
+      box-shadow: 0 0 30px rgba(42,188,212,0.1), inset 0 1px 0 rgba(255,255,255,0.05);
+    }
+    .phone-mockup {
+      background: linear-gradient(145deg, #1a1a2e, #0d1a2e);
+      border: 2px solid rgba(42,188,212,0.3);
+      box-shadow: 0 30px 80px rgba(0,0,0,0.5), 0 0 40px rgba(42,188,212,0.15);
+    }
+    .tag-ia {
+      background: linear-gradient(90deg, #2ABCD4, #4dd9ed);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .btn-primary {
+      background: linear-gradient(135deg, #2ABCD4, #1a96ac);
+      transition: all 0.3s;
+      box-shadow: 0 4px 20px rgba(42,188,212,0.35);
+    }
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 28px rgba(42,188,212,0.5);
+    }
+    .btn-outline {
+      border: 2px solid rgba(255,255,255,0.4);
+      transition: all 0.3s;
+    }
+    .btn-outline:hover {
+      border-color: #2ABCD4;
+      background: rgba(42,188,212,0.1);
+    }
+    .section-fade {
+      opacity: 0;
+      transform: translateY(24px);
+      transition: opacity 0.7s ease, transform 0.7s ease;
+    }
+    .section-fade.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+    .star-bg {
+      background-image: radial-gradient(circle, rgba(42,188,212,0.08) 1px, transparent 1px);
+      background-size: 40px 40px;
+    }
+    .ai-pulse {
+      animation: aiPulse 2s ease-in-out infinite;
+    }
+    @keyframes aiPulse {
+      0%, 100% { opacity: 0.6; transform: scale(1); }
+      50% { opacity: 1; transform: scale(1.05); }
+    }
+    .scrolled-nav {
+      background: rgba(255,255,255,0.97);
+      backdrop-filter: blur(20px);
+      box-shadow: 0 2px 20px rgba(0,0,0,0.08);
+    }
+    .scrolled-nav .nav-link {
+      color: rgba(55,65,81,0.85) !important;
+    }
+    .scrolled-nav .nav-link:hover {
+      color: rgb(9,74,87) !important;
+    }
+    .scrolled-nav .nav-ia-link {
+      color: rgb(26,150,172) !important;
+    }
+    .scrolled-nav #menu-btn {
+      color: rgb(55,65,81) !important;
+    }
+
+    /* ===== PLANOS E PREÇOS ===== */
+    .plans-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(42,188,212,0.08);
+      border: 1px solid rgba(42,188,212,0.2);
+      border-radius: 100px;
+      padding: 6px 16px;
+      font-size: 12px;
+      font-weight: 600;
+      color: #2ABCD4;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+      margin-bottom: 20px;
+    }
+    .plans-tag::before {
+      content: '';
+      width: 6px; height: 6px;
+      border-radius: 50%;
+      background: #2ABCD4;
+      animation: planTagPulse 2s ease-in-out infinite;
+    }
+    @keyframes planTagPulse {
+      0%,100% { opacity:1; transform:scale(1); }
+      50%      { opacity:.4; transform:scale(.7); }
+    }
+    .trial-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      background: rgba(0,184,122,0.08);
+      border: 1px solid rgba(0,184,122,0.25);
+      border-radius: 100px;
+      padding: 10px 22px;
+      font-size: .875rem;
+      font-weight: 600;
+      color: #00b87a;
+    }
+    .billing-toggle {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 14px;
+      margin-bottom: 48px;
+      font-size: .9rem;
+      color: #7a93b0;
+      font-weight: 500;
+    }
+    .billing-toggle span.active { color: #0f1c2e; font-weight: 700; }
+    .toggle-wrap {
+      position: relative;
+      width: 48px; height: 26px;
+      background: #dde6f0;
+      border-radius: 100px;
+      cursor: pointer;
+      border: 1px solid #c5d4e8;
+      transition: background .3s;
+    }
+    .toggle-wrap.on { background: #2ABCD4; border-color: #2ABCD4; }
+    .toggle-knob {
+      position: absolute;
+      top: 3px; left: 3px;
+      width: 18px; height: 18px;
+      border-radius: 50%;
+      background: #fff;
+      box-shadow: 0 1px 4px rgba(0,0,0,.15);
+      transition: transform .3s;
+    }
+    .toggle-wrap.on .toggle-knob { transform: translateX(22px); }
+    .save-pill {
+      background: rgba(0,184,122,0.1);
+      border: 1px solid rgba(0,184,122,0.25);
+      color: #00b87a;
+      font-size: .75rem;
+      font-weight: 700;
+      padding: 3px 10px;
+      border-radius: 100px;
+    }
+    .plans-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 18px;
+      max-width: 1100px;
+      margin: 0 auto;
+    }
+    .plan-card {
+      position: relative;
+      background: #ffffff;
+      border: 1.5px solid #dde6f0;
+      border-radius: 20px;
+      padding: 30px 26px 34px;
+      display: flex;
+      flex-direction: column;
+      transition: transform .3s, box-shadow .3s, border-color .3s;
+      overflow: hidden;
+    }
+    .plan-card:hover {
+      transform: translateY(-5px);
+      border-color: #b8d0f0;
+      box-shadow: 0 16px 48px rgba(42,188,212,0.1);
+    }
+    .plan-card.solo {
+      border-color: rgba(124,58,237,0.25);
+      background: linear-gradient(160deg, #faf8ff 0%, #f5f0ff 100%);
+    }
+    .plan-card.solo:hover {
+      border-color: rgba(124,58,237,0.45);
+      box-shadow: 0 16px 48px rgba(124,58,237,0.12);
+    }
+    .plan-card.featured {
+      background: linear-gradient(160deg, #127a8c 0%, #2ABCD4 100%);
+      border-color: transparent;
+      box-shadow: 0 12px 40px rgba(42,188,212,0.3);
+      color: #fff;
+    }
+    .plan-card.featured:hover {
+      transform: translateY(-7px);
+      box-shadow: 0 20px 56px rgba(42,188,212,0.4);
+    }
+    .featured-ribbon {
+      position: absolute;
+      top: 18px; right: -26px;
+      background: rgba(255,255,255,0.2);
+      color: #fff;
+      font-size: .65rem;
+      font-weight: 700;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+      padding: 5px 36px;
+      transform: rotate(45deg);
+    }
+    .solo-ribbon {
+      position: absolute;
+      top: 18px; right: -28px;
+      background: rgba(124,58,237,0.15);
+      color: #7c3aed;
+      font-size: .65rem;
+      font-weight: 700;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+      padding: 5px 36px;
+      transform: rotate(45deg);
+      border: 1px solid rgba(124,58,237,0.2);
+    }
+    .plan-name {
+      font-size: .68rem;
+      font-weight: 700;
+      letter-spacing: .14em;
+      text-transform: uppercase;
+      color: #7a93b0;
+      margin-bottom: 4px;
+    }
+    .plan-card.featured .plan-name { color: rgba(255,255,255,0.6); }
+    .plan-card.solo .plan-name { color: rgba(124,58,237,0.6); }
+    .plan-title {
+      font-size: 1.35rem;
+      font-weight: 800;
+      color: #0f1c2e;
+      margin-bottom: 8px;
+    }
+    .plan-card.featured .plan-title { color: #fff; }
+    .plan-card.solo .plan-title { color: #7c3aed; }
+    .plan-desc {
+      font-size: .8rem;
+      color: #3d5a80;
+      line-height: 1.55;
+      margin-bottom: 22px;
+    }
+    .plan-card.featured .plan-desc { color: rgba(255,255,255,0.75); }
+    .plan-card.solo .plan-desc { color: #6d4a9c; }
+    .plan-price {
+      display: flex;
+      align-items: flex-end;
+      gap: 3px;
+      line-height: 1;
+      margin-bottom: 4px;
+    }
+    .plan-currency {
+      font-size: .95rem;
+      font-weight: 600;
+      color: #3d5a80;
+      padding-bottom: 5px;
+    }
+    .plan-card.featured .plan-currency { color: rgba(255,255,255,0.7); }
+    .plan-card.solo .plan-currency { color: #7c3aed; opacity: .7; }
+    .plan-amount {
+      font-size: 2.5rem;
+      font-weight: 900;
+      color: #0f1c2e;
+    }
+    .plan-card.featured .plan-amount { color: #fff; }
+    .plan-card.solo .plan-amount { color: #7c3aed; }
+    .amount-annual { display: none; }
+    .plan-period {
+      font-size: .8rem;
+      color: #7a93b0;
+      padding-bottom: 7px;
+    }
+    .plan-card.featured .plan-period { color: rgba(255,255,255,0.6); }
+    .annual-note {
+      font-size: .73rem;
+      color: #00b87a;
+      font-weight: 600;
+      min-height: 16px;
+      display: none;
+      margin-bottom: 2px;
+    }
+    .plan-card.featured .annual-note { color: rgba(255,255,255,0.8); }
+    .plan-card.solo .annual-note { color: #7c3aed; opacity: .8; }
+    body.annual .amount-monthly { display: none; }
+    body.annual .amount-annual  { display: inline; }
+    body.annual .annual-note    { display: block; }
+    .plan-divider {
+      height: 1px;
+      background: #dde6f0;
+      margin: 20px 0;
+    }
+    .plan-card.featured .plan-divider { background: rgba(255,255,255,0.15); }
+    .plan-card.solo .plan-divider { background: rgba(124,58,237,0.15); }
+    .features-list {
+      list-style: none;
+      padding: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      margin-bottom: 28px;
+      flex: 1;
+    }
+    .features-list li {
+      display: flex;
+      align-items: flex-start;
+      gap: 9px;
+      font-size: .82rem;
+      color: #0f1c2e;
+      line-height: 1.4;
+    }
+    .plan-card.featured .features-list li { color: rgba(255,255,255,0.9); }
+    .plan-card.solo .features-list li { color: #3d2070; }
+    .features-list li.disabled { color: #7a93b0; }
+    .plan-card.featured .features-list li.disabled { color: rgba(255,255,255,0.35); }
+    .plan-card.solo .features-list li.disabled { color: rgba(124,58,237,0.3); }
+    .check-icon {
+      flex-shrink: 0;
+      width: 18px; height: 18px;
+      border-radius: 50%;
+      background: rgba(0,184,122,0.1);
+      border: 1.5px solid rgba(0,184,122,0.3);
+      display: flex; align-items: center; justify-content: center;
+      margin-top: 1px;
+    }
+    .plan-card.featured .check-icon { background: rgba(255,255,255,0.15); border-color: rgba(255,255,255,0.35); }
+    .plan-card.solo .check-icon { background: rgba(124,58,237,0.1); border-color: rgba(124,58,237,0.3); }
+    .check-icon svg { width: 9px; height: 9px; }
+    .cross-icon {
+      flex-shrink: 0;
+      width: 18px; height: 18px;
+      border-radius: 50%;
+      background: rgba(0,0,0,0.04);
+      border: 1.5px solid #dde6f0;
+      display: flex; align-items: center; justify-content: center;
+      margin-top: 1px;
+    }
+    .plan-card.featured .cross-icon { background: rgba(255,255,255,0.06); border-color: rgba(255,255,255,0.15); }
+    .cross-icon svg { width: 9px; height: 9px; }
+    .plan-btn {
+      display: block;
+      width: 100%;
+      padding: 13px;
+      border-radius: 12px;
+      font-size: .85rem;
+      font-weight: 700;
+      text-align: center;
+      text-decoration: none;
+      cursor: pointer;
+      border: none;
+      transition: all .25s;
+    }
+    .plan-btn.outline {
+      background: transparent;
+      border: 1.5px solid #dde6f0;
+      color: #2ABCD4;
+    }
+    .plan-btn.outline:hover { background: rgba(42,188,212,0.05); border-color: #2ABCD4; }
+    .plan-btn.outline-purple {
+      background: transparent;
+      border: 1.5px solid rgba(124,58,237,0.3);
+      color: #7c3aed;
+    }
+    .plan-btn.outline-purple:hover { background: rgba(124,58,237,0.06); border-color: #7c3aed; }
+    .plan-btn.primary-white {
+      background: #fff;
+      color: #2ABCD4;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.12);
+    }
+    .plan-btn.primary-white:hover { box-shadow: 0 8px 24px rgba(0,0,0,0.18); transform: translateY(-1px); }
+    .plan-btn-sub {
+      text-align: center;
+      font-size: .7rem;
+      color: #7a93b0;
+      margin-top: 8px;
+    }
+    .plan-card.featured .plan-btn-sub { color: rgba(255,255,255,0.5); }
+    .plan-card.solo .plan-btn-sub { color: rgba(124,58,237,0.5); }
+
+    /* ===== TRUST BAR ===== */
+    .trust-bar { border-bottom: 1px solid #edf2f8; }
+    .trust-item { display:flex; align-items:center; gap:8px; color:#4d6e88; font-size:.85rem; font-weight:500; white-space:nowrap; }
+    .trust-item svg { flex-shrink:0; }
+
+    /* ===== DEPOIMENTOS ===== */
+    .testimonial-card {
+      background:#fff;
+      border:1px solid #edf2f8;
+      border-radius:20px;
+      padding:28px 26px;
+      position:relative;
+      transition:all .3s;
+      box-shadow:0 2px 12px rgba(0,0,0,0.04);
+    }
+    .testimonial-card:hover {
+      border-color:#9dd8e8;
+      box-shadow:0 12px 36px rgba(42,188,212,0.12);
+      transform:translateY(-5px);
+    }
+    .testimonial-quote {
+      position:absolute;
+      top:22px; right:22px;
+      font-size:3.5rem;
+      line-height:1;
+      color:#e0f7fa;
+      font-family:Georgia,serif;
+      user-select:none;
+    }
+    .star-fill { color:#f59e0b; }
+
+    /* ===== FAQ ===== */
+    .faq-item {
+      border:1px solid #e8eef5;
+      border-radius:14px;
+      overflow:hidden;
+      background:#fff;
+      transition:border-color .25s, box-shadow .25s;
+    }
+    .faq-item.open { border-color:#9dd8e8; box-shadow:0 4px 20px rgba(42,188,212,0.08); }
+    .faq-btn {
+      width:100%; text-align:left;
+      padding:18px 22px;
+      display:flex; justify-content:space-between; align-items:center;
+      background:none; border:none; cursor:pointer;
+      font-size:.95rem; font-weight:600; color:#1a2e3e;
+      transition:color .2s;
+      gap:12px;
+    }
+    .faq-btn:hover { color:#2ABCD4; }
+    .faq-item.open .faq-btn { color:#2ABCD4; }
+    .faq-icon {
+      width:26px; height:26px; border-radius:50%;
+      background:#f0f4f8;
+      display:flex; align-items:center; justify-content:center;
+      flex-shrink:0;
+      transition:background .2s, transform .35s;
+    }
+    .faq-item.open .faq-icon { background:#e0f7fa; transform:rotate(45deg); }
+    .faq-body {
+      max-height:0; overflow:hidden;
+      transition:max-height .35s ease;
+      padding:0 22px;
+    }
+    .faq-item.open .faq-body { max-height:220px; }
+    .faq-body p { padding-bottom:18px; font-size:.9rem; color:#4d6b80; line-height:1.7; }
+
+    /* ===== WHATSAPP FLOAT ===== */
+    .wa-float {
+      position:fixed; bottom:26px; right:26px; z-index:998;
+      width:58px; height:58px; border-radius:50%;
+      background:#25d366;
+      box-shadow:0 6px 24px rgba(37,211,102,0.5);
+      display:flex; align-items:center; justify-content:center;
+      text-decoration:none;
+      transition:transform .3s, box-shadow .3s;
+      animation:waFloat 4s ease-in-out infinite;
+    }
+    .wa-float:hover { transform:scale(1.12) !important; box-shadow:0 10px 36px rgba(37,211,102,0.65); }
+    @keyframes waFloat {
+      0%,100% { transform:translateY(0); }
+      50% { transform:translateY(-6px); }
+    }
+    .wa-float-tooltip {
+      position:absolute; right:68px; top:50%; transform:translateY(-50%);
+      background:#1a2e3e; color:#fff; font-size:.75rem; font-weight:600;
+      padding:6px 12px; border-radius:8px; white-space:nowrap;
+      opacity:0; transition:opacity .2s; pointer-events:none;
+    }
+    .wa-float-tooltip::after {
+      content:''; position:absolute; left:100%; top:50%; transform:translateY(-50%);
+      border:5px solid transparent; border-left-color:#1a2e3e;
+    }
+    .wa-float:hover .wa-float-tooltip { opacity:1; }
+  </style>
+</head>
+
+<body class="font-sans antialiased bg-white text-gray-800 overflow-x-hidden">
+
+<!-- ===================== NAVBAR ===================== -->
+<nav id="navbar" class="fixed top-0 left-0 right-0 z-50 transition-all duration-300">
+  <div class="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
+    <a href="#hero">
+      <img src="img/logo_branca.png" alt="Vitta Sistemas" class="h-16" onerror="this.src='img/logo.png';this.classList.add('brightness-0','invert')" />
+    </a>
+    <div class="hidden md:flex items-center gap-8">
+      <a href="#funcionalidades" class="nav-link text-white/80 hover:text-white text-sm font-medium">Funcionalidades</a>
+      <a href="#beneficios" class="nav-link text-white/80 hover:text-white text-sm font-medium">Benefícios</a>
+      <a href="#vitta-ia" class="nav-link nav-ia-link text-vitta-400 hover:text-vitta-300 text-sm font-semibold">Vitta IA</a>
+      <a href="#profissionais" class="nav-link text-white/80 hover:text-white text-sm font-medium">App Profissionais</a>
+      <a href="#modulos" class="nav-link text-white/80 hover:text-white text-sm font-medium">Módulos</a>
+      <a href="#planos" class="nav-link text-white/80 hover:text-white text-sm font-medium">Planos</a>
+      <a href="#faq" class="nav-link text-white/80 hover:text-white text-sm font-medium">FAQ</a>
+      <a href="#fale-conosco" class="nav-link text-white/80 hover:text-white text-sm font-medium">Contato</a>
+    </div>
+    <a href="https://app.vittasistemas.com.br/" target="_blank" rel="noopener noreferrer" class="btn-primary hidden md:inline-flex items-center gap-2 px-5 py-2.5 rounded-xl text-white text-sm font-semibold">
+      <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+        <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><polyline points="10 17 15 12 10 7"/><line x1="15" y1="12" x2="3" y2="12"/>
+      </svg>
+      Acessar Sistema
+    </a>
+    <button id="menu-btn" class="md:hidden text-white">
+      <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+        <line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/>
+      </svg>
+    </button>
+  </div>
+  <!-- Mobile menu -->
+  <div id="mobile-menu" class="hidden md:hidden bg-vitta-900/95 backdrop-blur-lg px-6 pb-6 border-t border-white/10">
+    <div class="flex flex-col gap-4 pt-4">
+      <a href="#funcionalidades" class="text-white/80 text-sm font-medium">Funcionalidades</a>
+      <a href="#beneficios" class="text-white/80 text-sm font-medium">Benefícios</a>
+      <a href="#vitta-ia" class="text-vitta-400 text-sm font-semibold">Vitta IA</a>
+      <a href="#profissionais" class="text-white/80 text-sm font-medium">App Profissionais</a>
+      <a href="#modulos" class="text-white/80 text-sm font-medium">Módulos</a>
+      <a href="#planos" class="text-white/80 text-sm font-medium">Planos e Preços</a>
+      <a href="#faq" class="text-white/80 text-sm font-medium">FAQ</a>
+      <a href="#fale-conosco" class="text-white/80 text-sm font-medium">Contato</a>
+      <a href="https://app.vittasistemas.com.br/" target="_blank" rel="noopener noreferrer" class="btn-primary inline-flex items-center justify-center gap-2 px-5 py-3 rounded-xl text-white text-sm font-semibold">
+        Acessar Sistema
+      </a>
+    </div>
+  </div>
+</nav>
+
+<!-- ===================== HERO ===================== -->
+<section id="hero" class="gradient-hero min-h-screen flex items-center relative overflow-hidden pt-20">
+  <!-- Decorative blobs -->
+  <div class="absolute top-[-10%] right-[-5%] w-[600px] h-[600px] rounded-full bg-white/5 blur-3xl pointer-events-none"></div>
+  <div class="absolute bottom-[-15%] left-[-8%] w-[500px] h-[500px] rounded-full bg-white/5 blur-3xl pointer-events-none"></div>
+  <div class="absolute top-1/3 left-1/3 w-[300px] h-[300px] rounded-full bg-vitta-400/10 blur-2xl pointer-events-none"></div>
+
+  <div class="max-w-7xl mx-auto px-6 py-20 grid lg:grid-cols-2 gap-16 items-center w-full">
+
+    <!-- Left -->
+    <div class="relative z-10">
+      <!-- IA Badge -->
+      <div class="inline-flex items-center gap-2 glass rounded-full px-4 py-2 mb-8">
+        <span class="w-2 h-2 rounded-full bg-vitta-400 ai-pulse"></span>
+        <span class="text-vitta-300 text-xs font-semibold tracking-widest uppercase">Agora com Vitta IA</span>
+      </div>
+
+      <h1 class="text-4xl md:text-5xl lg:text-6xl font-black text-white leading-tight mb-6">
+        Gestão Clínica<br/>
+        <span class="text-white" style="text-shadow: 0 0 30px rgba(255,255,255,0.4);">inteligente</span><br/>
+        do futuro
+      </h1>
+      <p class="text-white/70 text-lg leading-relaxed mb-10 max-w-lg">
+        O sistema completo para clínicas e consultórios — com Inteligência Artificial, app mobile nativo e controle total da sua operação.
+      </p>
+
+      <div class="flex flex-wrap gap-4">
+        <a href="https://app.vittasistemas.com.br/pages/cadastro.html" target="_blank" rel="noopener noreferrer" class="btn-primary inline-flex items-center gap-2.5 px-7 py-4 rounded-2xl text-white font-bold text-sm">
+          <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+            <polyline points="20 6 9 17 4 12"/>
+          </svg>
+          Testar Grátis — 14 dias
+        </a>
+        <a href="https://wa.me/5548984096109?text=Ol%C3%A1%2C%20quero%20conhecer%20o%20Vitta%20Sistemas!" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-2.5 px-7 py-4 rounded-2xl bg-white text-vitta-700 font-bold text-sm border border-white/80 hover:bg-white/90 transition-all" style="box-shadow:0 4px 20px rgba(0,0,0,0.15);">
+          <svg class="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/>
+          </svg>
+          Falar no WhatsApp
+        </a>
+      </div>
+
+      <!-- Stats -->
+      <div class="mt-14 flex flex-wrap gap-8">
+        <div>
+          <p class="text-3xl font-black text-white">100%</p>
+          <p class="text-white/50 text-xs mt-0.5">Na nuvem</p>
+        </div>
+        <div class="w-px bg-white/10"></div>
+        <div>
+          <p class="text-3xl font-black text-white">Multi</p>
+          <p class="text-white/50 text-xs mt-0.5">Especialidades</p>
+        </div>
+        <div class="w-px bg-white/10"></div>
+        <div>
+          <p class="text-3xl font-black text-white">iOS + Android</p>
+          <p class="text-white/50 text-xs mt-0.5">App nativo</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Right — dashboard mockup -->
+    <div class="relative z-10 hidden lg:flex justify-center items-center">
+      <div class="animate-float relative">
+
+        <!-- Main card -->
+        <div class="glass rounded-3xl p-6 w-[420px] shadow-2xl">
+          <!-- Logo -->
+          <div class="mb-5">
+            <img src="img/logo_branca.png" alt="Vitta Sistemas" class="h-12" onerror="this.src='img/logo.png';this.classList.add('brightness-0','invert')" />
+          </div>
+
+          <!-- Stats row -->
+          <div class="grid grid-cols-3 gap-3 mb-5">
+            <div class="glass rounded-2xl p-4 text-center">
+              <p class="text-white text-2xl font-black">24</p>
+              <p class="text-white/50 text-[10px] mt-0.5">Consultas</p>
+            </div>
+            <div class="glass rounded-2xl p-4 text-center">
+              <p class="text-white text-2xl font-black">312</p>
+              <p class="text-white/50 text-[10px] mt-0.5">Pacientes</p>
+            </div>
+            <div class="glass rounded-2xl p-4 text-center">
+              <p class="text-white text-2xl font-black">8</p>
+              <p class="text-white/50 text-[10px] mt-0.5">Aguardando</p>
+            </div>
+          </div>
+
+          <!-- Agenda -->
+          <div class="space-y-2">
+            <p class="text-white/40 text-[10px] uppercase tracking-widest font-bold mb-3">Agenda de Hoje</p>
+
+            <!-- Ana Souza -->
+            <div class="glass rounded-2xl p-3 flex items-center gap-3">
+              <span class="text-white/50 text-[10px] font-semibold w-9 shrink-0">08:30</span>
+              <div class="w-1 h-8 rounded-full bg-green-400 shrink-0"></div>
+              <div class="flex-1">
+                <p class="text-white text-xs font-bold">Ana Souza</p>
+                <p class="text-white/40 text-[10px]">Dr. Marcos</p>
+              </div>
+              <span class="text-[10px] font-bold bg-green-400/20 text-green-300 px-2 py-0.5 rounded-full">Conf.</span>
+            </div>
+
+            <!-- Carlos Lima -->
+            <div class="glass rounded-2xl p-3 flex items-center gap-3">
+              <span class="text-white/50 text-[10px] font-semibold w-9 shrink-0">09:00</span>
+              <div class="w-1 h-8 rounded-full bg-vitta-400 shrink-0"></div>
+              <div class="flex-1">
+                <p class="text-white text-xs font-bold">Carlos Lima</p>
+                <p class="text-white/40 text-[10px]">Dra. Juliana</p>
+              </div>
+              <span class="text-[10px] font-bold bg-vitta-400/20 text-vitta-300 px-2 py-0.5 rounded-full">Agend.</span>
+            </div>
+
+            <!-- Maria Costa -->
+            <div class="glass rounded-2xl p-3 flex items-center gap-3">
+              <span class="text-white/50 text-[10px] font-semibold w-9 shrink-0">10:15</span>
+              <div class="w-1 h-8 rounded-full bg-white/30 shrink-0"></div>
+              <div class="flex-1">
+                <p class="text-white text-xs font-bold">Maria Costa</p>
+                <p class="text-white/40 text-[10px]">Dr. Paulo</p>
+              </div>
+              <span class="text-[10px] font-bold bg-white/10 text-white/50 px-2 py-0.5 rounded-full">Real.</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Floating top-right: Pagamento registrado -->
+        <div class="absolute -top-4 -right-6 glass-dark rounded-2xl p-3 flex items-center gap-2.5 w-[190px] animate-float-delay">
+          <div class="w-9 h-9 rounded-xl bg-green-400/25 flex items-center justify-center shrink-0">
+            <svg class="w-5 h-5 text-green-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+              <polyline points="20 6 9 17 4 12"/>
+            </svg>
+          </div>
+          <div>
+            <p class="text-white text-[11px] font-bold leading-tight">Pagamento</p>
+            <p class="text-white/50 text-[10px]">registrado</p>
+          </div>
+        </div>
+
+        <!-- Floating bottom-left: Aniversariante -->
+        <div class="absolute -bottom-4 -left-6 glass-dark rounded-2xl p-3 flex items-center gap-2.5 w-[190px] animate-float-delay">
+          <span class="text-xl shrink-0">🎂</span>
+          <div>
+            <p class="text-white text-[11px] font-bold leading-tight">Aniversariante!</p>
+            <p class="text-white/50 text-[10px]">Pedro Alves</p>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- Wave bottom -->
+  <div class="absolute bottom-0 left-0 right-0">
+    <svg viewBox="0 0 1440 80" fill="none" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none" class="w-full h-16">
+      <path d="M0,80 C360,0 1080,80 1440,20 L1440,80 Z" fill="white"/>
+    </svg>
+  </div>
+</section>
+
+<!-- ===================== TRUST BAR ===================== -->
+<section class="trust-bar bg-white py-4">
+  <div class="max-w-7xl mx-auto px-6">
+    <div class="flex flex-wrap items-center justify-center gap-6 md:gap-12">
+      <div class="trust-item">
+        <svg class="w-4 h-4 text-vitta-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+        14 dias grátis, sem cartão
+      </div>
+      <div class="hidden sm:block w-px h-4 bg-gray-200"></div>
+      <div class="trust-item">
+        <svg class="w-4 h-4 text-vitta-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+        Cancele quando quiser
+      </div>
+      <div class="hidden sm:block w-px h-4 bg-gray-200"></div>
+      <div class="trust-item">
+        <svg class="w-4 h-4 text-vitta-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+        Suporte via WhatsApp
+      </div>
+      <div class="hidden sm:block w-px h-4 bg-gray-200"></div>
+      <div class="trust-item">
+        <svg class="w-4 h-4 text-vitta-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+        100% LGPD compliant
+      </div>
+      <div class="hidden sm:block w-px h-4 bg-gray-200"></div>
+      <div class="trust-item">
+        <svg class="w-4 h-4 text-vitta-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+        100% na nuvem
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== FUNCIONALIDADES ===================== -->
+<section id="funcionalidades" class="py-24 bg-white">
+  <div class="max-w-7xl mx-auto px-6">
+    <div class="text-center mb-16 section-fade">
+      <span class="inline-block text-vitta-500 text-xs font-bold uppercase tracking-widest mb-3">Funcionalidades</span>
+      <h2 class="text-3xl md:text-4xl font-black text-gray-900 mb-4">Tudo que sua clínica precisa</h2>
+      <p class="text-gray-500 text-lg max-w-xl mx-auto">Um sistema completo, integrado e inteligente — do agendamento ao financeiro.</p>
+    </div>
+
+    <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+
+      <!-- Agendamentos -->
+      <div class="card-hover bg-white border border-gray-100 rounded-2xl p-7 shadow-sm section-fade">
+        <div class="w-12 h-12 rounded-2xl bg-vitta-100 flex items-center justify-center mb-5">
+          <svg class="w-6 h-6 text-vitta-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/><polyline points="9 16 11 18 15 14"/>
+          </svg>
+        </div>
+        <h3 class="text-lg font-bold text-gray-800 mb-2">Agendamentos Inteligentes</h3>
+        <p class="text-gray-500 text-sm leading-relaxed">Controle de horários, salas e profissionais em um calendário visual intuitivo. Confirmação automática, gestão de encaixes e consultas recorrentes (semanais, quinzenais ou mensais) criadas em poucos cliques.</p>
+      </div>
+
+      <!-- Videochamada Google Meet -->
+      <div class="card-hover bg-white border border-gray-100 rounded-2xl p-7 shadow-sm section-fade">
+        <div class="w-12 h-12 rounded-2xl flex items-center justify-center mb-5" style="background:linear-gradient(135deg,#00ac47 0%,#00832d 35%,#0066da 70%,#2684fc 100%)">
+          <svg class="w-6 h-6 text-white" viewBox="0 0 24 24" fill="currentColor"><path d="M17 10.5V7a1 1 0 0 0-1-1H4a1 1 0 0 0-1 1v10a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-3.5l4 4v-11l-4 4Z"/></svg>
+        </div>
+        <h3 class="text-lg font-bold text-gray-800 mb-2">Consultas Online com Google Meet</h3>
+        <p class="text-gray-500 text-sm leading-relaxed">Ao marcar uma consulta online, o sistema gera automaticamente o link do Google Meet direto na agenda, usando a própria conta Google da sua clínica — sem precisar copiar links manualmente.</p>
+      </div>
+
+      <!-- Pacientes -->
+      <div class="card-hover bg-white border border-gray-100 rounded-2xl p-7 shadow-sm section-fade">
+        <div class="w-12 h-12 rounded-2xl bg-blue-50 flex items-center justify-center mb-5">
+          <svg class="w-6 h-6 text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+          </svg>
+        </div>
+        <h3 class="text-lg font-bold text-gray-800 mb-2">Gestão de Pacientes</h3>
+        <p class="text-gray-500 text-sm leading-relaxed">Cadastro completo, histórico de consultas, documentos e acompanhamento de tratamento em um perfil centralizado.</p>
+      </div>
+
+      <!-- Prontuário -->
+      <div class="card-hover bg-white border border-gray-100 rounded-2xl p-7 shadow-sm section-fade">
+        <div class="w-12 h-12 rounded-2xl bg-purple-50 flex items-center justify-center mb-5">
+          <svg class="w-6 h-6 text-purple-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/>
+          </svg>
+        </div>
+        <h3 class="text-lg font-bold text-gray-800 mb-2">Prontuário Eletrônico</h3>
+        <p class="text-gray-500 text-sm leading-relaxed">Registro digital completo das consultas, evoluções clínicas, prescrições e exames com segurança e rastreabilidade total.</p>
+      </div>
+
+      <!-- Financeiro -->
+      <div class="card-hover bg-white border border-gray-100 rounded-2xl p-7 shadow-sm section-fade">
+        <div class="w-12 h-12 rounded-2xl bg-green-50 flex items-center justify-center mb-5">
+          <svg class="w-6 h-6 text-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
+          </svg>
+        </div>
+        <h3 class="text-lg font-bold text-gray-800 mb-2">Financeiro Completo</h3>
+        <p class="text-gray-500 text-sm leading-relaxed">Controle de receitas, despesas, múltiplos tipos de pagamento, fluxo de caixa e conciliação financeira integrada ao sistema.</p>
+      </div>
+
+      <!-- Relatórios -->
+      <div class="card-hover bg-white border border-gray-100 rounded-2xl p-7 shadow-sm section-fade">
+        <div class="w-12 h-12 rounded-2xl bg-orange-50 flex items-center justify-center mb-5">
+          <svg class="w-6 h-6 text-orange-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/>
+          </svg>
+        </div>
+        <h3 class="text-lg font-bold text-gray-800 mb-2">Relatórios e Indicadores</h3>
+        <p class="text-gray-500 text-sm leading-relaxed">Dashboard executivo com KPIs em tempo real, relatórios de produtividade, faturamento e análise de performance por período.</p>
+      </div>
+
+      <!-- Notificações -->
+      <div class="card-hover bg-white border border-gray-100 rounded-2xl p-7 shadow-sm section-fade">
+        <div class="w-12 h-12 rounded-2xl bg-pink-50 flex items-center justify-center mb-5">
+          <svg class="w-6 h-6 text-pink-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/>
+          </svg>
+        </div>
+        <h3 class="text-lg font-bold text-gray-800 mb-2">Notificações Automáticas</h3>
+        <p class="text-gray-500 text-sm leading-relaxed">Lembretes automáticos de consultas, alertas de retorno, comunicação integrada com pacientes e profissionais.</p>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ===================== BENEFÍCIOS ===================== -->
+<section id="beneficios" class="py-24 bg-gray-50 overflow-hidden">
+  <div class="max-w-7xl mx-auto px-6">
+    <div class="grid lg:grid-cols-2 gap-16 items-center">
+
+      <!-- Left: Financial panel mockup -->
+      <div class="relative section-fade flex justify-center">
+
+        <!-- Main teal card -->
+        <div class="rounded-3xl p-7 w-full max-w-[480px] relative shadow-2xl" style="background: linear-gradient(135deg, #1a96ac 0%, #2ABCD4 100%);">
+
+          <!-- Header -->
+          <div class="flex items-center gap-3 mb-7">
+            <img src="img/logo_branca.png" alt="Vitta" class="h-8" onerror="this.src='img/logo.png';this.classList.add('brightness-0','invert')" />
+            <span class="text-white/30 text-lg font-thin">|</span>
+            <span class="text-white/70 text-sm font-medium">Painel Financeiro</span>
+          </div>
+
+          <!-- Bar chart -->
+          <div class="flex items-center justify-between mb-4">
+            <p class="text-white/50 text-[10px] font-bold uppercase tracking-widest">Receita Mensal</p>
+            <div class="flex gap-1.5">
+              <div class="flex items-center gap-1 bg-white/20 rounded-full px-2.5 py-1">
+                <svg class="w-3 h-3 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                  <path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/>
+                </svg>
+                <span class="text-white text-[9px] font-semibold">Vitta IA</span>
+              </div>
+              <div class="flex items-center gap-1 bg-white/20 rounded-full px-2.5 py-1">
+                <svg class="w-3 h-3 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                  <rect x="5" y="2" width="14" height="20" rx="2" ry="2"/><line x1="12" y1="18" x2="12.01" y2="18"/>
+                </svg>
+                <span class="text-white text-[9px] font-semibold">App</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Bars -->
+          <div class="flex items-end gap-2" style="height:90px;">
+            <div class="flex-1 bg-white/25 rounded-lg" style="height:52%"></div>
+            <div class="flex-1 bg-white/25 rounded-lg" style="height:64%"></div>
+            <div class="flex-1 bg-white/25 rounded-lg" style="height:46%"></div>
+            <div class="flex-1 bg-white/25 rounded-lg" style="height:60%"></div>
+            <div class="flex-1 bg-white/25 rounded-lg" style="height:72%"></div>
+            <div class="flex-1 bg-white/25 rounded-lg" style="height:82%"></div>
+            <div class="flex-1 bg-white rounded-lg shadow-lg" style="height:100%"></div>
+          </div>
+          <!-- Labels -->
+          <div class="flex gap-2 mt-1.5 mb-5">
+            <div class="flex-1 text-center text-white/40 text-[9px]">Nov</div>
+            <div class="flex-1 text-center text-white/40 text-[9px]">Dez</div>
+            <div class="flex-1 text-center text-white/40 text-[9px]">Jan</div>
+            <div class="flex-1 text-center text-white/40 text-[9px]">Fev</div>
+            <div class="flex-1 text-center text-white/40 text-[9px]">Mar</div>
+            <div class="flex-1 text-center text-white/40 text-[9px]">Abr</div>
+            <div class="flex-1 text-center text-white font-bold text-[9px]">Mai</div>
+          </div>
+
+          <!-- Summary cards -->
+          <div class="grid grid-cols-3 gap-3 mb-5">
+            <div class="bg-white/15 rounded-2xl p-3 text-center">
+              <p class="text-white/50 text-[9px] mb-1">Receita</p>
+              <p class="text-white font-bold text-sm">R$ 18.400</p>
+            </div>
+            <div class="bg-white/15 rounded-2xl p-3 text-center">
+              <p class="text-white/50 text-[9px] mb-1">Pagamentos</p>
+              <p class="text-white font-bold text-sm">47</p>
+            </div>
+            <div class="bg-white/15 rounded-2xl p-3 text-center">
+              <p class="text-white/50 text-[9px] mb-1">Pendentes</p>
+              <p class="text-white font-bold text-sm">R$ 2.100</p>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Floating top-right: Consulta confirmada -->
+        <div class="absolute -top-4 right-0 bg-white rounded-2xl shadow-lg px-4 py-3 flex items-center gap-3 w-[210px]">
+          <div class="w-9 h-9 rounded-xl bg-green-100 flex items-center justify-center shrink-0">
+            <svg class="w-5 h-5 text-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+              <polyline points="20 6 9 17 4 12"/>
+            </svg>
+          </div>
+          <div>
+            <p class="text-gray-800 text-[11px] font-bold">Consulta Confirmada</p>
+            <p class="text-gray-400 text-[10px]">há 2 minutos</p>
+          </div>
+        </div>
+
+        <!-- Floating bottom-left: Aniversariantes -->
+        <div class="absolute -bottom-4 -left-4 bg-white rounded-2xl shadow-lg px-4 py-3 flex items-center gap-3 w-[200px]">
+          <span class="text-xl shrink-0">🎂</span>
+          <div>
+            <p class="text-gray-800 text-[11px] font-bold">5 Aniversariantes</p>
+            <p class="text-gray-400 text-[10px]">esta semana</p>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Right: Benefits -->
+      <div class="section-fade">
+        <span class="inline-block bg-vitta-100 text-vitta-600 text-xs font-bold uppercase tracking-widest px-4 py-2 rounded-full mb-6 border border-vitta-200">Benefícios</span>
+
+        <h2 class="text-3xl md:text-4xl font-black text-gray-900 mb-10 leading-tight">
+          Por que escolher o<br/>
+          <span class="text-vitta-500">Vitta Sistemas?</span>
+        </h2>
+
+        <div class="space-y-7">
+
+          <div class="flex items-start gap-5">
+            <div class="w-11 h-11 rounded-2xl bg-vitta-100 flex items-center justify-center shrink-0">
+              <svg class="w-5 h-5 text-vitta-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                <polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/>
+              </svg>
+            </div>
+            <div>
+              <h4 class="font-bold text-gray-900 text-base mb-1">Decisões baseadas em dados</h4>
+              <p class="text-gray-500 text-sm leading-relaxed">Dashboard com indicadores em tempo real para você tomar decisões rápidas e assertivas sobre sua clínica.</p>
+            </div>
+          </div>
+
+          <div class="flex items-start gap-5">
+            <div class="w-11 h-11 rounded-2xl bg-purple-50 flex items-center justify-center shrink-0">
+              <svg class="w-5 h-5 text-purple-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+              </svg>
+            </div>
+            <div>
+              <h4 class="font-bold text-gray-900 text-base mb-1">Segurança e controle de acesso</h4>
+              <p class="text-gray-500 text-sm leading-relaxed">Perfis de usuário personalizados: Admin, Secretaria, Profissional — cada um com acesso apenas ao que precisa.</p>
+            </div>
+          </div>
+
+          <div class="flex items-start gap-5">
+            <div class="w-11 h-11 rounded-2xl bg-green-50 flex items-center justify-center shrink-0">
+              <svg class="w-5 h-5 text-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/>
+              </svg>
+            </div>
+            <div>
+              <h4 class="font-bold text-gray-900 text-base mb-1">Fácil de usar, fácil de implantar</h4>
+              <p class="text-gray-500 text-sm leading-relaxed">Interface moderna e intuitiva que sua equipe aprende rapidamente, sem necessidade de longa capacitação.</p>
+            </div>
+          </div>
+
+          <div class="flex items-start gap-5">
+            <div class="w-11 h-11 rounded-2xl bg-vitta-100 flex items-center justify-center shrink-0">
+              <svg class="w-5 h-5 text-vitta-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                <path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/>
+              </svg>
+            </div>
+            <div>
+              <h4 class="font-bold text-gray-900 text-base mb-1">Inteligência Artificial integrada</h4>
+              <p class="text-gray-500 text-sm leading-relaxed">A <span class="font-semibold text-vitta-600">Vitta IA</span> analisa sua clínica em tempo real — sugerindo agendamentos, alertando retornos e gerando resumos clínicos automaticamente.</p>
+            </div>
+          </div>
+
+          <div class="flex items-start gap-5">
+            <div class="w-11 h-11 rounded-2xl bg-indigo-50 flex items-center justify-center shrink-0">
+              <svg class="w-5 h-5 text-indigo-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                <rect x="5" y="2" width="14" height="20" rx="2" ry="2"/><line x1="12" y1="18" x2="12.01" y2="18"/>
+              </svg>
+            </div>
+            <div>
+              <h4 class="font-bold text-gray-900 text-base mb-1">App nativo para profissionais</h4>
+              <p class="text-gray-500 text-sm leading-relaxed">Médicos e profissionais acessam agenda, prontuários e pacientes direto pelo <span class="font-semibold text-indigo-600">App</span> no iOS e Android — de qualquer lugar.</p>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ===================== VITTA IA ===================== -->
+<section id="vitta-ia" class="gradient-ia py-28 relative overflow-hidden">
+  <!-- Star pattern overlay -->
+  <div class="absolute inset-0 star-bg opacity-20 pointer-events-none"></div>
+  <!-- Decorative circles -->
+  <div class="absolute top-0 left-1/4 w-[400px] h-[400px] rounded-full bg-vitta-500/5 blur-3xl pointer-events-none"></div>
+  <div class="absolute bottom-0 right-1/4 w-[300px] h-[300px] rounded-full bg-vitta-400/8 blur-2xl pointer-events-none"></div>
+
+  <div class="max-w-7xl mx-auto px-6">
+
+    <!-- Header -->
+    <div class="text-center mb-20 section-fade">
+      <div class="inline-flex items-center gap-3 mb-6">
+        <div class="w-10 h-10 rounded-2xl bg-vitta-500/20 border border-vitta-500/30 flex items-center justify-center">
+          <svg class="w-5 h-5 text-vitta-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/>
+          </svg>
+        </div>
+        <span class="text-vitta-400 text-sm font-bold uppercase tracking-widest">Inteligência Artificial</span>
+      </div>
+      <h2 class="text-4xl md:text-5xl font-black text-white mb-5 glow-text">
+        Conheça a <span class="tag-ia">Vitta IA</span>
+      </h2>
+      <p class="text-white/60 text-lg max-w-2xl mx-auto">
+        Inteligência artificial desenvolvida especialmente para clínicas brasileiras. Aprende com o seu fluxo e trabalha para você.
+      </p>
+    </div>
+
+    <!-- IA Features grid -->
+    <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6 mb-20">
+
+      <div class="ia-glow rounded-2xl p-7 section-fade">
+        <div class="w-12 h-12 rounded-2xl bg-vitta-500/20 flex items-center justify-center mb-5 ai-pulse">
+          <svg class="w-6 h-6 text-vitta-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/>
+          </svg>
+        </div>
+        <h3 class="text-white font-bold text-base mb-2">Agendamento Preditivo</h3>
+        <p class="text-white/55 text-sm leading-relaxed">A IA analisa o histórico e prevê os melhores horários, reduz faltas e otimiza a agenda automaticamente.</p>
+      </div>
+
+      <div class="ia-glow rounded-2xl p-7 section-fade">
+        <div class="w-12 h-12 rounded-2xl bg-vitta-500/20 flex items-center justify-center mb-5 ai-pulse" style="animation-delay:0.3s">
+          <svg class="w-6 h-6 text-vitta-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><path d="M9.5 12.5 Q12 10 14.5 12.5 Q12 15 9.5 12.5"/>
+          </svg>
+        </div>
+        <h3 class="text-white font-bold text-base mb-2">Auxílio no Prontuário</h3>
+        <p class="text-white/55 text-sm leading-relaxed">Sugestões inteligentes de anamnese, CID-10 automático e resumo de evoluções clínicas gerado pela IA.</p>
+      </div>
+
+      <div class="ia-glow rounded-2xl p-7 section-fade">
+        <div class="w-12 h-12 rounded-2xl bg-vitta-500/20 flex items-center justify-center mb-5 ai-pulse" style="animation-delay:0.6s">
+          <svg class="w-6 h-6 text-vitta-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <path d="M22 12h-4l-3 9L9 3l-3 9H2"/>
+          </svg>
+        </div>
+        <h3 class="text-white font-bold text-base mb-2">Análise de Indicadores</h3>
+        <p class="text-white/55 text-sm leading-relaxed">Identifica tendências, gargalos e oportunidades de crescimento com análise preditiva do seu faturamento.</p>
+      </div>
+
+      <div class="ia-glow rounded-2xl p-7 section-fade">
+        <div class="w-12 h-12 rounded-2xl bg-vitta-500/20 flex items-center justify-center mb-5 ai-pulse" style="animation-delay:0.9s">
+          <svg class="w-6 h-6 text-vitta-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+          </svg>
+        </div>
+        <h3 class="text-white font-bold text-base mb-2">Comunicação Automatizada</h3>
+        <p class="text-white/55 text-sm leading-relaxed">Mensagens personalizadas de confirmação, lembrete e pós-consulta geradas automaticamente pela IA para cada paciente.</p>
+      </div>
+
+      <div class="ia-glow rounded-2xl p-7 section-fade">
+        <div class="w-12 h-12 rounded-2xl bg-vitta-500/20 flex items-center justify-center mb-5 ai-pulse" style="animation-delay:1.2s">
+          <svg class="w-6 h-6 text-vitta-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+          </svg>
+        </div>
+        <h3 class="text-white font-bold text-base mb-2">Busca Inteligente</h3>
+        <p class="text-white/55 text-sm leading-relaxed">Encontre pacientes, consultas e documentos em segundos com busca semântica por linguagem natural.</p>
+      </div>
+
+      <div class="ia-glow rounded-2xl p-7 section-fade">
+        <div class="w-12 h-12 rounded-2xl bg-vitta-500/20 flex items-center justify-center mb-5 ai-pulse" style="animation-delay:1.5s">
+          <svg class="w-6 h-6 text-vitta-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+          </svg>
+        </div>
+        <h3 class="text-white font-bold text-base mb-2">Alertas Preventivos</h3>
+        <p class="text-white/55 text-sm leading-relaxed">Detecta padrões de risco, pacientes sem retorno e inconsistências financeiras antes que se tornem problemas.</p>
+      </div>
+
+    </div>
+
+    <!-- IA highlight banner -->
+    <div class="section-fade">
+      <div class="relative rounded-3xl overflow-hidden border border-vitta-500/20 p-10 text-center"
+           style="background: linear-gradient(135deg, rgba(42,188,212,0.12), rgba(18,122,140,0.06));">
+        <div class="absolute inset-0 star-bg opacity-30"></div>
+        <div class="relative z-10">
+          <div class="inline-flex items-center gap-2 bg-vitta-500/20 border border-vitta-500/30 rounded-full px-4 py-1.5 mb-5">
+            <span class="w-2 h-2 bg-vitta-400 rounded-full ai-pulse"></span>
+            <span class="text-vitta-400 text-xs font-bold uppercase tracking-widest">Em desenvolvimento contínuo</span>
+          </div>
+          <h3 class="text-white text-2xl md:text-3xl font-black mb-3">
+            A Vitta IA aprende com a sua clínica
+          </h3>
+          <p class="text-white/60 max-w-xl mx-auto text-sm leading-relaxed">
+            Cada consulta registrada, cada agendamento confirmado, cada relatório gerado treina nossa IA para oferecer recomendações cada vez mais precisas para o seu negócio.
+          </p>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- ===================== APP PROFISSIONAIS ===================== -->
+<section id="profissionais" class="py-28 bg-white overflow-hidden">
+  <div class="max-w-7xl mx-auto px-6">
+
+    <div class="grid lg:grid-cols-2 gap-16 items-center">
+
+      <!-- Left: phone mockups -->
+      <div class="relative flex justify-center section-fade order-2 lg:order-1">
+        <!-- Background glow -->
+        <div class="absolute inset-0 bg-vitta-500/5 rounded-full blur-3xl"></div>
+
+        <!-- Main phone -->
+        <div class="phone-mockup rounded-[3rem] w-[260px] h-[520px] relative animate-float z-10 flex flex-col overflow-hidden">
+          <!-- Phone top bar -->
+          <div class="bg-gray-900 px-6 pt-6 pb-4 shrink-0">
+            <div class="flex justify-between items-center mb-4">
+              <div class="flex items-center gap-2">
+                <img src="img/logo_branca.png" alt="Vitta" class="h-7 brightness-0 invert" onerror="this.style.display='none'" />
+
+              </div>
+              <div class="glass rounded-full px-2 py-0.5">
+                <span class="text-vitta-400 text-[9px] font-medium">IA Ativa</span>
+              </div>
+            </div>
+            <!-- Today's summary -->
+            <div class="bg-vitta-500/20 rounded-2xl p-3">
+              <p class="text-white/50 text-[9px] mb-0.5">Sua agenda hoje</p>
+              <p class="text-white text-base font-black">8 consultas</p>
+              <div class="flex gap-3 mt-1">
+                <span class="text-green-400 text-[9px]">6 confirmadas</span>
+                <span class="text-yellow-400 text-[9px]">2 pendentes</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Agenda items -->
+          <div class="flex-1 bg-gray-900/95 px-4 py-3 space-y-2 overflow-hidden">
+            <p class="text-white/30 text-[9px] uppercase tracking-wider font-semibold">Próximas</p>
+            <div class="bg-vitta-500/15 border border-vitta-500/20 rounded-xl p-2.5">
+              <div class="flex justify-between items-start mb-1">
+                <p class="text-white text-[10px] font-bold">João Pereira</p>
+                <span class="text-vitta-400 text-[9px]">14:00</span>
+              </div>
+              <p class="text-white/40 text-[9px]">Cardiologia • Sala 2</p>
+            </div>
+            <div class="bg-white/5 rounded-xl p-2.5">
+              <div class="flex justify-between items-start mb-1">
+                <p class="text-white text-[10px] font-bold">Maria Santos</p>
+                <span class="text-white/40 text-[9px]">15:00</span>
+              </div>
+              <p class="text-white/40 text-[9px]">Retorno • Sala 1</p>
+            </div>
+            <div class="bg-white/5 rounded-xl p-2.5">
+              <div class="flex justify-between items-start mb-1">
+                <p class="text-white text-[10px] font-bold">Carlos Lima</p>
+                <span class="text-white/40 text-[9px]">16:30</span>
+              </div>
+              <p class="text-white/40 text-[9px]">Consulta • Sala 2</p>
+            </div>
+
+            <!-- Quick action -->
+            <div class="mt-3 bg-vitta-500 rounded-xl p-2.5 flex items-center justify-center gap-1.5">
+              <svg class="w-3 h-3 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/>
+              </svg>
+              <span class="text-white text-[10px] font-bold">Abrir Prontuário</span>
+            </div>
+          </div>
+
+          <!-- Home indicator -->
+          <div class="bg-gray-900 py-2 flex justify-center shrink-0">
+            <div class="w-24 h-1 bg-white/20 rounded-full"></div>
+          </div>
+        </div>
+
+        <!-- Second phone (slightly behind) -->
+        <div class="phone-mockup rounded-[3rem] w-[220px] h-[440px] absolute top-10 -right-4 opacity-60 animate-float-delay z-0 flex flex-col overflow-hidden">
+          <div class="bg-gray-900 p-5 shrink-0">
+            <p class="text-white/50 text-[9px] mb-2">Prontuário</p>
+            <p class="text-white text-sm font-bold">Ana Silva</p>
+          </div>
+          <div class="flex-1 bg-gray-900/90 p-4 space-y-2">
+            <div class="bg-white/5 rounded-xl p-2.5">
+              <p class="text-white/40 text-[9px]">Última consulta</p>
+              <p class="text-white text-[10px] font-medium">15 Mai 2025</p>
+            </div>
+            <div class="bg-vitta-500/15 rounded-xl p-2.5 border border-vitta-500/20">
+              <p class="text-vitta-400 text-[9px] font-semibold mb-1">Vitta IA</p>
+              <p class="text-white/60 text-[9px]">Retorno recomendado em 30 dias</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Right: content -->
+      <div class="section-fade order-1 lg:order-2">
+        <span class="inline-flex items-center gap-2 bg-vitta-50 text-vitta-600 text-xs font-bold uppercase tracking-widest px-4 py-2 rounded-full mb-6 border border-vitta-200">
+          <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+            <rect x="5" y="2" width="14" height="20" rx="2" ry="2"/><line x1="12" y1="18" x2="12.01" y2="18"/>
+          </svg>
+          App para Profissionais
+        </span>
+
+        <h2 class="text-3xl md:text-4xl font-black text-gray-900 mb-5 leading-tight">
+          A clínica na palma<br/>da mão do profissional
+        </h2>
+        <p class="text-gray-500 text-base leading-relaxed mb-8">
+          Médicos, psicólogos, fisioterapeutas e todos os profissionais de saúde têm acesso completo à sua agenda, prontuários e pacientes — de qualquer lugar, a qualquer hora.
+        </p>
+
+        <div class="space-y-5 mb-10">
+          <div class="flex items-start gap-4">
+            <div class="w-10 h-10 rounded-xl bg-vitta-100 flex items-center justify-center shrink-0 mt-0.5">
+              <svg class="w-5 h-5 text-vitta-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                <rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/>
+              </svg>
+            </div>
+            <div>
+              <h4 class="font-bold text-gray-800 mb-1">Agenda personalizada</h4>
+              <p class="text-gray-500 text-sm">Veja apenas a sua agenda, confirme consultas e gerencie horários direto no celular.</p>
+            </div>
+          </div>
+
+          <div class="flex items-start gap-4">
+            <div class="w-10 h-10 rounded-xl bg-purple-50 flex items-center justify-center shrink-0 mt-0.5">
+              <svg class="w-5 h-5 text-purple-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/>
+              </svg>
+            </div>
+            <div>
+              <h4 class="font-bold text-gray-800 mb-1">Prontuário na palma da mão</h4>
+              <p class="text-gray-500 text-sm">Acesse e registre evoluções, anamneses e prescrições de qualquer dispositivo.</p>
+            </div>
+          </div>
+
+          <div class="flex items-start gap-4">
+            <div class="w-10 h-10 rounded-xl bg-green-50 flex items-center justify-center shrink-0 mt-0.5">
+              <svg class="w-5 h-5 text-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/>
+              </svg>
+            </div>
+            <div>
+              <h4 class="font-bold text-gray-800 mb-1">Histórico completo do paciente</h4>
+              <p class="text-gray-500 text-sm">Todo o histórico de consultas, exames e documentos acessível em segundos.</p>
+            </div>
+          </div>
+
+          <div class="flex items-start gap-4">
+            <div class="w-10 h-10 rounded-xl bg-vitta-100 flex items-center justify-center shrink-0 mt-0.5">
+              <svg class="w-5 h-5 text-vitta-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                <path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/>
+              </svg>
+            </div>
+            <div>
+              <h4 class="font-bold text-gray-800 mb-1">Assistente Vitta IA</h4>
+              <p class="text-gray-500 text-sm">Sugestões inteligentes durante o atendimento, auxílio na anamnese e alertas clínicos.</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Download badges -->
+        <div class="flex flex-wrap gap-4">
+          <div class="flex items-center gap-3 bg-gray-900 text-white px-5 py-3.5 rounded-2xl cursor-pointer hover:bg-gray-800 transition-colors">
+            <svg class="w-7 h-7" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M17.05 20.28c-.98.95-2.05.8-3.08.35-1.09-.46-2.09-.48-3.24 0-1.44.62-2.2.44-3.06-.35C2.79 15.25 3.51 7.7 9.05 7.4c1.32.06 2.22.72 2.98.8.98-.2 1.93-.82 2.99-.86 1.86-.08 3.35.83 4.15 2.12-3.84 2.26-3.01 7.22.88 8.82zm-3.07-15.06C13.32 6.69 12 8.08 12 9.38c1.22.02 2.49-.97 3.05-2.22.07-.52-.07-1.04-.07-1.94z"/>
+            </svg>
+            <div>
+              <p class="text-[9px] text-white/60">Em breve na</p>
+              <p class="font-bold text-sm">App Store</p>
+            </div>
+          </div>
+          <div class="flex items-center gap-3 bg-gray-900 text-white px-5 py-3.5 rounded-2xl cursor-pointer hover:bg-gray-800 transition-colors">
+            <svg class="w-7 h-7" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M3 20.5v-17c0-.83 1-1.24 1.59-.64L14 12l-9.41 9.14C4 21.74 3 21.33 3 20.5zm13.5-9.41L8.5 4.5l8.5 4.93-2 1.66zM20 12c0 .85-.5 1.59-1.24 1.93l-2.26 1.31L14 12l2.5-3.24 2.26 1.31C19.5 10.41 20 11.15 20 12z"/>
+            </svg>
+            <div>
+              <p class="text-[9px] text-white/60">Em breve no</p>
+              <p class="font-bold text-sm">Google Play</p>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== MÓDULOS ===================== -->
+<section id="modulos" class="py-24 bg-gray-50">
+  <div class="max-w-7xl mx-auto px-6">
+    <div class="text-center mb-16 section-fade">
+      <span class="inline-block text-vitta-500 text-xs font-bold uppercase tracking-widest mb-3">Módulos</span>
+      <h2 class="text-3xl md:text-4xl font-black text-gray-900 mb-4">Todos os módulos integrados</h2>
+      <p class="text-gray-500 text-lg max-w-xl mx-auto">Cada módulo conversa com os outros. Uma plataforma, sem integrações complicadas.</p>
+    </div>
+
+    <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 section-fade">
+
+      <div class="bg-white rounded-2xl p-5 flex items-center gap-3 shadow-sm border border-gray-100 card-hover">
+        <div class="w-9 h-9 rounded-xl bg-vitta-100 flex items-center justify-center shrink-0">
+          <svg class="w-4.5 h-4.5 text-vitta-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+        </div>
+        <span class="text-gray-700 text-sm font-medium">Agendamentos</span>
+      </div>
+
+      <div class="bg-white rounded-2xl p-5 flex items-center gap-3 shadow-sm border border-gray-100 card-hover">
+        <div class="w-9 h-9 rounded-xl bg-blue-50 flex items-center justify-center shrink-0">
+          <svg class="w-4.5 h-4.5 text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>
+        </div>
+        <span class="text-gray-700 text-sm font-medium">Pacientes</span>
+      </div>
+
+      <div class="bg-white rounded-2xl p-5 flex items-center gap-3 shadow-sm border border-gray-100 card-hover">
+        <div class="w-9 h-9 rounded-xl bg-purple-50 flex items-center justify-center shrink-0">
+          <svg class="w-4.5 h-4.5 text-purple-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+        </div>
+        <span class="text-gray-700 text-sm font-medium">Prontuário</span>
+      </div>
+
+      <div class="bg-white rounded-2xl p-5 flex items-center gap-3 shadow-sm border border-gray-100 card-hover">
+        <div class="w-9 h-9 rounded-xl bg-green-50 flex items-center justify-center shrink-0">
+          <svg class="w-4.5 h-4.5 text-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+        </div>
+        <span class="text-gray-700 text-sm font-medium">Financeiro</span>
+      </div>
+
+      <div class="bg-white rounded-2xl p-5 flex items-center gap-3 shadow-sm border border-gray-100 card-hover">
+        <div class="w-9 h-9 rounded-xl bg-orange-50 flex items-center justify-center shrink-0">
+          <svg class="w-4.5 h-4.5 text-orange-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/></svg>
+        </div>
+        <span class="text-gray-700 text-sm font-medium">Relatórios</span>
+      </div>
+
+      <div class="bg-white rounded-2xl p-5 flex items-center gap-3 shadow-sm border border-gray-100 card-hover">
+        <div class="w-9 h-9 rounded-xl bg-red-50 flex items-center justify-center shrink-0">
+          <svg class="w-4.5 h-4.5 text-red-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+        </div>
+        <span class="text-gray-700 text-sm font-medium">Profissionais</span>
+      </div>
+
+      <div class="bg-white rounded-2xl p-5 flex items-center gap-3 shadow-sm border border-gray-100 card-hover">
+        <div class="w-9 h-9 rounded-xl bg-yellow-50 flex items-center justify-center shrink-0">
+          <svg class="w-4.5 h-4.5 text-yellow-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+        </div>
+        <span class="text-gray-700 text-sm font-medium">Especialidades</span>
+      </div>
+
+      <div class="bg-white rounded-2xl p-5 flex items-center gap-3 shadow-sm border border-gray-100 card-hover">
+        <div class="w-9 h-9 rounded-xl bg-teal-50 flex items-center justify-center shrink-0">
+          <svg class="w-4.5 h-4.5 text-teal-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+        </div>
+        <span class="text-gray-700 text-sm font-medium">Salas</span>
+      </div>
+
+      <div class="bg-white rounded-2xl p-5 flex items-center gap-3 shadow-sm border border-gray-100 card-hover">
+        <div class="w-9 h-9 rounded-xl bg-indigo-50 flex items-center justify-center shrink-0">
+          <svg class="w-4.5 h-4.5 text-indigo-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+        </div>
+        <span class="text-gray-700 text-sm font-medium">Notificações</span>
+      </div>
+
+      <div class="bg-white rounded-2xl p-5 flex items-center gap-3 shadow-sm border border-gray-100 card-hover">
+        <div class="w-9 h-9 rounded-xl bg-pink-50 flex items-center justify-center shrink-0">
+          <svg class="w-4.5 h-4.5 text-pink-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="8.5" cy="7" r="4"/><polyline points="17 11 19 13 23 9"/></svg>
+        </div>
+        <span class="text-gray-700 text-sm font-medium">Usuários</span>
+      </div>
+
+      <div class="bg-white rounded-2xl p-5 flex items-center gap-3 shadow-sm border border-gray-100 card-hover">
+        <div class="w-9 h-9 rounded-xl bg-gray-100 flex items-center justify-center shrink-0">
+          <svg class="w-4.5 h-4.5 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/><path d="M4.93 4.93a10 10 0 0 0 0 14.14"/></svg>
+        </div>
+        <span class="text-gray-700 text-sm font-medium">Configurações</span>
+      </div>
+
+      <div class="bg-white rounded-2xl p-5 flex items-center gap-3 shadow-sm border border-gray-100 card-hover">
+        <div class="w-9 h-9 rounded-xl flex items-center justify-center shrink-0" style="background:linear-gradient(135deg,#00ac47 0%,#00832d 35%,#0066da 70%,#2684fc 100%)">
+          <svg class="w-4.5 h-4.5 text-white" viewBox="0 0 24 24" fill="currentColor"><path d="M17 10.5V7a1 1 0 0 0-1-1H4a1 1 0 0 0-1 1v10a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-3.5l4 4v-11l-4 4Z"/></svg>
+        </div>
+        <span class="text-gray-700 text-sm font-medium">Videochamada</span>
+      </div>
+
+      <!-- IA badge module -->
+      <div class="bg-gradient-to-r from-vitta-500 to-vitta-600 rounded-2xl p-5 flex items-center gap-3 shadow-sm card-hover">
+        <div class="w-9 h-9 rounded-xl bg-white/20 flex items-center justify-center shrink-0">
+          <svg class="w-4.5 h-4.5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
+        </div>
+        <span class="text-white text-sm font-bold">Vitta IA</span>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ===================== DEPOIMENTOS ===================== -->
+<section id="depoimentos" class="py-24 bg-white">
+  <div class="max-w-7xl mx-auto px-6">
+
+    <div class="text-center mb-16 section-fade">
+      <span class="inline-block text-vitta-500 text-xs font-bold uppercase tracking-widest mb-3">Depoimentos</span>
+      <h2 class="text-3xl md:text-4xl font-black text-gray-900 mb-4">O que dizem os profissionais</h2>
+      <p class="text-gray-500 text-base max-w-lg mx-auto">Clínicas de todo o Brasil já transformaram sua gestão com o Vitta Sistemas.</p>
+    </div>
+
+    <div class="grid md:grid-cols-3 gap-6">
+
+      <!-- Depoimento 1 -->
+      <div class="testimonial-card section-fade">
+        <div class="testimonial-quote">"</div>
+        <div class="flex gap-1 mb-4">
+          <svg class="w-4 h-4 star-fill" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
+          <svg class="w-4 h-4 star-fill" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
+          <svg class="w-4 h-4 star-fill" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
+          <svg class="w-4 h-4 star-fill" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
+          <svg class="w-4 h-4 star-fill" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
+        </div>
+        <p class="text-gray-600 text-sm leading-relaxed mb-6">
+          "Organizei toda a agenda da clínica em um dia. Antes perdia horas com planilhas — hoje o Vitta cuida de agendamento, prontuário e financeiro num só lugar. Nunca mais voltarei ao método antigo."
+        </p>
+        <div class="flex items-center gap-3 pt-4 border-t border-gray-100">
+          <div class="testimonial-avatar bg-purple-100 text-purple-600">AF</div>
+          <div>
+            <p class="font-bold text-gray-800 text-sm">Dra. Amanda Ferreira</p>
+            <p class="text-gray-400 text-xs">Psicóloga · São Paulo, SP</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Depoimento 2 -->
+      <div class="testimonial-card section-fade" style="transition-delay:.1s">
+        <div class="testimonial-quote">"</div>
+        <div class="flex gap-1 mb-4">
+          <svg class="w-4 h-4 star-fill" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
+          <svg class="w-4 h-4 star-fill" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
+          <svg class="w-4 h-4 star-fill" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
+          <svg class="w-4 h-4 star-fill" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
+          <svg class="w-4 h-4 star-fill" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
+        </div>
+        <p class="text-gray-600 text-sm leading-relaxed mb-6">
+          "O app para profissionais é o que faltava. Vejo minha agenda, acesso prontuários e registro evoluções pelo celular entre um atendimento e outro. A equipe da clínica também adorou a facilidade."
+        </p>
+        <div class="flex items-center gap-3 pt-4 border-t border-gray-100">
+          <div class="testimonial-avatar bg-vitta-100 text-vitta-700">RM</div>
+          <div>
+            <p class="font-bold text-gray-800 text-sm">Dr. Rafael Mendonça</p>
+            <p class="text-gray-400 text-xs">Fisioterapeuta · Florianópolis, SC</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Depoimento 3 -->
+      <div class="testimonial-card section-fade" style="transition-delay:.2s">
+        <div class="testimonial-quote">"</div>
+        <div class="flex gap-1 mb-4">
+          <svg class="w-4 h-4 star-fill" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
+          <svg class="w-4 h-4 star-fill" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
+          <svg class="w-4 h-4 star-fill" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
+          <svg class="w-4 h-4 star-fill" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
+          <svg class="w-4 h-4 star-fill" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
+        </div>
+        <p class="text-gray-600 text-sm leading-relaxed mb-6">
+          "A Vitta IA me surpreendeu. Ela já me alertou sobre pacientes sem retorno que eu tinha esquecido e sugere os melhores horários para a agenda. É como ter uma secretária inteligente trabalhando o tempo todo."
+        </p>
+        <div class="flex items-center gap-3 pt-4 border-t border-gray-100">
+          <div class="testimonial-avatar bg-green-100 text-green-700">PN</div>
+          <div>
+            <p class="font-bold text-gray-800 text-sm">Dra. Priscila Neves</p>
+            <p class="text-gray-400 text-xs">Cardiologista · Belo Horizonte, MG</p>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ===================== PLANOS E PREÇOS ===================== -->
+<section id="planos" class="py-24 bg-gray-50 overflow-hidden">
+  <div class="max-w-7xl mx-auto px-6">
+
+    <!-- Header -->
+    <div class="text-center mb-12 section-fade">
+      <div class="plans-tag">Planos e Preços</div>
+      <h2 class="text-3xl md:text-4xl font-black text-gray-900 mb-4 leading-tight">
+        Escolha o plano <span style="background:linear-gradient(135deg,#1a96ac 0%,#2ABCD4 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">ideal para sua clínica</span>
+      </h2>
+      <p class="text-gray-500 text-base max-w-md mx-auto mb-6 leading-relaxed">Sem taxas ocultas. Cancele quando quiser. Todos os planos incluem suporte e atualizações gratuitas.</p>
+      <div class="trial-badge">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+        14 dias grátis em qualquer plano — sem cobrança nos primeiros 14 dias
+      </div>
+    </div>
+
+    <!-- Billing Toggle -->
+    <div class="billing-toggle section-fade">
+      <span class="active" id="lbl-monthly">Mensal</span>
+      <div class="toggle-wrap" id="billingToggle" onclick="toggleBilling()">
+        <div class="toggle-knob"></div>
+      </div>
+      <span id="lbl-annual">Anual</span>
+      <span class="save-pill">Economize 20%</span>
+    </div>
+
+    <!-- Plans Grid -->
+    <div class="plans-grid section-fade">
+
+      <!--
+        PLANO SOLO — REMOVIDO DA VENDA (Apple App Store Guideline 3.1.3(c) / 3.1.1).
+        Código preservado abaixo, apenas comentado, caso o plano seja reativado no futuro.
+
+      <!-- SOLO 
+      <div class="plan-card solo">
+        <div class="solo-ribbon">Pequenas</div>
+        <div class="plan-name">Plano 01</div>
+        <div class="plan-title">Solo</div>
+        <div class="plan-desc">Para clínicas e consultórios pequenos, com até 3 usuários (profissional responsável + equipe).</div>
+        <div class="plan-price">
+          <span class="plan-currency">R$</span>
+          <span class="plan-amount"><span class="amount-monthly">97</span><span class="amount-annual">77</span></span>
+          <span class="plan-period">/mês</span>
+        </div>
+        <div class="annual-note">Cobrado anualmente — R$ 924/ano</div>
+        <div class="plan-divider"></div>
+        <ul class="features-list">
+          <li><span class="check-icon"><svg viewBox="0 0 12 12" fill="none" stroke="#7c3aed" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="2,6 5,9 10,3"/></svg></span>Sistema Web completo</li>
+          <li><span class="check-icon"><svg viewBox="0 0 12 12" fill="none" stroke="#7c3aed" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="2,6 5,9 10,3"/></svg></span>App iOS e Android</li>
+          <li><span class="check-icon"><svg viewBox="0 0 12 12" fill="none" stroke="#7c3aed" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="2,6 5,9 10,3"/></svg></span>Vitta IA completa</li>
+          <li><span class="check-icon"><svg viewBox="0 0 12 12" fill="none" stroke="#7c3aed" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="2,6 5,9 10,3"/></svg></span>Perfil híbrido (prof. + secretária)</li>
+          <li><span class="check-icon"><svg viewBox="0 0 12 12" fill="none" stroke="#7c3aed" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="2,6 5,9 10,3"/></svg></span>Prontuário eletrônico</li>
+          <li><span class="check-icon"><svg viewBox="0 0 12 12" fill="none" stroke="#7c3aed" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="2,6 5,9 10,3"/></svg></span>Financeiro completo</li>
+          <li><span class="check-icon"><svg viewBox="0 0 12 12" fill="none" stroke="#7c3aed" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="2,6 5,9 10,3"/></svg></span>Até 3 usuários</li>
+        </ul>
+        <a href="https://app.vittasistemas.com.br/pages/cadastro.html?plano=Solo" target="_blank" rel="noopener noreferrer" class="plan-btn outline-purple">Começar grátis</a>
+        <div class="plan-btn-sub">14 dias grátis • Sem cobrança nos primeiros 14 dias</div>
+      </div>
+
+      FIM PLANO SOLO -->
+
+      <!-- ESSENCIAL -->
+      <div class="plan-card">
+        <div class="plan-name">Plano 02</div>
+        <div class="plan-title">Essencial</div>
+        <div class="plan-desc">Ideal para clínicas que querem digitalizar a gestão com sistema completo na web.</div>
+        <div class="plan-price">
+          <span class="plan-currency">R$</span>
+          <span class="plan-amount"><span class="amount-monthly">147</span><span class="amount-annual">117</span></span>
+          <span class="plan-period">/mês</span>
+        </div>
+        <div class="annual-note">Cobrado anualmente — R$ 1.404/ano</div>
+        <div class="plan-divider"></div>
+        <ul class="features-list">
+          <li><span class="check-icon"><svg viewBox="0 0 12 12" fill="none" stroke="#00b87a" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="2,6 5,9 10,3"/></svg></span>Sistema Web completo</li>
+          <li><span class="check-icon"><svg viewBox="0 0 12 12" fill="none" stroke="#00b87a" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="2,6 5,9 10,3"/></svg></span>Agendamentos ilimitados</li>
+          <li><span class="check-icon"><svg viewBox="0 0 12 12" fill="none" stroke="#00b87a" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="2,6 5,9 10,3"/></svg></span>Link automático do Google Meet</li>
+          <li><span class="check-icon"><svg viewBox="0 0 12 12" fill="none" stroke="#00b87a" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="2,6 5,9 10,3"/></svg></span>Prontuário eletrônico</li>
+          <li><span class="check-icon"><svg viewBox="0 0 12 12" fill="none" stroke="#00b87a" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="2,6 5,9 10,3"/></svg></span>Financeiro completo</li>
+          <li><span class="check-icon"><svg viewBox="0 0 12 12" fill="none" stroke="#00b87a" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="2,6 5,9 10,3"/></svg></span>Usuários ilimitados</li>
+          <li class="disabled"><span class="cross-icon"><svg viewBox="0 0 12 12" fill="none" stroke="#aaa" stroke-width="2.5" stroke-linecap="round"><line x1="3" y1="3" x2="9" y2="9"/><line x1="9" y1="3" x2="3" y2="9"/></svg></span>App para profissionais</li>
+          <li class="disabled"><span class="cross-icon"><svg viewBox="0 0 12 12" fill="none" stroke="#aaa" stroke-width="2.5" stroke-linecap="round"><line x1="3" y1="3" x2="9" y2="9"/><line x1="9" y1="3" x2="3" y2="9"/></svg></span>Vitta IA</li>
+        </ul>
+        <a href="https://app.vittasistemas.com.br/pages/cadastro.html?plano=Essencial" target="_blank" rel="noopener noreferrer" class="plan-btn outline">Começar grátis</a>
+        <div class="plan-btn-sub">14 dias grátis • Sem cobrança nos primeiros 14 dias</div>
+      </div>
+
+      <!-- CLÍNICA — FEATURED -->
+      <div class="plan-card featured">
+        <div class="featured-ribbon">Popular</div>
+        <div class="plan-name">Plano 03</div>
+        <div class="plan-title">Clínica</div>
+        <div class="plan-desc">Para clínicas que precisam de mobilidade — profissionais acessam tudo pelo celular.</div>
+        <div class="plan-price">
+          <span class="plan-currency">R$</span>
+          <span class="plan-amount"><span class="amount-monthly">197</span><span class="amount-annual">157</span></span>
+          <span class="plan-period">/mês</span>
+        </div>
+        <div class="annual-note">Cobrado anualmente — R$ 1.884/ano</div>
+        <div class="plan-divider"></div>
+        <ul class="features-list">
+          <li><span class="check-icon"><svg viewBox="0 0 12 12" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="2,6 5,9 10,3"/></svg></span>Tudo do plano Essencial</li>
+          <li><span class="check-icon"><svg viewBox="0 0 12 12" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="2,6 5,9 10,3"/></svg></span>App iOS e Android</li>
+          <li><span class="check-icon"><svg viewBox="0 0 12 12" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="2,6 5,9 10,3"/></svg></span>Agenda no celular</li>
+          <li><span class="check-icon"><svg viewBox="0 0 12 12" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="2,6 5,9 10,3"/></svg></span>Prontuário pelo app</li>
+          <li><span class="check-icon"><svg viewBox="0 0 12 12" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="2,6 5,9 10,3"/></svg></span>Notificações push</li>
+          <li><span class="check-icon"><svg viewBox="0 0 12 12" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="2,6 5,9 10,3"/></svg></span>Link automático do Google Meet</li>
+          <li><span class="check-icon"><svg viewBox="0 0 12 12" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="2,6 5,9 10,3"/></svg></span>Usuários ilimitados</li>
+          <li class="disabled"><span class="cross-icon"><svg viewBox="0 0 12 12" fill="none" stroke="rgba(255,255,255,0.4)" stroke-width="2.5" stroke-linecap="round"><line x1="3" y1="3" x2="9" y2="9"/><line x1="9" y1="3" x2="3" y2="9"/></svg></span>Vitta IA</li>
+        </ul>
+        <a href="https://app.vittasistemas.com.br/pages/cadastro.html?plano=Cl%C3%ADnica" target="_blank" rel="noopener noreferrer" class="plan-btn primary-white">Começar grátis</a>
+        <div class="plan-btn-sub">14 dias grátis • Sem cobrança nos primeiros 14 dias</div>
+      </div>
+
+      <!-- PRO -->
+      <div class="plan-card">
+        <div class="plan-name">Plano 04</div>
+        <div class="plan-title">Pro</div>
+        <div class="plan-desc">Para clínicas que querem o máximo — sistema web, app e inteligência artificial integrada.</div>
+        <div class="plan-price">
+          <span class="plan-currency">R$</span>
+          <span class="plan-amount"><span class="amount-monthly">297</span><span class="amount-annual">237</span></span>
+          <span class="plan-period">/mês</span>
+        </div>
+        <div class="annual-note">Cobrado anualmente — R$ 2.844/ano</div>
+        <div class="plan-divider"></div>
+        <ul class="features-list">
+          <li><span class="check-icon"><svg viewBox="0 0 12 12" fill="none" stroke="#00b87a" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="2,6 5,9 10,3"/></svg></span>Tudo do plano Clínica</li>
+          <li><span class="check-icon"><svg viewBox="0 0 12 12" fill="none" stroke="#00b87a" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="2,6 5,9 10,3"/></svg></span>Vitta IA completa</li>
+          <li><span class="check-icon"><svg viewBox="0 0 12 12" fill="none" stroke="#00b87a" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="2,6 5,9 10,3"/></svg></span>Resumo automático de consultas</li>
+          <li><span class="check-icon"><svg viewBox="0 0 12 12" fill="none" stroke="#00b87a" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="2,6 5,9 10,3"/></svg></span>Análise de indicadores com IA</li>
+          <li><span class="check-icon"><svg viewBox="0 0 12 12" fill="none" stroke="#00b87a" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="2,6 5,9 10,3"/></svg></span>Alertas preventivos</li>
+          <li><span class="check-icon"><svg viewBox="0 0 12 12" fill="none" stroke="#00b87a" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="2,6 5,9 10,3"/></svg></span>Link automático do Google Meet</li>
+          <li><span class="check-icon"><svg viewBox="0 0 12 12" fill="none" stroke="#00b87a" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="2,6 5,9 10,3"/></svg></span>Suporte prioritário</li>
+          <li><span class="check-icon"><svg viewBox="0 0 12 12" fill="none" stroke="#00b87a" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="2,6 5,9 10,3"/></svg></span>Usuários ilimitados</li>
+        </ul>
+        <a href="https://app.vittasistemas.com.br/pages/cadastro.html?plano=Pro" target="_blank" rel="noopener noreferrer" class="plan-btn outline">Começar grátis</a>
+        <div class="plan-btn-sub">14 dias grátis • Sem cobrança nos primeiros 14 dias</div>
+      </div>
+
+    </div>
+
+    <!-- Footer note -->
+    <p class="text-center text-gray-400 text-sm mt-10 section-fade">
+      Dúvidas sobre qual plano escolher?
+      <a href="https://wa.me/5548984096109" target="_blank" rel="noopener" class="text-vitta-500 font-semibold hover:underline">Fale com a gente no WhatsApp</a>
+    </p>
+
+  </div>
+</section>
+
+<script>
+  let isAnnual = false;
+  function toggleBilling() {
+    isAnnual = !isAnnual;
+    const toggle = document.getElementById('billingToggle');
+    const lblM = document.getElementById('lbl-monthly');
+    const lblA = document.getElementById('lbl-annual');
+    toggle.classList.toggle('on', isAnnual);
+    lblM.classList.toggle('active', !isAnnual);
+    lblA.classList.toggle('active', isAnnual);
+    document.body.classList.toggle('annual', isAnnual);
+  }
+</script>
+
+<!-- ===================== FAQ ===================== -->
+<section id="faq" class="py-24 bg-gray-50">
+  <div class="max-w-3xl mx-auto px-6">
+
+    <div class="text-center mb-14">
+      <span class="inline-block text-vitta-500 text-xs font-bold uppercase tracking-widest mb-3">Dúvidas Frequentes</span>
+      <h2 class="text-3xl md:text-4xl font-black text-gray-900 mb-4">Perguntas que todos fazem antes de assinar</h2>
+      <p class="text-gray-500 text-base">Respondemos as principais dúvidas para você tomar a decisão com confiança.</p>
+    </div>
+
+    <div class="space-y-3">
+
+      <div class="faq-item">
+        <button class="faq-btn" onclick="toggleFaq(this)">
+          <span>Como funciona o teste grátis de 14 dias?</span>
+          <span class="faq-icon"><svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="6" y1="2" x2="6" y2="10"/><line x1="2" y1="6" x2="10" y2="6"/></svg></span>
+        </button>
+        <div class="faq-body"><p>Você cria sua conta e tem acesso completo a todas as funcionalidades por 14 dias, sem precisar informar cartão de crédito. Só começa a cobrar se você decidir continuar após o período de teste.</p></div>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-btn" onclick="toggleFaq(this)">
+          <span>O sistema funciona para a minha especialidade?</span>
+          <span class="faq-icon"><svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="6" y1="2" x2="6" y2="10"/><line x1="2" y1="6" x2="10" y2="6"/></svg></span>
+        </button>
+        <div class="faq-body"><p>Sim! O Vitta é multi-especialidades e atende médicos, psicólogos, fisioterapeutas, dentistas, nutricionistas e muito mais. O prontuário é adaptável para cada área de atuação.</p></div>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-btn" onclick="toggleFaq(this)">
+          <span>Preciso instalar algum programa?</span>
+          <span class="faq-icon"><svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="6" y1="2" x2="6" y2="10"/><line x1="2" y1="6" x2="10" y2="6"/></svg></span>
+        </button>
+        <div class="faq-body"><p>Não. O Vitta Sistemas é 100% online (SaaS). Você acessa pelo navegador de qualquer computador, tablet ou celular — sem instalação e sem se preocupar com atualizações.</p></div>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-btn" onclick="toggleFaq(this)">
+          <span>Posso cancelar a qualquer momento?</span>
+          <span class="faq-icon"><svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="6" y1="2" x2="6" y2="10"/><line x1="2" y1="6" x2="10" y2="6"/></svg></span>
+        </button>
+        <div class="faq-body"><p>Sim, sem multa e sem burocracia. Você cancela quando quiser diretamente pelo sistema. Seus dados ficam disponíveis para exportação por 30 dias após o cancelamento.</p></div>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-btn" onclick="toggleFaq(this)">
+          <span>Os dados dos meus pacientes são seguros?</span>
+          <span class="faq-icon"><svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="6" y1="2" x2="6" y2="10"/><line x1="2" y1="6" x2="10" y2="6"/></svg></span>
+        </button>
+        <div class="faq-body"><p>Sim. Todos os dados são armazenados com criptografia em servidores seguros na nuvem, em total conformidade com a LGPD (Lei Geral de Proteção de Dados). Só você e sua equipe têm acesso.</p></div>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-btn" onclick="toggleFaq(this)">
+          <span>Como funciona o suporte?</span>
+          <span class="faq-icon"><svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="6" y1="2" x2="6" y2="10"/><line x1="2" y1="6" x2="10" y2="6"/></svg></span>
+        </button>
+        <div class="faq-body"><p>Oferecemos suporte via WhatsApp e e-mail em horário comercial. No plano Pro o atendimento é prioritário com tempo de resposta reduzido. Nossa equipe está sempre pronta para te ajudar.</p></div>
+      </div>
+
+    </div>
+
+    <p class="text-center text-gray-400 text-sm mt-10">
+      Não encontrou sua dúvida?
+      <a href="https://wa.me/5548984096109" target="_blank" rel="noopener" class="text-vitta-500 font-semibold hover:underline">Pergunte no WhatsApp</a> — respondemos na hora.
+    </p>
+
+  </div>
+</section>
+
+<!-- ===================== CTA ===================== -->
+<section id="contato" class="gradient-hero py-24 relative overflow-hidden">
+  <div class="absolute inset-0 star-bg opacity-30"></div>
+  <div class="absolute top-0 left-1/2 -translate-x-1/2 w-[600px] h-[600px] rounded-full bg-white/5 blur-3xl pointer-events-none"></div>
+  <div class="max-w-4xl mx-auto px-6 text-center relative z-10 section-fade">
+    <div class="inline-flex items-center gap-2 glass rounded-full px-4 py-2 mb-8">
+      <span class="w-2 h-2 rounded-full bg-green-400 ai-pulse"></span>
+      <span class="text-white/80 text-xs font-semibold">Sistema disponível agora</span>
+    </div>
+    <h2 class="text-4xl md:text-5xl font-black text-white mb-5">
+      Transforme sua clínica<br/>com a <span class="text-white" style="text-shadow: 0 0 30px rgba(255,255,255,0.4);">Vitta IA</span>
+    </h2>
+    <p class="text-white/70 text-lg mb-10 max-w-xl mx-auto">
+      Sistema completo, app mobile nativo e inteligência artificial trabalhando para você — comece hoje.
+    </p>
+    <div class="flex flex-wrap justify-center gap-4">
+      <a href="https://app.vittasistemas.com.br/" target="_blank" rel="noopener noreferrer" class="btn-primary inline-flex items-center gap-2.5 px-8 py-4 rounded-2xl text-white font-bold">
+        <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+          <polyline points="20 6 9 17 4 12"/>
+        </svg>
+        Começar Grátis — 14 dias
+      </a>
+      <a href="https://wa.me/5548984096109?text=Ol%C3%A1%2C%20quero%20conhecer%20o%20Vitta%20Sistemas!" target="_blank" rel="noopener noreferrer" class="btn-outline inline-flex items-center gap-2.5 px-8 py-4 rounded-2xl text-white font-bold">
+        <svg class="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/>
+        </svg>
+        Falar no WhatsApp
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== FALE CONOSCO ===================== -->
+<section id="fale-conosco" class="py-24 bg-gray-50">
+  <div class="max-w-7xl mx-auto px-6">
+    <div class="grid lg:grid-cols-2 gap-16 items-start">
+
+      <!-- Left -->
+      <div class="section-fade">
+        <span class="inline-block bg-vitta-100 text-vitta-600 text-xs font-bold uppercase tracking-widest px-4 py-2 rounded-full mb-6 border border-vitta-200">Fale Conosco</span>
+
+        <h2 class="text-3xl md:text-4xl font-black text-gray-900 mb-5 leading-tight">
+          Vamos conversar<br/>
+          <span class="text-vitta-500">sobre sua clínica</span>
+        </h2>
+        <p class="text-gray-500 text-base leading-relaxed mb-10">
+          Estamos prontos para apresentar o Vitta Sistemas para você. Entre em contato pelo WhatsApp ou preencha o formulário ao lado para solicitar uma demonstração ou orçamento.
+        </p>
+
+        <div class="space-y-4">
+          <!-- WhatsApp card -->
+          <a href="https://wa.me/5548984096109" target="_blank" rel="noopener"
+             class="flex items-center gap-4 bg-white border-2 border-green-200 rounded-2xl p-5 hover:border-green-400 hover:shadow-md transition-all group">
+            <div class="w-14 h-14 rounded-2xl bg-green-500 flex items-center justify-center shrink-0">
+              <svg class="w-8 h-8 text-white" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/>
+              </svg>
+            </div>
+            <div class="flex-1">
+              <p class="font-bold text-gray-800 text-base">WhatsApp</p>
+              <p class="text-green-500 font-semibold text-sm">(48) 98409-6109</p>
+              <p class="text-gray-400 text-xs mt-0.5">Clique para conversar agora</p>
+            </div>
+            <svg class="w-5 h-5 text-gray-300 group-hover:text-green-400 transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+              <polyline points="9 18 15 12 9 6"/>
+            </svg>
+          </a>
+
+          <!-- Email card -->
+          <a href="mailto:contato@vittasistemas.com.br"
+             class="flex items-center gap-4 bg-white border border-gray-200 rounded-2xl p-5 hover:border-vitta-300 hover:shadow-md transition-all group">
+            <div class="w-14 h-14 rounded-2xl bg-vitta-50 border border-vitta-200 flex items-center justify-center shrink-0">
+              <svg class="w-7 h-7 text-vitta-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+                <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/>
+              </svg>
+            </div>
+            <div class="flex-1">
+              <p class="font-bold text-gray-800 text-base">E-mail</p>
+              <p class="text-vitta-500 font-semibold text-sm">contato@vittasistemas.com.br</p>
+              <p class="text-gray-400 text-xs mt-0.5">Respondemos em até 24h</p>
+            </div>
+          </a>
+        </div>
+      </div>
+
+      <!-- Right: Form -->
+      <div class="section-fade">
+        <div class="bg-white rounded-3xl p-8 shadow-sm border border-gray-100">
+          <h3 class="text-xl font-black text-gray-900 mb-1">Solicite uma demonstração</h3>
+          <p class="text-gray-400 text-sm mb-7">Preencha o formulário e entraremos em contato para agendar.</p>
+
+          <form id="contact-form" class="space-y-5">
+            <div class="grid grid-cols-2 gap-4">
+              <div>
+                <label class="block text-xs font-bold text-gray-500 uppercase tracking-widest mb-1.5">Nome <span class="text-red-400">*</span></label>
+                <input id="cf-nome" type="text" placeholder="Seu nome" required
+                  class="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm text-gray-800 placeholder-gray-300 focus:outline-none focus:border-vitta-400 focus:ring-2 focus:ring-vitta-100 transition-all" />
+              </div>
+              <div>
+                <label class="block text-xs font-bold text-gray-500 uppercase tracking-widest mb-1.5">Clínica / Empresa <span class="text-red-400">*</span></label>
+                <input id="cf-clinica" type="text" placeholder="Nome da clínica" required
+                  class="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm text-gray-800 placeholder-gray-300 focus:outline-none focus:border-vitta-400 focus:ring-2 focus:ring-vitta-100 transition-all" />
+              </div>
+            </div>
+
+            <div class="grid grid-cols-2 gap-4">
+              <div>
+                <label class="block text-xs font-bold text-gray-500 uppercase tracking-widest mb-1.5">WhatsApp <span class="text-red-400">*</span></label>
+                <input id="cf-whatsapp" type="tel" placeholder="(00) 00000-0000" required maxlength="16"
+                  class="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm text-gray-800 placeholder-gray-300 focus:outline-none focus:border-vitta-400 focus:ring-2 focus:ring-vitta-100 transition-all" />
+              </div>
+              <div>
+                <label class="block text-xs font-bold text-gray-500 uppercase tracking-widest mb-1.5">E-mail</label>
+                <input id="cf-email" type="email" placeholder="seu@email.com"
+                  class="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm text-gray-800 placeholder-gray-300 focus:outline-none focus:border-vitta-400 focus:ring-2 focus:ring-vitta-100 transition-all" />
+              </div>
+            </div>
+
+            <div>
+              <label class="block text-xs font-bold text-gray-500 uppercase tracking-widest mb-1.5">Interesse</label>
+              <select id="cf-interesse"
+                class="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm text-gray-700 focus:outline-none focus:border-vitta-400 focus:ring-2 focus:ring-vitta-100 transition-all bg-white appearance-none cursor-pointer">
+                <option>Demonstração gratuita</option>
+                <option>Orçamento personalizado</option>
+                <option>Conhecer funcionalidades</option>
+                <option>Migração de sistema atual</option>
+                <option>Outro</option>
+              </select>
+            </div>
+
+            <div>
+              <label class="block text-xs font-bold text-gray-500 uppercase tracking-widest mb-1.5">Mensagem</label>
+              <textarea id="cf-mensagem" rows="4" placeholder="Conte um pouco sobre sua clínica..."
+                class="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm text-gray-800 placeholder-gray-300 focus:outline-none focus:border-vitta-400 focus:ring-2 focus:ring-vitta-100 transition-all resize-none"></textarea>
+            </div>
+
+            <button type="submit"
+              class="w-full btn-primary flex items-center justify-center gap-2.5 px-6 py-4 rounded-2xl text-white font-bold text-sm">
+              <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                <line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/>
+              </svg>
+              Enviar Solicitação via WhatsApp
+            </button>
+          </form>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<script>
+  (function() {
+    const input = document.getElementById('cf-whatsapp');
+    input.addEventListener('input', function(e) {
+      let v = e.target.value.replace(/\D/g, '').slice(0, 11);
+      let masked = '';
+      if (v.length > 0) masked = '(' + v.slice(0, 2);
+      if (v.length >= 2) masked += ') ' + v.slice(2, 7);
+      if (v.length >= 7) masked += '-' + v.slice(7, 11);
+      e.target.value = masked;
+    });
+    input.addEventListener('keydown', function(e) {
+      if (e.key === 'Backspace') {
+        const val = e.target.value;
+        if (val.endsWith(') ') || val.endsWith('-')) {
+          e.target.value = val.slice(0, -2);
+          e.preventDefault();
+        }
+      }
+    });
+  })();
+
+  document.getElementById('contact-form').addEventListener('submit', function(e) {
+    e.preventDefault();
+    const nome = document.getElementById('cf-nome').value.trim();
+    const clinica = document.getElementById('cf-clinica').value.trim();
+    const whatsapp = document.getElementById('cf-whatsapp').value.trim();
+    const email = document.getElementById('cf-email').value.trim();
+    const interesse = document.getElementById('cf-interesse').value;
+    const mensagem = document.getElementById('cf-mensagem').value.trim();
+
+    const digits = whatsapp.replace(/\D/g, '');
+    if (!nome || !clinica || !whatsapp || digits.length < 11) return;
+
+    let msg = `Olá! Gostaria de solicitar: *${interesse}*\n\n`;
+    msg += `*Nome:* ${nome}\n`;
+    msg += `*Clínica/Empresa:* ${clinica}\n`;
+    msg += `*WhatsApp:* ${whatsapp}\n`;
+    if (email) msg += `*E-mail:* ${email}\n`;
+    if (mensagem) msg += `\n*Mensagem:* ${mensagem}`;
+
+    window.open(`https://wa.me/5548984096109?text=${encodeURIComponent(msg)}`, '_blank');
+  });
+</script>
+
+<!-- ===================== FOOTER ===================== -->
+<footer class="bg-vitta-900 text-white py-14">
+  <div class="max-w-7xl mx-auto px-6">
+    <div class="grid md:grid-cols-4 gap-10 mb-12">
+      <div class="md:col-span-2">
+        <img src="img/logo_branca.png" alt="Vitta Sistemas" class="h-10 mb-4" onerror="this.src='img/logo.png';this.classList.add('brightness-0','invert')" />
+        <p class="text-white/50 text-sm leading-relaxed max-w-xs">
+          Sistema de gestão clínica completo com Inteligência Artificial, desenvolvido para clínicas e consultórios brasileiros.
+        </p>
+        <div class="mt-5 flex items-center gap-2">
+          <span class="w-2 h-2 rounded-full bg-vitta-400 ai-pulse"></span>
+          <span class="text-vitta-400 text-xs font-semibold">Vitta IA — Ativa</span>
+        </div>
+      </div>
+
+      <div>
+        <p class="text-white/30 text-xs font-bold uppercase tracking-widest mb-5">Sistema</p>
+        <div class="space-y-3">
+          <a href="#funcionalidades" class="block text-white/60 text-sm hover:text-white transition-colors">Funcionalidades</a>
+          <a href="#vitta-ia" class="block text-vitta-400 text-sm hover:text-vitta-300 transition-colors">Vitta IA</a>
+          <a href="#profissionais" class="block text-white/60 text-sm hover:text-white transition-colors">App Profissionais</a>
+          <a href="#modulos" class="block text-white/60 text-sm hover:text-white transition-colors">Módulos</a>
+          <a href="#planos" class="block text-white/60 text-sm hover:text-white transition-colors">Planos e Preços</a>
+          <a href="https://app.vittasistemas.com.br/" target="_blank" rel="noopener noreferrer" class="block text-white/60 text-sm hover:text-white transition-colors">Acessar Sistema</a>
+        </div>
+      </div>
+
+      <div>
+        <p class="text-white/30 text-xs font-bold uppercase tracking-widest mb-5">Contato</p>
+        <div class="space-y-3">
+          <a href="mailto:contato@vittasistemas.com.br" class="flex items-center gap-2 text-white/60 text-sm hover:text-white transition-colors">
+            <svg class="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+            contato@vittasistemas.com.br
+          </a>
+          <a href="mailto:suporte@vittasistemas.com.br" class="flex items-center gap-2 text-white/60 text-sm hover:text-white transition-colors">
+            <svg class="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+            suporte@vittasistemas.com.br
+          </a>
+          <a href="http://vittasistemas.com.br" class="flex items-center gap-2 text-white/60 text-sm hover:text-white transition-colors">
+            <svg class="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+            vittasistemas.com.br
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <div class="border-t border-white/10 pt-8 flex flex-col md:flex-row items-center justify-between gap-4">
+      <p class="text-white/30 text-sm">© <span id="footer-year"></span> Vitta Sistemas. Todos os direitos reservados.</p>
+      <div class="flex items-center gap-2 text-white/20 text-xs">
+        <svg class="w-3.5 h-3.5 text-vitta-500/50" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+        100% seguro • Dados na nuvem • LGPD
+      </div>
+    </div>
+  </div>
+</footer>
+
+<script>
+  // Footer year
+  document.getElementById('footer-year').textContent = new Date().getFullYear();
+
+  // Navbar scroll effect
+  const navbar = document.getElementById('navbar');
+  const navLogo = document.querySelector('#navbar a[href="#hero"] img');
+  window.addEventListener('scroll', () => {
+    if (window.scrollY > 50) {
+      navbar.classList.add('scrolled-nav');
+      if (navLogo) { navLogo.src = 'img/logo.png'; navLogo.classList.remove('brightness-0','invert'); }
+    } else {
+      navbar.classList.remove('scrolled-nav');
+      if (navLogo) { navLogo.src = 'img/logo_branca.png'; navLogo.classList.remove('brightness-0','invert'); }
+    }
+  });
+
+  // Mobile menu toggle
+  document.getElementById('menu-btn').addEventListener('click', () => {
+    document.getElementById('mobile-menu').classList.toggle('hidden');
+  });
+
+  // Close mobile menu on link click
+  document.querySelectorAll('#mobile-menu a').forEach(a => {
+    a.addEventListener('click', () => {
+      document.getElementById('mobile-menu').classList.add('hidden');
+    });
+  });
+
+  // Intersection Observer for section-fade animations
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add('visible');
+      }
+    });
+  }, { threshold: 0.1, rootMargin: '0px 0px -40px 0px' });
+
+  document.querySelectorAll('.section-fade').forEach(el => observer.observe(el));
+</script>
+<!-- ===================== WHATSAPP FLOAT ===================== -->
+<a href="https://wa.me/5548984096109?text=Ol%C3%A1%2C%20quero%20conhecer%20o%20Vitta%20Sistemas!" target="_blank" rel="noopener noreferrer" class="wa-float" aria-label="Falar no WhatsApp">
+  <span class="wa-float-tooltip">Falar no WhatsApp</span>
+  <svg viewBox="0 0 24 24" fill="white" xmlns="http://www.w3.org/2000/svg">
+    <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/>
+  </svg>
+</a>
+
+<script>
+  function toggleFaq(btn) {
+    const item = btn.closest('.faq-item');
+    const isOpen = item.classList.contains('open');
+    document.querySelectorAll('.faq-item.open').forEach(el => el.classList.remove('open'));
+    if (!isOpen) item.classList.add('open');
+  }
+</script>
+</body>
+</html>

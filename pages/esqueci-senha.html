@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>Esqueci minha senha — Vitta Sistemas</title>
+  <link rel="icon" type="image/png" href="../img/favicon.png" />
+
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            vitta: { 50:'#f0fbfd', 100:'#e0f7fa', 400:'#4dd9ed', 500:'#2ABCD4', 600:'#1a96ac', 700:'#127a8c' }
+          },
+          fontFamily: { sans: ['Inter','system-ui','sans-serif'] },
+          boxShadow: { vitta:'0 4px 20px rgba(42,188,212,0.35)', 'vitta-lg':'0 6px 28px rgba(42,188,212,0.45)' }
+        }
+      }
+    }
+  </script>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+
+  <style type="text/tailwindcss">
+    @layer components {
+      .field-input {
+        @apply w-full pl-11 pr-4 py-3 border-[1.5px] border-gray-200 rounded-xl text-sm text-gray-700 bg-white outline-none
+               placeholder:text-gray-400 transition-all duration-200
+               focus:border-vitta-500 focus:shadow-[0_0_0_3px_rgba(42,188,212,0.15)];
+      }
+      .btn-vitta {
+        @apply w-full py-3.5 rounded-xl font-semibold text-sm text-white
+               bg-gradient-to-r from-vitta-500 to-vitta-600
+               shadow-vitta hover:shadow-vitta-lg hover:-translate-y-0.5
+               active:translate-y-0 disabled:opacity-60 disabled:cursor-not-allowed disabled:transform-none
+               transition-all duration-200 flex items-center justify-center gap-2;
+      }
+      .btn-outline-vitta {
+        @apply w-full py-3.5 rounded-xl font-semibold text-sm text-vitta-600
+               border-[1.5px] border-vitta-500 hover:bg-vitta-50
+               transition-all duration-200 flex items-center justify-center gap-2;
+      }
+      .alert-error   { @apply flex items-start gap-2.5 p-3.5 mb-5 rounded-xl text-sm font-medium bg-red-50 text-red-700 border border-red-200; }
+      .alert-success { @apply flex items-start gap-2.5 p-3.5 mb-5 rounded-xl text-sm font-medium bg-green-50 text-green-700 border border-green-200; }
+    }
+  </style>
+</head>
+
+<body class="min-h-screen flex font-sans antialiased bg-white">
+
+  <!-- PAINEL ESQUERDO -->
+  <aside class="hidden lg:flex w-[44%] min-h-screen flex-col items-center justify-center p-14
+                bg-gradient-to-br from-vitta-700 via-vitta-600 to-vitta-400 relative overflow-hidden">
+    <div class="absolute w-[480px] h-[480px] rounded-full bg-white/5 -bottom-40 -right-28 pointer-events-none"></div>
+    <div class="absolute w-[280px] h-[280px] rounded-full bg-white/5 -top-20 -left-20 pointer-events-none"></div>
+
+    <div class="relative z-10 max-w-[340px] text-center">
+      <img src="../img/logo.png" alt="Vitta Sistemas" class="w-56 mx-auto mb-10 brightness-0 invert" />
+
+      <h2 class="text-[1.45rem] font-bold text-white mb-3 leading-snug">Recuperação de acesso</h2>
+      <p class="text-white/75 text-[0.9rem] leading-relaxed">
+        Sem problema. Informe seu e-mail cadastrado e enviaremos as instruções para redefinir sua senha.
+      </p>
+
+      <div class="mt-10 flex flex-col gap-4 text-left">
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 rounded-xl bg-white/15 flex items-center justify-center shrink-0">
+            <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+              <rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+            </svg>
+          </div>
+          <span class="text-white/90 text-sm">Link seguro com validade de 1 hora</span>
+        </div>
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 rounded-xl bg-white/15 flex items-center justify-center shrink-0">
+            <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+              <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/>
+            </svg>
+          </div>
+          <span class="text-white/90 text-sm">Verifique também a caixa de spam</span>
+        </div>
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 rounded-xl bg-white/15 flex items-center justify-center shrink-0">
+            <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+              <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+            </svg>
+          </div>
+          <span class="text-white/90 text-sm">Suporte disponível para ajudar</span>
+        </div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- PAINEL DIREITO -->
+  <main class="flex-1 min-h-screen relative flex items-center justify-center px-6 bg-white overflow-y-auto">
+    <div class="w-full max-w-[420px] py-14">
+
+      <!-- Logo mobile -->
+      <img src="../img/logo.png" alt="Vitta Sistemas" class="lg:hidden w-44 mx-auto mb-10" />
+
+      <!-- Ícone central -->
+      <div class="w-16 h-16 rounded-full bg-vitta-100 flex items-center justify-center mx-auto mb-7">
+        <svg xmlns="http://www.w3.org/2000/svg" class="w-7 h-7 text-vitta-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+          <path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.778 7.778 5.5 5.5 0 0 1 7.777-7.777zm0 0L15.5 7.5m0 0l3 3L22 7l-3-3m-3.5 3.5L19 4"/>
+        </svg>
+      </div>
+
+      <!-- Cabeçalho -->
+      <div class="mb-7 text-center">
+        <h1 class="text-[1.85rem] font-extrabold text-gray-800 mb-1.5 tracking-tight">Esqueci minha senha</h1>
+        <p class="text-gray-500 text-sm leading-relaxed">
+          Digite o e-mail vinculado à sua conta e enviaremos um link para criar uma nova senha.
+        </p>
+      </div>
+
+      <!-- Alertas -->
+      <div id="forgot-alert" role="alert" aria-live="polite"></div>
+
+      <!-- Formulário -->
+      <form id="forgot-form" novalidate>
+
+        <div class="mb-6">
+          <label for="email" class="block text-[0.78rem] font-semibold text-gray-500 uppercase tracking-wider mb-1.5">
+            E-mail cadastrado
+          </label>
+          <div class="relative">
+            <span class="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none">
+              <svg xmlns="http://www.w3.org/2000/svg" class="w-[18px] h-[18px]" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/>
+              </svg>
+            </span>
+            <input
+              type="email"
+              id="email"
+              name="email"
+              class="field-input"
+              placeholder="seu@email.com"
+              autocomplete="email"
+              required
+            />
+          </div>
+        </div>
+
+        <!-- Botão enviar -->
+        <button type="submit" id="btn-forgot" class="btn-vitta mb-3">
+          <svg id="spinner" class="hidden w-4 h-4 animate-spin" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/>
+            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/>
+          </svg>
+          <span id="btn-text" class="flex items-center gap-2">
+            <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+              <line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/>
+            </svg>
+            Enviar link de redefinição
+          </span>
+        </button>
+
+        <!-- Voltar -->
+        <a href="../index.html" class="btn-outline-vitta">
+          <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/>
+          </svg>
+          Voltar para o login
+        </a>
+
+      </form>
+
+      <p class="mt-8 text-center text-[0.8rem] text-gray-400">
+        Não recebeu o e-mail?
+        <a href="mailto:suporte@vittasistemas.com.br" class="text-vitta-600 font-semibold hover:text-vitta-700">
+          Fale com o suporte
+        </a>
+      </p>
+    </div>
+
+    <p class="absolute bottom-4 left-0 right-0 text-center text-[0.72rem] text-gray-300">
+      © <span id="year"></span> Vitta Sistemas. Todos os direitos reservados.
+    </p>
+  </main>
+
+</body>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<script src="../assets/js/config.js?v=2"></script>
+<script>
+  document.getElementById('year').textContent = new Date().getFullYear();
+
+  document.getElementById('forgot-form').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const alertEl = document.getElementById('forgot-alert');
+    alertEl.innerHTML = '';
+
+    const email   = document.getElementById('email').value.trim();
+    const btn     = document.getElementById('btn-forgot');
+    const spinner = document.getElementById('spinner');
+    const btnText = document.getElementById('btn-text');
+
+    if (!email) {
+      alertEl.innerHTML = `<div class="alert-error"><span>⚠</span><span>Informe seu e-mail cadastrado.</span></div>`;
+      return;
+    }
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      alertEl.innerHTML = `<div class="alert-error"><span>⚠</span><span>Informe um e-mail válido.</span></div>`;
+      return;
+    }
+
+    btn.disabled = true;
+    spinner.classList.remove('hidden');
+    btnText.classList.add('hidden');
+
+    const redirectTo = `${APP_BASE_URL}/pages/redefinir-senha.html`;
+
+    await supabase.auth.resetPasswordForEmail(email, { redirectTo });
+
+    btn.disabled = false;
+    spinner.classList.add('hidden');
+    btnText.classList.remove('hidden');
+
+    /* Sempre exibe mensagem de sucesso (evita enumeração de e-mails) */
+    alertEl.innerHTML = `<div class="alert-success">
+      <span>✓</span>
+      <span>Se este e-mail estiver cadastrado, você receberá o link de redefinição em breve. Verifique também sua caixa de spam.</span>
+    </div>`;
+  });
+</script>
+</html>
