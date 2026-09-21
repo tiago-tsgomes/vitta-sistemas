@@ -18,6 +18,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
   <script src="../assets/js/config.js?v=2"></script>
+  <script src="../assets/js/toast.js?v=1"></script>
   <script src="../assets/js/admin-empresa-context.js?v=1"></script>
   <script src="../assets/js/access-guard.js?v=2"></script>
   <script src="../assets/js/notifications.js?v=3"></script>
@@ -28,7 +29,6 @@
     .submenu.open{max-height:500px;opacity:1}
     .chevron{transition:transform .25s ease;display:inline-block}
     .chevron.open{transform:rotate(180deg)}
-    #toast{position:fixed;bottom:24px;right:24px;z-index:9999;transition:all .3s ease}
     .scroll-thin::-webkit-scrollbar{width:3px}
     .scroll-thin::-webkit-scrollbar-thumb{background:#e5e7eb;border-radius:4px}
   </style>
@@ -125,6 +125,7 @@
       <a href="planos.html" class="flex items-center gap-2 pl-10 pr-3 py-2 mx-2 rounded-xl text-[0.8rem] text-gray-500 hover:bg-white/5 hover:text-gray-300 transition-colors cursor-pointer">Planos</a>
         <a href="configuracoes.html" class="flex items-center gap-2 pl-10 pr-3 py-2 mx-2 rounded-xl text-[0.8rem] text-gray-500 hover:bg-white/5 hover:text-gray-300 transition-colors">Configura&ccedil;&otilde;es</a>
         <a href="logs.html" class="flex items-center gap-2 pl-10 pr-3 py-2 mx-2 rounded-xl text-[0.8rem] text-gray-500 hover:bg-white/5 hover:text-gray-300 transition-colors cursor-pointer">Log</a>
+      <a href="cadastros_admin.html" class="flex items-center gap-2 pl-10 pr-3 py-2 mx-2 rounded-xl text-[0.8rem] text-gray-500 hover:bg-white/5 hover:text-gray-300 transition-colors cursor-pointer">Cadastros</a>
       </div>
     </div>
     <div class="h-4"></div>
@@ -191,10 +192,6 @@
   </main>
 </div>
 
-<!-- TOAST -->
-<div id="toast" class="hidden">
-  <div id="toastInner" class="flex items-center gap-3 px-4 py-3 rounded-xl shadow-lg text-sm font-medium text-white min-w-[240px]"></div>
-</div>
 
 <script>
 let currentUserMeta = null;
@@ -206,11 +203,6 @@ function toggleMenu(k){const s=document.getElementById('sub-'+k),c=document.getE
 function toggleSidebar(){const sb=document.getElementById('sidebar'),ov=document.getElementById('overlay');const o=sb.classList.contains('-translate-x-full');sb.classList.toggle('-translate-x-full',!o);ov.classList.toggle('hidden',!o);}
 async function handleLogout(){await supabase.auth.signOut();window.location.href='../index.html';}
 
-function showToast(msg,ok=true){
-  const t=document.getElementById('toast'),i=document.getElementById('toastInner');
-  i.textContent=msg;i.className=`flex items-center gap-3 px-4 py-3 rounded-xl shadow-lg text-sm font-medium text-white min-w-[240px] ${ok?'bg-emerald-500':'bg-red-500'}`;
-  t.classList.remove('hidden');setTimeout(()=>t.classList.add('hidden'),3500);
-}
 
 function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
 
@@ -268,9 +260,9 @@ function renderNotifs(){
       <div class="w-11 h-11 rounded-xl ${cfg.cls} flex items-center justify-center shrink-0">${cfg.svg}</div>
       <div class="flex-1 min-w-0">
         <div class="flex items-start justify-between gap-2">
-          <p class="text-[0.88rem] font-semibold text-gray-800 leading-snug">${esc(n.TITULO_NOT)}</p>
+          <p class="text-[0.9rem] font-semibold text-gray-800 leading-snug">${esc(n.TITULO_NOT)}</p>
           <div class="flex items-center gap-2 shrink-0">
-            <span class="text-[0.67rem] text-gray-400 whitespace-nowrap">${timeStr(n.DTCRI_NOT)}</span>
+            <span class="text-[0.68rem] text-gray-400 whitespace-nowrap">${timeStr(n.DTCRI_NOT)}</span>
             ${!n.LIDA_NOT?'<div class="w-2 h-2 rounded-full bg-vitta-500 shrink-0"></div>':''}
           </div>
         </div>
@@ -301,7 +293,7 @@ async function markAllRead(){
   let q=supabase.from('NOTIFICACAO').update({LIDA_NOT:true}).eq('LIDA_NOT',false);
   const _idEmp=AdminEmpresaCtx.resolveIdEmp(currentUserTipo, meta.ID_EMP || meta.id_emp);if(_idEmp)q=q.eq('ID_EMP',_idEmp);
   const{error}=await q;
-  if(error){showToast('Erro ao marcar',false);return;}
+  if(error){showToast('Erro ao marcar', 'error');return;}
   allNotifs.forEach(n=>n.LIDA_NOT=true);
   renderNotifs();
   showToast('Todas as notificações marcadas como lidas!');

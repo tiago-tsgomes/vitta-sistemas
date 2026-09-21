@@ -119,6 +119,7 @@
       <a href="dashboard-gerencial.html" class="flex items-center gap-2 pl-10 pr-3 py-2 mx-2 rounded-xl text-[0.8rem] text-gray-500 hover:bg-white/5 hover:text-gray-300 transition-colors cursor-pointer">Dashboard Gerencial</a>
       <a href="configuracoes.html" class="flex items-center gap-2 pl-10 pr-3 py-2 mx-2 rounded-xl text-[0.8rem] text-gray-500 hover:bg-white/5 hover:text-gray-300 transition-colors cursor-pointer">Configura&ccedil;&otilde;es</a>
       <a href="logs.html" class="flex items-center gap-2 pl-10 pr-3 py-2 mx-2 rounded-xl text-[0.8rem] text-gray-500 hover:bg-white/5 hover:text-gray-300 transition-colors cursor-pointer">Log</a>
+      <a href="cadastros_admin.html" class="flex items-center gap-2 pl-10 pr-3 py-2 mx-2 rounded-xl text-[0.8rem] text-gray-500 hover:bg-white/5 hover:text-gray-300 transition-colors cursor-pointer">Cadastros</a>
     </div>
     <div class="h-4"></div>
   </nav>
@@ -639,7 +640,7 @@ function renderRow(p) {
   const desc = p.description || 'Mensalidade Vitta Sistemas';
   const paidDate = p.paymentDate || p.clientPaymentDate;
   return `<tr class="border-b border-gray-50">
-    <td class="px-5 py-3.5 text-[0.84rem] text-gray-700 max-w-[200px]">
+    <td class="px-5 py-3.5 text-[0.83rem] text-gray-700 max-w-[200px]">
       <span class="truncate block" title="${desc}">${desc}</span>
     </td>
     <td class="px-4 py-3.5 text-[0.83rem] text-gray-600 whitespace-nowrap">${fmtDate(p.dueDate)}</td>
@@ -1018,7 +1019,7 @@ function renderNf() {
         <div class="flex items-center gap-3">
           <div class="w-9 h-9 rounded-lg bg-red-500 flex items-center justify-center text-white text-[0.6rem] font-bold shrink-0">PDF</div>
           <div>
-            <p class="text-[0.84rem] font-semibold text-gray-800 leading-tight">${nf.NOME_ARQUIVO}</p>
+            <p class="text-[0.83rem] font-semibold text-gray-800 leading-tight">${nf.NOME_ARQUIVO}</p>
             <p class="text-[0.68rem] text-gray-400 mt-0.5">${fmtSize(nf.TAMANHO_BYTES)}</p>
           </div>
         </div>

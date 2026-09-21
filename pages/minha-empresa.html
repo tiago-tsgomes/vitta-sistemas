@@ -21,6 +21,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
   <script src="../assets/js/config.js?v=2"></script>
+  <script src="../assets/js/toast.js?v=1"></script>
   <script src="../assets/js/admin-empresa-context.js?v=1"></script>
   <script src="../assets/js/notifications.js?v=3"></script>
   <style>
@@ -33,7 +34,6 @@
     @keyframes fadeUp { from{opacity:0;transform:translateY(8px)} to{opacity:1;transform:translateY(0)} }
     .fade-up { animation:fadeUp .35s ease forwards; }
     .field-disabled { background:#f9fafb; color:#374151; cursor:default; }
-    #toast { position:fixed; bottom:24px; right:24px; z-index:999; transition:all .3s ease; }
     .modal-overlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,.5); z-index:300; align-items:flex-start; justify-content:center; padding:24px 16px; overflow-y:auto; }
     .modal-overlay.open { display:flex; }
   </style>
@@ -131,6 +131,7 @@
       <a href="planos.html" class="flex items-center gap-2 pl-10 pr-3 py-2 mx-2 rounded-xl text-[0.8rem] text-gray-500 hover:bg-white/5 hover:text-gray-300 transition-colors cursor-pointer">Planos</a>
       <a href="configuracoes.html" class="flex items-center gap-2 pl-10 pr-3 py-2 mx-2 rounded-xl text-[0.8rem] text-gray-500 hover:bg-white/5 hover:text-gray-300 transition-colors cursor-pointer">Configura&ccedil;&otilde;es</a>
       <a href="logs.html" class="flex items-center gap-2 pl-10 pr-3 py-2 mx-2 rounded-xl text-[0.8rem] text-gray-500 hover:bg-white/5 hover:text-gray-300 transition-colors cursor-pointer">Log</a>
+      <a href="cadastros_admin.html" class="flex items-center gap-2 pl-10 pr-3 py-2 mx-2 rounded-xl text-[0.8rem] text-gray-500 hover:bg-white/5 hover:text-gray-300 transition-colors cursor-pointer">Cadastros</a>
     </div>
     </div>
     <div class="h-4"></div>
@@ -206,7 +207,7 @@
         <!-- Plano atual + botão mudar -->
         <div id="heroPlanoBlocoOuter" class="hidden shrink-0 flex flex-col items-end gap-2">
           <div class="flex flex-col items-end gap-1">
-            <p class="text-[0.62rem] font-bold uppercase tracking-wider text-gray-400">Plano Atual</p>
+            <p class="text-[0.6rem] font-bold uppercase tracking-wider text-gray-400">Plano Atual</p>
             <span id="planoAtualBadge" class="inline-flex items-center gap-1.5 text-xs font-bold bg-rose-100 text-rose-700 border border-rose-200 px-3 py-1.5 rounded-full">—</span>
           </div>
           <button onclick="abrirModalMudarPlano()"
@@ -679,10 +680,6 @@
   </div>
 </div>
 
-<!-- Toast -->
-<div id="toast" class="hidden">
-  <div id="toastInner" class="flex items-center gap-3 px-4 py-3 rounded-xl shadow-lg text-sm font-medium text-white min-w-[240px]"></div>
-</div>
 
 <script>
 /* ─── Estado ─── */
@@ -711,14 +708,6 @@ function toggleSidebar() {
 async function handleLogout() {
   await supabase.auth.signOut();
   window.location.href = '../index.html';
-}
-function showToast(msg, ok = true) {
-  const t = document.getElementById('toast');
-  const i = document.getElementById('toastInner');
-  i.textContent = msg;
-  i.className = `flex items-center gap-3 px-4 py-3 rounded-xl shadow-lg text-sm font-medium text-white min-w-[240px] ${ok ? 'bg-emerald-500' : 'bg-red-500'}`;
-  t.classList.remove('hidden');
-  setTimeout(() => t.classList.add('hidden'), 3500);
 }
 function fmtDate(d) {
   if (!d) return '—';
@@ -887,7 +876,7 @@ async function carregarEmpresa() {
 /* ─── Busca de CEP (ViaCEP) ─── */
 async function buscarCep() {
   const cep = document.getElementById('fCep').value.replace(/\D/g, '');
-  if (cep.length !== 8) { showToast('Informe um CEP válido com 8 dígitos.', false); return; }
+  if (cep.length !== 8) { showToast('Informe um CEP válido com 8 dígitos.', 'error'); return; }
 
   const spin = document.getElementById('cepSpin');
   const btn  = document.getElementById('btnBuscarCep');
@@ -899,7 +888,7 @@ async function buscarCep() {
   try {
     const res  = await fetch(`https://viacep.com.br/ws/${cep}/json/`);
     const data = await res.json();
-    if (data.erro) { showToast('CEP não encontrado.', false); return; }
+    if (data.erro) { showToast('CEP não encontrado.', 'error'); return; }
     document.getElementById('fLogradouro').value = data.logradouro || '';
     document.getElementById('fBairro').value     = data.bairro     || '';
     document.getElementById('fCidade').value     = data.localidade || '';
@@ -907,7 +896,7 @@ async function buscarCep() {
     document.getElementById('fNumero').focus();
     showToast('Endereço preenchido com sucesso!');
   } catch {
-    showToast('Erro ao buscar CEP. Verifique sua conexão.', false);
+    showToast('Erro ao buscar CEP. Verifique sua conexão.', 'error');
   } finally {
     spin.classList.add('hidden');
     btn.disabled = false;
@@ -939,8 +928,8 @@ document.addEventListener('DOMContentLoaded', () => {
 function onLogoSelect(event) {
   const file = event.target.files[0];
   if (!file) return;
-  if (!file.type.startsWith('image/')) { showToast('Selecione uma imagem válida (PNG, JPG ou WebP).', false); return; }
-  if (file.size > 2 * 1024 * 1024) { showToast('A imagem deve ter no máximo 2MB.', false); return; }
+  if (!file.type.startsWith('image/')) { showToast('Selecione uma imagem válida (PNG, JPG ou WebP).', 'error'); return; }
+  if (file.size > 2 * 1024 * 1024) { showToast('A imagem deve ter no máximo 2MB.', 'error'); return; }
   newLogoFile = file;
   logoRemovido = false;
   const reader = new FileReader();
@@ -1317,7 +1306,7 @@ async function confirmarReativacao() {
     mostrarPassoReativ(3);
     await carregarStatusAssinatura();
   } catch (e) {
-    showToast('Erro: ' + e.message, false);
+    showToast('Erro: ' + e.message, 'error');
     fecharModalReativacao();
   } finally {
     btn.disabled = false;
@@ -1398,7 +1387,7 @@ async function confirmarCancelamento() {
     mostrarPasso(3);
     await carregarStatusAssinatura();
   } catch (e) {
-    showToast('Erro: ' + e.message, false);
+    showToast('Erro: ' + e.message, 'error');
     fecharModalCancelamento();
   } finally {
     btn.disabled = false;
@@ -1550,7 +1539,7 @@ async function confirmarMudancaPlano() {
     document.getElementById('mpSucessoNome').textContent = _novoPlanoNome;
     mostrarPassoMp(3);
   } catch (e) {
-    showToast('Erro: ' + (e.message || 'Tente novamente.'), false);
+    showToast('Erro: ' + (e.message || 'Tente novamente.'), 'error');
     fecharModalMudarPlano();
   } finally {
     btn.disabled = false;
@@ -1597,10 +1586,10 @@ async function iniciarConexaoGoogleMeet() {
       body: JSON.stringify({ id_emp: empresaId }),
     });
     const data = await resp.json();
-    if (!resp.ok || !data.sucesso) { showToast(data.erro || 'Não foi possível iniciar a conexão com o Google.', false); return; }
+    if (!resp.ok || !data.sucesso) { showToast(data.erro || 'Não foi possível iniciar a conexão com o Google.', 'error'); return; }
 
     const popup = window.open(data.url, 'googleMeetConnect', 'width=520,height=650');
-    if (!popup) { showToast('Permita pop-ups para conectar o Google Meet.', false); return; }
+    if (!popup) { showToast('Permita pop-ups para conectar o Google Meet.', 'error'); return; }
 
     const poll = setInterval(() => {
       if (popup.closed) {
@@ -1609,7 +1598,7 @@ async function iniciarConexaoGoogleMeet() {
       }
     }, 800);
   } catch (e) {
-    showToast('Erro ao iniciar conexão com o Google: ' + e.message, false);
+    showToast('Erro ao iniciar conexão com o Google: ' + e.message, 'error');
   }
 }
 
@@ -1630,11 +1619,11 @@ async function confirmarDesconexaoGoogleMeet() {
       body: JSON.stringify({ id_emp: empresaId }),
     });
     const data = await resp.json();
-    if (!resp.ok || !data.sucesso) { showToast(data.erro || 'Não foi possível desconectar o Google Meet.', false); return; }
+    if (!resp.ok || !data.sucesso) { showToast(data.erro || 'Não foi possível desconectar o Google Meet.', 'error'); return; }
     showToast('Google Meet desconectado.');
     await renderGoogleMeetStatus();
   } catch (e) {
-    showToast('Erro ao desconectar o Google Meet: ' + e.message, false);
+    showToast('Erro ao desconectar o Google Meet: ' + e.message, 'error');
   }
 }
 
@@ -1653,7 +1642,7 @@ async function confirmarDesconexaoGoogleMeet() {
   const params = new URLSearchParams(window.location.search);
   const googleMeetResult = params.get('google_meet');
   if (googleMeetResult) {
-    showToast(googleMeetResult === 'conectado' ? 'Google Meet conectado com sucesso!' : 'Não foi possível conectar o Google Meet. Tente novamente.', googleMeetResult === 'conectado');
+    showToast(googleMeetResult === 'conectado' ? 'Google Meet conectado com sucesso!' : 'Não foi possível conectar o Google Meet. Tente novamente.', googleMeetResult === 'conectado' ? 'success' : 'error');
     params.delete('google_meet');
     params.delete('motivo');
     const newQuery = params.toString();

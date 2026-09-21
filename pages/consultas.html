@@ -21,6 +21,7 @@
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
   <script src="../assets/js/config.js?v=2"></script>
+  <script src="../assets/js/toast.js?v=1"></script>
   <script src="../assets/js/admin-empresa-context.js?v=1"></script>
   <script src="../assets/js/access-guard.js?v=2"></script>
   <script src="../assets/js/ai-utils.js?v=1"></script>
@@ -34,7 +35,6 @@
     .chevron.open{transform:rotate(180deg)}
     .scroll-thin::-webkit-scrollbar{width:3px}
     .scroll-thin::-webkit-scrollbar-thumb{background:#e5e7eb;border-radius:4px}
-    #toast{position:fixed;bottom:24px;right:24px;z-index:9999;transition:all .3s ease}
     .agd-card{border:1.5px solid transparent;transition:all .15s;cursor:pointer}
     .agd-card:hover{background:#f9fafb;border-color:#e5e7eb}
     .agd-card.selected{background:#f0fbfd;border-color:#2ABCD4}
@@ -138,6 +138,7 @@
         <a href="empresas.html" class="flex items-center gap-2 pl-10 pr-3 py-2 mx-2 rounded-xl text-[0.8rem] text-gray-500 hover:bg-white/5 hover:text-gray-300 transition-colors">Empresas</a>
         <a href="usuarios.html" class="flex items-center gap-2 pl-10 pr-3 py-2 mx-2 rounded-xl text-[0.8rem] text-gray-500 hover:bg-white/5 hover:text-gray-300 transition-colors">Usu&aacute;rios Admin</a>
         <a href="logs.html" class="flex items-center gap-2 pl-10 pr-3 py-2 mx-2 rounded-xl text-[0.8rem] text-gray-500 hover:bg-white/5 hover:text-gray-300 transition-colors">Log</a>
+      <a href="cadastros_admin.html" class="flex items-center gap-2 pl-10 pr-3 py-2 mx-2 rounded-xl text-[0.8rem] text-gray-500 hover:bg-white/5 hover:text-gray-300 transition-colors cursor-pointer">Cadastros</a>
       </div>
     </div>
     <div class="h-4"></div>
@@ -206,7 +207,7 @@
         </button>
         <div class="flex-1 text-center cursor-pointer" onclick="goToday()">
           <p id="dateLabel" class="text-[0.82rem] font-bold text-gray-800"></p>
-          <p id="dateRelative" class="text-[0.67rem] text-vitta-500 font-semibold h-3"></p>
+          <p id="dateRelative" class="text-[0.68rem] text-vitta-500 font-semibold h-3"></p>
         </div>
         <button onclick="navDay(1)" class="p-1.5 rounded-lg hover:bg-gray-100 text-gray-400 transition-colors">
           <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg>
@@ -338,7 +339,7 @@
           <div class="min-w-0">
             <div class="flex items-center gap-2 flex-wrap">
               <h3 id="m-nome" class="text-[1rem] font-bold text-gray-800"></h3>
-              <span id="m-menor" class="hidden text-[0.62rem] font-bold bg-purple-100 text-purple-700 px-2 py-0.5 rounded-full">Menor</span>
+              <span id="m-menor" class="hidden text-[0.6rem] font-bold bg-purple-100 text-purple-700 px-2 py-0.5 rounded-full">Menor</span>
               <span id="m-badge" class="inline-flex px-2 py-0.5 rounded-full text-[0.65rem] font-bold text-white"></span>
             </div>
             <div class="flex flex-wrap gap-x-3 gap-y-0 mt-0.5">
@@ -596,10 +597,6 @@
   </div>
 </div>
 
-<!-- TOAST -->
-<div id="toast" class="hidden">
-  <div id="toastInner" class="flex items-center gap-3 px-4 py-3 rounded-xl shadow-lg text-sm font-medium text-white min-w-[240px]"></div>
-</div>
 
 <script>
 /* ── constants ── */
@@ -633,11 +630,6 @@ function toggleMenu(k){const s=document.getElementById('sub-'+k),c=document.getE
 function toggleSidebar(){const sb=document.getElementById('sidebar'),ov=document.getElementById('overlay');const o=sb.classList.contains('-translate-x-full');sb.classList.toggle('-translate-x-full',!o);ov.classList.toggle('hidden',!o);}
 async function handleLogout(){await supabase.auth.signOut();window.location.href='../index.html';}
 
-function showToast(msg,ok=true){
-  const t=document.getElementById('toast'),i=document.getElementById('toastInner');
-  i.textContent=msg;i.className=`flex items-center gap-3 px-4 py-3 rounded-xl shadow-lg text-sm font-medium text-white min-w-[240px] ${ok?'bg-emerald-500':'bg-red-500'}`;
-  t.classList.remove('hidden');setTimeout(()=>t.classList.add('hidden'),3500);
-}
 
 function avColor(n){let h=0;for(const c of(n||''))h=(h<<5)-h+c.charCodeAt(0);return AV_COLORS[Math.abs(h)%AV_COLORS.length];}
 function initials(n){return(n||'').split(' ').filter(Boolean).slice(0,2).map(w=>w[0]).join('').toUpperCase();}
@@ -773,7 +765,7 @@ function agdCardHTML(a,selected=false){
       <div class="w-9 h-9 rounded-xl ${col} flex items-center justify-center text-white text-xs font-bold shrink-0">${initials(pac.NOME_PAC)}</div>
       <div class="flex-1 min-w-0">
         <p class="text-[0.83rem] font-semibold text-gray-800 truncate">${pac.NOME_PAC||'—'}</p>
-        <p class="text-[0.71rem] text-gray-400 mt-0.5">${fmtTime(a.DT_AGD)} ${tipo}</p>
+        <p class="text-[0.7rem] text-gray-400 mt-0.5">${fmtTime(a.DT_AGD)} ${tipo}</p>
       </div>
     </div>
   </div>`;
@@ -832,7 +824,7 @@ function renderUpcomingList(){
     const dt=new Date(items[0].DT_AGD);
     const header=dt.toLocaleDateString('pt-BR',{weekday:'short',day:'numeric',month:'short'}).replace(/\./g,'');
     return `<div class="mb-2">
-      <p class="text-[0.67rem] font-bold text-gray-400 uppercase tracking-wider px-3 mb-1 mt-2">${header}</p>
+      <p class="text-[0.68rem] font-bold text-gray-400 uppercase tracking-wider px-3 mb-1 mt-2">${header}</p>
       ${items.map(a=>agdCardHTML(a,currentAgd?.ID_AGD===a.ID_AGD)).join('')}
     </div>`;
   }).join('');
@@ -963,8 +955,8 @@ function realizadaCardHTML(a){
     <div class="flex items-center gap-3">
       <div class="w-10 h-10 rounded-xl ${col} flex items-center justify-center text-white text-sm font-bold shrink-0">${initials(pac.NOME_PAC)}</div>
       <div class="flex-1 min-w-0">
-        <p class="text-[0.88rem] font-semibold text-gray-800">${pac.NOME_PAC||'—'}</p>
-        <p class="text-[0.73rem] text-gray-400 mt-0.5 truncate">
+        <p class="text-[0.9rem] font-semibold text-gray-800">${pac.NOME_PAC||'—'}</p>
+        <p class="text-[0.72rem] text-gray-400 mt-0.5 truncate">
           ${age?`${age} anos &middot; `:''}${timeStr}${prof?` &middot; ${prof}`:''}${tipo?` &middot; ${tipo}`:''}
         </p>
       </div>
@@ -1169,7 +1161,7 @@ function renderAiCompact(count){
       </div>
       <div class="flex-1 min-w-0">
         <p class="text-[0.82rem] font-semibold text-gray-800">An&aacute;lise gerada com sucesso</p>
-        <p class="text-[0.67rem] text-gray-400">${count} consulta${count!==1?'s':''} analisada${count!==1?'s':''} &middot; Clique para ver o resumo completo</p>
+        <p class="text-[0.68rem] text-gray-400">${count} consulta${count!==1?'s':''} analisada${count!==1?'s':''} &middot; Clique para ver o resumo completo</p>
       </div>
       <button onclick="openAiModal()" class="shrink-0 flex items-center gap-1.5 px-3.5 py-2 bg-violet-500 text-white rounded-lg text-[0.75rem] font-semibold hover:bg-violet-600 transition-colors shadow-sm">
         Ver an&aacute;lise
@@ -1831,9 +1823,9 @@ function baixarPdfPreview(){
 }
 
 function enviarPdfPreviewPorEmail(){
-  if(!_pdfPreview.doc){ showToast('Nenhum documento para enviar.',false); return; }
+  if(!_pdfPreview.doc){ showToast('Nenhum documento para enviar.', 'error'); return; }
   const meta=_pdfPreview.meta||{};
-  if(!meta.idEmp){ showToast('Não foi possível identificar a empresa deste documento.',false); return; }
+  if(!meta.idEmp){ showToast('Não foi possível identificar a empresa deste documento.', 'error'); return; }
   document.getElementById('enviarEmailDocTitulo').textContent=_pdfPreview.titulo||'Documento';
   const input=document.getElementById('inputEnviarEmailDestino');
   input.value=meta.pacEmail||'';
@@ -1849,8 +1841,8 @@ function fecharModalEnviarEmail(){
 
 async function confirmarEnvioPdfEmail(){
   const email=document.getElementById('inputEnviarEmailDestino').value.trim();
-  if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){ showToast('Email inválido.',false); return; }
-  if(!_pdfPreview.doc){ showToast('Nenhum documento para enviar.',false); return; }
+  if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){ showToast('Email inválido.', 'error'); return; }
+  if(!_pdfPreview.doc){ showToast('Nenhum documento para enviar.', 'error'); return; }
   const meta=_pdfPreview.meta||{};
 
   const btn=document.getElementById('btnConfirmarEnvioEmail');
@@ -1880,7 +1872,7 @@ async function confirmarEnvioPdfEmail(){
     if(e?.context && typeof e.context.json==='function'){
       try{ const body=await e.context.json(); if(body?.erro) msg=body.erro; }catch(_){}
     }
-    showToast('Erro ao enviar email: '+msg,false);
+    showToast('Erro ao enviar email: '+msg, 'error');
   }finally{
     btn.disabled=false;spin.classList.add('hidden');txt.textContent='Enviar';
   }
@@ -1961,7 +1953,7 @@ async function salvarAtendimento(rascunho){
     }
     if(!rascunho){
       const {data:servData}=await supabase.from('SERVICO').select('VALOR_1CONS').eq('ID_PROF',modalAgd.PROF_AGD).eq('ATIVO_SERV',true).maybeSingle();
-      if(!servData?.VALOR_1CONS) showToast('Aviso: profissional sem valor de serviço definido. Verifique o financeiro.',false);
+      if(!servData?.VALOR_1CONS) showToast('Aviso: profissional sem valor de serviço definido. Verifique o financeiro.', 'error');
       await supabase.from('AGENDAMENTO').update({STATUS_AGD:'REALIZADA'}).eq('ID_AGD',modalAgd.ID_AGD);
       modalAgd.STATUS_AGD='REALIZADA';
       const badge=document.getElementById('m-badge');
@@ -1975,7 +1967,7 @@ async function salvarAtendimento(rascunho){
       showToast('Rascunho salvo!');
     }
   } catch(err){
-    showToast(err.message||'Erro ao salvar',false);
+    showToast(err.message||'Erro ao salvar', 'error');
   }
   btnR.disabled=false;btnF.disabled=false;
   btnR.textContent='Salvar Rascunho';btnF.textContent=document.getElementById('m-fConsId').value?'Salvar Alterações':'Finalizar Consulta';

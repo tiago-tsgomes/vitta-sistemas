@@ -19,6 +19,7 @@
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
   <script src="../assets/js/config.js?v=2"></script>
+  <script src="../assets/js/toast.js?v=1"></script>
   <script src="../assets/js/admin-empresa-context.js?v=1"></script>
   <script src="../assets/js/access-guard.js?v=2"></script>
   <script src="../assets/js/notifications.js?v=3"></script>
@@ -31,7 +32,6 @@
     .chevron.open{transform:rotate(180deg)}
     .scroll-thin::-webkit-scrollbar{width:3px}
     .scroll-thin::-webkit-scrollbar-thumb{background:#e5e7eb;border-radius:4px}
-    #toast{position:fixed;bottom:24px;right:24px;z-index:9999;transition:all .3s ease}
     .rtab{flex:1;text-align:center;font-size:0.78rem;font-weight:600;padding:0.4rem 0.75rem;border-radius:8px;color:#6b7280;cursor:pointer;transition:all .15s;white-space:nowrap}
     .rtab.active{background:#fff;color:#2ABCD4;box-shadow:0 1px 3px rgba(0,0,0,.08)}
     .bar-track{background:#f3f4f6;border-radius:99px;height:8px;overflow:hidden}
@@ -132,6 +132,7 @@
       <a href="planos.html" class="flex items-center gap-2 pl-10 pr-3 py-2 mx-2 rounded-xl text-[0.8rem] text-gray-500 hover:bg-white/5 hover:text-gray-300 transition-colors cursor-pointer">Planos</a>
         <a href="configuracoes.html" class="flex items-center gap-2 pl-10 pr-3 py-2 mx-2 rounded-xl text-[0.8rem] text-gray-500 hover:bg-white/5 hover:text-gray-300 transition-colors">Configura&ccedil;&otilde;es</a>
         <a href="logs.html" class="flex items-center gap-2 pl-10 pr-3 py-2 mx-2 rounded-xl text-[0.8rem] text-gray-500 hover:bg-white/5 hover:text-gray-300 transition-colors cursor-pointer">Log</a>
+      <a href="cadastros_admin.html" class="flex items-center gap-2 pl-10 pr-3 py-2 mx-2 rounded-xl text-[0.8rem] text-gray-500 hover:bg-white/5 hover:text-gray-300 transition-colors cursor-pointer">Cadastros</a>
       </div>
     </div>
     <div class="h-4"></div>
@@ -285,10 +286,6 @@
   </main>
 </div>
 
-<!-- TOAST -->
-<div id="toast" class="hidden">
-  <div id="toastInner" class="flex items-center gap-3 px-4 py-3 rounded-xl shadow-lg text-sm font-medium text-white min-w-[240px]"></div>
-</div>
 
 <!-- ═══ MODAL: PREVIEW PDF ═══ -->
 <div id="modalPdfPreview" class="fixed inset-0 bg-black/60 z-[70] hidden items-center justify-center p-4" onclick="if(event.target===this)closePdfPreview()">
@@ -347,7 +344,6 @@ const FORMA_LABELS = {PIX:'PIX',DINHEIRO:'Dinheiro',CARTAO_DEB:'Cartão Débito'
 function toggleMenu(k){const s=document.getElementById('sub-'+k),c=document.getElementById('chev-'+k);const o=s.classList.contains('open');s.classList.toggle('open',!o);if(c)c.classList.toggle('open',!o);}
 function toggleSidebar(){const sb=document.getElementById('sidebar'),ov=document.getElementById('overlay');const o=sb.classList.contains('-translate-x-full');sb.classList.toggle('-translate-x-full',!o);ov.classList.toggle('hidden',!o);}
 async function handleLogout(){await supabase.auth.signOut();window.location.href='../index.html';}
-function showToast(msg,ok=true){const t=document.getElementById('toast'),i=document.getElementById('toastInner');i.textContent=msg;i.className=`flex items-center gap-3 px-4 py-3 rounded-xl shadow-lg text-sm font-medium text-white min-w-[240px] ${ok?'bg-emerald-500':'bg-red-500'}`;t.classList.remove('hidden');setTimeout(()=>t.classList.add('hidden'),3500);}
 
 function fmtMoney(v){return'R$ '+(v||0).toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2});}
 function fmtDate(dt){return new Date(dt).toLocaleDateString('pt-BR');}
@@ -412,7 +408,7 @@ function renderFinanceiro(){
           </div>
           <div class="flex justify-between items-center py-2.5">
             <span class="text-[0.82rem] font-bold text-gray-700">Total Líquido</span>
-            <span class="text-[0.88rem] font-extrabold text-gray-800">${fmtMoney(payments.reduce((s,a)=>s+(a.pagamento.VL_PGTO||0),0))}</span>
+            <span class="text-[0.9rem] font-extrabold text-gray-800">${fmtMoney(payments.reduce((s,a)=>s+(a.pagamento.VL_PGTO||0),0))}</span>
           </div>
         </div>
       </div>
@@ -618,7 +614,7 @@ async function loadReport(){
     computeKPIs();
     renderTab();
   } catch(err){
-    showToast('Erro ao carregar dados',false);
+    showToast('Erro ao carregar dados', 'error');
     console.error('loadReport error:',err);
   }
 }
@@ -802,7 +798,7 @@ async function loadEmpresaPdfInfo(){
 
 async function gerarRelatorioPdfProfissional(){
   const profId=currentProfId||document.getElementById('rProf').value;
-  if(!profId){showToast('Selecione um profissional para gerar o relatório em PDF',false);return;}
+  if(!profId){showToast('Selecione um profissional para gerar o relatório em PDF', 'error');return;}
   const btn=document.getElementById('btnRelatorioPdf');
   const btnOrigHtml=btn.innerHTML;
   btn.disabled=true;btn.textContent='Gerando…';
@@ -964,7 +960,7 @@ async function gerarRelatorioPdfProfissional(){
     showPdfPreview(doc,'Relatório de Atendimentos',filename,{idEmp,destEmail:prof?.EMAIL_PROF||'',destNome:prof?.NOME_PROF||''});
   }catch(e){
     console.error('gerarRelatorioPdfProfissional error:',e);
-    showToast('Erro ao gerar relatório em PDF',false);
+    showToast('Erro ao gerar relatório em PDF', 'error');
   }finally{
     btn.innerHTML=btnOrigHtml;
     updateBtnRelatorioPdfState();
@@ -996,9 +992,9 @@ function baixarPdfPreview(){
   a.remove();
 }
 function enviarPdfPreviewPorEmail(){
-  if(!_pdfPreview.doc){ showToast('Nenhum documento para enviar.',false); return; }
+  if(!_pdfPreview.doc){ showToast('Nenhum documento para enviar.', 'error'); return; }
   const meta=_pdfPreview.meta||{};
-  if(!meta.idEmp){ showToast('Não foi possível identificar a empresa deste documento.',false); return; }
+  if(!meta.idEmp){ showToast('Não foi possível identificar a empresa deste documento.', 'error'); return; }
   document.getElementById('enviarEmailDocTitulo').textContent=_pdfPreview.titulo||'Documento';
   const input=document.getElementById('inputEnviarEmailDestino');
   input.value=meta.destEmail||'';
@@ -1012,8 +1008,8 @@ function fecharModalEnviarEmail(){
 }
 async function confirmarEnvioPdfEmail(){
   const email=document.getElementById('inputEnviarEmailDestino').value.trim();
-  if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){ showToast('Email inválido.',false); return; }
-  if(!_pdfPreview.doc){ showToast('Nenhum documento para enviar.',false); return; }
+  if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){ showToast('Email inválido.', 'error'); return; }
+  if(!_pdfPreview.doc){ showToast('Nenhum documento para enviar.', 'error'); return; }
   const meta=_pdfPreview.meta||{};
 
   const btn=document.getElementById('btnConfirmarEnvioEmail');
@@ -1042,7 +1038,7 @@ async function confirmarEnvioPdfEmail(){
     if(e?.context && typeof e.context.json==='function'){
       try{ const body=await e.context.json(); if(body?.erro) msg=body.erro; }catch(_){}
     }
-    showToast('Erro ao enviar email: '+msg,false);
+    showToast('Erro ao enviar email: '+msg, 'error');
   }finally{
     btn.disabled=false;spin.classList.add('hidden');txt.textContent='Enviar';
   }

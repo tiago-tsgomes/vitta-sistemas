@@ -21,6 +21,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
   <script src="../assets/js/config.js?v=2"></script>
+  <script src="../assets/js/toast.js?v=1"></script>
   <script src="../assets/js/access-guard.js?v=2"></script>
   <script src="../assets/js/admin-empresa-context.js?v=1"></script>
   <script src="../assets/js/notifications.js?v=3"></script>
@@ -37,7 +38,6 @@
     .modal-overlay.open { display:flex; }
     .modal-scroll::-webkit-scrollbar { width:4px; }
     .modal-scroll::-webkit-scrollbar-thumb { background:#e5e7eb; border-radius:4px; }
-    #toast { position:fixed; bottom:24px; right:24px; z-index:999; transition:all .3s ease; }
     tbody tr { transition:background .15s; }
     tbody tr:hover { background:#f9fafb; }
   </style>
@@ -137,6 +137,7 @@
       <a href="planos.html" class="flex items-center gap-2 pl-10 pr-3 py-2 mx-2 rounded-xl text-[0.8rem] text-gray-500 hover:bg-white/5 hover:text-gray-300 transition-colors cursor-pointer">Planos</a>
       <a href="configuracoes.html" class="flex items-center gap-2 pl-10 pr-3 py-2 mx-2 rounded-xl text-[0.8rem] text-gray-500 hover:bg-white/5 hover:text-gray-300 transition-colors cursor-pointer">Configura&ccedil;&otilde;es</a>
       <a href="logs.html" class="flex items-center gap-2 pl-10 pr-3 py-2 mx-2 rounded-xl text-[0.8rem] text-gray-500 hover:bg-white/5 hover:text-gray-300 transition-colors cursor-pointer">Log</a>
+      <a href="cadastros_admin.html" class="flex items-center gap-2 pl-10 pr-3 py-2 mx-2 rounded-xl text-[0.8rem] text-gray-500 hover:bg-white/5 hover:text-gray-300 transition-colors cursor-pointer">Cadastros</a>
     </div>
     </div>
     <div class="h-4"></div>
@@ -246,19 +247,23 @@
         </svg>
         <span class="text-sm">Carregando especialidades&hellip;</span>
       </div>
-      <div id="tableWrap" class="hidden overflow-x-auto">
-        <table class="w-full text-sm">
-          <thead>
-            <tr class="border-b border-gray-100 bg-gray-50 text-[0.72rem] font-semibold text-gray-500 uppercase tracking-wider">
-              <th class="px-5 py-3 text-left">Especialidade</th>
-              <th class="px-5 py-3 text-left">Descri&ccedil;&atilde;o</th>
-              <th id="colEmp" class="px-5 py-3 text-left hidden">Empresa</th>
-              <th class="px-5 py-3 text-left">Status</th>
-              <th class="px-5 py-3 text-right">A&ccedil;&otilde;es</th>
-            </tr>
-          </thead>
-          <tbody id="especBody"></tbody>
-        </table>
+      <div id="tableWrap" class="hidden">
+        <div class="hidden sm:block overflow-x-auto">
+          <table class="w-full text-sm">
+            <thead>
+              <tr class="border-b border-gray-100 bg-gray-50 text-[0.72rem] font-semibold text-gray-500 uppercase tracking-wider">
+                <th class="px-5 py-3 text-left">Especialidade</th>
+                <th class="px-5 py-3 text-left">Descri&ccedil;&atilde;o</th>
+                <th id="colEmp" class="px-5 py-3 text-left hidden">Empresa</th>
+                <th class="px-5 py-3 text-left">Status</th>
+                <th class="px-5 py-3 text-right">A&ccedil;&otilde;es</th>
+              </tr>
+            </thead>
+            <tbody id="especBody"></tbody>
+          </table>
+        </div>
+        <div id="mobileList" class="sm:hidden divide-y divide-gray-100"></div>
+        <div id="pagination" class="flex items-center gap-1.5 justify-end px-5 py-3.5 border-t border-gray-100"></div>
       </div>
       <div id="tableEmpty" class="hidden py-16 text-center">
         <svg xmlns="http://www.w3.org/2000/svg" class="w-10 h-10 text-gray-300 mx-auto mb-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="1"/></svg>
@@ -300,6 +305,16 @@
         <label class="block text-[0.78rem] font-semibold text-gray-600 mb-1">Descri&ccedil;&atilde;o</label>
         <input id="fDescr" type="text" maxlength="255" placeholder="Descri&ccedil;&atilde;o opcional"
           class="w-full py-2.5 px-3 text-sm border border-gray-200 rounded-xl outline-none focus:border-vitta-500 focus:ring-2 focus:ring-vitta-500/20" />
+      </div>
+      <!-- Logo -->
+      <div>
+        <label class="block text-[0.78rem] font-semibold text-gray-600 mb-1">Logo</label>
+        <div class="flex items-center gap-3">
+          <img id="fLogoPreview" class="hidden w-10 h-10 rounded-lg object-contain border border-gray-200 bg-gray-50 shrink-0" />
+          <select id="fLogo" onchange="updateLogoPreview()" class="w-full py-2.5 px-3 text-sm border border-gray-200 rounded-xl outline-none focus:border-vitta-500 bg-white">
+            <option value="">Sem logo</option>
+          </select>
+        </div>
       </div>
       <!-- Ativo (edit only) -->
       <div id="rowAtivo" class="hidden">
@@ -349,14 +364,12 @@
   </div>
 </div>
 
-<!-- TOAST -->
-<div id="toast" class="hidden">
-  <div id="toastInner" class="flex items-center gap-3 px-4 py-3 rounded-xl shadow-lg text-sm font-medium text-white min-w-[240px]"></div>
-</div>
 
 <script>
 let allEspec = [], filtered = [], editId = null, toggleTargetId = null, toggleTargetAtivo = false, deleteTargetId = null;
-let currentUserMeta = null, empresas = [];
+let currentUserMeta = null, empresas = [], logosEspec = [];
+const PAGE_SIZE = 10;
+let currentPage = 1;
 
 function toggleMenu(k) {
   const s=document.getElementById('sub-'+k),c=document.getElementById('chev-'+k);
@@ -372,11 +385,6 @@ async function handleLogout() {
   await supabase.auth.signOut(); window.location.href='../index.html';
 }
 
-function showToast(msg, ok=true) {
-  const t=document.getElementById('toast'), i=document.getElementById('toastInner');
-  i.textContent=msg; i.className=`flex items-center gap-3 px-4 py-3 rounded-xl shadow-lg text-sm font-medium text-white min-w-[240px] ${ok?'bg-emerald-500':'bg-red-500'}`;
-  t.classList.remove('hidden'); setTimeout(()=>t.classList.add('hidden'),3500);
-}
 
 async function initAuth() {
   document.getElementById('header-date').textContent = 'Gestao de especialidades — ' + new Date().toLocaleDateString('pt-BR', { weekday:'long', year:'numeric', month:'long', day:'numeric' });
@@ -425,15 +433,38 @@ async function loadEmpresas() {
   }
 }
 
+async function loadLogosEspec() {
+  const { data, error } = await supabase
+    .from('LOGOS')
+    .select('ID_LOGO,TITULO_LOGO,URL_LOGO')
+    .eq('TIPO_LOGO', 'ESPECIALIDADE')
+    .eq('ATIVO_LOGO', true)
+    .order('TITULO_LOGO');
+  if (error) return;
+  logosEspec = data || [];
+  const sel = document.getElementById('fLogo');
+  logosEspec.forEach(l => {
+    sel.insertAdjacentHTML('beforeend', `<option value="${l.ID_LOGO}">${l.TITULO_LOGO}</option>`);
+  });
+}
+
+function updateLogoPreview() {
+  const id = document.getElementById('fLogo').value;
+  const img = document.getElementById('fLogoPreview');
+  const logo = logosEspec.find(l => l.ID_LOGO === id);
+  if (logo) { img.src = logo.URL_LOGO; img.classList.remove('hidden'); }
+  else { img.classList.add('hidden'); img.src = ''; }
+}
+
 async function loadEspecialidades() {
   let q = supabase
     .from('ESPECIALIDADE')
-    .select('ID_ESPEC,NOME_ESPEC,DESCR_ESPEC,ATIVO_ESPEC,DTCRI_ESPEC,ID_EMP,EMPRESA(NOME_EMP)')
+    .select('ID_ESPEC,NOME_ESPEC,DESCR_ESPEC,ATIVO_ESPEC,DTCRI_ESPEC,ID_EMP,ID_LOGO,EMPRESA(NOME_EMP),LOGOS(TITULO_LOGO,URL_LOGO)')
     .order('NOME_ESPEC');
   const empId = AdminEmpresaCtx.resolveIdEmp(currentUserMeta?.tipo_usu, currentUserMeta?.ID_EMP || currentUserMeta?.id_emp);
   if (empId) q = q.eq('ID_EMP', empId);
   const { data, error } = await q;
-  if (error) { showToast('Erro ao carregar especialidades', false); return; }
+  if (error) { showToast('Erro ao carregar especialidades', 'error'); return; }
   allEspec = data || [];
   document.getElementById('statTotal').textContent  = allEspec.length;
   document.getElementById('statAtivas').textContent = allEspec.filter(e => e.ATIVO_ESPEC).length;
@@ -453,6 +484,7 @@ function applyFilters() {
     if (q && !e.NOME_ESPEC?.toLowerCase().includes(q) && !e.DESCR_ESPEC?.toLowerCase().includes(q)) return false;
     return true;
   });
+  currentPage = 1;
   renderTable();
 }
 
@@ -469,14 +501,20 @@ function renderTable() {
   if (!filtered.length) {
     document.getElementById('tableWrap').classList.add('hidden');
     document.getElementById('tableEmpty').classList.remove('hidden');
+    document.getElementById('pagination').innerHTML = '';
     return;
   }
   document.getElementById('tableWrap').classList.remove('hidden');
   document.getElementById('tableEmpty').classList.add('hidden');
-  tbody.innerHTML = filtered.map(e => `
+  const start = (currentPage - 1) * PAGE_SIZE;
+  const slice = filtered.slice(start, start + PAGE_SIZE);
+  tbody.innerHTML = slice.map(e => `
     <tr class="border-b border-gray-50 fade-up">
       <td class="px-5 py-3.5">
-        <span class="font-semibold text-gray-800 ${!e.ATIVO_ESPEC?'opacity-50':''}">${e.NOME_ESPEC}</span>
+        <div class="flex items-center gap-2.5 ${!e.ATIVO_ESPEC?'opacity-50':''}">
+          ${e.LOGOS?.URL_LOGO ? `<img src="${e.LOGOS.URL_LOGO}" class="w-7 h-7 rounded-lg object-contain border border-gray-100 bg-gray-50 shrink-0" />` : ''}
+          <span class="font-semibold text-gray-800">${e.NOME_ESPEC}</span>
+        </div>
       </td>
       <td class="px-5 py-3.5 text-gray-500 text-[0.82rem]">${e.DESCR_ESPEC||'&mdash;'}</td>
       <td class="px-5 py-3.5">
@@ -498,6 +536,64 @@ function renderTable() {
         </div>
       </td>
     </tr>`).join('');
+  document.getElementById('mobileList').innerHTML = slice.map(renderMobileCard).join('');
+  renderPagination();
+}
+
+function renderMobileCard(e) {
+  return `
+  <div class="px-4 py-3.5">
+    <div class="flex items-start justify-between gap-3">
+      <div class="min-w-0 flex-1">
+        <div class="flex items-center gap-2 ${!e.ATIVO_ESPEC?'opacity-50':''}">
+          ${e.LOGOS?.URL_LOGO ? `<img src="${e.LOGOS.URL_LOGO}" class="w-6 h-6 rounded-lg object-contain border border-gray-100 bg-gray-50 shrink-0" />` : ''}
+          <p class="text-sm font-semibold text-gray-800 truncate">${e.NOME_ESPEC}</p>
+        </div>
+        <p class="text-xs text-gray-500 mt-0.5">${e.DESCR_ESPEC||'&mdash;'}</p>
+        <div class="mt-1.5">
+          ${e.ATIVO_ESPEC
+            ? '<span class="inline-flex items-center gap-1 text-[0.7rem] font-bold bg-emerald-50 text-emerald-700 px-2.5 py-1 rounded-full"><span class="w-1.5 h-1.5 bg-emerald-500 rounded-full"></span>Ativa</span>'
+            : '<span class="inline-flex items-center gap-1 text-[0.7rem] font-bold bg-red-50 text-red-600 px-2.5 py-1 rounded-full"><span class="w-1.5 h-1.5 bg-red-400 rounded-full"></span>Inativa</span>'}
+        </div>
+      </div>
+      <div class="flex items-center gap-1 shrink-0">
+        <button onclick="openEditModal('${e.ID_ESPEC}')" title="Editar" class="p-1.5 rounded-lg text-gray-400 hover:text-vitta-600 hover:bg-vitta-50 transition-colors">
+          <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+        </button>
+        <button onclick="openToggleModal('${e.ID_ESPEC}','${e.NOME_ESPEC.replace(/'/g,"\\'")}',${e.ATIVO_ESPEC})" title="${e.ATIVO_ESPEC?'Desativar':'Ativar'}" class="p-1.5 rounded-lg text-gray-400 hover:text-red-500 hover:bg-red-50 transition-colors">
+          <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="4.93" y1="4.93" x2="19.07" y2="19.07"/></svg>
+        </button>
+        <button onclick="openDeleteModal('${e.ID_ESPEC}','${e.NOME_ESPEC.replace(/'/g,"\\'")}' )" title="Excluir" class="p-1.5 rounded-lg text-gray-400 hover:text-red-600 hover:bg-red-50 transition-colors">
+          <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4h6v2"/></svg>
+        </button>
+      </div>
+    </div>
+  </div>`;
+}
+
+function renderPagination() {
+  const total = Math.ceil(filtered.length / PAGE_SIZE);
+  const pg = document.getElementById('pagination');
+  if (!pg) return;
+  if (total <= 1) { pg.innerHTML = ''; return; }
+  const btnBase = 'min-w-[32px] h-8 rounded-lg border border-gray-200 text-xs font-semibold flex items-center justify-center px-2 transition-colors';
+  let html = `<button class="${btnBase} hover:bg-gray-50 text-gray-500" onclick="goPage(${currentPage - 1})" ${currentPage === 1 ? 'disabled' : ''}>&lsaquo;</button>`;
+  for (let i = 1; i <= total; i++) {
+    if (total > 7 && i > 3 && i < total - 1 && Math.abs(i - currentPage) > 1) {
+      if (i === 4 || i === total - 2) html += `<button class="${btnBase} text-gray-400 cursor-default" disabled>&hellip;</button>`;
+      continue;
+    }
+    html += `<button class="${btnBase} ${i === currentPage ? 'bg-vitta-500 text-white border-vitta-500' : 'hover:bg-gray-50 text-gray-600'}" onclick="goPage(${i})">${i}</button>`;
+  }
+  html += `<button class="${btnBase} hover:bg-gray-50 text-gray-500" onclick="goPage(${currentPage + 1})" ${currentPage === total ? 'disabled' : ''}>&rsaquo;</button>`;
+  pg.innerHTML = html;
+}
+
+function goPage(n) {
+  const total = Math.ceil(filtered.length / PAGE_SIZE);
+  if (n < 1 || n > total) return;
+  currentPage = n;
+  renderTable();
 }
 
 function openFormModal() {
@@ -507,6 +603,8 @@ function openFormModal() {
   document.getElementById('fId').value = '';
   document.getElementById('fNome').value = '';
   document.getElementById('fDescr').value = '';
+  document.getElementById('fLogo').value = '';
+  updateLogoPreview();
   document.getElementById('rowAtivo').classList.add('hidden');
   document.getElementById('modalForm').classList.add('open');
 }
@@ -520,6 +618,8 @@ function openEditModal(id) {
   document.getElementById('fId').value    = e.ID_ESPEC;
   document.getElementById('fNome').value  = e.NOME_ESPEC;
   document.getElementById('fDescr').value = e.DESCR_ESPEC || '';
+  document.getElementById('fLogo').value = e.ID_LOGO || '';
+  updateLogoPreview();
   document.getElementById('fAtivo').checked = e.ATIVO_ESPEC;
   document.getElementById('rowAtivo').classList.remove('hidden');
   document.getElementById('modalForm').classList.add('open');
@@ -533,15 +633,16 @@ async function saveEspecialidade(ev) {
   btn.disabled = true; btn.textContent = 'Salvando…';
   const nome  = document.getElementById('fNome').value.trim();
   const descr = document.getElementById('fDescr').value.trim();
+  const idLogo = document.getElementById('fLogo').value || null;
   const empId = AdminEmpresaCtx.resolveIdEmp(currentUserMeta?.tipo_usu, currentUserMeta?.ID_EMP || currentUserMeta?.id_emp);
-  if (!empId) { showToast('Selecione a empresa', false); btn.disabled=false; btn.textContent='Salvar'; return; }
+  if (!empId) { showToast('Selecione a empresa', 'error'); btn.disabled=false; btn.textContent='Salvar'; return; }
   try {
     if (!editId) {
-      const { error } = await supabase.from('ESPECIALIDADE').insert({ ID_EMP:empId, NOME_ESPEC:nome, DESCR_ESPEC:descr||null });
+      const { error } = await supabase.from('ESPECIALIDADE').insert({ ID_EMP:empId, NOME_ESPEC:nome, DESCR_ESPEC:descr||null, ID_LOGO:idLogo });
       if (error) throw error;
       showToast('Especialidade criada com sucesso!');
     } else {
-      const payload = { NOME_ESPEC:nome, DESCR_ESPEC:descr||null, ATIVO_ESPEC:document.getElementById('fAtivo').checked };
+      const payload = { NOME_ESPEC:nome, DESCR_ESPEC:descr||null, ID_LOGO:idLogo, ATIVO_ESPEC:document.getElementById('fAtivo').checked };
       const { error } = await supabase.from('ESPECIALIDADE').update(payload).eq('ID_ESPEC', editId);
       if (error) throw error;
       showToast('Especialidade atualizada!');
@@ -549,7 +650,7 @@ async function saveEspecialidade(ev) {
     closeFormModal();
     await loadEspecialidades();
   } catch(err) {
-    showToast(err.message || 'Erro ao salvar', false);
+    showToast(err.message || 'Erro ao salvar', 'error');
   }
   btn.disabled=false; btn.textContent='Salvar';
 }
@@ -566,7 +667,7 @@ function closeToggleModal() { document.getElementById('modalToggle').classList.r
 
 async function confirmToggle() {
   const { error } = await supabase.from('ESPECIALIDADE').update({ ATIVO_ESPEC:!toggleTargetAtivo }).eq('ID_ESPEC', toggleTargetId);
-  if (error) { showToast(error.message, false); return; }
+  if (error) { showToast(error.message, 'error'); return; }
   showToast(toggleTargetAtivo ? 'Especialidade desativada!' : 'Especialidade ativada!');
   closeToggleModal();
   await loadEspecialidades();
@@ -599,7 +700,7 @@ async function confirmDelete() {
     .eq('ID_ESPEC', deleteTargetId);
 
   if (countErr) {
-    showToast('Erro ao validar uso da especialidade.', false);
+    showToast('Erro ao validar uso da especialidade.', 'error');
     btn.disabled = false; spin.classList.add('hidden'); return;
   }
 
@@ -612,7 +713,7 @@ async function confirmDelete() {
 
   const { error } = await supabase.from('ESPECIALIDADE').delete().eq('ID_ESPEC', deleteTargetId);
   spin.classList.add('hidden');
-  if (error) { showToast(error.message || 'Erro ao excluir.', false); btn.disabled = false; return; }
+  if (error) { showToast(error.message || 'Erro ao excluir.', 'error'); btn.disabled = false; return; }
   showToast('Especialidade excluída com sucesso!');
   closeDeleteModal();
   await loadEspecialidades();
@@ -626,6 +727,7 @@ async function confirmDelete() {
     return;
   }
   await loadEmpresas();
+  await loadLogosEspec();
   await loadEspecialidades();
 })();
 

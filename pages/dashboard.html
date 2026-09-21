@@ -176,6 +176,7 @@
       <a href="dashboard-gerencial.html" class="flex items-center gap-2 pl-10 pr-3 py-2 mx-2 rounded-xl text-[0.8rem] text-gray-500 hover:bg-white/5 hover:text-gray-300 transition-colors cursor-pointer">Dashboard Gerencial</a>
       <a href="configuracoes.html" class="flex items-center gap-2 pl-10 pr-3 py-2 mx-2 rounded-xl text-[0.8rem] text-gray-500 hover:bg-white/5 hover:text-gray-300 transition-colors cursor-pointer">Configura&ccedil;&otilde;es</a>
       <a href="logs.html" class="flex items-center gap-2 pl-10 pr-3 py-2 mx-2 rounded-xl text-[0.8rem] text-gray-500 hover:bg-white/5 hover:text-gray-300 transition-colors cursor-pointer">Log</a>
+      <a href="cadastros_admin.html" class="flex items-center gap-2 pl-10 pr-3 py-2 mx-2 rounded-xl text-[0.8rem] text-gray-500 hover:bg-white/5 hover:text-gray-300 transition-colors cursor-pointer">Cadastros</a>
     </div>
     </div>
 
@@ -259,7 +260,7 @@
           <div>
             <p id="kpi-consultas" class="text-[1.4rem] sm:text-[1.75rem] font-extrabold text-gray-800 leading-none">&#8212;</p>
             <p class="text-[0.72rem] sm:text-[0.75rem] font-medium text-gray-500 mt-1">Consultas Hoje</p>
-            <p class="hidden sm:block text-[0.67rem] text-gray-400 mt-0.5">agendamentos do dia</p>
+            <p class="hidden sm:block text-[0.68rem] text-gray-400 mt-0.5">agendamentos do dia</p>
           </div>
         </div>
       </div>
@@ -276,7 +277,7 @@
           <div>
             <p id="kpi-pacientes" class="text-[1.4rem] sm:text-[1.75rem] font-extrabold text-gray-800 leading-none">&#8212;</p>
             <p class="text-[0.72rem] sm:text-[0.75rem] font-medium text-gray-500 mt-1">Pacientes Ativos</p>
-            <p class="hidden sm:block text-[0.67rem] text-gray-400 mt-0.5">cadastrados na clinica</p>
+            <p class="hidden sm:block text-[0.68rem] text-gray-400 mt-0.5">cadastrados na clinica</p>
           </div>
         </div>
       </div>
@@ -292,7 +293,7 @@
           <div>
             <p id="kpi-aguardando" class="text-[1.4rem] sm:text-[1.75rem] font-extrabold text-gray-800 leading-none">&#8212;</p>
             <p class="text-[0.72rem] sm:text-[0.75rem] font-medium text-gray-500 mt-1">Aguardando</p>
-            <p class="hidden sm:block text-[0.67rem] text-gray-400 mt-0.5">status agendado hoje</p>
+            <p class="hidden sm:block text-[0.68rem] text-gray-400 mt-0.5">status agendado hoje</p>
           </div>
         </div>
       </div>
@@ -310,7 +311,7 @@
           <div>
             <p id="kpi-faltas" class="text-[1.4rem] sm:text-[1.75rem] font-extrabold text-gray-800 leading-none">&#8212;</p>
             <p class="text-[0.72rem] sm:text-[0.75rem] font-medium text-gray-500 mt-1">Faltas</p>
-            <p class="hidden sm:block text-[0.67rem] text-gray-400 mt-0.5">ausencias registradas hoje</p>
+            <p class="hidden sm:block text-[0.68rem] text-gray-400 mt-0.5">ausencias registradas hoje</p>
           </div>
         </div>
       </div>
@@ -333,7 +334,7 @@
               </svg>
             </div>
             <div>
-              <h2 class="text-[0.88rem] font-bold text-gray-800">Agenda de Hoje</h2>
+              <h2 class="text-[0.9rem] font-bold text-gray-800">Agenda de Hoje</h2>
               <p id="agenda-date" class="text-[0.68rem] text-gray-400"></p>
             </div>
           </div>
@@ -355,7 +356,7 @@
               <path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z" stroke-linecap="round" stroke-linejoin="round"/>
             </svg>
           </div>
-          <h2 class="text-[0.88rem] font-bold text-gray-800">Profissionais da Clinica</h2>
+          <h2 class="text-[0.9rem] font-bold text-gray-800">Profissionais da Clinica</h2>
         </div>
         <div class="overflow-auto" style="max-height: 318px;">
           <table class="w-full min-w-[260px]">
@@ -395,7 +396,7 @@
           </div>
           <div class="flex-1 min-w-0">
             <div class="flex items-center gap-2">
-              <h2 class="text-[0.88rem] font-bold text-gray-800">Pacientes para Agendar</h2>
+              <h2 class="text-[0.9rem] font-bold text-gray-800">Pacientes para Agendar</h2>
               <span id="badge-para-agendar" class="hidden bg-red-500 text-white text-[0.6rem] font-bold px-1.5 py-0.5 rounded-full min-w-[18px] text-center"></span>
             </div>
             <p class="text-[0.68rem] text-gray-400">Frequência vencida ou vencendo em 5 dias · sem agendamento</p>
@@ -424,7 +425,7 @@
             </svg>
           </div>
           <div>
-            <h2 class="text-[0.88rem] font-bold text-gray-800">Aniversariantes do Mes</h2>
+            <h2 class="text-[0.9rem] font-bold text-gray-800">Aniversariantes do Mes</h2>
             <p id="aniv-mes-label" class="text-[0.68rem] text-gray-400 capitalize"></p>
           </div>
         </div>

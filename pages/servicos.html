@@ -21,6 +21,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
   <script src="../assets/js/config.js?v=2"></script>
+  <script src="../assets/js/toast.js?v=1"></script>
   <script src="../assets/js/access-guard.js?v=2"></script>
   <script src="../assets/js/admin-empresa-context.js?v=1"></script>
   <script src="../assets/js/notifications.js?v=3"></script>
@@ -37,7 +38,6 @@
     .modal-overlay.open { display:flex; }
     .modal-scroll::-webkit-scrollbar { width:4px; }
     .modal-scroll::-webkit-scrollbar-thumb { background:#e5e7eb; border-radius:4px; }
-    #toast { position:fixed; bottom:24px; right:24px; z-index:999; transition:all .3s ease; }
     tbody tr { transition:background .15s; }
     tbody tr:hover { background:#f9fafb; }
     tbody tr.selected { background:#f0fbfd; }
@@ -139,6 +139,7 @@
       <a href="planos.html" class="flex items-center gap-2 pl-10 pr-3 py-2 mx-2 rounded-xl text-[0.8rem] text-gray-500 hover:bg-white/5 hover:text-gray-300 transition-colors cursor-pointer">Planos</a>
       <a href="configuracoes.html" class="flex items-center gap-2 pl-10 pr-3 py-2 mx-2 rounded-xl text-[0.8rem] text-gray-500 hover:bg-white/5 hover:text-gray-300 transition-colors cursor-pointer">Configura&ccedil;&otilde;es</a>
       <a href="logs.html" class="flex items-center gap-2 pl-10 pr-3 py-2 mx-2 rounded-xl text-[0.8rem] text-gray-500 hover:bg-white/5 hover:text-gray-300 transition-colors cursor-pointer">Log</a>
+      <a href="cadastros_admin.html" class="flex items-center gap-2 pl-10 pr-3 py-2 mx-2 rounded-xl text-[0.8rem] text-gray-500 hover:bg-white/5 hover:text-gray-300 transition-colors cursor-pointer">Cadastros</a>
     </div>
     </div>
     <div class="h-4"></div>
@@ -235,20 +236,24 @@
           </svg>
           <span class="text-sm">Carregando servi&ccedil;os&hellip;</span>
         </div>
-        <div id="tableWrap" class="hidden overflow-x-auto">
-          <table class="w-full text-sm">
-            <thead>
-              <tr class="border-b border-gray-100 bg-gray-50 text-[0.72rem] font-semibold text-gray-500 uppercase tracking-wider">
-                <th class="px-5 py-3 text-left">Nome Profissional</th>
-                <th class="px-5 py-3 text-left">Especialidade</th>
-                <th class="px-5 py-3 text-left">Valor 1&ordm; Consulta</th>
-                <th class="px-5 py-3 text-left">Tipo de Pagamento</th>
-                <th id="colEmp" class="px-5 py-3 text-left hidden">Empresa</th>
-                <th class="px-5 py-3 text-right">A&ccedil;&otilde;es</th>
-              </tr>
-            </thead>
-            <tbody id="servBody"></tbody>
-          </table>
+        <div id="tableWrap" class="hidden">
+          <div class="hidden sm:block overflow-x-auto">
+            <table class="w-full text-sm">
+              <thead>
+                <tr class="border-b border-gray-100 bg-gray-50 text-[0.72rem] font-semibold text-gray-500 uppercase tracking-wider">
+                  <th class="px-5 py-3 text-left">Nome Profissional</th>
+                  <th class="px-5 py-3 text-left">Especialidade</th>
+                  <th class="px-5 py-3 text-left">Valor 1&ordm; Consulta</th>
+                  <th class="px-5 py-3 text-left">Tipo de Pagamento</th>
+                  <th id="colEmp" class="px-5 py-3 text-left hidden">Empresa</th>
+                  <th class="px-5 py-3 text-right">A&ccedil;&otilde;es</th>
+                </tr>
+              </thead>
+              <tbody id="servBody"></tbody>
+            </table>
+          </div>
+          <div id="mobileList" class="sm:hidden divide-y divide-gray-100"></div>
+          <div id="pagination" class="flex items-center gap-1.5 justify-end px-5 py-3.5 border-t border-gray-100"></div>
         </div>
         <div id="tableEmpty" class="hidden py-16 text-center">
           <svg xmlns="http://www.w3.org/2000/svg" class="w-10 h-10 text-gray-300 mx-auto mb-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="1"/><line x1="9" y1="12" x2="15" y2="12"/><line x1="9" y1="16" x2="12" y2="16"/></svg>
@@ -270,7 +275,7 @@
           <div class="flex items-center gap-3 mb-5">
             <div id="dtAvatar" class="w-12 h-12 rounded-full bg-vitta-500 flex items-center justify-center text-white text-lg font-bold shrink-0">A</div>
             <div>
-              <p id="dtNome" class="font-bold text-gray-800 text-[0.92rem] leading-snug"></p>
+              <p id="dtNome" class="font-bold text-gray-800 text-[0.9rem] leading-snug"></p>
               <p id="dtEspec" class="text-[0.75rem] text-vitta-600 font-medium"></p>
             </div>
           </div>
@@ -418,16 +423,14 @@
   </div>
 </div>
 
-<!-- TOAST -->
-<div id="toast" class="hidden">
-  <div id="toastInner" class="flex items-center gap-3 px-4 py-3 rounded-xl shadow-lg text-sm font-medium text-white min-w-[240px]"></div>
-</div>
 
 <script>
 let allServicos = [], filtered = [], editId = null, deleteTargetId = null;
 let allProfis = [], allEspec = [], allTipPag = [], allTipAcom = [], empresas = [];
 let currentUserMeta = null, currentEmpId = null, isGlobal = false;
 let selectedServId = null;
+const PAGE_SIZE = 10;
+let currentPage = 1;
 
 function toggleMenu(k) {
   const s=document.getElementById('sub-'+k), c=document.getElementById('chev-'+k);
@@ -441,11 +444,6 @@ function toggleSidebar() {
 }
 async function handleLogout() { await supabase.auth.signOut(); window.location.href='../index.html'; }
 
-function showToast(msg, ok=true) {
-  const t=document.getElementById('toast'), i=document.getElementById('toastInner');
-  i.textContent=msg; i.className=`flex items-center gap-3 px-4 py-3 rounded-xl shadow-lg text-sm font-medium text-white min-w-[240px] ${ok?'bg-emerald-500':'bg-red-500'}`;
-  t.classList.remove('hidden'); setTimeout(()=>t.classList.add('hidden'),3500);
-}
 
 function fmtBRL(v) {
   if (v==null || v==='' || isNaN(v)) return '—';
@@ -590,7 +588,7 @@ async function loadServicos() {
     .order('DTCRI_SERV',{ascending:false});
   if (currentEmpId) q = q.eq('ID_EMP', currentEmpId);
   const { data, error } = await q;
-  if (error) { showToast('Erro ao carregar serviços', false); return; }
+  if (error) { showToast('Erro ao carregar serviços', 'error'); return; }
   allServicos = data || [];
   document.getElementById('tableLoader').classList.add('hidden');
   document.getElementById('tableWrap').classList.remove('hidden');
@@ -607,6 +605,7 @@ function applyFilters() {
     if (q && !s.PROFISSIONAL?.NOME_PROF?.toLowerCase().includes(q)) return false;
     return true;
   });
+  currentPage = 1;
   renderTable();
 }
 
@@ -623,11 +622,14 @@ function renderTable() {
   if (!filtered.length) {
     document.getElementById('tableWrap').classList.add('hidden');
     document.getElementById('tableEmpty').classList.remove('hidden');
+    document.getElementById('pagination').innerHTML = '';
     return;
   }
   document.getElementById('tableWrap').classList.remove('hidden');
   document.getElementById('tableEmpty').classList.add('hidden');
-  tbody.innerHTML = filtered.map(s => {
+  const start = (currentPage - 1) * PAGE_SIZE;
+  const slice = filtered.slice(start, start + PAGE_SIZE);
+  tbody.innerHTML = slice.map(s => {
     const prof = s.PROFISSIONAL;
     const espec = prof?.ESPECIALIDADE?.NOME_ESPEC || prof?.ESPECIAL_PROF || '&mdash;';
     const isSelected = s.ID_SERV === selectedServId;
@@ -652,6 +654,64 @@ function renderTable() {
       </td>
     </tr>`;
   }).join('');
+  document.getElementById('mobileList').innerHTML = slice.map(renderMobileCard).join('');
+  renderPagination();
+}
+
+function renderMobileCard(s) {
+  const prof = s.PROFISSIONAL;
+  const espec = prof?.ESPECIALIDADE?.NOME_ESPEC || prof?.ESPECIAL_PROF || '&mdash;';
+  const isSelected = s.ID_SERV === selectedServId;
+  return `
+  <div class="px-4 py-3.5 ${isSelected?'bg-vitta-50':''}" onclick="openDetailPanel('${s.ID_SERV}')">
+    <div class="flex items-start justify-between gap-3">
+      <div class="min-w-0 flex-1">
+        <p class="text-sm font-semibold text-gray-800 truncate">${prof?.NOME_PROF || '&mdash;'}</p>
+        <p class="text-xs text-gray-500 mt-0.5">${espec}</p>
+        <div class="flex items-center gap-1.5 mt-1.5 flex-wrap">
+          <span class="text-xs font-semibold text-gray-700">${fmtBRL(s.VALOR_1CONS)}</span>
+          <span class="text-xs text-gray-400">&middot;</span>
+          <span class="text-xs text-gray-500">${s.TIPPAG?.NOME_TIPPAG||'&mdash;'}</span>
+        </div>
+      </div>
+      <div class="flex items-center gap-1 shrink-0" onclick="event.stopPropagation()">
+        <button onclick="openDetailPanel('${s.ID_SERV}')" title="Ver detalhes" class="p-1.5 rounded-lg text-gray-400 hover:text-vitta-600 hover:bg-vitta-50 transition-colors">
+          <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
+        </button>
+        <button onclick="openEditModal('${s.ID_SERV}')" title="Editar" class="p-1.5 rounded-lg text-gray-400 hover:text-vitta-600 hover:bg-vitta-50 transition-colors">
+          <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+        </button>
+        <button onclick="openDeleteModal('${s.ID_SERV}','${(prof?.NOME_PROF||'').replace(/'/g,"\\'")}' )" title="Excluir" class="p-1.5 rounded-lg text-gray-400 hover:text-red-500 hover:bg-red-50 transition-colors">
+          <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>
+        </button>
+      </div>
+    </div>
+  </div>`;
+}
+
+function renderPagination() {
+  const total = Math.ceil(filtered.length / PAGE_SIZE);
+  const pg = document.getElementById('pagination');
+  if (!pg) return;
+  if (total <= 1) { pg.innerHTML = ''; return; }
+  const btnBase = 'min-w-[32px] h-8 rounded-lg border border-gray-200 text-xs font-semibold flex items-center justify-center px-2 transition-colors';
+  let html = `<button class="${btnBase} hover:bg-gray-50 text-gray-500" onclick="goPage(${currentPage - 1})" ${currentPage === 1 ? 'disabled' : ''}>&lsaquo;</button>`;
+  for (let i = 1; i <= total; i++) {
+    if (total > 7 && i > 3 && i < total - 1 && Math.abs(i - currentPage) > 1) {
+      if (i === 4 || i === total - 2) html += `<button class="${btnBase} text-gray-400 cursor-default" disabled>&hellip;</button>`;
+      continue;
+    }
+    html += `<button class="${btnBase} ${i === currentPage ? 'bg-vitta-500 text-white border-vitta-500' : 'hover:bg-gray-50 text-gray-600'}" onclick="goPage(${i})">${i}</button>`;
+  }
+  html += `<button class="${btnBase} hover:bg-gray-50 text-gray-500" onclick="goPage(${currentPage + 1})" ${currentPage === total ? 'disabled' : ''}>&rsaquo;</button>`;
+  pg.innerHTML = html;
+}
+
+function goPage(n) {
+  const total = Math.ceil(filtered.length / PAGE_SIZE);
+  if (n < 1 || n > total) return;
+  currentPage = n;
+  renderTable();
 }
 
 function openDetailPanel(id) {
@@ -751,10 +811,10 @@ async function saveServico(ev) {
   btn.disabled=true; btn.textContent='Salvando…';
 
   const profId = document.getElementById('fProf').value;
-  if (!profId) { showToast('Selecione o profissional', false); btn.disabled=false; btn.textContent='Salvar'; return; }
+  if (!profId) { showToast('Selecione o profissional', 'error'); btn.disabled=false; btn.textContent='Salvar'; return; }
 
   const empId = currentEmpId;
-  if (!empId) { showToast('Selecione a empresa', false); btn.disabled=false; btn.textContent='Salvar'; return; }
+  if (!empId) { showToast('Selecione a empresa', 'error'); btn.disabled=false; btn.textContent='Salvar'; return; }
   const payload = {
     ID_EMP:    empId,
     ID_PROF:   profId,
@@ -779,7 +839,7 @@ async function saveServico(ev) {
     closeDetailPanel();
     await loadServicos();
   } catch(err) {
-    showToast(err.message || 'Erro ao salvar', false);
+    showToast(err.message || 'Erro ao salvar', 'error');
   }
   btn.disabled=false; btn.textContent='Salvar';
 }
@@ -793,7 +853,7 @@ function closeDeleteModal() { document.getElementById('modalDelete').classList.r
 
 async function confirmDelete() {
   const { error } = await supabase.from('SERVICO').delete().eq('ID_SERV', deleteTargetId);
-  if (error) { showToast(error.message, false); return; }
+  if (error) { showToast(error.message, 'error'); return; }
   showToast('Serviço excluído!');
   closeDeleteModal();
   if (selectedServId === deleteTargetId) closeDetailPanel();

@@ -21,6 +21,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
   <script src="../assets/js/config.js?v=2"></script>
+  <script src="../assets/js/toast.js?v=1"></script>
   <script src="../assets/js/access-guard.js?v=2"></script>
   <script src="../assets/js/admin-empresa-context.js?v=1"></script>
   <script src="../assets/js/notifications.js?v=3"></script>
@@ -37,7 +38,6 @@
     .modal-overlay.open { display:flex; }
     .modal-scroll::-webkit-scrollbar { width:4px; }
     .modal-scroll::-webkit-scrollbar-thumb { background:#e5e7eb; border-radius:4px; }
-    #toast { position:fixed; bottom:24px; right:24px; z-index:999; transition:all .3s ease; }
     tbody tr { transition:background .15s; }
     tbody tr:hover { background:#f9fafb; }
   </style>
@@ -137,6 +137,7 @@
       <a href="planos.html" class="flex items-center gap-2 pl-10 pr-3 py-2 mx-2 rounded-xl text-[0.8rem] text-gray-500 hover:bg-white/5 hover:text-gray-300 transition-colors cursor-pointer">Planos</a>
       <a href="configuracoes.html" class="flex items-center gap-2 pl-10 pr-3 py-2 mx-2 rounded-xl text-[0.8rem] text-gray-500 hover:bg-white/5 hover:text-gray-300 transition-colors cursor-pointer">Configura&ccedil;&otilde;es</a>
       <a href="logs.html" class="flex items-center gap-2 pl-10 pr-3 py-2 mx-2 rounded-xl text-[0.8rem] text-gray-500 hover:bg-white/5 hover:text-gray-300 transition-colors cursor-pointer">Log</a>
+      <a href="cadastros_admin.html" class="flex items-center gap-2 pl-10 pr-3 py-2 mx-2 rounded-xl text-[0.8rem] text-gray-500 hover:bg-white/5 hover:text-gray-300 transition-colors cursor-pointer">Cadastros</a>
     </div>
     </div>
     <div class="h-4"></div>
@@ -246,19 +247,23 @@
         </svg>
         <span class="text-sm">Carregando tipos de acompanhamento&hellip;</span>
       </div>
-      <div id="tableWrap" class="hidden overflow-x-auto">
-        <table class="w-full text-sm">
-          <thead>
-            <tr class="border-b border-gray-100 bg-gray-50 text-[0.72rem] font-semibold text-gray-500 uppercase tracking-wider">
-              <th class="px-5 py-3 text-left">Nome</th>
-              <th class="px-5 py-3 text-left">Descri&ccedil;&atilde;o</th>
-              <th id="colEmp" class="px-5 py-3 text-left hidden">Empresa</th>
-              <th class="px-5 py-3 text-left">Status</th>
-              <th class="px-5 py-3 text-right">A&ccedil;&otilde;es</th>
-            </tr>
-          </thead>
-          <tbody id="tipAcomBody"></tbody>
-        </table>
+      <div id="tableWrap" class="hidden">
+        <div class="hidden sm:block overflow-x-auto">
+          <table class="w-full text-sm">
+            <thead>
+              <tr class="border-b border-gray-100 bg-gray-50 text-[0.72rem] font-semibold text-gray-500 uppercase tracking-wider">
+                <th class="px-5 py-3 text-left">Nome</th>
+                <th class="px-5 py-3 text-left">Descri&ccedil;&atilde;o</th>
+                <th id="colEmp" class="px-5 py-3 text-left hidden">Empresa</th>
+                <th class="px-5 py-3 text-left">Status</th>
+                <th class="px-5 py-3 text-right">A&ccedil;&otilde;es</th>
+              </tr>
+            </thead>
+            <tbody id="tipAcomBody"></tbody>
+          </table>
+        </div>
+        <div id="mobileList" class="sm:hidden divide-y divide-gray-100"></div>
+        <div id="pagination" class="flex items-center gap-1.5 justify-end px-5 py-3.5 border-t border-gray-100"></div>
       </div>
       <div id="tableEmpty" class="hidden py-16 text-center">
         <svg xmlns="http://www.w3.org/2000/svg" class="w-10 h-10 text-gray-300 mx-auto mb-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="1"/></svg>
@@ -324,14 +329,12 @@
   </div>
 </div>
 
-<!-- TOAST -->
-<div id="toast" class="hidden">
-  <div id="toastInner" class="flex items-center gap-3 px-4 py-3 rounded-xl shadow-lg text-sm font-medium text-white min-w-[240px]"></div>
-</div>
 
 <script>
 let allTipAcom = [], filtered = [], editId = null, toggleTargetId = null, toggleTargetAtivo = false;
 let currentUserMeta = null, empresas = [];
+const PAGE_SIZE = 10;
+let currentPage = 1;
 
 function toggleMenu(k) {
   const s=document.getElementById('sub-'+k),c=document.getElementById('chev-'+k);
@@ -345,11 +348,6 @@ function toggleSidebar() {
 }
 async function handleLogout() { await supabase.auth.signOut(); window.location.href='../index.html'; }
 
-function showToast(msg, ok=true) {
-  const t=document.getElementById('toast'), i=document.getElementById('toastInner');
-  i.textContent=msg; i.className=`flex items-center gap-3 px-4 py-3 rounded-xl shadow-lg text-sm font-medium text-white min-w-[240px] ${ok?'bg-emerald-500':'bg-red-500'}`;
-  t.classList.remove('hidden'); setTimeout(()=>t.classList.add('hidden'),3500);
-}
 
 async function initAuth() {
   document.getElementById('header-date').textContent = 'Tipos de acompanhamento — ' + new Date().toLocaleDateString('pt-BR',{weekday:'long',year:'numeric',month:'long',day:'numeric'});
@@ -400,7 +398,7 @@ async function loadTiposAcomp() {
   const empIdFiltro = AdminEmpresaCtx.resolveIdEmp(currentUserMeta?.tipo_usu, currentUserMeta?.ID_EMP || currentUserMeta?.id_emp);
   if (empIdFiltro) q = q.eq('ID_EMP', empIdFiltro);
   const { data, error } = await q;
-  if (error) { showToast('Erro ao carregar tipos de acompanhamento', false); return; }
+  if (error) { showToast('Erro ao carregar tipos de acompanhamento', 'error'); return; }
   allTipAcom = data || [];
   document.getElementById('statTotal').textContent  = allTipAcom.length;
   document.getElementById('statAtivos').textContent = allTipAcom.filter(t => t.ATIVO_TIPACOM).length;
@@ -420,6 +418,7 @@ function applyFilters() {
     if (q && !t.NOME_TIPACOM?.toLowerCase().includes(q) && !t.DESCR_TIPACOM?.toLowerCase().includes(q)) return false;
     return true;
   });
+  currentPage = 1;
   renderTable();
 }
 
@@ -436,11 +435,15 @@ function renderTable() {
   if (!filtered.length) {
     document.getElementById('tableWrap').classList.add('hidden');
     document.getElementById('tableEmpty').classList.remove('hidden');
+    document.getElementById('mobileList').innerHTML = '';
+    document.getElementById('pagination').innerHTML = '';
     return;
   }
   document.getElementById('tableWrap').classList.remove('hidden');
   document.getElementById('tableEmpty').classList.add('hidden');
-  tbody.innerHTML = filtered.map(t => `
+  const start = (currentPage - 1) * PAGE_SIZE;
+  const slice = filtered.slice(start, start + PAGE_SIZE);
+  tbody.innerHTML = slice.map(t => `
     <tr class="border-b border-gray-50 fade-up">
       <td class="px-5 py-3.5">
         <span class="font-semibold text-gray-800 ${!t.ATIVO_TIPACOM?'opacity-50':''}">${t.NOME_TIPACOM}</span>
@@ -462,6 +465,58 @@ function renderTable() {
         </div>
       </td>
     </tr>`).join('');
+  document.getElementById('mobileList').innerHTML = slice.map(renderMobileCard).join('');
+  renderPagination();
+}
+
+function renderMobileCard(t) {
+  return `
+    <div class="px-4 py-3.5">
+      <div class="flex items-start justify-between gap-3">
+        <div class="min-w-0 flex-1">
+          <p class="text-sm font-semibold text-gray-800 ${!t.ATIVO_TIPACOM?'opacity-50':''} truncate">${t.NOME_TIPACOM}</p>
+          <p class="text-xs text-gray-500 mt-0.5 truncate">${t.DESCR_TIPACOM||'&mdash;'}</p>
+          <div class="mt-2">
+            ${t.ATIVO_TIPACOM
+              ? '<span class="inline-flex items-center gap-1 text-[0.72rem] font-bold bg-emerald-50 text-emerald-700 px-2.5 py-1 rounded-full"><span class="w-1.5 h-1.5 bg-emerald-500 rounded-full"></span>Ativo</span>'
+              : '<span class="inline-flex items-center gap-1 text-[0.72rem] font-bold bg-red-50 text-red-600 px-2.5 py-1 rounded-full"><span class="w-1.5 h-1.5 bg-red-400 rounded-full"></span>Inativo</span>'}
+          </div>
+        </div>
+        <div class="flex items-center gap-1 shrink-0">
+          <button onclick="openEditModal('${t.ID_TIPACOM}')" title="Editar" class="p-1.5 rounded-lg text-gray-400 hover:text-vitta-600 hover:bg-vitta-50 transition-colors">
+            <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+          </button>
+          <button onclick="openToggleModal('${t.ID_TIPACOM}','${t.NOME_TIPACOM.replace(/'/g,"\\'")}',${t.ATIVO_TIPACOM})" title="${t.ATIVO_TIPACOM?'Desativar':'Ativar'}" class="p-1.5 rounded-lg text-gray-400 hover:text-red-500 hover:bg-red-50 transition-colors">
+            <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="4.93" y1="4.93" x2="19.07" y2="19.07"/></svg>
+          </button>
+        </div>
+      </div>
+    </div>`;
+}
+
+function renderPagination() {
+  const total = Math.ceil(filtered.length / PAGE_SIZE);
+  const pg = document.getElementById('pagination');
+  if (!pg) return;
+  if (total <= 1) { pg.innerHTML = ''; return; }
+  const btnBase = 'min-w-[32px] h-8 rounded-lg border border-gray-200 text-xs font-semibold flex items-center justify-center px-2 transition-colors';
+  let html = `<button class="${btnBase} hover:bg-gray-50 text-gray-500" onclick="goPage(${currentPage - 1})" ${currentPage === 1 ? 'disabled' : ''}>‹</button>`;
+  for (let i = 1; i <= total; i++) {
+    if (total > 7 && i > 3 && i < total - 1 && Math.abs(i - currentPage) > 1) {
+      if (i === 4 || i === total - 2) html += `<button class="${btnBase} text-gray-400 cursor-default" disabled>…</button>`;
+      continue;
+    }
+    html += `<button class="${btnBase} ${i === currentPage ? 'bg-vitta-500 text-white border-vitta-500' : 'hover:bg-gray-50 text-gray-600'}" onclick="goPage(${i})">${i}</button>`;
+  }
+  html += `<button class="${btnBase} hover:bg-gray-50 text-gray-500" onclick="goPage(${currentPage + 1})" ${currentPage === total ? 'disabled' : ''}>›</button>`;
+  pg.innerHTML = html;
+}
+
+function goPage(n) {
+  const total = Math.ceil(filtered.length / PAGE_SIZE);
+  if (n < 1 || n > total) return;
+  currentPage = n;
+  renderTable();
 }
 
 function openFormModal() {
@@ -498,7 +553,7 @@ async function saveTipAcom(ev) {
   const nome  = document.getElementById('fNome').value.trim();
   const descr = document.getElementById('fDescr').value.trim();
   const empId = AdminEmpresaCtx.resolveIdEmp(currentUserMeta?.tipo_usu, currentUserMeta?.ID_EMP || currentUserMeta?.id_emp);
-  if (!empId) { showToast('Selecione a empresa', false); btn.disabled=false; btn.textContent='Salvar'; return; }
+  if (!empId) { showToast('Selecione a empresa', 'error'); btn.disabled=false; btn.textContent='Salvar'; return; }
   try {
     if (!editId) {
       const { error } = await supabase.from('TIPACOM').insert({ ID_EMP:empId, NOME_TIPACOM:nome, DESCR_TIPACOM:descr||null });
@@ -513,7 +568,7 @@ async function saveTipAcom(ev) {
     closeFormModal();
     await loadTiposAcomp();
   } catch(err) {
-    showToast(err.message || 'Erro ao salvar', false);
+    showToast(err.message || 'Erro ao salvar', 'error');
   }
   btn.disabled=false; btn.textContent='Salvar';
 }
@@ -530,7 +585,7 @@ function closeToggleModal() { document.getElementById('modalToggle').classList.r
 
 async function confirmToggle() {
   const { error } = await supabase.from('TIPACOM').update({ ATIVO_TIPACOM:!toggleTargetAtivo }).eq('ID_TIPACOM', toggleTargetId);
-  if (error) { showToast(error.message, false); return; }
+  if (error) { showToast(error.message, 'error'); return; }
   showToast(toggleTargetAtivo ? 'Tipo desativado!' : 'Tipo ativado!');
   closeToggleModal();
   await loadTiposAcomp();

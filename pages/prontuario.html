@@ -22,6 +22,7 @@
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
   <script src="../assets/js/config.js?v=2"></script>
+  <script src="../assets/js/toast.js?v=1"></script>
   <script src="../assets/js/admin-empresa-context.js?v=1"></script>
   <script src="../assets/js/access-guard.js?v=2"></script>
   <script src="../assets/js/ai-utils.js?v=1"></script>
@@ -35,7 +36,6 @@
     .chevron.open{transform:rotate(180deg)}
     .modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:300;align-items:flex-start;justify-content:center;padding:24px 16px;overflow-y:auto}
     .modal-overlay.open{display:flex}
-    #toast{position:fixed;bottom:24px;right:24px;z-index:999;transition:all .3s ease}
     .tab-btn{border-bottom:2px solid transparent;transition:all .15s}
     .tab-btn.active{color:#2ABCD4;border-bottom-color:#2ABCD4}
     @keyframes fadeUp{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
@@ -148,6 +148,7 @@
       <a href="planos.html" class="flex items-center gap-2 pl-10 pr-3 py-2 mx-2 rounded-xl text-[0.8rem] text-gray-500 hover:bg-white/5 hover:text-gray-300 transition-colors cursor-pointer">Planos</a>
       <a href="configuracoes.html" class="flex items-center gap-2 pl-10 pr-3 py-2 mx-2 rounded-xl text-[0.8rem] text-gray-500 hover:bg-white/5 hover:text-gray-300 transition-colors cursor-pointer">Configura&ccedil;&otilde;es</a>
       <a href="logs.html" class="flex items-center gap-2 pl-10 pr-3 py-2 mx-2 rounded-xl text-[0.8rem] text-gray-500 hover:bg-white/5 hover:text-gray-300 transition-colors cursor-pointer">Log</a>
+      <a href="cadastros_admin.html" class="flex items-center gap-2 pl-10 pr-3 py-2 mx-2 rounded-xl text-[0.8rem] text-gray-500 hover:bg-white/5 hover:text-gray-300 transition-colors cursor-pointer">Cadastros</a>
     </div>
     </div>
     <div class="h-4"></div>
@@ -223,7 +224,7 @@
           <div id="pac-av" class="w-16 h-16 rounded-2xl bg-vitta-500 flex items-center justify-center text-white text-xl font-bold shrink-0">A</div>
           <div class="flex-1 min-w-0">
             <div class="flex items-center gap-2 flex-wrap mb-1">
-              <h2 id="pac-nome" class="text-[1.15rem] font-extrabold text-gray-800">—</h2>
+              <h2 id="pac-nome" class="text-[1rem] font-extrabold text-gray-800">—</h2>
               <span id="pac-menor" class="hidden text-[0.65rem] font-bold bg-purple-100 text-purple-700 px-2 py-0.5 rounded-full">Menor de idade</span>
             </div>
             <p id="pac-meta" class="text-[0.82rem] text-gray-500 mb-0.5">—</p>
@@ -236,16 +237,16 @@
             </button>
             <div class="grid grid-cols-3 gap-2 text-center">
               <div class="bg-gray-50 rounded-xl px-3 py-2">
-                <p class="text-[1.15rem] font-extrabold text-gray-800 leading-none" id="stat-total">—</p>
-                <p class="text-[0.62rem] text-gray-400 mt-0.5">consultas</p>
+                <p class="text-[1rem] font-extrabold text-gray-800 leading-none" id="stat-total">—</p>
+                <p class="text-[0.6rem] text-gray-400 mt-0.5">consultas</p>
               </div>
               <div class="bg-gray-50 rounded-xl px-3 py-2">
                 <p class="text-[0.75rem] font-bold text-gray-700 leading-none" id="stat-primeira">—</p>
-                <p class="text-[0.62rem] text-gray-400 mt-0.5">1ª consulta</p>
+                <p class="text-[0.6rem] text-gray-400 mt-0.5">1ª consulta</p>
               </div>
               <div class="bg-gray-50 rounded-xl px-3 py-2">
                 <p class="text-[0.75rem] font-bold text-gray-700 leading-none" id="stat-ultima">—</p>
-                <p class="text-[0.62rem] text-gray-400 mt-0.5">última</p>
+                <p class="text-[0.6rem] text-gray-400 mt-0.5">última</p>
               </div>
             </div>
           </div>
@@ -524,7 +525,7 @@
           <div class="min-w-0">
             <div class="flex items-center gap-2 flex-wrap">
               <h3 id="m-nome" class="text-[1rem] font-bold text-gray-800"></h3>
-              <span id="m-menor" class="hidden text-[0.62rem] font-bold bg-purple-100 text-purple-700 px-2 py-0.5 rounded-full">Menor</span>
+              <span id="m-menor" class="hidden text-[0.6rem] font-bold bg-purple-100 text-purple-700 px-2 py-0.5 rounded-full">Menor</span>
               <span id="m-badge" class="inline-flex px-2 py-0.5 rounded-full text-[0.65rem] font-bold text-white"></span>
             </div>
             <div class="flex flex-wrap gap-x-3 gap-y-0 mt-0.5">
@@ -775,10 +776,6 @@
   </div>
 </div>
 
-<!-- TOAST -->
-<div id="toast" class="hidden">
-  <div id="toastInner" class="flex items-center gap-3 px-4 py-3 rounded-xl shadow-lg text-sm font-medium text-white min-w-[240px]"></div>
-</div>
 
 <script>
 const AV_COLORS = ['bg-blue-500','bg-emerald-500','bg-violet-500','bg-amber-500','bg-rose-500','bg-cyan-500','bg-indigo-500','bg-pink-500'];
@@ -807,7 +804,6 @@ const STATUS_LABELS = {
 function toggleMenu(k){const s=document.getElementById('sub-'+k),c=document.getElementById('chev-'+k);const o=s.classList.contains('open');s.classList.toggle('open',!o);if(c)c.classList.toggle('open',!o);}
 function toggleSidebar(){const sb=document.getElementById('sidebar'),ov=document.getElementById('overlay');const o=sb.classList.contains('-translate-x-full');sb.classList.toggle('-translate-x-full',!o);ov.classList.toggle('hidden',!o);}
 async function handleLogout(){await supabase.auth.signOut();window.location.href='../index.html';}
-function showToast(msg,ok=true){const t=document.getElementById('toast'),i=document.getElementById('toastInner');i.textContent=msg;i.className=`flex items-center gap-3 px-4 py-3 rounded-xl shadow-lg text-sm font-medium text-white min-w-[240px] ${ok?'bg-emerald-500':'bg-red-500'}`;t.classList.remove('hidden');setTimeout(()=>t.classList.add('hidden'),3500);}
 function avColor(n){let h=0;for(const c of(n||''))h=(h<<5)-h+c.charCodeAt(0);return AV_COLORS[Math.abs(h)%AV_COLORS.length];}
 function initials(n){return(n||'').split(' ').filter(Boolean).slice(0,2).map(w=>w[0]).join('').toUpperCase();}
 function calcAge(d){if(!d)return null;const dt=new Date(d),now=new Date();let a=now.getFullYear()-dt.getFullYear();if(now<new Date(now.getFullYear(),dt.getMonth(),dt.getDate()))a--;return a;}
@@ -1094,7 +1090,7 @@ function novoAtendCardHTML(a,selected){
       <div class="w-9 h-9 rounded-xl ${col} flex items-center justify-center text-white text-xs font-bold shrink-0">${initials(pac.NOME_PAC)}</div>
       <div class="flex-1 min-w-0">
         <p class="text-[0.83rem] font-semibold text-gray-800 truncate">${pac.NOME_PAC||'—'}</p>
-        <p class="text-[0.71rem] text-gray-400 mt-0.5">${fmtTime(a.DT_AGD)} ${tipo}</p>
+        <p class="text-[0.7rem] text-gray-400 mt-0.5">${fmtTime(a.DT_AGD)} ${tipo}</p>
       </div>
     </div>
   </div>`;
@@ -1121,11 +1117,11 @@ function iniciarAtendimentoSelecionado(){
 
 /* ── modal atendimento: abrir a partir de uma consulta do histórico ── */
 async function openConsultaModal(idAgd){
-  if(!idAgd){ showToast('Agendamento não encontrado para esta consulta',false); return; }
+  if(!idAgd){ showToast('Agendamento não encontrado para esta consulta', 'error'); return; }
   const {data:agd,error}=await supabase.from('AGENDAMENTO')
     .select('ID_AGD,DT_AGD,DT_FIM_AGD,STATUS_AGD,TIPO_AGD,PAC_AGD,PROF_AGD,SALA_AGD,ID_EMP,PROFISSIONAL!PROF_AGD(NOME_PROF,CONSELHO_PROF,REGISTRO_PROF,ASSINATURA_PROF),SALA!SALA_AGD(NOME_SALA)')
     .eq('ID_AGD',idAgd).single();
-  if(error||!agd){ showToast('Não foi possível carregar os dados do agendamento',false); return; }
+  if(error||!agd){ showToast('Não foi possível carregar os dados do agendamento', 'error'); return; }
   agd.PACIENTE=currentPaciente;
   await openAtendimentoForAgd(agd);
 }
@@ -1321,7 +1317,7 @@ function renderAiCompact(count){
       </div>
       <div class="flex-1 min-w-0">
         <p class="text-[0.82rem] font-semibold text-gray-800">An&aacute;lise gerada com sucesso</p>
-        <p class="text-[0.67rem] text-gray-400">${count} consulta${count!==1?'s':''} analisada${count!==1?'s':''} &middot; Clique para ver o resumo completo</p>
+        <p class="text-[0.68rem] text-gray-400">${count} consulta${count!==1?'s':''} analisada${count!==1?'s':''} &middot; Clique para ver o resumo completo</p>
       </div>
       <button onclick="openAiModal()" class="shrink-0 flex items-center gap-1.5 px-3.5 py-2 bg-violet-500 text-white rounded-lg text-[0.75rem] font-semibold hover:bg-violet-600 transition-colors shadow-sm">
         Ver an&aacute;lise
@@ -1426,7 +1422,7 @@ async function salvarAtendimento(rascunho){
     }
     if(!rascunho){
       const {data:servData}=await supabase.from('SERVICO').select('VALOR_1CONS').eq('ID_PROF',modalAgd.PROF_AGD).eq('ATIVO_SERV',true).maybeSingle();
-      if(!servData?.VALOR_1CONS) showToast('Aviso: profissional sem valor de serviço definido. Verifique o financeiro.',false);
+      if(!servData?.VALOR_1CONS) showToast('Aviso: profissional sem valor de serviço definido. Verifique o financeiro.', 'error');
       await supabase.from('AGENDAMENTO').update({STATUS_AGD:'REALIZADA'}).eq('ID_AGD',modalAgd.ID_AGD);
       modalAgd.STATUS_AGD='REALIZADA';
       const badge=document.getElementById('m-badge');
@@ -1439,7 +1435,7 @@ async function salvarAtendimento(rascunho){
       showToast('Rascunho salvo!');
     }
   } catch(err){
-    showToast(err.message||'Erro ao salvar',false);
+    showToast(err.message||'Erro ao salvar', 'error');
   }
   btnR.disabled=false;btnF.disabled=false;
   btnR.textContent='Salvar Rascunho';btnF.textContent=document.getElementById('m-fConsId').value?'Salvar Alterações':'Finalizar Consulta';
@@ -1492,8 +1488,8 @@ function renderHistorico(){
       <div class="flex items-center gap-3">
         <div class="w-10 h-10 rounded-xl ${col} flex items-center justify-center text-white text-sm font-bold shrink-0">${initials(prof)}</div>
         <div class="flex-1 min-w-0">
-          <p class="text-[0.88rem] font-semibold text-gray-800 truncate">${fmtDateTime(c.DT_CONS)} <span class="text-gray-400 font-normal">&middot; ${prof}</span></p>
-          <p class="text-[0.73rem] text-gray-400 mt-0.5 truncate">${tipo}${c.QUEIXA?` &middot; ${escHtml(c.QUEIXA)}`:''}</p>
+          <p class="text-[0.9rem] font-semibold text-gray-800 truncate">${fmtDateTime(c.DT_CONS)} <span class="text-gray-400 font-normal">&middot; ${prof}</span></p>
+          <p class="text-[0.72rem] text-gray-400 mt-0.5 truncate">${tipo}${c.QUEIXA?` &middot; ${escHtml(c.QUEIXA)}`:''}</p>
         </div>
         <div class="flex items-center gap-1.5 shrink-0 flex-wrap justify-end" onclick="event.stopPropagation()">
           ${docsBtns}
@@ -2161,9 +2157,9 @@ function baixarPdfPreview(){
 }
 
 function enviarPdfPreviewPorEmail(){
-  if(!_pdfPreview.doc){ showToast('Nenhum documento para enviar.',false); return; }
+  if(!_pdfPreview.doc){ showToast('Nenhum documento para enviar.', 'error'); return; }
   const meta=_pdfPreview.meta||{};
-  if(!meta.idEmp){ showToast('Não foi possível identificar a empresa deste documento.',false); return; }
+  if(!meta.idEmp){ showToast('Não foi possível identificar a empresa deste documento.', 'error'); return; }
   document.getElementById('enviarEmailDocTitulo').textContent=_pdfPreview.titulo||'Documento';
   const input=document.getElementById('inputEnviarEmailDestino');
   input.value=meta.pacEmail||'';
@@ -2179,8 +2175,8 @@ function fecharModalEnviarEmail(){
 
 async function confirmarEnvioPdfEmail(){
   const email=document.getElementById('inputEnviarEmailDestino').value.trim();
-  if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){ showToast('Email inválido.',false); return; }
-  if(!_pdfPreview.doc){ showToast('Nenhum documento para enviar.',false); return; }
+  if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){ showToast('Email inválido.', 'error'); return; }
+  if(!_pdfPreview.doc){ showToast('Nenhum documento para enviar.', 'error'); return; }
   const meta=_pdfPreview.meta||{};
 
   const btn=document.getElementById('btnConfirmarEnvioEmail');
@@ -2210,7 +2206,7 @@ async function confirmarEnvioPdfEmail(){
     if(e?.context && typeof e.context.json==='function'){
       try{ const body=await e.context.json(); if(body?.erro) msg=body.erro; }catch(_){}
     }
-    showToast('Erro ao enviar email: '+msg,false);
+    showToast('Erro ao enviar email: '+msg, 'error');
   }finally{
     btn.disabled=false;spin.classList.add('hidden');txt.textContent='Enviar';
   }
@@ -2260,7 +2256,7 @@ function renderSinaisVitais(){
   kpis.innerHTML=kpiItems.map(k=>`
     <div class="${k.bg} rounded-2xl p-4 flex flex-col items-center text-center">
       <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 ${k.txt} mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path d="${k.icon}"/></svg>
-      <p class="text-[1.1rem] font-extrabold ${k.txt} leading-none">${k.value}</p>
+      <p class="text-[1rem] font-extrabold ${k.txt} leading-none">${k.value}</p>
       <p class="text-[0.65rem] text-gray-500 mt-1 uppercase tracking-wide font-semibold">${k.label}</p>
     </div>`).join('');
 
@@ -2344,7 +2340,7 @@ function closeAlergiaModal(){document.getElementById('modalAlergia').classList.r
 
 async function saveAlergia(){
   const descr=document.getElementById('alergiaDescr').value.trim();
-  if(!descr){showToast('Informe a substância',false);return;}
+  if(!descr){showToast('Informe a substância', 'error');return;}
   const grav=document.getElementById('alergiaGrav').value;
   const editId=document.getElementById('alergiaId').value;
   const btn=document.getElementById('btnSaveAlergia');
@@ -2362,13 +2358,13 @@ async function saveAlergia(){
     }
     closeAlergiaModal();
     await loadAlergias();
-  }catch(err){showToast(err.message||'Erro ao salvar',false);}
+  }catch(err){showToast(err.message||'Erro ao salvar', 'error');}
   btn.disabled=false;btn.textContent='Salvar';
 }
 
 async function toggleAlergia(id,ativo){
   const{error}=await supabase.from('ALERGIA').update({ATIVO_ALERGIA:!ativo}).eq('ID_ALERGIA',id);
-  if(error){showToast(error.message,false);return;}
+  if(error){showToast(error.message, 'error');return;}
   showToast(ativo?'Alergia desativada!':'Alergia ativada!');
   await loadAlergias();
 }

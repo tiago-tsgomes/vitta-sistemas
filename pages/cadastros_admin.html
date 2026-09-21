@@ -1,0 +1,636 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>Cadastros &mdash; Vitta Sistemas</title>
+  <link rel="icon" type="image/png" href="../img/favicon.png" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: { vitta: { 50:'#f0fbfd',100:'#e0f7fa',300:'#80deea',400:'#4dd9ed',500:'#2ABCD4',600:'#1a96ac',700:'#127a8c' } },
+          fontFamily: { sans: ['Inter','system-ui','sans-serif'] }
+        }
+      }
+    }
+  </script>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+  <script src="../assets/js/config.js?v=2"></script>
+  <script src="../assets/js/toast.js?v=1"></script>
+  <script src="../assets/js/admin-empresa-context.js?v=1"></script>
+  <script src="../assets/js/access-guard.js?v=2"></script>
+  <script src="../assets/js/notifications.js?v=3"></script>
+  <style>
+    .sidebar-nav::-webkit-scrollbar { width:3px; }
+    .sidebar-nav::-webkit-scrollbar-thumb { background:rgba(255,255,255,.1); border-radius:4px; }
+    .submenu { overflow:hidden; max-height:0; opacity:0; transition:max-height .25s ease,opacity .2s ease; }
+    .submenu.open { max-height:500px; opacity:1; }
+    .chevron { transition:transform .25s ease; display:inline-block; }
+    .chevron.open { transform:rotate(180deg); }
+    @keyframes fadeUp { from{opacity:0;transform:translateY(8px)} to{opacity:1;transform:translateY(0)} }
+    .fade-up { animation:fadeUp .35s ease forwards; }
+    .modal-overlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,.5); z-index:300; align-items:flex-start; justify-content:center; padding:24px 16px; overflow-y:auto; }
+    .modal-overlay.open { display:flex; }
+    .modal-scroll::-webkit-scrollbar { width:4px; }
+    .modal-scroll::-webkit-scrollbar-thumb { background:#e5e7eb; border-radius:4px; }
+    .admin-tab { border-bottom: 2px solid transparent; }
+    .admin-tab.active { border-bottom-color: #2ABCD4; color: #127a8c; }
+  </style>
+</head>
+
+<body class="bg-[#F0F2F5] font-sans antialiased">
+<div class="flex min-h-screen">
+
+<!-- ====== SIDEBAR ====== -->
+<aside id="sidebar" class="fixed inset-y-0 left-0 w-[220px] bg-[#111827] flex flex-col z-30 -translate-x-full lg:translate-x-0 transition-transform duration-300">
+  <div class="flex flex-col items-center justify-center gap-1 py-4 px-5 border-b border-white/10 shrink-0">
+    <img src="../img/logo.png" alt="Vitta Sistemas" class="h-12 w-auto brightness-0 invert" />
+    <p class="text-[0.6rem] text-gray-500 tracking-wide">v1.2.2</p>
+  </div>
+  <nav class="flex-1 overflow-y-auto sidebar-nav py-3">
+    <p class="block text-[0.6rem] font-bold text-gray-500 uppercase tracking-widest px-4 pb-1 pt-3">Principal</p>
+    <a href="dashboard.html" class="flex items-center gap-3 px-3 py-2.5 mx-2 rounded-xl text-[0.83rem] font-medium text-gray-400 hover:bg-white/10 hover:text-white transition-colors duration-150 mb-0.5">
+      <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>Dashboard
+    </a>
+    <a href="agendamentos.html" class="flex items-center gap-3 px-3 py-2.5 mx-2 rounded-xl text-[0.83rem] font-medium text-gray-400 hover:bg-white/10 hover:text-white transition-colors duration-150 mb-0.5">
+      <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>Agendamentos
+    </a>
+    <a href="consultas.html" class="flex items-center gap-3 px-3 py-2.5 mx-2 rounded-xl text-[0.83rem] font-medium text-gray-400 hover:bg-white/10 hover:text-white transition-colors duration-150 mb-0.5">
+      <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>Consultas
+    </a>
+
+    <p class="block text-[0.6rem] font-bold text-gray-500 uppercase tracking-widest px-4 pb-1 pt-4">Cadastros</p>
+    <button onclick="toggleMenu('cadastros')" class="w-full flex items-center gap-3 px-3 py-2.5 mx-2 rounded-xl text-[0.83rem] font-medium text-gray-400 hover:bg-white/10 hover:text-white transition-colors duration-150 mb-0.5" style="width:calc(100% - 16px)">
+      <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>Cadastros
+      <svg id="chev-cadastros" class="chevron w-3.5 h-3.5 ml-auto text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+    </button>
+    <div id="sub-cadastros" class="submenu">
+      <a href="pacientes.html" class="flex items-center gap-2 pl-10 pr-3 py-2 mx-2 rounded-xl text-[0.8rem] text-gray-500 hover:bg-white/5 hover:text-gray-300 transition-colors cursor-pointer">Pacientes</a>
+      <a href="profissionais.html" class="flex items-center gap-2 pl-10 pr-3 py-2 mx-2 rounded-xl text-[0.8rem] text-gray-500 hover:bg-white/5 hover:text-gray-300 transition-colors cursor-pointer">Profissionais</a>
+      <a href="usuarios-empresa.html" class="flex items-center gap-2 pl-10 pr-3 py-2 mx-2 rounded-xl text-[0.8rem] text-gray-500 hover:bg-white/5 hover:text-gray-300 transition-colors cursor-pointer">Usu&aacute;rios</a>
+      <div class="hidden" id="menuDocumentosWrap"><a href="documentos.html" class="flex items-center gap-2 pl-10 pr-3 py-2 mx-2 rounded-xl text-[0.8rem] text-gray-500 hover:bg-white/5 hover:text-gray-300 transition-colors cursor-pointer w-full">Documentos</a></div>
+      <a href="leads.html" class="flex items-center gap-2 pl-10 pr-3 py-2 mx-2 rounded-xl text-[0.8rem] text-gray-500 hover:bg-white/5 hover:text-gray-300 transition-colors cursor-pointer">Leads</a>
+    </div>
+
+    <p class="block text-[0.6rem] font-bold text-gray-500 uppercase tracking-widest px-4 pb-1 pt-4">Outros Cadastros</p>
+    <button onclick="toggleMenu('servicos')" class="w-full flex items-center gap-3 px-3 py-2.5 mx-2 rounded-xl text-[0.83rem] font-medium text-gray-400 hover:bg-white/10 hover:text-white transition-colors duration-150 cursor-pointer mb-0.5" style="width:calc(100% - 16px)">
+      <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>Outros Cadastros
+      <svg id="chev-servicos" class="chevron w-3.5 h-3.5 ml-auto text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+    </button>
+    <div id="sub-servicos" class="submenu">
+      <a href="servicos.html" class="flex items-center gap-2 pl-10 pr-3 py-2 mx-2 rounded-xl text-[0.8rem] text-gray-500 hover:bg-white/5 hover:text-gray-300 transition-colors cursor-pointer">Servi&ccedil;os</a>
+      <a href="salas.html" class="flex items-center gap-2 pl-10 pr-3 py-2 mx-2 rounded-xl text-[0.8rem] text-gray-500 hover:bg-white/5 hover:text-gray-300 transition-colors cursor-pointer">Salas</a>
+      <a href="especialidades.html" class="flex items-center gap-2 pl-10 pr-3 py-2 mx-2 rounded-xl text-[0.8rem] text-gray-500 hover:bg-white/5 hover:text-gray-300 transition-colors cursor-pointer">Especialidades</a>
+      <a href="grupo.html" class="flex items-center gap-2 pl-10 pr-3 py-2 mx-2 rounded-xl text-[0.8rem] text-gray-500 hover:bg-white/5 hover:text-gray-300 transition-colors cursor-pointer">Grupo</a>
+      <a href="tipospagamento.html" class="flex items-center gap-2 pl-10 pr-3 py-2 mx-2 rounded-xl text-[0.8rem] text-gray-500 hover:bg-white/5 hover:text-gray-300 transition-colors cursor-pointer">Tipos de Pagamento</a>
+      <a href="tiposacompanhamento.html" class="flex items-center gap-2 pl-10 pr-3 py-2 mx-2 rounded-xl text-[0.8rem] text-gray-500 hover:bg-white/5 hover:text-gray-300 transition-colors cursor-pointer">Tipos de Acomp.</a>
+    </div>
+
+    <p class="block text-[0.6rem] font-bold text-gray-500 uppercase tracking-widest px-4 pb-1 pt-4">Financeiro</p>
+    <button onclick="toggleMenu('financeiro')" class="w-full flex items-center gap-3 px-3 py-2.5 mx-2 rounded-xl text-[0.83rem] font-medium text-gray-400 hover:bg-white/10 hover:text-white transition-colors duration-150 cursor-pointer mb-0.5" style="width:calc(100% - 16px)">
+      <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>Financeiro
+      <svg id="chev-financeiro" class="chevron w-3.5 h-3.5 ml-auto text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+    </button>
+    <div id="sub-financeiro" class="submenu">
+      <a href="financeiro.html" class="flex items-center gap-2 pl-10 pr-3 py-2 mx-2 rounded-xl text-[0.8rem] text-gray-500 hover:bg-white/5 hover:text-gray-300 transition-colors cursor-pointer">Lan&ccedil;amentos</a>
+      <a href="relatorios.html" class="flex items-center gap-2 pl-10 pr-3 py-2 mx-2 rounded-xl text-[0.8rem] text-gray-500 hover:bg-white/5 hover:text-gray-300 transition-colors cursor-pointer">Relat&oacute;rios</a>
+    </div>
+
+    <div id="sectionMinhaEmpresa" class="hidden">
+    <p class="block text-[0.6rem] font-bold text-gray-500 uppercase tracking-widest px-4 pb-1 pt-4">Minha Empresa</p>
+    <button onclick="toggleMenu('minhaempresa')" class="w-full flex items-center gap-3 px-3 py-2.5 mx-2 rounded-xl text-[0.83rem] font-medium text-gray-400 hover:bg-white/10 hover:text-white transition-colors duration-150 cursor-pointer mb-0.5" style="width:calc(100% - 16px)">
+      <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>Minha Empresa
+      <svg id="chev-minhaempresa" class="chevron w-3.5 h-3.5 ml-auto text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+    </button>
+    <div id="sub-minhaempresa" class="submenu">
+      <a href="minha-empresa.html" class="flex items-center gap-2 pl-10 pr-3 py-2 mx-2 rounded-xl text-[0.8rem] text-gray-500 hover:bg-white/5 hover:text-gray-300 transition-colors cursor-pointer">Meus Dados</a>
+      <a href="faturas.html" class="flex items-center gap-2 pl-10 pr-3 py-2 mx-2 rounded-xl text-[0.8rem] text-gray-500 hover:bg-white/5 hover:text-gray-300 transition-colors cursor-pointer">Minhas Faturas</a>
+    </div>
+    </div>
+    <div id="sectionVittaBI" class="hidden">
+    <p class="block text-[0.6rem] font-bold text-gray-500 uppercase tracking-widest px-4 pb-1 pt-4">Vitta BI</p>
+    <a id="linkVittaBI" href="https://bi.vittasistemas.com.br" target="_blank" rel="noopener"
+       class="flex items-center gap-3 px-3 py-2.5 mx-2 rounded-xl text-[0.83rem] font-medium text-gray-400 hover:bg-white/10 hover:text-white transition-colors duration-150 cursor-pointer mb-0.5">
+      <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+        <path d="M3 3v18h18"/><path d="M18.7 8l-5.3 5.3-3-3L4 16.3"/>
+      </svg>
+      Vitta BI
+      <span class="ml-auto text-[0.55rem] font-bold text-violet-300 bg-violet-500/20 px-1.5 py-0.5 rounded">BI</span>
+    </a>
+    </div>
+
+    <div id="sectionAdmin" class="hidden">
+    <p class="block text-[0.6rem] font-bold text-gray-500 uppercase tracking-widest px-4 pb-1 pt-4">Sistema</p>
+    <button onclick="toggleMenu('admin')" class="w-full flex items-center gap-3 px-3 py-2.5 mx-2 rounded-xl text-[0.83rem] font-medium text-vitta-400 bg-vitta-500/10 transition-colors duration-150 mb-0.5" style="width:calc(100% - 16px)">
+      <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14M4.93 4.93a10 10 0 0 0 0 14.14"/></svg>Administra&ccedil;&atilde;o
+      <svg id="chev-admin" class="chevron open w-3.5 h-3.5 ml-auto text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+    </button>
+    <div id="sub-admin" class="submenu open">
+      <a href="empresas.html" class="flex items-center gap-2 pl-10 pr-3 py-2 mx-2 rounded-xl text-[0.8rem] text-gray-500 hover:bg-white/5 hover:text-gray-300 transition-colors cursor-pointer">Empresas</a>
+      <a href="usuarios.html" class="flex items-center gap-2 pl-10 pr-3 py-2 mx-2 rounded-xl text-[0.8rem] text-gray-500 hover:bg-white/5 hover:text-gray-300 transition-colors cursor-pointer">Usu&aacute;rios Admin</a>
+      <a href="planos.html" class="flex items-center gap-2 pl-10 pr-3 py-2 mx-2 rounded-xl text-[0.8rem] text-gray-500 hover:bg-white/5 hover:text-gray-300 transition-colors cursor-pointer">Planos</a>
+      <a href="dashboard-gerencial.html" class="flex items-center gap-2 pl-10 pr-3 py-2 mx-2 rounded-xl text-[0.8rem] text-gray-500 hover:bg-white/5 hover:text-gray-300 transition-colors cursor-pointer">Dashboard Gerencial</a>
+      <a href="configuracoes.html" class="flex items-center gap-2 pl-10 pr-3 py-2 mx-2 rounded-xl text-[0.8rem] text-gray-500 hover:bg-white/5 hover:text-gray-300 transition-colors cursor-pointer">Configura&ccedil;&otilde;es</a>
+      <a href="logs.html" class="flex items-center gap-2 pl-10 pr-3 py-2 mx-2 rounded-xl text-[0.8rem] text-gray-500 hover:bg-white/5 hover:text-gray-300 transition-colors cursor-pointer">Log</a>
+      <a href="cadastros_admin.html" class="flex items-center gap-2 pl-10 pr-3 py-2 mx-2 rounded-xl text-[0.8rem] font-semibold text-vitta-400 bg-vitta-500/10 transition-colors cursor-pointer">Cadastros</a>
+    </div>
+    </div>
+    <div class="h-4"></div>
+  </nav>
+  <div class="shrink-0 border-t border-white/10 p-3">
+    <div class="group flex items-center gap-2.5 p-2.5 rounded-xl hover:bg-white/5 cursor-pointer">
+      <div id="user-avatar" class="w-8 h-8 rounded-full bg-vitta-500 flex items-center justify-center text-white text-xs font-bold shrink-0">A</div>
+      <div class="flex-1 min-w-0">
+        <p id="user-name" class="text-white text-[0.8rem] font-semibold truncate">Usu&aacute;rio</p>
+        <p id="user-role" class="text-gray-500 text-[0.7rem] truncate">Admin</p>
+      </div>
+      <button onclick="handleLogout()" title="Sair" class="text-gray-600 hover:text-red-400 transition-colors opacity-0 group-hover:opacity-100">
+        <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+      </button>
+    </div>
+  </div>
+</aside>
+
+<div id="overlay" class="fixed inset-0 bg-black/50 z-20 hidden lg:hidden" onclick="toggleSidebar()"></div>
+
+<div class="flex-1 lg:ml-[220px] flex flex-col min-h-screen">
+  <header class="sticky top-0 z-20 h-16 bg-white border-b border-gray-200 flex items-center px-5 gap-3 shadow-sm">
+    <button onclick="toggleSidebar()" class="lg:hidden p-2 rounded-lg hover:bg-gray-100 text-gray-500">
+      <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+        <line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/>
+      </svg>
+    </button>
+    <div class="flex-1">
+      <h1 class="text-[1rem] font-bold text-gray-800 leading-tight">Cadastros</h1>
+      <p class="text-[0.7rem] text-gray-400 leading-tight">Cadastros administrativos do sistema</p>
+    </div>
+    <div class="hidden md:flex items-center gap-2 px-3 py-2 bg-gray-50 border border-gray-200 rounded-xl">
+      <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-vitta-500 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+        <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/>
+      </svg>
+      <span id="empresa-nome" class="text-[0.78rem] font-semibold text-gray-700">Vitta Sistemas</span>
+    </div>
+    <div class="flex items-center gap-2.5">
+      <div id="header-avatar" class="w-9 h-9 rounded-full bg-vitta-500 flex items-center justify-center text-white text-sm font-bold shrink-0">A</div>
+      <div class="hidden sm:block">
+        <p id="header-user-name" class="text-[0.8rem] font-semibold text-gray-800 leading-tight">Usu&aacute;rio</p>
+        <p id="header-user-role" class="text-[0.7rem] text-gray-400 leading-tight">Admin Global</p>
+      </div>
+    </div>
+    <button onclick="handleLogout()" class="p-2.5 rounded-xl hover:bg-red-50 text-gray-400 hover:text-red-500 transition-colors" title="Sair">
+      <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+        <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/>
+      </svg>
+    </button>
+  </header>
+
+  <main class="flex-1 p-5 lg:p-6">
+
+    <!-- Acesso negado (não ADMIN_GLOBAL) -->
+    <div id="accessDenied" class="hidden max-w-md mx-auto mt-16 text-center fade-up">
+      <div class="w-14 h-14 rounded-2xl bg-red-50 border border-red-100 flex items-center justify-center mx-auto mb-4">
+        <svg xmlns="http://www.w3.org/2000/svg" class="w-7 h-7 text-red-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+      </div>
+      <h2 class="text-lg font-bold text-gray-800">Acesso restrito</h2>
+      <p class="text-sm text-gray-500 mt-1">Esta &aacute;rea &eacute; exclusiva do Admin Global.</p>
+    </div>
+
+    <!-- Conteúdo principal (ADMIN_GLOBAL) -->
+    <div id="mainContent" class="hidden max-w-6xl mx-auto fade-up space-y-4">
+
+      <!-- Barra de abas -->
+      <div class="bg-white rounded-2xl border border-gray-100 shadow-sm px-2">
+        <div class="flex items-center gap-1" id="adminTabs">
+          <button type="button" data-tab="logos" onclick="switchAdminTab('logos')"
+            class="admin-tab active flex items-center gap-2 px-4 py-3.5 text-[0.84rem] font-semibold text-vitta-600 transition-colors">
+            <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="3"/><circle cx="9" cy="9" r="2"/><path d="M21 15l-4.5-4.5a2 2 0 0 0-2.8 0L5 19"/></svg>
+            Logos
+          </button>
+        </div>
+      </div>
+
+      <!-- Painel: Logos -->
+      <div id="tabPanel-logos" class="space-y-4">
+
+        <div class="bg-white border border-gray-100 rounded-2xl shadow-sm p-4 flex flex-wrap gap-3 items-center">
+          <div class="relative flex-1 min-w-[200px]">
+            <svg class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+            <input id="filterLogoTipo" type="text" placeholder="Buscar por título ou tipo..." oninput="renderLogos()"
+              class="w-full pl-9 pr-3 py-2.5 border border-gray-200 rounded-xl text-sm bg-gray-50 outline-none focus:border-vitta-500 focus:bg-white transition-colors">
+          </div>
+          <div class="h-6 w-px bg-gray-200"></div>
+          <label class="flex items-center gap-2.5 cursor-pointer select-none">
+            <div class="relative w-9 h-5">
+              <input type="checkbox" id="toggleLogosInativas" class="sr-only peer" onchange="renderLogos()">
+              <div class="w-9 h-5 bg-gray-300 peer-checked:bg-vitta-500 rounded-full transition-colors"></div>
+              <div class="absolute top-0.5 left-0.5 w-4 h-4 bg-white rounded-full shadow transition-transform peer-checked:translate-x-4"></div>
+            </div>
+            <span class="text-sm font-medium text-gray-600">Mostrar inativas</span>
+          </label>
+          <button onclick="openLogoModal()"
+            class="flex items-center gap-2 px-4 py-2.5 bg-vitta-500 hover:bg-vitta-600 text-white text-sm font-semibold rounded-xl shadow-sm transition-colors ml-auto">
+            <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            Nova Logo
+          </button>
+        </div>
+
+        <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-5">
+          <div id="logosLoader" class="flex items-center justify-center py-16 gap-3">
+            <svg class="animate-spin w-5 h-5 text-vitta-500" fill="none" viewBox="0 0 24 24">
+              <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/>
+              <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/>
+            </svg>
+            <span class="text-sm text-gray-400">Carregando logos...</span>
+          </div>
+          <div id="logosEmpty" class="hidden text-center py-16">
+            <p class="text-sm text-gray-400">Nenhuma logo cadastrada ainda.</p>
+          </div>
+          <div id="logosGrid" class="hidden grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4"></div>
+        </div>
+
+      </div>
+
+    </div>
+
+  </main>
+</div>
+
+<!-- ══════════════════════════════════
+     MODAL: NOVA/EDITAR LOGO
+══════════════════════════════════ -->
+<div class="modal-overlay" id="logoModal">
+  <div class="bg-white rounded-2xl w-full max-w-[440px] shadow-2xl mx-auto my-auto modal-scroll overflow-y-auto max-h-[90vh]">
+    <div class="sticky top-0 bg-white flex items-center gap-3 px-6 py-4 border-b border-gray-100 rounded-t-2xl z-10">
+      <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-vitta-500 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="3"/><circle cx="9" cy="9" r="2"/><path d="M21 15l-4.5-4.5a2 2 0 0 0-2.8 0L5 19"/></svg>
+      <h2 class="text-base font-bold text-gray-800 flex-1" id="logoModalTitle">Nova Logo</h2>
+      <button onclick="closeLogoModal()" class="w-8 h-8 flex items-center justify-center rounded-full bg-gray-100 hover:bg-gray-200 text-gray-500 transition-colors">
+        <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+    <form id="logoForm" onsubmit="saveLogo(event)" class="px-6 py-5 space-y-4">
+      <input type="hidden" id="logoId" value="">
+
+      <div>
+        <label class="block text-[0.72rem] font-bold text-gray-500 uppercase tracking-wide mb-1.5">Imagem</label>
+        <div class="flex items-center gap-4">
+          <div id="logoPreviewWrap" class="w-20 h-20 rounded-xl border border-gray-200 bg-gray-50 flex items-center justify-center overflow-hidden shrink-0">
+            <img id="logoPreviewImg" class="hidden w-full h-full object-cover" src="" alt="">
+            <svg id="logoPreviewIcon" xmlns="http://www.w3.org/2000/svg" class="w-7 h-7 text-gray-300" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="3"/><circle cx="9" cy="9" r="2"/><path d="M21 15l-4.5-4.5a2 2 0 0 0-2.8 0L5 19"/></svg>
+          </div>
+          <div class="flex-1">
+            <input type="file" id="logoFile" accept="image/*" onchange="onLogoFileSelect(event)"
+              class="block w-full text-xs text-gray-500 file:mr-3 file:py-2 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-vitta-50 file:text-vitta-700 hover:file:bg-vitta-100">
+            <p class="text-[0.68rem] text-gray-400 mt-1">PNG, JPG ou SVG</p>
+          </div>
+        </div>
+      </div>
+
+      <div>
+        <label class="block text-[0.72rem] font-bold text-gray-500 uppercase tracking-wide mb-1.5">Título</label>
+        <input id="logoTitulo" type="text" required placeholder="Ex: Nutrição, Psicologia, Sala 1..."
+          class="w-full px-3 py-2.5 border border-gray-200 rounded-xl text-sm outline-none focus:border-vitta-500 transition-colors">
+        <p class="text-[0.68rem] text-gray-400 mt-1">Nome específico desta logo.</p>
+      </div>
+
+      <div>
+        <label class="block text-[0.72rem] font-bold text-gray-500 uppercase tracking-wide mb-1.5">Tipo</label>
+        <input id="logoTipo" type="text" required list="logoTipoSuggestions" placeholder="Ex: ESPECIALIDADE, SALA, TIPOPAGAMENTO..."
+          class="w-full px-3 py-2.5 border border-gray-200 rounded-xl text-sm outline-none focus:border-vitta-500 transition-colors">
+        <datalist id="logoTipoSuggestions"></datalist>
+        <p class="text-[0.68rem] text-gray-400 mt-1">Categoria da logo. Várias logos podem compartilhar o mesmo tipo.</p>
+      </div>
+
+      <label class="flex items-center gap-2.5 cursor-pointer select-none">
+        <div class="relative w-9 h-5">
+          <input type="checkbox" id="logoAtivo" class="sr-only peer" checked>
+          <div class="w-9 h-5 bg-gray-300 peer-checked:bg-vitta-500 rounded-full transition-colors"></div>
+          <div class="absolute top-0.5 left-0.5 w-4 h-4 bg-white rounded-full shadow transition-transform peer-checked:translate-x-4"></div>
+        </div>
+        <span class="text-sm font-medium text-gray-600">Ativa</span>
+      </label>
+
+      <div class="flex gap-3 pt-2">
+        <button type="button" onclick="closeLogoModal()" class="flex-1 py-2.5 border border-gray-200 rounded-xl text-sm font-semibold text-gray-600 hover:bg-gray-50 transition-colors">Cancelar</button>
+        <button type="submit" id="btnLogoSave"
+          class="flex-1 flex items-center justify-center gap-2 py-2.5 bg-vitta-500 hover:bg-vitta-600 text-white text-sm font-semibold rounded-xl transition-colors">
+          <svg id="logoSaveSpin" class="hidden animate-spin w-4 h-4" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/></svg>
+          <span id="logoSaveTxt">Salvar</span>
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════
+     MODAL: CONFIRMAR EXCLUSÃO
+══════════════════════════════════ -->
+<div class="modal-overlay" id="deleteLogoModal">
+  <div class="bg-white rounded-2xl w-full max-w-[420px] shadow-2xl mx-auto my-auto p-6 text-center">
+    <div class="w-14 h-14 rounded-full bg-red-100 flex items-center justify-center mx-auto mb-4">
+      <svg xmlns="http://www.w3.org/2000/svg" class="w-7 h-7 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+        <polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/>
+        <path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4h6v2"/>
+      </svg>
+    </div>
+    <h3 class="text-base font-bold text-gray-800 mb-2">Excluir logo?</h3>
+    <p class="text-sm text-gray-500 mb-5">Esta ação é irreversível.</p>
+    <div class="flex gap-3">
+      <button onclick="closeDeleteLogoModal()" class="flex-1 py-2.5 border border-gray-200 rounded-xl text-sm font-semibold text-gray-600 hover:bg-gray-50 transition-colors">Cancelar</button>
+      <button onclick="confirmDeleteLogo()" id="btnDeleteLogoConfirm"
+              class="flex-1 flex items-center justify-center gap-2 py-2.5 bg-red-500 hover:bg-red-600 text-white text-sm font-semibold rounded-xl transition-colors">
+        <svg id="deleteLogoSpin" class="hidden animate-spin w-4 h-4" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/></svg>
+        <span id="deleteLogoBtnTxt">Excluir</span>
+      </button>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ═══════════════════════════════════════════
+   SIDEBAR
+═══════════════════════════════════════════ */
+function toggleMenu(k) {
+  const s = document.getElementById('sub-' + k);
+  const c = document.getElementById('chev-' + k);
+  const o = s.classList.contains('open');
+  s.classList.toggle('open', !o);
+  if (c) c.classList.toggle('open', !o);
+}
+function toggleSidebar() {
+  const sb = document.getElementById('sidebar');
+  const ov = document.getElementById('overlay');
+  const o  = sb.classList.contains('-translate-x-full');
+  sb.classList.toggle('-translate-x-full', !o);
+  ov.classList.toggle('hidden', !o);
+}
+async function handleLogout() { await supabase.auth.signOut(); window.location.href = '../index.html'; }
+
+/* ═══════════════════════════════════════════
+   ABAS
+═══════════════════════════════════════════ */
+function switchAdminTab(key) {
+  document.querySelectorAll('#adminTabs .admin-tab').forEach(btn => {
+    btn.classList.toggle('active', btn.dataset.tab === key);
+    btn.classList.toggle('text-vitta-600', btn.dataset.tab === key);
+    btn.classList.toggle('text-gray-500', btn.dataset.tab !== key);
+  });
+  document.querySelectorAll('[id^="tabPanel-"]').forEach(panel => {
+    panel.classList.toggle('hidden', panel.id !== 'tabPanel-' + key);
+  });
+}
+
+/* ═══════════════════════════════════════════
+   LOGOS — CRUD
+═══════════════════════════════════════════ */
+let _logos = [];
+let _logoFile = null;
+let _deleteLogoTargetId = null;
+
+function escHtml(s) { return (s == null ? '' : String(s)).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+async function loadLogos() {
+  document.getElementById('logosLoader').classList.remove('hidden');
+  document.getElementById('logosEmpty').classList.add('hidden');
+  document.getElementById('logosGrid').classList.add('hidden');
+
+  const { data, error } = await supabase.from('LOGOS')
+    .select('ID_LOGO,TITULO_LOGO,TIPO_LOGO,URL_LOGO,ATIVO_LOGO,DTCRI_LOGO')
+    .order('TIPO_LOGO').order('TITULO_LOGO');
+
+  document.getElementById('logosLoader').classList.add('hidden');
+  if (error) { showToast('Erro ao carregar logos: ' + error.message, 'error'); return; }
+
+  _logos = data || [];
+  populateTipoSuggestions();
+  renderLogos();
+}
+
+function populateTipoSuggestions() {
+  const dl = document.getElementById('logoTipoSuggestions');
+  const tipos = [...new Set(_logos.map(l => l.TIPO_LOGO).filter(Boolean))].sort((a, b) => a.localeCompare(b, 'pt-BR'));
+  dl.innerHTML = tipos.map(t => `<option value="${escHtml(t)}"></option>`).join('');
+}
+
+function renderLogos() {
+  const q = (document.getElementById('filterLogoTipo').value || '').trim().toLowerCase();
+  const showInativas = document.getElementById('toggleLogosInativas').checked;
+
+  const rows = _logos.filter(l => {
+    if (!showInativas && !l.ATIVO_LOGO) return false;
+    if (q && !(l.TIPO_LOGO || '').toLowerCase().includes(q) && !(l.TITULO_LOGO || '').toLowerCase().includes(q)) return false;
+    return true;
+  });
+
+  const grid = document.getElementById('logosGrid');
+  const empty = document.getElementById('logosEmpty');
+
+  if (!rows.length) {
+    grid.classList.add('hidden');
+    empty.classList.remove('hidden');
+    return;
+  }
+
+  empty.classList.add('hidden');
+  grid.classList.remove('hidden');
+  grid.innerHTML = rows.map(l => `
+    <div class="border border-gray-100 rounded-xl p-3 flex flex-col items-center gap-2 relative ${l.ATIVO_LOGO ? '' : 'opacity-50'}">
+      <div class="w-16 h-16 rounded-lg bg-gray-50 border border-gray-100 flex items-center justify-center overflow-hidden">
+        <img src="${escHtml(l.URL_LOGO)}" class="w-full h-full object-contain" alt="${escHtml(l.TITULO_LOGO)}">
+      </div>
+      <span class="text-[0.7rem] font-semibold text-gray-700 text-center break-all">${escHtml(l.TITULO_LOGO)}</span>
+      <span class="text-[0.62rem] font-medium text-gray-400 uppercase tracking-wide">${escHtml(l.TIPO_LOGO)}</span>
+      ${!l.ATIVO_LOGO ? '<span class="text-[0.6rem] font-bold text-red-400 uppercase">Inativa</span>' : ''}
+      <div class="flex items-center gap-1.5 mt-1">
+        <button onclick="openLogoModal('${l.ID_LOGO}')" title="Editar" class="w-7 h-7 flex items-center justify-center rounded-lg hover:bg-gray-100 text-gray-400 hover:text-vitta-600 transition-colors">
+          <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+        </button>
+        <button onclick="openDeleteLogoModal('${l.ID_LOGO}')" title="Excluir" class="w-7 h-7 flex items-center justify-center rounded-lg hover:bg-red-50 text-gray-400 hover:text-red-500 transition-colors">
+          <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/></svg>
+        </button>
+      </div>
+    </div>
+  `).join('');
+}
+
+function openLogoModal(id) {
+  const logo = id ? _logos.find(l => l.ID_LOGO === id) : null;
+  document.getElementById('logoModalTitle').textContent = logo ? 'Editar Logo' : 'Nova Logo';
+  document.getElementById('logoId').value = logo ? logo.ID_LOGO : '';
+  document.getElementById('logoTitulo').value = logo ? logo.TITULO_LOGO : '';
+  document.getElementById('logoTipo').value = logo ? logo.TIPO_LOGO : '';
+  document.getElementById('logoAtivo').checked = logo ? !!logo.ATIVO_LOGO : true;
+  document.getElementById('logoFile').value = '';
+  _logoFile = null;
+
+  const img = document.getElementById('logoPreviewImg');
+  const icon = document.getElementById('logoPreviewIcon');
+  if (logo && logo.URL_LOGO) {
+    img.src = logo.URL_LOGO;
+    img.classList.remove('hidden');
+    icon.classList.add('hidden');
+  } else {
+    img.classList.add('hidden');
+    icon.classList.remove('hidden');
+  }
+
+  document.getElementById('logoModal').classList.add('open');
+}
+function closeLogoModal() { document.getElementById('logoModal').classList.remove('open'); }
+
+function onLogoFileSelect(e) {
+  const file = e.target.files?.[0];
+  if (!file) return;
+  _logoFile = file;
+  const img = document.getElementById('logoPreviewImg');
+  const icon = document.getElementById('logoPreviewIcon');
+  const reader = new FileReader();
+  reader.onload = () => {
+    img.src = reader.result;
+    img.classList.remove('hidden');
+    icon.classList.add('hidden');
+  };
+  reader.readAsDataURL(file);
+}
+
+function fileToBase64(file) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(reader.result.split(',')[1]);
+    reader.onerror = reject;
+    reader.readAsDataURL(file);
+  });
+}
+
+// O upload direto ao Storage vem falhando com "row-level security policy" por
+// uma inconsistência na infraestrutura de auth da Supabase. Contorna isso
+// passando o arquivo por uma Edge Function que usa a service role key
+// (supabase/functions/upload-logo).
+async function uploadLogoViaEdgeFunction(file, ext) {
+  const base64 = await fileToBase64(file);
+  const { data, error } = await supabase.functions.invoke('upload-logo', {
+    body: { base64, contentType: file.type || 'image/png', ext },
+  });
+  if (error) throw new Error(data?.erro || error.message);
+  if (data?.erro) throw new Error(data.erro);
+  return data.url;
+}
+
+async function saveLogo(e) {
+  e.preventDefault();
+  const id = document.getElementById('logoId').value;
+  const titulo = document.getElementById('logoTitulo').value.trim();
+  const tipo = document.getElementById('logoTipo').value.trim().toUpperCase();
+  const ativo = document.getElementById('logoAtivo').checked;
+
+  if (!titulo) { showToast('Informe o título da logo.', 'error'); return; }
+  if (!tipo) { showToast('Informe o tipo da logo.', 'error'); return; }
+  if (!id && !_logoFile) { showToast('Selecione uma imagem.', 'error'); return; }
+
+  const btn = document.getElementById('btnLogoSave');
+  const spin = document.getElementById('logoSaveSpin');
+  const txt = document.getElementById('logoSaveTxt');
+  btn.disabled = true; spin.classList.remove('hidden'); txt.textContent = 'Salvando...';
+
+  try {
+    let urlLogo = null;
+
+    if (_logoFile) {
+      const ext = (_logoFile.name.split('.').pop() || 'png').toLowerCase();
+      urlLogo = await uploadLogoViaEdgeFunction(_logoFile, ext);
+    }
+
+    if (id) {
+      const patch = { TITULO_LOGO: titulo, TIPO_LOGO: tipo, ATIVO_LOGO: ativo };
+      if (urlLogo) patch.URL_LOGO = urlLogo;
+      const { error } = await supabase.from('LOGOS').update(patch).eq('ID_LOGO', id);
+      if (error) throw new Error(error.message);
+      showToast('Logo atualizada com sucesso!');
+    } else {
+      const { error } = await supabase.from('LOGOS').insert({ TITULO_LOGO: titulo, TIPO_LOGO: tipo, URL_LOGO: urlLogo, ATIVO_LOGO: ativo });
+      if (error) throw new Error(error.message);
+      showToast('Logo cadastrada com sucesso!');
+    }
+
+    closeLogoModal();
+    await loadLogos();
+  } catch (err) {
+    showToast(err.message || 'Erro ao salvar logo.', 'error');
+  } finally {
+    btn.disabled = false; spin.classList.add('hidden'); txt.textContent = 'Salvar';
+  }
+}
+
+function openDeleteLogoModal(id) {
+  _deleteLogoTargetId = id;
+  document.getElementById('deleteLogoModal').classList.add('open');
+}
+function closeDeleteLogoModal() {
+  _deleteLogoTargetId = null;
+  document.getElementById('deleteLogoModal').classList.remove('open');
+}
+async function confirmDeleteLogo() {
+  if (!_deleteLogoTargetId) return;
+  const btn = document.getElementById('btnDeleteLogoConfirm');
+  const spin = document.getElementById('deleteLogoSpin');
+  const txt = document.getElementById('deleteLogoBtnTxt');
+  btn.disabled = true; spin.classList.remove('hidden'); txt.textContent = 'Excluindo...';
+
+  try {
+    const { error } = await supabase.from('LOGOS').delete().eq('ID_LOGO', _deleteLogoTargetId);
+    if (error) throw new Error(error.message);
+    showToast('Logo excluída com sucesso!');
+    closeDeleteLogoModal();
+    await loadLogos();
+  } catch (err) {
+    showToast(err.message || 'Erro ao excluir logo.', 'error');
+  } finally {
+    btn.disabled = false; spin.classList.add('hidden'); txt.textContent = 'Excluir';
+  }
+}
+
+/* ═══════════════════════════════════════════
+   INICIALIZAÇÃO
+═══════════════════════════════════════════ */
+(async () => {
+  const { data: { session } } = await supabase.auth.getSession();
+  if (!session) { window.location.href = '../index.html'; return; }
+
+  const u = await getUsuarioAtual('NOME_USU,TIPO_USU,ATIVO_USU,PROF_USU', session);
+  if (!u || !u.ATIVO_USU) { await supabase.auth.signOut(); window.location.href = '../index.html'; return; }
+
+  const nome = u.NOME_USU || session.user.email;
+  const ini = nome.trim() ? nome.split(' ').map(w => w[0]).join('').slice(0, 2).toUpperCase() : '?';
+  ['user-name', 'header-user-name'].forEach(id => document.getElementById(id).textContent = nome);
+  ['user-avatar', 'header-avatar'].forEach(id => document.getElementById(id).textContent = ini);
+  if (!u.PROF_USU) document.querySelector('a[href="consultas.html"]')?.classList.add('hidden');
+
+  if (u.TIPO_USU !== 'ADMIN_GLOBAL') {
+    document.getElementById('accessDenied').classList.remove('hidden');
+    return;
+  }
+
+  ['user-role', 'header-user-role'].forEach(id => document.getElementById(id).textContent = 'Admin Global');
+  AdminEmpresaCtx.initSelector('ADMIN_GLOBAL', session.user.id);
+  document.getElementById('sectionAdmin').classList.remove('hidden');
+  document.getElementById('mainContent').classList.remove('hidden');
+  await loadLogos();
+})();
+
+document.querySelectorAll('#sidebar nav a').forEach(function(link) {
+  link.addEventListener('click', function() {
+    const sb = document.getElementById('sidebar');
+    const ov = document.getElementById('overlay');
+    if (sb && !sb.classList.contains('-translate-x-full')) {
+      sb.classList.add('-translate-x-full');
+      if (ov) ov.classList.add('hidden');
+    }
+  });
+});
+</script>
+</body>
+</html>

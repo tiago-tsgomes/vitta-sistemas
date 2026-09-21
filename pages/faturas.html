@@ -126,6 +126,7 @@
       <a href="planos.html" class="flex items-center gap-2 pl-10 pr-3 py-2 mx-2 rounded-xl text-[0.8rem] text-gray-500 hover:bg-white/5 hover:text-gray-300 transition-colors cursor-pointer">Planos</a>
       <a href="configuracoes.html" class="flex items-center gap-2 pl-10 pr-3 py-2 mx-2 rounded-xl text-[0.8rem] text-gray-500 hover:bg-white/5 hover:text-gray-300 transition-colors cursor-pointer">Configura&ccedil;&otilde;es</a>
       <a href="logs.html" class="flex items-center gap-2 pl-10 pr-3 py-2 mx-2 rounded-xl text-[0.8rem] text-gray-500 hover:bg-white/5 hover:text-gray-300 transition-colors cursor-pointer">Log</a>
+      <a href="cadastros_admin.html" class="flex items-center gap-2 pl-10 pr-3 py-2 mx-2 rounded-xl text-[0.8rem] text-gray-500 hover:bg-white/5 hover:text-gray-300 transition-colors cursor-pointer">Cadastros</a>
     </div>
     </div>
     <div class="h-4"></div>
@@ -325,6 +326,7 @@
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
 <script src="../assets/js/config.js?v=2"></script>
+<script src="../assets/js/toast.js?v=1"></script>
 <script src="../assets/js/admin-empresa-context.js?v=1"></script>
 
 <script>
@@ -425,7 +427,7 @@ async function abrirNf(path) {
     if (error || !data?.signedUrl) throw error || new Error('URL indisponível');
     window.open(data.signedUrl, '_blank', 'noopener');
   } catch (err) {
-    alert('Não foi possível abrir a nota fiscal.');
+    showToast('Não foi possível abrir a nota fiscal.', 'error');
   }
 }
 

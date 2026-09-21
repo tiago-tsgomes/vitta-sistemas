@@ -542,11 +542,11 @@
       const taxaFalta = p.taxaFaltaPct === null || p.taxaFaltaPct === undefined ? '—' : `${p.taxaFaltaPct}%`;
       const avatar = p.foto
         ? `<img src="${p.foto}" style="width:100%;height:100%;object-fit:cover;" alt="">`
-        : `<span style="font-size:14px;font-weight:700;color:#6D5DF6;">${iniciaisProf(p.nome)}</span>`;
+        : `<span style="font-size:20px;font-weight:700;color:#6D5DF6;">${iniciaisProf(p.nome)}</span>`;
       return `
-        <div style="display:flex;align-items:flex-start;gap:12px;padding:9px 0;border-bottom:1px solid #E3E1EE;">
-          <div style="width:20px;flex-shrink:0;font-size:13px;font-weight:700;color:#C4C1D6;text-align:center;padding-top:7px;">${idx + 1}</div>
-          <div style="width:32px;height:32px;border-radius:50%;flex-shrink:0;overflow:hidden;background:#EFEDF9;display:flex;align-items:center;justify-content:center;">${avatar}</div>
+        <div style="display:flex;align-items:center;gap:12px;padding:9px 0;border-bottom:1px solid #E3E1EE;">
+          <div style="width:20px;flex-shrink:0;font-size:13px;font-weight:700;color:#C4C1D6;text-align:center;">${idx + 1}</div>
+          <div style="width:56px;height:56px;border-radius:50%;flex-shrink:0;overflow:hidden;background:#EFEDF9;display:flex;align-items:center;justify-content:center;">${avatar}</div>
           <div style="flex:1;min-width:0;">
             <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:8px;">
               <div style="min-width:0;">
@@ -558,7 +558,7 @@
                 <div style="font-size:13px;color:#6B7280;white-space:nowrap;margin-top:1px;">Repasse ${fmtBRL(p.repasseClinica)} · Líquido ${fmtBRL(p.liquidoProf)}</div>
               </div>
             </div>
-            <div style="height:8px;background:#F1F0F7;border-radius:999px;margin-top:6px;overflow:hidden;">
+            <div style="height:8px;background:#F1F0F7;border-radius:999px;margin-top:8px;overflow:hidden;">
               <div style="height:100%;width:${pct}%;background:#2ABCD4;border-radius:999px;"></div>
             </div>
             <div style="display:flex;align-items:center;justify-content:space-between;margin-top:6px;gap:8px;flex-wrap:wrap;">
@@ -617,9 +617,9 @@
       const taxaFalta = e.taxaFaltaPct === null || e.taxaFaltaPct === undefined ? '—' : `${e.taxaFaltaPct}%`;
       const qtdProf = e.qtdProfissionais === 1 ? '1 profissional' : `${e.qtdProfissionais} profissionais`;
       return `
-        <div style="display:flex;align-items:flex-start;gap:12px;padding:9px 0;border-bottom:1px solid #E3E1EE;">
-          <div style="width:20px;flex-shrink:0;font-size:13px;font-weight:700;color:#C4C1D6;text-align:center;padding-top:7px;">${idx + 1}</div>
-          <div style="width:32px;height:32px;border-radius:50%;flex-shrink:0;overflow:hidden;background:#E6F7FA;display:flex;align-items:center;justify-content:center;"><span style="font-size:14px;font-weight:700;color:#2ABCD4;">${iniciaisProf(e.nome)}</span></div>
+        <div style="display:flex;align-items:center;gap:12px;padding:9px 0;border-bottom:1px solid #E3E1EE;">
+          <div style="width:20px;flex-shrink:0;font-size:13px;font-weight:700;color:#C4C1D6;text-align:center;">${idx + 1}</div>
+          <div style="width:56px;height:56px;border-radius:50%;flex-shrink:0;overflow:hidden;background:#E6F7FA;position:relative;display:flex;align-items:center;justify-content:center;">${e.urlLogo ? `<img src="${e.urlLogo}" style="position:absolute;top:0;left:0;width:100%;height:100%;object-fit:contain;" />` : `<span style="font-size:20px;font-weight:700;color:#2ABCD4;">${iniciaisProf(e.nome)}</span>`}</div>
           <div style="flex:1;min-width:0;">
             <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:8px;">
               <div style="min-width:0;">
@@ -631,7 +631,7 @@
                 <div style="font-size:13px;color:#6B7280;white-space:nowrap;margin-top:1px;">Repasse ${fmtBRL(e.repasseClinica)} · Líquido ${fmtBRL(e.liquidoProf)}</div>
               </div>
             </div>
-            <div style="height:8px;background:#F1F0F7;border-radius:999px;margin-top:6px;overflow:hidden;">
+            <div style="height:8px;background:#F1F0F7;border-radius:999px;margin-top:8px;overflow:hidden;">
               <div style="height:100%;width:${pct}%;background:#2ABCD4;border-radius:999px;"></div>
             </div>
             <div style="display:flex;align-items:center;justify-content:space-between;margin-top:6px;gap:8px;flex-wrap:wrap;">

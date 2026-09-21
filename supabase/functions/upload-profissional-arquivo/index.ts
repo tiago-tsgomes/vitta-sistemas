@@ -67,7 +67,10 @@ Deno.serve(async (req: Request) => {
     if (upErr) return json({ erro: upErr.message }, 500)
 
     const { data: pub } = supabase.storage.from('profissionais-fotos').getPublicUrl(path)
-    return json({ url: pub.publicUrl })
+    // cache-busting: o path é fixo por profissional (upsert sobrescreve o mesmo
+    // arquivo), então sem isso a URL pública não muda e o navegador/CDN continua
+    // servindo a imagem antiga em cache após trocar a foto.
+    return json({ url: `${pub.publicUrl}?v=${Date.now()}` })
   } catch (e: unknown) {
     return json({ erro: e instanceof Error ? e.message : String(e) }, 500)
   }

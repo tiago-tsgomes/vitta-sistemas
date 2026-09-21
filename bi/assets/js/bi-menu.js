@@ -16,7 +16,7 @@
 
   const NAV_ITEMS = [
     { key: 'dashboard', label: 'Dashboard', href: 'dashboard.html', ready: true },
-    { key: 'financeiro', label: 'Financeiro', href: 'financeiro.html', ready: false },
+    { key: 'financeiro', label: 'Financeiro', href: 'financeiro.html', ready: true },
     { key: 'agenda', label: 'Agenda & Ocupação', href: 'agenda.html', ready: false },
     { key: 'pacientes', label: 'Pacientes', href: 'pacientes.html', ready: false },
     { key: 'leads', label: 'Leads', href: 'leads.html', ready: true },
@@ -32,8 +32,8 @@
       const on = item.key === active;
       const iconColor = on ? '#6D5DF6' : '#9CA3AF';
       const textColor = on ? '#4F3DD1' : '#6B7280';
-      const wrapStyle = `display:flex;align-items:center;gap:11px;margin:1px 10px;padding:9px 12px;border-radius:10px;font-size:14.5px;font-weight:${on ? 600 : 500};background:${on ? '#F3F1FE' : 'transparent'};text-decoration:none;${item.ready ? 'cursor:pointer;' : 'cursor:default;opacity:.45;'}`;
-      const badge = item.ready ? '' : '<span style="margin-left:auto;font-size:10.5px;font-weight:700;color:#C4C1D6;background:#F5F4FA;padding:2px 6px;border-radius:999px;">EM BREVE</span>';
+      const wrapStyle = `display:flex;align-items:center;gap:11px;margin:1px 10px;padding:8px 12px;border-radius:10px;font-size:13.5px;font-weight:${on ? 600 : 500};background:${on ? '#F3F1FE' : 'transparent'};text-decoration:none;${item.ready ? 'cursor:pointer;' : 'cursor:default;opacity:.45;'}`;
+      const badge = item.ready ? '' : '<span style="margin-left:auto;font-size:10px;font-weight:700;color:#C4C1D6;background:#F5F4FA;padding:2px 6px;border-radius:999px;">EM BREVE</span>';
       const inner = `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="${iconColor}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${ICON_PATHS[item.key]}</svg><span style="color:${textColor};">${item.label}</span>${badge}`;
       const tag = item.ready ? 'a' : 'div';
       const hrefAttr = item.ready ? ` href="${item.href}"` : ' title="Em breve"';
@@ -49,15 +49,15 @@
         <div style="height:1px;background:#F1F0F7;margin:2px 20px 14px 20px;"></div>
         <nav style="flex:1;display:flex;flex-direction:column;gap:2px;">${navHtml}</nav>
         <div style="margin:0 14px 14px 14px;padding:12px 14px;border-radius:12px;background:#F8F7FD;border:1px solid #EFEDF9;">
-          <div style="font-size:11px;font-weight:600;letter-spacing:.04em;text-transform:uppercase;color:#8B7FE8;margin-bottom:4px;">Empresa ativa</div>
-          <div style="font-size:14.5px;font-weight:600;color:#111827;margin-bottom:4px;">${empresaNome}</div>
-          <div style="font-size:12px;line-height:1.4;color:#9CA3AF;">Dados exibidos são exclusivos desta empresa</div>
+          <div style="font-size:10px;font-weight:600;letter-spacing:.04em;text-transform:uppercase;color:#8B7FE8;margin-bottom:4px;">Empresa ativa</div>
+          <div style="font-size:13.5px;font-weight:600;color:#111827;margin-bottom:4px;">${empresaNome}</div>
+          <div style="font-size:11.5px;line-height:1.4;color:#9CA3AF;">Dados exibidos são exclusivos desta empresa</div>
         </div>
         <a href="${APP_BASE_URL}/pages/dashboard.html" style="display:flex;align-items:center;gap:9px;padding:14px 20px;border-top:1px solid #F1F0F7;cursor:pointer;text-decoration:none;">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#9CA3AF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <path d="M19 12H5M12 19l-7-7 7-7"/>
           </svg>
-          <span style="font-size:14px;font-weight:500;color:#9CA3AF;">Voltar ao sistema</span>
+          <span style="font-size:13px;font-weight:500;color:#9CA3AF;">Voltar ao sistema</span>
         </a>
       </div>
     `;

@@ -35,7 +35,6 @@
     .modal-overlay.open { display:flex; }
     .modal-scroll::-webkit-scrollbar { width:4px; }
     .modal-scroll::-webkit-scrollbar-thumb { background:#e5e7eb; border-radius:4px; }
-    #toast { position:fixed; bottom:24px; right:24px; z-index:999; transition:all .3s ease; }
     tbody tr { transition:background .15s; }
     tbody tr:hover { background:#f9fafb; }
     .sec-body { transition:max-height .3s ease,opacity .2s ease; overflow:hidden; }
@@ -153,6 +152,7 @@
       <a href="planos.html" class="flex items-center gap-2 pl-10 pr-3 py-2 mx-2 rounded-xl text-[0.8rem] text-gray-500 hover:bg-white/5 hover:text-gray-300 transition-colors cursor-pointer">Planos</a>
       <a href="configuracoes.html" class="flex items-center gap-2 pl-10 pr-3 py-2 mx-2 rounded-xl text-[0.8rem] text-gray-500 hover:bg-white/5 hover:text-gray-300 transition-colors cursor-pointer">Configura&ccedil;&otilde;es</a>
       <a href="logs.html" class="flex items-center gap-2 pl-10 pr-3 py-2 mx-2 rounded-xl text-[0.8rem] text-gray-500 hover:bg-white/5 hover:text-gray-300 transition-colors cursor-pointer">Log</a>
+      <a href="cadastros_admin.html" class="flex items-center gap-2 pl-10 pr-3 py-2 mx-2 rounded-xl text-[0.8rem] text-gray-500 hover:bg-white/5 hover:text-gray-300 transition-colors cursor-pointer">Cadastros</a>
     </div>
     </div>
     <div class="h-4"></div>
@@ -288,22 +288,27 @@
         </svg>
         <span class="text-sm">Carregando usuários…</span>
       </div>
-      <div id="tableWrap" class="hidden overflow-x-auto">
-        <table class="w-full text-sm">
-          <thead>
-            <tr class="bg-gray-50 border-b border-gray-100 text-left">
-              <th class="px-5 py-3 text-[0.72rem] font-bold text-gray-500 uppercase tracking-wider">Usuário</th>
-              <th class="px-4 py-3 text-[0.72rem] font-bold text-gray-500 uppercase tracking-wider">Perfil</th>
-              <th class="px-4 py-3 text-[0.72rem] font-bold text-gray-500 uppercase tracking-wider">Profissional vinculado</th>
-              <th id="thEmpresa" class="hidden px-4 py-3 text-[0.72rem] font-bold text-gray-500 uppercase tracking-wider">Empresa</th>
-              <th class="px-4 py-3 text-[0.72rem] font-bold text-gray-500 uppercase tracking-wider">Cadastrado em</th>
-              <th class="px-4 py-3 text-[0.72rem] font-bold text-gray-500 uppercase tracking-wider">Status</th>
-              <th class="px-4 py-3 text-[0.72rem] font-bold text-gray-500 uppercase tracking-wider text-right">Ações</th>
-            </tr>
-          </thead>
-          <tbody id="usuBody"></tbody>
-        </table>
+      <div id="tableWrap" class="hidden">
+        <div class="hidden sm:block overflow-x-auto">
+          <table class="w-full text-sm">
+            <thead>
+              <tr class="bg-gray-50 border-b border-gray-100 text-left">
+                <th class="px-5 py-3 text-[0.72rem] font-bold text-gray-500 uppercase tracking-wider">Usuário</th>
+                <th class="px-4 py-3 text-[0.72rem] font-bold text-gray-500 uppercase tracking-wider">Perfil</th>
+                <th class="px-4 py-3 text-[0.72rem] font-bold text-gray-500 uppercase tracking-wider">Profissional vinculado</th>
+                <th id="thEmpresa" class="hidden px-4 py-3 text-[0.72rem] font-bold text-gray-500 uppercase tracking-wider">Empresa</th>
+                <th class="px-4 py-3 text-[0.72rem] font-bold text-gray-500 uppercase tracking-wider">Cadastrado em</th>
+                <th class="px-4 py-3 text-[0.72rem] font-bold text-gray-500 uppercase tracking-wider">Status</th>
+                <th class="px-4 py-3 text-[0.72rem] font-bold text-gray-500 uppercase tracking-wider text-right">Ações</th>
+              </tr>
+            </thead>
+            <tbody id="usuBody"></tbody>
+          </table>
+        </div>
+        <div id="mobileList" class="sm:hidden divide-y divide-gray-100"></div>
       </div>
+
+      <div id="pagination" class="flex items-center gap-1.5 justify-end px-5 py-3.5 border-t border-gray-100"></div>
     </div>
   </main>
 </div>
@@ -322,7 +327,9 @@
         <h3 id="formTitle" class="text-[0.95rem] font-bold text-gray-800">Novo Usuário</h3>
         <p id="formSubtitle" class="text-[0.72rem] text-gray-400">Preencha os dados do usuário</p>
       </div>
-      <button onclick="closeFormModal()" class="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center text-gray-500 hover:bg-gray-200 text-lg leading-none">×</button>
+      <button onclick="closeFormModal()" class="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center text-gray-500 hover:bg-gray-200 transition-colors">
+        <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
     </div>
 
     <div id="formAlert" class="px-6"></div>
@@ -525,7 +532,7 @@
 <div id="toggleModal" class="modal-overlay">
   <div class="w-full max-w-sm bg-white rounded-2xl shadow-2xl p-6 my-auto">
     <div class="text-center mb-5">
-      <div id="toggleIcon" class="text-4xl mb-3">⚠️</div>
+      <div id="toggleIcon" class="mb-3 flex justify-center text-amber-500"><svg class="w-10 h-10" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z"/></svg></div>
       <h3 id="toggleTitle" class="text-[1rem] font-bold text-gray-800 mb-2"></h3>
       <p id="toggleMsg" class="text-sm text-gray-500 leading-relaxed"></p>
     </div>
@@ -543,16 +550,10 @@
   </div>
 </div>
 
-<!-- TOAST -->
-<div id="toast" class="hidden">
-  <div id="toastMsg" class="flex items-center gap-3 px-4 py-3 rounded-xl shadow-lg text-sm font-semibold text-white min-w-[260px]">
-    <span id="toastIcon" class="shrink-0">✓</span>
-    <span id="toastText"></span>
-  </div>
-</div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
 <script src="../assets/js/config.js?v=2"></script>
+<script src="../assets/js/toast.js?v=1"></script>
   <script src="../assets/js/access-guard.js?v=2"></script>
 <script src="../assets/js/admin-empresa-context.js?v=1"></script>
 <script src="../assets/js/notifications.js?v=3"></script>
@@ -562,6 +563,8 @@ let allProfis     = [];
 let allEmpresas   = [];
 let allCargos     = [];
 let filtered      = [];
+const PAGE_SIZE = 10;
+let currentPage = 1;
 let currentEmpId  = null;
 let isGlobal      = false;
 let toggleTargetId    = null;
@@ -601,18 +604,9 @@ function cargoToTipo(descr) {
   return map[descr] || 'USUARIO';
 }
 
-function showToast(msg, type='success') {
-  const el = document.getElementById('toast');
-  document.getElementById('toastText').textContent = msg;
-  document.getElementById('toastIcon').textContent = type==='success'?'✓':type==='error'?'✕':'ℹ';
-  document.getElementById('toastMsg').className = `flex items-center gap-3 px-4 py-3 rounded-xl shadow-lg text-sm font-semibold text-white min-w-[260px] ${
-    type==='success'?'bg-green-600':type==='error'?'bg-red-500':'bg-vitta-600'}`;
-  el.classList.remove('hidden');
-  setTimeout(()=>el.classList.add('hidden'), 3500);
-}
 function showErr(msg) {
   return `<div class="flex items-start gap-2 bg-red-50 text-red-700 border border-red-200 rounded-xl px-4 py-3 text-sm font-medium mb-1">
-    <span class="shrink-0 mt-0.5">⚠</span><span>${msg}</span></div>`;
+    <span class="shrink-0 mt-0.5"><svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z"/></svg></span><span>${msg}</span></div>`;
 }
 function toggleMenu(k) {
   const s=document.getElementById('sub-'+k), c=document.getElementById('chev-'+k);
@@ -679,7 +673,7 @@ async function loadCargos() {
   selFilter.innerHTML = '<option value="">Todos os perfis</option>';
   allCargos.forEach(c => {
     const opt = `<option value="${c.ID_CARGO}">${cargoLabel(c.DESCR_CARGO)}</option>`;
-    selForm.insertAdjacentHTML('beforeend', opt);
+    if (c.DESCR_CARGO !== 'AUTONOMO') selForm.insertAdjacentHTML('beforeend', opt);
     selFilter.insertAdjacentHTML('beforeend', opt);
   });
 }
@@ -771,6 +765,7 @@ function applyFilters() {
     if (q && !u.NOME_USU?.toLowerCase().includes(q) && !u.EMAIL_USU?.toLowerCase().includes(q)) return false;
     return true;
   });
+  currentPage = 1;
   renderTable();
 }
 
@@ -782,28 +777,41 @@ function clearFilters() {
   applyFilters();
 }
 
+function profCellHtml(u) {
+  const profNome = u.PROFISSIONAL?.NOME_PROF;
+  return profNome
+    ? `<span class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[0.7rem] font-semibold bg-vitta-50 text-vitta-700">
+         <svg xmlns="http://www.w3.org/2000/svg" class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+         ${profNome}</span>`
+    : `<span class="text-[0.78rem] text-gray-400">—</span>`;
+}
+function statusBadgeHtml(u) {
+  return u.ATIVO_USU
+    ? `<span class="inline-flex items-center px-2 py-0.5 rounded-full text-[0.7rem] font-semibold bg-green-50 text-green-700">● Ativo</span>`
+    : `<span class="inline-flex items-center px-2 py-0.5 rounded-full text-[0.7rem] font-semibold bg-red-50 text-red-600">● Inativo</span>`;
+}
+
 function renderTable() {
   const tbody = document.getElementById('usuBody');
+  const mobileList = document.getElementById('mobileList');
   document.getElementById('tableCount').innerHTML =
     `Exibindo <strong class="text-gray-800">${filtered.length}</strong> usuário${filtered.length!==1?'s':''}`;
 
   if (!filtered.length) {
     tbody.innerHTML = `<tr><td colspan="7" class="text-center py-14 text-gray-400 text-sm">Nenhum usuário encontrado.</td></tr>`;
+    mobileList.innerHTML = `<div class="text-center py-14 text-gray-400 text-sm">Nenhum usuário encontrado.</div>`;
+    renderPagination();
     return;
   }
 
-  tbody.innerHTML = filtered.map(u => {
+  const start = (currentPage - 1) * PAGE_SIZE;
+  const slice = filtered.slice(start, start + PAGE_SIZE);
+
+  tbody.innerHTML = slice.map(u => {
     const ini  = initials(u.NOME_USU);
     const tipoBadge = cargoBadge(u.CARGO);
-    const profNome = u.PROFISSIONAL?.NOME_PROF;
-    const profCell = profNome
-      ? `<span class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[0.7rem] font-semibold bg-vitta-50 text-vitta-700">
-           <svg xmlns="http://www.w3.org/2000/svg" class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-           ${profNome}</span>`
-      : `<span class="text-[0.78rem] text-gray-400">—</span>`;
-    const statusBadge = u.ATIVO_USU
-      ? `<span class="inline-flex items-center px-2 py-0.5 rounded-full text-[0.7rem] font-semibold bg-green-50 text-green-700">● Ativo</span>`
-      : `<span class="inline-flex items-center px-2 py-0.5 rounded-full text-[0.7rem] font-semibold bg-red-50 text-red-600">● Inativo</span>`;
+    const profCell = profCellHtml(u);
+    const statusBadge = statusBadgeHtml(u);
     const empCell = '';
 
     return `
@@ -852,6 +860,80 @@ function renderTable() {
       </td>
     </tr>`;
   }).join('');
+
+  mobileList.innerHTML = slice.map(renderMobileCard).join('');
+  renderPagination();
+}
+
+function renderMobileCard(u) {
+  const ini = initials(u.NOME_USU);
+  return `
+  <div class="px-4 py-3.5">
+    <div class="flex items-start gap-3">
+      ${u.FOTO_USU
+        ? `<img src="${u.FOTO_USU}" class="w-10 h-10 rounded-full object-cover shrink-0 border border-gray-200" alt="" />`
+        : `<div class="w-10 h-10 rounded-full ${avColor(u.NOME_USU)} flex items-center justify-center text-white text-xs font-bold shrink-0">${ini}</div>`}
+      <div class="flex-1 min-w-0">
+        <p class="text-sm font-semibold text-gray-800 ${!u.ATIVO_USU?'opacity-50':''} truncate">${u.NOME_USU||'—'}</p>
+        <p class="text-xs text-gray-400 truncate">${u.EMAIL_USU||'—'}</p>
+        <div class="flex items-center gap-1.5 flex-wrap mt-1.5">
+          ${cargoBadge(u.CARGO)}
+          ${statusBadgeHtml(u)}
+        </div>
+        <div class="mt-1.5">${profCellHtml(u)}</div>
+        <p class="text-xs text-gray-400 mt-1.5">Cadastrado em ${fmtDate(u.DTCRI_USU)}</p>
+      </div>
+      <div class="flex flex-col items-center gap-1 shrink-0">
+        <button onclick='openFormModal(${JSON.stringify(u)})'
+          class="p-1.5 rounded-lg text-gray-400 hover:text-vitta-600 hover:bg-vitta-50 transition-colors" title="Editar">
+          <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
+            <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
+          </svg>
+        </button>
+        <button onclick="openToggleModal('${u.ID_USU}','${(u.NOME_USU||'').replace(/'/g,"\\'")}',${u.ATIVO_USU})"
+          class="p-1.5 rounded-lg ${u.ATIVO_USU?'text-gray-400 hover:text-red-500 hover:bg-red-50':'text-gray-400 hover:text-green-600 hover:bg-green-50'} transition-colors"
+          title="${u.ATIVO_USU?'Inativar':'Ativar'}">
+          <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            ${u.ATIVO_USU
+              ? '<circle cx="12" cy="12" r="10"/><line x1="4.93" y1="4.93" x2="19.07" y2="19.07"/>'
+              : '<path d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10z"/><path d="M9 12l2 2 4-4"/>'}
+          </svg>
+        </button>
+        <button onclick="openDeleteModal('${u.ID_USU}','${u.AUTH_ID||''}','${(u.NOME_USU||'').replace(/'/g,"\\'")}')"
+          class="p-1.5 rounded-lg text-gray-400 hover:text-red-600 hover:bg-red-50 transition-colors" title="Excluir">
+          <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/>
+          </svg>
+        </button>
+      </div>
+    </div>
+  </div>`;
+}
+
+function renderPagination() {
+  const total = Math.ceil(filtered.length / PAGE_SIZE);
+  const pg = document.getElementById('pagination');
+  if (!pg) return;
+  if (total <= 1) { pg.innerHTML = ''; return; }
+  const btnBase = 'min-w-[32px] h-8 rounded-lg border border-gray-200 text-xs font-semibold flex items-center justify-center px-2 transition-colors';
+  let html = `<button class="${btnBase} hover:bg-gray-50 text-gray-500" onclick="goPage(${currentPage - 1})" ${currentPage === 1 ? 'disabled' : ''}>‹</button>`;
+  for (let i = 1; i <= total; i++) {
+    if (total > 7 && i > 3 && i < total - 1 && Math.abs(i - currentPage) > 1) {
+      if (i === 4 || i === total - 2) html += `<button class="${btnBase} text-gray-400 cursor-default" disabled>…</button>`;
+      continue;
+    }
+    html += `<button class="${btnBase} ${i === currentPage ? 'bg-vitta-500 text-white border-vitta-500' : 'hover:bg-gray-50 text-gray-600'}" onclick="goPage(${i})">${i}</button>`;
+  }
+  html += `<button class="${btnBase} hover:bg-gray-50 text-gray-500" onclick="goPage(${currentPage + 1})" ${currentPage === total ? 'disabled' : ''}>›</button>`;
+  pg.innerHTML = html;
+}
+
+function goPage(n) {
+  const total = Math.ceil(filtered.length / PAGE_SIZE);
+  if (n < 1 || n > total) return;
+  currentPage = n;
+  renderTable();
 }
 
 /* ── Modal ── */
@@ -1122,7 +1204,11 @@ async function executeDelete() {
 function openToggleModal(id, nome, ativo) {
   toggleTargetId = id; toggleTargetAtivo = ativo;
   const inativando = ativo;
-  document.getElementById('toggleIcon').textContent   = inativando ? '⚠️' : '✅';
+  const toggleIconEl = document.getElementById('toggleIcon');
+  toggleIconEl.className = 'mb-3 flex justify-center ' + (inativando ? 'text-amber-500' : 'text-emerald-500');
+  toggleIconEl.innerHTML = inativando
+    ? '<svg class="w-10 h-10" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z"/></svg>'
+    : '<svg class="w-10 h-10" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>';
   document.getElementById('toggleTitle').textContent  = inativando ? `Inativar "${nome}"?` : `Ativar "${nome}"?`;
   document.getElementById('toggleMsg').textContent    = inativando
     ? 'O usuário não poderá mais acessar o sistema.' : 'O usuário poderá acessar o sistema novamente.';

@@ -21,6 +21,7 @@
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
   <script src="../assets/js/config.js?v=2"></script>
+  <script src="../assets/js/toast.js?v=1"></script>
   <script src="../assets/js/access-guard.js?v=2"></script>
   <script src="../assets/js/admin-empresa-context.js?v=1"></script>
   <script src="../assets/js/notifications.js?v=3"></script>
@@ -33,7 +34,6 @@
     .chevron.open{transform:rotate(180deg)}
     .modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:300;align-items:flex-start;justify-content:center;padding:24px 16px;overflow-y:auto}
     .modal-overlay.open{display:flex}
-    #toast{position:fixed;bottom:24px;right:24px;z-index:999;transition:all .3s ease}
     .tab-btn{border-bottom:2px solid transparent;transition:all .15s}
     .tab-btn.active{color:#2ABCD4;border-bottom-color:#2ABCD4}
     .table-scroll::-webkit-scrollbar{height:4px}
@@ -138,6 +138,7 @@
       <a href="planos.html" class="flex items-center gap-2 pl-10 pr-3 py-2 mx-2 rounded-xl text-[0.8rem] text-gray-500 hover:bg-white/5 hover:text-gray-300 transition-colors cursor-pointer">Planos</a>
       <a href="configuracoes.html" class="flex items-center gap-2 pl-10 pr-3 py-2 mx-2 rounded-xl text-[0.8rem] text-gray-500 hover:bg-white/5 hover:text-gray-300 transition-colors cursor-pointer">Configura&ccedil;&otilde;es</a>
       <a href="logs.html" class="flex items-center gap-2 pl-10 pr-3 py-2 mx-2 rounded-xl text-[0.8rem] text-gray-500 hover:bg-white/5 hover:text-gray-300 transition-colors cursor-pointer">Log</a>
+      <a href="cadastros_admin.html" class="flex items-center gap-2 pl-10 pr-3 py-2 mx-2 rounded-xl text-[0.8rem] text-gray-500 hover:bg-white/5 hover:text-gray-300 transition-colors cursor-pointer">Cadastros</a>
     </div>
     </div>
     <div class="h-4"></div>
@@ -262,7 +263,7 @@
           </table>
           <div id="lancEmpty" class="hidden py-16 text-center">
             <svg xmlns="http://www.w3.org/2000/svg" class="w-12 h-12 text-gray-200 mx-auto mb-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
-            <p class="text-[0.88rem] font-semibold text-gray-400">Nenhum lan&ccedil;amento encontrado</p>
+            <p class="text-[0.9rem] font-semibold text-gray-400">Nenhum lan&ccedil;amento encontrado</p>
             <p class="text-[0.78rem] text-gray-300 mt-1">Consultas marcadas para pagamento aparecer&atilde;o aqui</p>
           </div>
         </div>
@@ -547,7 +548,7 @@
       <div class="grid grid-cols-2 gap-3">
         <div class="bg-emerald-50 rounded-xl px-4 py-3">
           <p class="text-[0.68rem] font-bold text-emerald-600 uppercase tracking-wider mb-1">Valor Pago</p>
-          <p id="viewVlPgto" class="text-[1.1rem] font-extrabold text-emerald-700">—</p>
+          <p id="viewVlPgto" class="text-[1rem] font-extrabold text-emerald-700">—</p>
         </div>
         <div class="bg-gray-50 rounded-xl px-4 py-3">
           <p class="text-[0.68rem] font-bold text-gray-500 uppercase tracking-wider mb-1">Pago em</p>
@@ -611,10 +612,6 @@
   </div>
 </div>
 
-<!-- TOAST -->
-<div id="toast" class="hidden">
-  <div id="toastInner" class="flex items-center gap-3 px-4 py-3 rounded-xl shadow-lg text-sm font-medium text-white min-w-[240px]"></div>
-</div>
 
 
 <script>
@@ -632,7 +629,6 @@ let comprovanteFile=null, comprovanteAtual=null, comprovanteRemovido=false;
 function toggleMenu(k){const s=document.getElementById('sub-'+k),c=document.getElementById('chev-'+k);const o=s.classList.contains('open');s.classList.toggle('open',!o);if(c)c.classList.toggle('open',!o);}
 function toggleSidebar(){const sb=document.getElementById('sidebar'),ov=document.getElementById('overlay');const o=sb.classList.contains('-translate-x-full');sb.classList.toggle('-translate-x-full',!o);ov.classList.toggle('hidden',!o);}
 async function handleLogout(){await supabase.auth.signOut();window.location.href='../index.html';}
-function showToast(msg,ok=true){const t=document.getElementById('toast'),i=document.getElementById('toastInner');i.textContent=msg;i.className=`flex items-center gap-3 px-4 py-3 rounded-xl shadow-lg text-sm font-medium text-white min-w-[240px] ${ok?'bg-emerald-500':'bg-red-500'}`;t.classList.remove('hidden');setTimeout(()=>t.classList.add('hidden'),3500);}
 function isGlobal(){return currentUserMeta?.tipo_usu==='ADMIN_GLOBAL';}
 function fmtBRL(v){return Number(v||0).toLocaleString('pt-BR',{style:'currency',currency:'BRL'});}
 function formatCurrencyBR(v){return(v===null||v===undefined||v==='')?'':Number(v).toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2});}
@@ -934,7 +930,7 @@ function onCompDrop(e){e.preventDefault();document.getElementById('compDropZone'
 function onComprovanteSelected(file){
   if(!file)return;
   const maxBytes=10*1024*1024;
-  if(file.size>maxBytes){showToast('Arquivo muito grande. Máximo 10MB.',false);return;}
+  if(file.size>maxBytes){showToast('Arquivo muito grande. Máximo 10MB.', 'error');return;}
   comprovanteFile=file;
   const info=fileTypeInfo(file.name);
   const icon=document.getElementById('compIcon');
@@ -960,7 +956,7 @@ async function viewComprovanteAtual(){
     const{data,error}=await supabase.storage.from('comprovantes-pagamento').createSignedUrl(comprovanteAtual.path,300);
     if(error)throw error;
     window.open(data.signedUrl,'_blank');
-  }catch(e){showToast('Não foi possível abrir o comprovante.',false);}
+  }catch(e){showToast('Não foi possível abrir o comprovante.', 'error');}
 }
 async function abrirComprovante(){
   const agd=allLancamentos.find(a=>a.ID_AGD===viewAgdId);
@@ -970,7 +966,7 @@ async function abrirComprovante(){
     const{data,error}=await supabase.storage.from('comprovantes-pagamento').createSignedUrl(path,300);
     if(error)throw error;
     window.open(data.signedUrl,'_blank');
-  }catch(e){showToast('Não foi possível abrir o comprovante.',false);}
+  }catch(e){showToast('Não foi possível abrir o comprovante.', 'error');}
 }
 async function baixarComprovante(){
   const agd=allLancamentos.find(a=>a.ID_AGD===viewAgdId);
@@ -983,7 +979,7 @@ async function baixarComprovante(){
     const a=document.createElement('a');
     a.href=url;a.download=p.COMPROVANTE_NOME||'comprovante';a.click();
     URL.revokeObjectURL(url);
-  }catch(e){showToast('Não foi possível baixar o comprovante.',false);}
+  }catch(e){showToast('Não foi possível baixar o comprovante.', 'error');}
 }
 
 function onTipPagChangePgto(){
@@ -1038,7 +1034,7 @@ async function doEstornarPagamento(){
   btn.disabled=true;btn.textContent='Estornando…';
   const {error}=await supabase.from('PAGAMENTO').update({ESTORNADO_PGTO:true}).eq('ID_AGD',viewAgdId);
   btn.disabled=false;btn.textContent='Estornar';
-  if(error){showToast(error.message,false);return;}
+  if(error){showToast(error.message, 'error');return;}
   closeConfirmEstorno();
   showToast('Pagamento estornado com sucesso!');
   closeViewModal();
@@ -1056,7 +1052,7 @@ async function savePayment(ev){
   const agd=allLancamentos.find(a=>a.ID_AGD===pgtoAgdId);
   if(!agd){btn.disabled=false;btn.textContent=wasEditing?'Salvar Alterações':'Confirmar Pagamento';return;}
   const vlPgto=parseCurrencyBR(document.getElementById('fVlPgto').value);
-  if(!vlPgto||vlPgto<=0){showToast('Informe um valor maior que zero',false);btn.disabled=false;btn.textContent=wasEditing?'Salvar Alterações':'Confirmar Pagamento';return;}
+  if(!vlPgto||vlPgto<=0){showToast('Informe um valor maior que zero', 'error');btn.disabled=false;btn.textContent=wasEditing?'Salvar Alterações':'Confirmar Pagamento';return;}
   const fields={
     VL_PGTO:vlPgto,
     DT_PGTO:document.getElementById('fDtPgto').value,
@@ -1095,7 +1091,7 @@ async function savePayment(ev){
     closeModal();
     await loadLancamentos();
   }catch(err){
-    showToast(err.message||'Erro ao salvar',false);
+    showToast(err.message||'Erro ao salvar', 'error');
   }
   btn.disabled=false;btn.textContent=wasEditing?'Salvar Alterações':'Confirmar Pagamento';
 }

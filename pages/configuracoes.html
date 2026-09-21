@@ -133,6 +133,7 @@
       <a href="dashboard-gerencial.html" class="flex items-center gap-2 pl-10 pr-3 py-2 mx-2 rounded-xl text-[0.8rem] text-gray-500 hover:bg-white/5 hover:text-gray-300 transition-colors cursor-pointer">Dashboard Gerencial</a>
       <a href="configuracoes.html" class="flex items-center gap-2 pl-10 pr-3 py-2 mx-2 rounded-xl text-[0.8rem] font-semibold text-vitta-400 bg-vitta-500/10 transition-colors cursor-pointer">Configura&ccedil;&otilde;es</a>
       <a href="logs.html" class="flex items-center gap-2 pl-10 pr-3 py-2 mx-2 rounded-xl text-[0.8rem] text-gray-500 hover:bg-white/5 hover:text-gray-300 transition-colors cursor-pointer">Log</a>
+      <a href="cadastros_admin.html" class="flex items-center gap-2 pl-10 pr-3 py-2 mx-2 rounded-xl text-[0.8rem] text-gray-500 hover:bg-white/5 hover:text-gray-300 transition-colors cursor-pointer">Cadastros</a>
     </div>
     </div>
     <div class="h-4"></div>
@@ -217,7 +218,7 @@
             </svg>
           </div>
           <div class="flex-1 min-w-0">
-            <h2 class="text-[0.92rem] font-bold text-gray-800">Resumo Prontu&aacute;rio</h2>
+            <h2 class="text-[0.9rem] font-bold text-gray-800">Resumo Prontu&aacute;rio</h2>
             <p class="text-[0.72rem] text-gray-400 mt-0.5">IA para resumo do hist&oacute;rico cl&iacute;nico do paciente</p>
           </div>
           <div id="ai-status-resumo" class="flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[0.7rem] font-semibold bg-gray-100 text-gray-400 border border-gray-200 shrink-0">
@@ -309,7 +310,7 @@
             </svg>
           </div>
           <div class="flex-1 min-w-0">
-            <h2 class="text-[0.92rem] font-bold text-gray-800">An&aacute;lise Financeira</h2>
+            <h2 class="text-[0.9rem] font-bold text-gray-800">An&aacute;lise Financeira</h2>
             <p class="text-[0.72rem] text-gray-400 mt-0.5">IA para an&aacute;lise e insights financeiros da cl&iacute;nica</p>
           </div>
           <div id="ai-status-fin" class="flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[0.7rem] font-semibold bg-gray-100 text-gray-400 border border-gray-200 shrink-0">
@@ -405,14 +406,11 @@
 
   </main>
 
-  <!-- Toast -->
-  <div id="toast-conf" class="fixed bottom-6 right-6 z-50 hidden">
-    <div id="toast-conf-inner" class="flex items-center gap-3 px-4 py-3 rounded-xl shadow-lg text-sm font-medium text-white min-w-[240px]"></div>
-  </div>
 </div>
 
 </div><!-- /flex min-h-screen -->
 
+<script src="../assets/js/toast.js?v=1"></script>
 <script src="../assets/js/ai-utils.js?v=1"></script>
 <script>
 /* ─────────────────────────────────────────────
@@ -446,15 +444,6 @@ let currentUserMeta = null;
 
 /* ── Utilitários ── */
 function escHtml(s) { return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
-
-function showToastConf(msg, ok = true) {
-  const t = document.getElementById('toast-conf');
-  const i = document.getElementById('toast-conf-inner');
-  i.textContent = msg;
-  i.className = `flex items-center gap-3 px-4 py-3 rounded-xl shadow-lg text-sm font-medium text-white min-w-[240px] ${ok ? 'bg-emerald-500' : 'bg-red-500'}`;
-  t.classList.remove('hidden');
-  setTimeout(() => t.classList.add('hidden'), 3500);
-}
 
 function toggleMenu(k) {
   const s = document.getElementById('sub-' + k);
@@ -521,7 +510,7 @@ async function testConnection(scope) {
   const key      = document.getElementById('inp-api-key-' + scope).value.trim();
   const provider = document.getElementById('sel-provider-' + scope).value;
   const model    = document.getElementById('sel-model-' + scope).value;
-  if (!key) { alert('Digite a chave antes de testar.'); return; }
+  if (!key) { showToast('Digite a chave antes de testar.', 'error'); return; }
   const result = document.getElementById('api-test-result-' + scope);
   result.classList.remove('hidden');
   result.innerHTML = `<div class="flex items-center gap-2 text-violet-600 text-[0.78rem]">
@@ -544,7 +533,7 @@ async function saveAiConfig(scope) {
   const provider = document.getElementById('sel-provider-' + scope).value;
   const model    = document.getElementById('sel-model-' + scope).value;
   const key      = document.getElementById('inp-api-key-' + scope).value.trim();
-  if (!key) { alert('Digite a chave de API para salvar.'); return; }
+  if (!key) { showToast('Digite a chave de API para salvar.', 'error'); return; }
   const P   = VittaAI.PROVIDERS[provider];
   const def = BLOCK_DEFS[scope];
   if (!P) return;
@@ -569,9 +558,9 @@ async function saveAiConfig(scope) {
     _aiConfigMap[def.providerKey] = provider;
     _aiConfigMap[def.modelKey]    = model;
     updateStatusBadge(scope, provider);
-    showToastConf('Configurações salvas! Usando ' + P.name + '.');
+    showToast('Configurações salvas! Usando ' + P.name + '.');
   } catch(err) {
-    showToastConf(err.message || 'Erro ao salvar', false);
+    showToast(err.message || 'Erro ao salvar', 'error');
   }
 }
 
@@ -596,7 +585,7 @@ function promptCardHTML(scope, p, idx) {
   return `<div id="prompt-card-${scope}-${idx}" class="border border-gray-100 rounded-xl overflow-hidden">
     <div class="flex items-start justify-between gap-3 p-4 bg-gray-50/60">
       <div>
-        <p class="text-[0.88rem] font-bold text-gray-800">${escHtml(p.TITULO || meta.titulo || p.CHAVE)}</p>
+        <p class="text-[0.9rem] font-bold text-gray-800">${escHtml(p.TITULO || meta.titulo || p.CHAVE)}</p>
         <p class="text-[0.72rem] text-gray-400 mt-0.5">${escHtml(p.DESCRICAO || meta.descricao || '')}</p>
       </div>
       <button type="button" onclick="editPrompt('${scope}', ${idx})"
@@ -646,7 +635,7 @@ function cancelEditPrompt(scope, idx) {
 async function savePrompt(scope, idx, chave) {
   const ta  = document.getElementById(`prompt-ta-${scope}-${idx}`);
   const val = ta.value.trim();
-  if (!val) { alert('O prompt não pode estar vazio.'); return; }
+  if (!val) { showToast('O prompt não pode estar vazio.', 'error'); return; }
   const btn = document.getElementById(`prompt-editor-${scope}-${idx}`).querySelector('button:last-child');
   btn.textContent = 'Salvando…'; btn.disabled = true;
   try {
@@ -658,13 +647,13 @@ async function savePrompt(scope, idx, chave) {
     if (error) throw error;
     _blockPrompts[scope][idx].VALOR = val;
     _aiConfigMap[chave] = val;
-    showToastConf('Prompt salvo com sucesso!');
+    showToast('Prompt salvo com sucesso!');
     cancelEditPrompt(scope, idx);
     const preview = val.slice(0, 200).replace(/\n/g, ' ');
     document.getElementById(`prompt-preview-${scope}-${idx}`).innerHTML =
       `<p class="text-[0.72rem] text-gray-500 font-mono leading-relaxed">${escHtml(preview)}${val.length > 200 ? '…' : ''}</p>`;
   } catch(err) {
-    showToastConf(err.message || 'Erro ao salvar', false);
+    showToast(err.message || 'Erro ao salvar', 'error');
   } finally {
     btn.textContent = 'Salvar Prompt'; btn.disabled = false;
   }
