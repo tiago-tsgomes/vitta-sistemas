@@ -530,3 +530,59 @@ async function initVittaBIMenu() {
     }
   } catch(_) {}
 })();
+
+/* ───────────────────────────────────────────────
+   Menu lateral: seções sempre fechadas ao abrir uma tela
+
+   As páginas trazem a seção da tela atual com class="submenu open"
+   (e o chevron com "open") no HTML. Ao navegar para outra tela, a
+   seção clicada ficava aberta. Aqui todas começam recolhidas; o
+   usuário abre a que quiser pelo toggleMenu de cada página.
+   A transição é desligada durante o recolhimento para não animar
+   o fechamento a cada carregamento de página.
+─────────────────────────────────────────────── */
+;(function() {
+  function collapseSidebarSections() {
+    const opened = document.querySelectorAll('#sidebar .submenu.open, #sidebar .chevron.open');
+    if (!opened.length) return;
+    const all = document.querySelectorAll('#sidebar .submenu, #sidebar .chevron');
+    all.forEach(el => { el.style.transition = 'none'; });
+    opened.forEach(el => el.classList.remove('open'));
+    void document.body.offsetHeight; // aplica o estado sem transição
+    all.forEach(el => { el.style.transition = ''; });
+  }
+
+  collapseSidebarSections();
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', collapseSidebarSections);
+  }
+})();
+
+/* ───────────────────────────────────────────────
+   Menu lateral: esconder Leads e Despesas para o Profissional
+
+   O TIPO_USU real vem sempre do banco (getUsuarioAtual), nunca do
+   JWT/user_metadata, para não repetir a regressão de privilégio já
+   vista neste projeto. Some para PROFISSIONAL; ADMIN_GLOBAL,
+   ADMIN_EMPRESA e SECRETARIA continuam vendo normalmente.
+─────────────────────────────────────────────── */
+;(function() {
+  async function hideLeadsEDespesasParaProfissional() {
+    const link = document.getElementById('menuLeads');
+    const secao = document.getElementById('sectionDespesas');
+    if (!link && !secao) return;
+    try {
+      const u = await getUsuarioAtual('TIPO_USU');
+      if (u?.TIPO_USU === 'PROFISSIONAL') {
+        link?.classList.add('hidden');
+        secao?.classList.add('hidden');
+      }
+    } catch (_) {}
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', hideLeadsEDespesasParaProfissional);
+  } else {
+    hideLeadsEDespesasParaProfissional();
+  }
+})();

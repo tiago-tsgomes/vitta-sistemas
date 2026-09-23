@@ -11,16 +11,16 @@
       theme: {
         extend: {
           colors: { vitta: { 50:'#f0fbfd',100:'#e0f7fa',300:'#80deea',400:'#4dd9ed',500:'#2ABCD4',600:'#1a96ac',700:'#127a8c' } },
-          fontFamily: { sans: ['Inter','system-ui','sans-serif'] }
+          fontFamily: { sans: ['Montserrat','system-ui','sans-serif'] }
         }
       }
     }
   </script>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
-  <script src="../assets/js/config.js?v=2"></script>
+  <script src="../assets/js/config.js?v=3"></script>
   <script src="../assets/js/toast.js?v=1"></script>
   <script src="../assets/js/admin-empresa-context.js?v=1"></script>
   <script src="../assets/js/notifications.js?v=3"></script>
@@ -60,7 +60,7 @@
       <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>Consultas
     </a>
 
-    <p class="block text-[0.6rem] font-bold text-gray-500 uppercase tracking-widest px-4 pb-1 pt-4">Cadastros</p>
+    <div class="pt-1"></div>
     <button onclick="toggleMenu('cadastros')" class="w-full flex items-center gap-3 px-3 py-2.5 mx-2 rounded-xl text-[0.83rem] font-medium text-gray-400 hover:bg-white/10 hover:text-white transition-colors duration-150 cursor-pointer mb-0.5" style="width:calc(100% - 16px)">
       <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>Cadastros
       <svg id="chev-cadastros" class="chevron w-3.5 h-3.5 ml-auto text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
@@ -70,10 +70,10 @@
       <a href="profissionais.html" class="flex items-center gap-2 pl-10 pr-3 py-2 mx-2 rounded-xl text-[0.8rem] text-gray-500 hover:bg-white/5 hover:text-gray-300 transition-colors cursor-pointer">Profissionais</a>
       <a href="usuarios-empresa.html" class="flex items-center gap-2 pl-10 pr-3 py-2 mx-2 rounded-xl text-[0.8rem] text-gray-500 hover:bg-white/5 hover:text-gray-300 transition-colors cursor-pointer">Usu&aacute;rios</a>
       <div class="hidden" id="menuDocumentosWrap"><a href="documentos.html" class="flex items-center gap-2 pl-10 pr-3 py-2 mx-2 rounded-xl text-[0.8rem] text-gray-500 hover:bg-white/5 hover:text-gray-300 transition-colors cursor-pointer w-full">Documentos</a></div>
-      <a href="leads.html" class="flex items-center gap-2 pl-10 pr-3 py-2 mx-2 rounded-xl text-[0.8rem] text-gray-500 hover:bg-white/5 hover:text-gray-300 transition-colors cursor-pointer">Leads</a>
+      <a href="leads.html" id="menuLeads" class="flex items-center gap-2 pl-10 pr-3 py-2 mx-2 rounded-xl text-[0.8rem] text-gray-500 hover:bg-white/5 hover:text-gray-300 transition-colors cursor-pointer">Leads</a>
     </div>
 
-    <p class="block text-[0.6rem] font-bold text-gray-500 uppercase tracking-widest px-4 pb-1 pt-4">Outros Cadastros</p>
+    <div class="pt-1"></div>
     <button onclick="toggleMenu('servicos')" class="w-full flex items-center gap-3 px-3 py-2.5 mx-2 rounded-xl text-[0.83rem] font-medium text-gray-400 hover:bg-white/10 hover:text-white transition-colors duration-150 cursor-pointer mb-0.5" style="width:calc(100% - 16px)">
       <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>Outros Cadastros
       <svg id="chev-servicos" class="chevron w-3.5 h-3.5 ml-auto text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
@@ -87,7 +87,7 @@
       <a href="tiposacompanhamento.html" class="flex items-center gap-2 pl-10 pr-3 py-2 mx-2 rounded-xl text-[0.8rem] text-gray-500 hover:bg-white/5 hover:text-gray-300 transition-colors cursor-pointer">Tipos de Acomp.</a>
     </div>
 
-    <p class="block text-[0.6rem] font-bold text-gray-500 uppercase tracking-widest px-4 pb-1 pt-4">Financeiro</p>
+    <div class="pt-1"></div>
     <button onclick="toggleMenu('financeiro')" class="w-full flex items-center gap-3 px-3 py-2.5 mx-2 rounded-xl text-[0.83rem] font-medium text-gray-400 hover:bg-white/10 hover:text-white transition-colors duration-150 cursor-pointer mb-0.5" style="width:calc(100% - 16px)">
       <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>Financeiro
       <svg id="chev-financeiro" class="chevron w-3.5 h-3.5 ml-auto text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
@@ -97,7 +97,19 @@
       <a href="relatorios.html" class="flex items-center gap-2 pl-10 pr-3 py-2 mx-2 rounded-xl text-[0.8rem] text-gray-500 hover:bg-white/5 hover:text-gray-300 transition-colors cursor-pointer">Relat&oacute;rios</a>
     </div>
 
-    <p class="block text-[0.6rem] font-bold text-gray-500 uppercase tracking-widest px-4 pb-1 pt-4">Minha Empresa</p>
+        <div id="sectionDespesas">
+<div class="pt-1"></div>
+    <button onclick="toggleMenu('despesas')" class="w-full flex items-center gap-3 px-3 py-2.5 mx-2 rounded-xl text-[0.83rem] font-medium text-gray-400 hover:bg-white/10 hover:text-white transition-colors duration-150 cursor-pointer mb-0.5" style="width:calc(100% - 16px)">
+      <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M4 2v20l2-1 2 1 2-1 2 1 2-1 2 1 2-1 2 1V2l-2 1-2-1-2 1-2-1-2 1-2-1-2 1z"/><path d="M16 8h-6a2 2 0 1 0 0 4h4a2 2 0 1 1 0 4H8"/><path d="M12 17.5v-11"/></svg>Despesas
+      <svg id="chev-despesas" class="chevron w-3.5 h-3.5 ml-auto text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+    </button>
+    <div id="sub-despesas" class="submenu">
+      <a href="despesas.html" class="flex items-center gap-2 pl-10 pr-3 py-2 mx-2 rounded-xl text-[0.8rem] text-gray-500 hover:bg-white/5 hover:text-gray-300 transition-colors cursor-pointer">Cadastro Despesa</a>
+      <a href="categorias-despesa.html" class="flex items-center gap-2 pl-10 pr-3 py-2 mx-2 rounded-xl text-[0.8rem] text-gray-500 hover:bg-white/5 hover:text-gray-300 transition-colors cursor-pointer">Categorias</a>
+    </div>
+    </div>
+
+    <div class="pt-1"></div>
     <button onclick="toggleMenu('minhaempresa')" class="w-full flex items-center gap-3 px-3 py-2.5 mx-2 rounded-xl text-[0.83rem] font-semibold text-vitta-400 bg-vitta-500/10 transition-colors duration-150 cursor-pointer mb-0.5" style="width:calc(100% - 16px)">
       <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>Minha Empresa
       <svg id="chev-minhaempresa" class="chevron open w-3.5 h-3.5 ml-auto text-vitta-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
@@ -108,7 +120,7 @@
     </div>
 
     <div id="sectionVittaBI" class="hidden">
-    <p class="block text-[0.6rem] font-bold text-gray-500 uppercase tracking-widest px-4 pb-1 pt-4">Vitta BI</p>
+    <div class="pt-1"></div>
     <a id="linkVittaBI" href="https://bi.vittasistemas.com.br" target="_blank" rel="noopener"
        class="flex items-center gap-3 px-3 py-2.5 mx-2 rounded-xl text-[0.83rem] font-medium text-gray-400 hover:bg-white/10 hover:text-white transition-colors duration-150 cursor-pointer mb-0.5">
       <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
@@ -120,7 +132,7 @@
     </div>
 
     <div id="sectionAdmin" class="hidden">
-    <p class="block text-[0.6rem] font-bold text-gray-500 uppercase tracking-widest px-4 pb-1 pt-4">Sistema</p>
+    <div class="pt-1"></div>
     <button onclick="toggleMenu('admin')" class="w-full flex items-center gap-3 px-3 py-2.5 mx-2 rounded-xl text-[0.83rem] font-medium text-gray-400 hover:bg-white/10 hover:text-white transition-colors duration-150 mb-0.5" style="width:calc(100% - 16px)">
       <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14M4.93 4.93a10 10 0 0 0 0 14.14"/></svg>Administra&ccedil;&atilde;o
       <svg id="chev-admin" class="chevron w-3.5 h-3.5 ml-auto text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
@@ -416,13 +428,13 @@
 
     <!-- Passo 1: Boas-vindas + escolha do plano -->
     <div id="reativPasso1">
-      <div class="px-6 pt-8 pb-2 text-center">
+      <div class="px-5 pt-6 pb-2 text-center">
         <div class="text-4xl mb-3">🎉</div>
-        <h3 class="text-lg font-extrabold text-gray-800">Que ótimo ter você de volta!</h3>
-        <p class="text-sm text-gray-500 mt-1">Sua assinatura será reativada imediatamente.</p>
+        <h3 class="text-[1.05rem] font-extrabold text-gray-800">Que ótimo ter você de volta!</h3>
+        <p class="text-[0.83rem] text-gray-500 mt-1">Sua assinatura será reativada imediatamente.</p>
       </div>
 
-      <div class="px-6 py-4">
+      <div class="px-5 py-4">
         <p class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-3">Deseja continuar com o mesmo plano?</p>
 
         <!-- Plano atual -->
@@ -448,19 +460,19 @@
         <div id="outrosPlanos" class="hidden mt-2 flex flex-col gap-2"></div>
       </div>
 
-      <div class="px-6 pb-6 flex justify-end gap-3">
-        <button onclick="fecharModalReativacao()" class="px-4 py-2.5 border border-gray-200 rounded-xl text-sm font-semibold text-gray-600 hover:bg-gray-50 transition-colors">Cancelar</button>
-        <button onclick="irParaConfirmacaoReativ()" class="px-5 py-2.5 bg-emerald-500 hover:bg-emerald-600 text-white text-sm font-semibold rounded-xl transition-colors">Continuar</button>
+      <div class="px-5 pb-5 flex justify-end gap-2.5">
+        <button onclick="fecharModalReativacao()" class="px-4 py-2 border border-gray-200 rounded-xl text-sm font-semibold text-gray-600 hover:bg-gray-50 transition-colors">Cancelar</button>
+        <button onclick="irParaConfirmacaoReativ()" class="px-5 py-2 bg-emerald-500 hover:bg-emerald-600 text-white text-sm font-semibold rounded-xl transition-colors">Continuar</button>
       </div>
     </div>
 
     <!-- Passo 2: Confirmação -->
     <div id="reativPasso2" class="hidden">
-      <div class="px-6 pt-6 pb-4 border-b border-gray-100">
-        <h3 class="text-base font-bold text-gray-800">Confirmar reativação</h3>
-        <p class="text-sm text-gray-500 mt-1">Revise os detalhes antes de confirmar.</p>
+      <div class="px-5 pt-5 pb-3 border-b border-gray-100">
+        <h3 class="text-[0.95rem] font-bold text-gray-800">Confirmar reativação</h3>
+        <p class="text-[0.72rem] text-gray-400 mt-0.5">Revise os detalhes antes de confirmar.</p>
       </div>
-      <div class="px-6 py-5 flex flex-col gap-3">
+      <div class="px-5 py-4 flex flex-col gap-3">
         <div class="bg-gray-50 rounded-xl p-4 flex flex-col gap-2.5">
           <div class="flex justify-between text-sm">
             <span class="text-gray-500">Plano</span>
@@ -478,10 +490,10 @@
         </div>
         <p class="text-xs text-gray-400 leading-relaxed">O boleto será gerado próximo à data de vencimento. Após o pagamento, sua assinatura é renovada automaticamente todo mês na mesma data.</p>
       </div>
-      <div class="px-6 pb-6 flex justify-end gap-3">
-        <button onclick="voltarReativPasso1()" class="px-4 py-2.5 border border-gray-200 rounded-xl text-sm font-semibold text-gray-600 hover:bg-gray-50 transition-colors">Voltar</button>
+      <div class="px-5 pb-5 flex justify-end gap-2.5">
+        <button onclick="voltarReativPasso1()" class="px-4 py-2 border border-gray-200 rounded-xl text-sm font-semibold text-gray-600 hover:bg-gray-50 transition-colors">Voltar</button>
         <button onclick="confirmarReativacao()" id="btnConfirmarReativ"
-                class="flex items-center gap-2 px-5 py-2.5 bg-emerald-500 hover:bg-emerald-600 text-white text-sm font-semibold rounded-xl transition-colors">
+                class="flex items-center gap-2 px-5 py-2 bg-emerald-500 hover:bg-emerald-600 text-white text-sm font-semibold rounded-xl transition-colors">
           <svg id="reativSpin" class="hidden animate-spin w-4 h-4" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/></svg>
           Reativar Assinatura
         </button>
@@ -489,13 +501,13 @@
     </div>
 
     <!-- Passo 3: Sucesso -->
-    <div id="reativPasso3" class="hidden px-6 py-10 text-center">
+    <div id="reativPasso3" class="hidden px-5 py-8 text-center">
       <div class="text-5xl mb-4">✅</div>
-      <h3 class="text-lg font-extrabold text-gray-800 mb-2">Assinatura reativada!</h3>
-      <p class="text-sm text-gray-500 leading-relaxed">Seu acesso está garantido.<br>O próximo boleto vencerá em</p>
+      <h3 class="text-[1.05rem] font-extrabold text-gray-800 mb-2">Assinatura reativada!</h3>
+      <p class="text-[0.83rem] text-gray-500 leading-relaxed">Seu acesso está garantido.<br>O próximo boleto vencerá em</p>
       <p id="reativSucessoVenc" class="text-xl font-extrabold text-emerald-600 mt-2">—</p>
       <p class="text-xs text-gray-400 mt-1">A partir daí, renova automaticamente todo mês na mesma data.</p>
-      <button onclick="fecharModalReativacao()" class="mt-6 px-6 py-2.5 bg-gray-800 hover:bg-gray-700 text-white text-sm font-semibold rounded-xl transition-colors">Fechar</button>
+      <button onclick="fecharModalReativacao()" class="mt-5 px-6 py-2 bg-gray-800 hover:bg-gray-700 text-white text-sm font-semibold rounded-xl transition-colors">Fechar</button>
     </div>
   </div>
 </div>
@@ -506,11 +518,11 @@
 
     <!-- Passo 1: Motivo -->
     <div id="cancelPasso1">
-      <div class="px-6 pt-6 pb-4 border-b border-gray-100">
-        <h3 class="text-base font-bold text-gray-800">Cancelar Assinatura</h3>
-        <p class="text-sm text-gray-500 mt-1">Nos conte o motivo para ajudarmos a melhorar.</p>
+      <div class="px-5 pt-5 pb-3 border-b border-gray-100">
+        <h3 class="text-[0.95rem] font-bold text-gray-800">Cancelar Assinatura</h3>
+        <p class="text-[0.72rem] text-gray-400 mt-0.5">Nos conte o motivo para ajudarmos a melhorar.</p>
       </div>
-      <div class="px-6 py-5 flex flex-col gap-3">
+      <div class="px-5 py-4 flex flex-col gap-3">
         <label class="text-xs font-semibold text-gray-500 uppercase tracking-wider">Motivo do cancelamento *</label>
         <div class="flex flex-col gap-2" id="motivoOpcoes">
           <label class="flex items-center gap-3 p-3 border border-gray-200 rounded-xl cursor-pointer hover:bg-gray-50 transition-colors has-[:checked]:border-red-300 has-[:checked]:bg-red-50">
@@ -538,19 +550,19 @@
         </div>
         <p id="motivoErro" class="hidden text-xs text-red-500 font-medium">Selecione ou informe um motivo para continuar.</p>
       </div>
-      <div class="px-6 pb-6 flex justify-end gap-3">
-        <button onclick="fecharModalCancelamento()" class="px-4 py-2.5 border border-gray-200 rounded-xl text-sm font-semibold text-gray-600 hover:bg-gray-50 transition-colors">Voltar</button>
-        <button onclick="irParaPasso2()" class="px-5 py-2.5 bg-red-500 hover:bg-red-600 text-white text-sm font-semibold rounded-xl transition-colors">Continuar</button>
+      <div class="px-5 pb-5 flex justify-end gap-2.5">
+        <button onclick="fecharModalCancelamento()" class="px-4 py-2 border border-gray-200 rounded-xl text-sm font-semibold text-gray-600 hover:bg-gray-50 transition-colors">Voltar</button>
+        <button onclick="irParaPasso2()" class="px-5 py-2 bg-red-500 hover:bg-red-600 text-white text-sm font-semibold rounded-xl transition-colors">Continuar</button>
       </div>
     </div>
 
     <!-- Passo 2: Confirmação -->
     <div id="cancelPasso2" class="hidden">
-      <div class="px-6 pt-6 pb-4 border-b border-gray-100">
-        <h3 class="text-base font-bold text-gray-800">Tem certeza?</h3>
-        <p class="text-sm text-gray-500 mt-1">Esta ação não pode ser desfeita.</p>
+      <div class="px-5 pt-5 pb-3 border-b border-gray-100">
+        <h3 class="text-[0.95rem] font-bold text-gray-800">Tem certeza?</h3>
+        <p class="text-[0.72rem] text-gray-400 mt-0.5">Esta ação não pode ser desfeita.</p>
       </div>
-      <div class="px-6 py-5">
+      <div class="px-5 py-4">
         <div class="bg-amber-50 border border-amber-200 rounded-xl p-4 flex gap-3">
           <svg class="w-5 h-5 text-amber-500 shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z"/></svg>
           <div>
@@ -563,10 +575,10 @@
           </div>
         </div>
       </div>
-      <div class="px-6 pb-6 flex justify-end gap-3">
-        <button onclick="voltarPasso1()" class="px-4 py-2.5 border border-gray-200 rounded-xl text-sm font-semibold text-gray-600 hover:bg-gray-50 transition-colors">Voltar</button>
+      <div class="px-5 pb-5 flex justify-end gap-2.5">
+        <button onclick="voltarPasso1()" class="px-4 py-2 border border-gray-200 rounded-xl text-sm font-semibold text-gray-600 hover:bg-gray-50 transition-colors">Voltar</button>
         <button onclick="confirmarCancelamento()" id="btnConfirmarCancel"
-                class="flex items-center gap-2 px-5 py-2.5 bg-red-500 hover:bg-red-600 text-white text-sm font-semibold rounded-xl transition-colors">
+                class="flex items-center gap-2 px-5 py-2 bg-red-500 hover:bg-red-600 text-white text-sm font-semibold rounded-xl transition-colors">
           <svg id="cancelSpin" class="hidden animate-spin w-4 h-4" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/></svg>
           Sim, cancelar assinatura
         </button>
@@ -574,15 +586,15 @@
     </div>
 
     <!-- Passo 3: Sucesso -->
-    <div id="cancelPasso3" class="hidden px-6 py-8 text-center">
-      <div class="w-14 h-14 rounded-full bg-emerald-100 border-2 border-emerald-300 flex items-center justify-center mx-auto mb-4">
-        <svg class="w-7 h-7 text-emerald-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5"/></svg>
+    <div id="cancelPasso3" class="hidden px-5 py-6 text-center">
+      <div class="w-12 h-12 rounded-full bg-emerald-100 border-2 border-emerald-300 flex items-center justify-center mx-auto mb-3">
+        <svg class="w-6 h-6 text-emerald-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5"/></svg>
       </div>
-      <h3 class="text-base font-bold text-gray-800 mb-2">Cancelamento confirmado</h3>
-      <p class="text-sm text-gray-500 leading-relaxed">Sua assinatura foi cancelada.<br>Você terá acesso ao sistema até</p>
+      <h3 class="text-[0.95rem] font-bold text-gray-800 mb-1.5">Cancelamento confirmado</h3>
+      <p class="text-[0.83rem] text-gray-500 leading-relaxed">Sua assinatura foi cancelada.<br>Você terá acesso ao sistema até</p>
       <p id="sucessoAcessoAte" class="text-lg font-bold text-gray-800 mt-2">—</p>
       <p class="text-xs text-gray-400 mt-1">Após essa data o sistema será bloqueado automaticamente.</p>
-      <button onclick="fecharModalCancelamento()" class="mt-5 px-6 py-2.5 bg-gray-800 hover:bg-gray-700 text-white text-sm font-semibold rounded-xl transition-colors">Entendido</button>
+      <button onclick="fecharModalCancelamento()" class="mt-5 px-6 py-2 bg-gray-800 hover:bg-gray-700 text-white text-sm font-semibold rounded-xl transition-colors">Entendido</button>
     </div>
   </div>
 </div>
@@ -593,29 +605,29 @@
 
     <!-- Passo 1: Seleção -->
     <div id="mpPasso1">
-      <div class="px-6 pt-6 pb-4 border-b border-gray-100 flex items-start justify-between">
+      <div class="px-5 pt-5 pb-3 border-b border-gray-100 flex items-start justify-between">
         <div>
-          <h3 class="text-base font-bold text-gray-800">Mudar de Plano</h3>
-          <p class="text-sm text-gray-500 mt-0.5">Selecione o plano desejado para sua clínica.</p>
+          <h3 class="text-[0.95rem] font-bold text-gray-800">Mudar de Plano</h3>
+          <p class="text-[0.72rem] text-gray-400 mt-0.5">Selecione o plano desejado para sua clínica.</p>
         </div>
-        <button onclick="fecharModalMudarPlano()" class="p-1.5 rounded-lg hover:bg-gray-100 text-gray-400 hover:text-gray-600 transition-colors">
-          <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        <button onclick="fecharModalMudarPlano()" class="w-7 h-7 rounded-full bg-gray-100 hover:bg-gray-200 text-gray-500 flex items-center justify-center transition-colors">
+          <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
         </button>
       </div>
-      <div id="mpPlanosLista" class="px-6 py-5 flex flex-col gap-3 max-h-[55vh] overflow-y-auto">
+      <div id="mpPlanosLista" class="px-5 py-4 flex flex-col gap-3 max-h-[55vh] overflow-y-auto">
         <p class="text-center text-sm text-gray-400 py-4">Carregando planos...</p>
       </div>
-      <div class="px-6 pb-6 border-t border-gray-100 pt-4 flex justify-end">
-        <button onclick="fecharModalMudarPlano()" class="px-5 py-2.5 border border-gray-200 rounded-xl text-sm font-semibold text-gray-600 hover:bg-gray-50 transition-colors">Cancelar</button>
+      <div class="px-5 pb-5 border-t border-gray-100 pt-3 flex justify-end">
+        <button onclick="fecharModalMudarPlano()" class="px-5 py-2 border border-gray-200 rounded-xl text-sm font-semibold text-gray-600 hover:bg-gray-50 transition-colors">Cancelar</button>
       </div>
     </div>
 
     <!-- Passo 2: Confirmação -->
     <div id="mpPasso2" class="hidden">
-      <div class="px-6 pt-6 pb-4 border-b border-gray-100">
-        <h3 class="text-base font-bold text-gray-800">Confirmar mudança de plano</h3>
+      <div class="px-5 pt-5 pb-3 border-b border-gray-100">
+        <h3 class="text-[0.95rem] font-bold text-gray-800">Confirmar mudança de plano</h3>
       </div>
-      <div class="px-6 py-5 flex flex-col gap-4">
+      <div class="px-5 py-4 flex flex-col gap-3">
         <div class="bg-vitta-50 border border-vitta-200 rounded-xl p-4 flex flex-col gap-2.5">
           <div class="flex justify-between text-sm">
             <span class="text-gray-500">Plano atual</span>
@@ -636,10 +648,10 @@
           <p class="text-sm text-amber-700 leading-relaxed">As próximas faturas serão cobradas no novo valor. A mudança de plano entra em vigor imediatamente após a confirmação.</p>
         </div>
       </div>
-      <div class="px-6 pb-6 border-t border-gray-100 pt-4 flex justify-end gap-3">
-        <button onclick="voltarMpPasso1()" class="px-4 py-2.5 border border-gray-200 rounded-xl text-sm font-semibold text-gray-600 hover:bg-gray-50 transition-colors">Voltar</button>
+      <div class="px-5 pb-5 border-t border-gray-100 pt-3 flex justify-end gap-2.5">
+        <button onclick="voltarMpPasso1()" class="px-4 py-2 border border-gray-200 rounded-xl text-sm font-semibold text-gray-600 hover:bg-gray-50 transition-colors">Voltar</button>
         <button onclick="confirmarMudancaPlano()" id="btnConfirmarMp"
-                class="flex items-center gap-2 px-5 py-2.5 bg-vitta-500 hover:bg-vitta-600 text-white text-sm font-semibold rounded-xl transition-colors">
+                class="flex items-center gap-2 px-5 py-2 bg-vitta-500 hover:bg-vitta-600 text-white text-sm font-semibold rounded-xl transition-colors">
           <svg id="mpSpin" class="hidden animate-spin w-4 h-4" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/></svg>
           <span id="mpConfirmTxt">Sim, mudar de plano</span>
         </button>
@@ -647,13 +659,13 @@
     </div>
 
     <!-- Passo 3: Sucesso -->
-    <div id="mpPasso3" class="hidden px-6 py-10 text-center">
-      <div class="w-14 h-14 rounded-full bg-emerald-100 border-2 border-emerald-300 flex items-center justify-center mx-auto mb-4">
-        <svg class="w-7 h-7 text-emerald-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5"/></svg>
+    <div id="mpPasso3" class="hidden px-5 py-8 text-center">
+      <div class="w-12 h-12 rounded-full bg-emerald-100 border-2 border-emerald-300 flex items-center justify-center mx-auto mb-3">
+        <svg class="w-6 h-6 text-emerald-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5"/></svg>
       </div>
-      <h3 class="text-base font-bold text-gray-800 mb-2">Plano alterado com sucesso!</h3>
-      <p class="text-sm text-gray-500 leading-relaxed">Sua clínica agora está no plano <strong id="mpSucessoNome" class="text-vitta-700">—</strong>.<br>As próximas faturas refletirão o novo valor.</p>
-      <button onclick="fecharModalMudarPlano()" class="mt-6 px-6 py-2.5 bg-gray-800 hover:bg-gray-700 text-white text-sm font-semibold rounded-xl transition-colors">Fechar</button>
+      <h3 class="text-[0.95rem] font-bold text-gray-800 mb-1.5">Plano alterado com sucesso!</h3>
+      <p class="text-[0.83rem] text-gray-500 leading-relaxed">Sua clínica agora está no plano <strong id="mpSucessoNome" class="text-vitta-700">—</strong>.<br>As próximas faturas refletirão o novo valor.</p>
+      <button onclick="fecharModalMudarPlano()" class="mt-5 px-6 py-2 bg-gray-800 hover:bg-gray-700 text-white text-sm font-semibold rounded-xl transition-colors">Fechar</button>
     </div>
   </div>
 </div>
@@ -661,20 +673,20 @@
 <!-- Modal Desconectar Google Meet -->
 <div id="modalDesconectarGoogle" class="modal-overlay" onclick="if(event.target===this)fecharModalDesconectarGoogle()">
   <div class="bg-white rounded-2xl shadow-xl w-full max-w-sm" onclick="event.stopPropagation()">
-    <div class="p-6">
-      <div class="flex items-center gap-4 mb-4">
-        <div class="w-11 h-11 rounded-full bg-red-100 flex items-center justify-center shrink-0">
-          <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M12 9v4"/><path d="M12 17h.01"/><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0Z"/></svg>
+    <div class="p-5">
+      <div class="flex items-center gap-3.5 mb-3">
+        <div class="w-9 h-9 rounded-full bg-red-100 flex items-center justify-center shrink-0">
+          <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M12 9v4"/><path d="M12 17h.01"/><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0Z"/></svg>
         </div>
         <div>
           <h3 class="text-[0.95rem] font-bold text-gray-800">Desconectar Google Meet</h3>
-          <p class="text-[0.78rem] text-gray-400 mt-0.5">Esta ação pode ser desfeita reconectando depois.</p>
+          <p class="text-[0.72rem] text-gray-400 mt-0.5">Esta ação pode ser desfeita reconectando depois.</p>
         </div>
       </div>
-      <p class="text-[0.83rem] text-gray-600 mb-5">Novos agendamentos online não poderão gerar links de videochamada até que a conexão seja refeita. Deseja continuar?</p>
-      <div class="flex gap-3">
-        <button onclick="fecharModalDesconectarGoogle()" class="flex-1 py-2.5 border border-gray-200 rounded-xl text-sm font-medium text-gray-600 hover:bg-gray-50 transition-colors">Cancelar</button>
-        <button onclick="confirmarDesconexaoGoogleMeet()" class="flex-1 py-2.5 bg-red-500 text-white rounded-xl text-sm font-semibold hover:bg-red-600 transition-colors">Desconectar</button>
+      <p class="text-[0.83rem] text-gray-600 mb-4">Novos agendamentos online não poderão gerar links de videochamada até que a conexão seja refeita. Deseja continuar?</p>
+      <div class="flex gap-2.5">
+        <button onclick="fecharModalDesconectarGoogle()" class="flex-1 py-2 border border-gray-200 rounded-xl text-sm font-medium text-gray-600 hover:bg-gray-50 transition-colors">Cancelar</button>
+        <button onclick="confirmarDesconexaoGoogleMeet()" class="flex-1 py-2 bg-red-500 text-white rounded-xl text-sm font-semibold hover:bg-red-600 transition-colors">Desconectar</button>
       </div>
     </div>
   </div>

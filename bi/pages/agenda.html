@@ -13,10 +13,10 @@
   body { margin: 0; font-family: 'Montserrat', system-ui, sans-serif; background: #FAFAFC; }
   .bi-card { background: #FFFFFF; border: 1px solid #F1F0F7; border-radius: 16px; box-shadow: 0 2px 8px rgba(109,93,246,.04); }
   .bi-kpi-icon { width: 36px; height: 36px; border-radius: 10px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
-  .bi-delta { display: inline-flex; align-items: center; gap: 3px; font-size: 12.5px; font-weight: 600; padding: 2px 7px; border-radius: 999px; }
+  .bi-delta { display: inline-flex; align-items: center; gap: 3px; font-size: 12.5px; font-weight: 500; padding: 2px 7px; border-radius: 999px; }
   .bi-filter { font-size: 14px; font-weight: 500; color: #6B7280; background: #FFFFFF; border: 1px solid #EFEDF9; border-radius: 9px; padding: 7px 12px; display: flex; align-items: center; gap: 6px; cursor: pointer; }
-  .bi-kpi-title { display: flex; align-items: center; gap: 6px; font-size: 13px; font-weight: 600; color: #6B7280; }
-  .bi-info { position: relative; width: 15px; height: 15px; border-radius: 50%; border: 1.3px solid #CBC8DC; color: #9C99B8; background: transparent; font-size: 10.5px; font-weight: 700; display: flex; align-items: center; justify-content: center; cursor: help; flex-shrink: 0; }
+  .bi-kpi-title { display: flex; align-items: center; gap: 6px; font-size: 13px; font-weight: 500; color: #6B7280; }
+  .bi-info { position: relative; width: 15px; height: 15px; border-radius: 50%; border: 1.3px solid #CBC8DC; color: #9C99B8; background: transparent; font-size: 10.5px; font-weight: 600; display: flex; align-items: center; justify-content: center; cursor: help; flex-shrink: 0; }
   .bi-info-tip { visibility: hidden; opacity: 0; position: absolute; top: calc(100% + 9px); right: -10px; width: 220px; background: #1F2937; color: #fff; font-size: 12.5px; font-weight: 500; line-height: 1.45; padding: 10px 12px; border-radius: 8px; box-shadow: 0 6px 20px rgba(0,0,0,.18); transition: opacity .15s ease; z-index: 30; text-align: left; pointer-events: none; }
   .bi-info-tip::after { content: ''; position: absolute; bottom: 100%; right: 13px; border: 5px solid transparent; border-bottom-color: #1F2937; }
   .bi-info:hover .bi-info-tip, .bi-info:focus .bi-info-tip { visibility: visible; opacity: 1; }
@@ -25,13 +25,13 @@
 
   .bi-period-panel { display: none; position: absolute; top: calc(100% + 8px); left: 0; width: 250px; background: #FFFFFF; border: 1px solid #F1F0F7; border-radius: 14px; box-shadow: 0 14px 34px rgba(17,17,17,.14); z-index: 40; padding: 10px; cursor: default; }
   .bi-period-panel.open { display: block; }
-  .bi-period-panel-title { font-size: 11.5px; font-weight: 700; color: #9C99B8; letter-spacing: .05em; text-transform: uppercase; padding: 4px 10px 8px; }
+  .bi-period-panel-title { font-size: 11.5px; font-weight: 600; color: #9C99B8; letter-spacing: .05em; text-transform: uppercase; padding: 4px 10px 8px; }
   .bi-period-opt { display: flex; align-items: center; gap: 10px; padding: 9px 10px; border-radius: 10px; cursor: pointer; }
   .bi-period-opt:hover { background: #F7F6FC; }
   .bi-period-opt.active { background: #FDECEC; }
   .bi-period-opt-icon { width: 15px; height: 15px; flex-shrink: 0; color: #9C99B8; }
   .bi-period-opt-text { flex: 1; min-width: 0; }
-  .bi-period-opt-title { font-size: 14px; font-weight: 600; color: #111827; }
+  .bi-period-opt-title { font-size: 14px; font-weight: 500; color: #111827; }
   .bi-period-opt.active .bi-period-opt-title { color: #C0392B; }
   .bi-period-opt-sub { font-size: 12px; color: #9CA3AF; margin-top: 1px; }
   .bi-period-opt-check { color: #C0392B; font-size: 14.5px; flex-shrink: 0; }
@@ -40,18 +40,18 @@
   .bi-period-back:hover { background: #F7F6FC; }
   .bi-range-input { flex: 1; border: 1.5px solid #EFEDF9; border-radius: 10px; padding: 7px 10px; cursor: pointer; }
   .bi-range-input.active { border-color: #E4534B; }
-  .bi-range-input-label { font-size: 10px; font-weight: 700; color: #9C99B8; text-transform: uppercase; letter-spacing: .03em; }
-  .bi-range-input-value { font-size: 13px; font-weight: 600; color: #111827; margin-top: 1px; }
+  .bi-range-input-label { font-size: 10px; font-weight: 600; color: #9C99B8; text-transform: uppercase; letter-spacing: .03em; }
+  .bi-range-input-value { font-size: 13px; font-weight: 500; color: #111827; margin-top: 1px; }
   .bi-cal-nav-btn { border: none; background: transparent; color: #6B7280; font-size: 16.5px; cursor: pointer; width: 24px; height: 24px; border-radius: 6px; }
   .bi-cal-nav-btn:hover { background: #F7F6FC; }
   .bi-cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 2px; }
-  .bi-cal-dow { font-size: 11px; font-weight: 700; color: #C4C1D6; text-align: center; padding: 4px 0; }
+  .bi-cal-dow { font-size: 11px; font-weight: 600; color: #C4C1D6; text-align: center; padding: 4px 0; }
   .bi-cal-day { font-size: 12.5px; text-align: center; padding: 7px 0; border-radius: 8px; cursor: pointer; color: #111827; }
   .bi-cal-day:hover { background: #F7F6FC; }
   .bi-cal-day.muted { color: #C4C1D6; }
   .bi-cal-day.in-range { background: #FCEAEA; }
-  .bi-cal-day.range-edge { background: #E4534B !important; color: #fff; font-weight: 600; }
-  .bi-pill { font-size: 11.5px; font-weight: 600; padding: 6px 10px; border-radius: 999px; border: 1px solid #EFEDF9; background: #fff; color: #6B7280; cursor: pointer; }
+  .bi-cal-day.range-edge { background: #E4534B !important; color: #fff; font-weight: 500; }
+  .bi-pill { font-size: 11.5px; font-weight: 500; padding: 6px 10px; border-radius: 999px; border: 1px solid #EFEDF9; background: #fff; color: #6B7280; cursor: pointer; }
   .bi-pill:hover { background: #F7F6FC; }
   @keyframes bi-skeleton-shimmer { 0% { background-position: 100% 50%; } 100% { background-position: 0 50%; } }
   .bi-skeleton { display: inline-block; background: linear-gradient(90deg, #F1F0F7 25%, #E9E7F3 37%, #F1F0F7 63%); background-size: 400% 100%; border-radius: 6px; animation: bi-skeleton-shimmer 1.4s ease infinite; vertical-align: middle; }
@@ -62,11 +62,11 @@
   .bi-fullscreen-backdrop.open { display: block; }
   .bi-card-fullscreen { position: fixed !important; inset: 20px !important; z-index: 200; margin: 0 !important; box-shadow: 0 20px 60px rgba(17,17,17,.28) !important; overflow-y: auto; }
 
-  .bi-section-title { font-size: 12px; font-weight: 700; color: #9C99B8; letter-spacing: .06em; text-transform: uppercase; margin: 6px 0 -6px 2px; }
+  .bi-section-title { font-size: 12px; font-weight: 600; color: #9C99B8; letter-spacing: .06em; text-transform: uppercase; margin: 6px 0 -6px 2px; }
 
   .heat-grid { display: grid; grid-template-columns: 46px repeat(24, 1fr); gap: 3px; align-items: center; }
-  .heat-hour-label { font-size: 10.5px; font-weight: 600; color: #9CA3AF; text-align: center; }
-  .heat-dow-label { font-size: 12.5px; font-weight: 600; color: #6B7280; text-align: right; padding-right: 6px; }
+  .heat-hour-label { font-size: 10.5px; font-weight: 500; color: #9CA3AF; text-align: center; }
+  .heat-dow-label { font-size: 12.5px; font-weight: 500; color: #6B7280; text-align: right; padding-right: 6px; }
   .heat-cell { aspect-ratio: 1 / 1; min-height: 16px; border-radius: 3px; }
 </style>
 </head>
@@ -112,7 +112,7 @@
             <div id="periodo-view-custom" style="display:none;">
               <div style="display:flex;align-items:center;gap:2px;margin-bottom:10px;">
                 <button type="button" class="bi-period-back" id="periodo-custom-voltar">←</button>
-                <span style="font-size:13px;font-weight:700;color:#111827;">Personalizado</span>
+                <span style="font-size:13px;font-weight:600;color:#111827;">Personalizado</span>
               </div>
               <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px;">
                 <div class="bi-range-input active" id="range-input-ini">
@@ -127,7 +127,7 @@
               </div>
               <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;">
                 <button type="button" class="bi-cal-nav-btn" id="cal-prev">‹</button>
-                <span id="cal-month-label" style="font-size:13px;font-weight:600;color:#111827;"></span>
+                <span id="cal-month-label" style="font-size:13px;font-weight:500;color:#111827;"></span>
                 <button type="button" class="bi-cal-nav-btn" id="cal-next">›</button>
               </div>
               <div class="bi-cal-grid" id="cal-dow"></div>
@@ -141,8 +141,8 @@
                 <button type="button" class="bi-pill" data-preset="ano">Ano (YTD)</button>
               </div>
               <div style="display:flex;gap:8px;">
-                <button type="button" id="periodo-custom-cancelar" style="flex:1;padding:9px;border-radius:10px;border:1px solid #EFEDF9;background:#fff;color:#6B7280;font-size:13px;font-weight:600;cursor:pointer;">Cancelar</button>
-                <button type="button" id="periodo-custom-aplicar" style="flex:1;padding:9px;border-radius:10px;border:none;background:#E4847D;color:#fff;font-size:13px;font-weight:600;cursor:pointer;">Aplicar período</button>
+                <button type="button" id="periodo-custom-cancelar" style="flex:1;padding:9px;border-radius:10px;border:1px solid #EFEDF9;background:#fff;color:#6B7280;font-size:13px;font-weight:500;cursor:pointer;">Cancelar</button>
+                <button type="button" id="periodo-custom-aplicar" style="flex:1;padding:9px;border-radius:10px;border:none;background:#E4847D;color:#fff;font-size:13px;font-weight:500;cursor:pointer;">Aplicar período</button>
               </div>
             </div>
           </div>
@@ -168,7 +168,7 @@
             </span>
             <span class="bi-info" tabindex="0">?<span class="bi-info-tip">Quantidade de agendamentos (campo Início) no período selecionado. Compara com o mesmo intervalo do período anterior.</span></span>
           </div>
-          <div id="kpi-total" style="font-size:23px;font-weight:700;color:#111827;line-height:1;">—</div>
+          <div id="kpi-total" style="font-size:23px;font-weight:600;color:#111827;line-height:1;">—</div>
           <div id="kpi-total-sub" style="font-size:13px;color:#6B7280;margin-top:5px;">—</div>
         </div>
 
@@ -180,7 +180,7 @@
             </span>
             <span class="bi-info" tabindex="0">?<span class="bi-info-tip">Agendamentos com Status = "Realizada" ÷ total de agendamentos no período.</span></span>
           </div>
-          <div id="kpi-realizacao" style="font-size:23px;font-weight:700;color:#111827;line-height:1;">—</div>
+          <div id="kpi-realizacao" style="font-size:23px;font-weight:600;color:#111827;line-height:1;">—</div>
           <div id="kpi-realizacao-sub" style="font-size:13px;color:#6B7280;margin-top:5px;">—</div>
         </div>
 
@@ -192,7 +192,7 @@
             </span>
             <span class="bi-info" tabindex="0">?<span class="bi-info-tip">Agendamentos com Status = "Falta" (no-show) ÷ total de agendamentos no período.</span></span>
           </div>
-          <div id="kpi-falta" style="font-size:23px;font-weight:700;color:#111827;line-height:1;">—</div>
+          <div id="kpi-falta" style="font-size:23px;font-weight:600;color:#111827;line-height:1;">—</div>
           <div id="kpi-falta-sub" style="font-size:13px;color:#6B7280;margin-top:5px;">—</div>
         </div>
 
@@ -204,7 +204,7 @@
             </span>
             <span class="bi-info" tabindex="0">?<span class="bi-info-tip">Agendamentos que fazem parte de uma série recorrente (criados com "Repetir agendamento") ÷ total no período.</span></span>
           </div>
-          <div id="kpi-recorrentes" style="font-size:23px;font-weight:700;color:#111827;line-height:1;">—</div>
+          <div id="kpi-recorrentes" style="font-size:23px;font-weight:600;color:#111827;line-height:1;">—</div>
           <div id="kpi-recorrentes-sub" style="font-size:13px;color:#6B7280;margin-top:5px;">—</div>
         </div>
       </div>
@@ -212,7 +212,7 @@
       <div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:20px;flex:none;">
         <div class="bi-card" style="padding:20px 24px;display:flex;flex-direction:column;">
           <div style="margin-bottom:14px;">
-            <span style="font-size:15.5px;font-weight:600;color:#111827;">Distribuição por status</span>
+            <span style="font-size:15.5px;font-weight:500;color:#111827;">Distribuição por status</span>
             <div style="font-size:14px;color:#9CA3AF;margin-top:3px;">Agendado, confirmada, realizada, falta, feedback e sem valor</div>
           </div>
           <div id="lista-status" style="display:flex;flex-direction:column;">—</div>
@@ -220,7 +220,7 @@
 
         <div class="bi-card" style="padding:20px 24px;display:flex;flex-direction:column;">
           <div style="margin-bottom:14px;">
-            <span style="font-size:15.5px;font-weight:600;color:#111827;">Distribuição por tipo</span>
+            <span style="font-size:15.5px;font-weight:500;color:#111827;">Distribuição por tipo</span>
             <div style="font-size:14px;color:#9CA3AF;margin-top:3px;">Presencial vs. online (campo Tipo de Consulta)</div>
           </div>
           <div id="lista-tipo" style="display:flex;flex-direction:column;">—</div>
@@ -231,7 +231,7 @@
         <div class="bi-card" id="card-evolucao" style="padding:24px;display:flex;flex-direction:column;">
           <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:18px;flex-wrap:wrap;">
             <div>
-              <span style="display:flex;align-items:center;gap:6px;font-size:17.5px;font-weight:700;color:#111827;">
+              <span style="display:flex;align-items:center;gap:6px;font-size:17.5px;font-weight:600;color:#111827;">
                 Evolução de agendamentos
                 <span class="bi-info" tabindex="0">?<span class="bi-info-tip bi-info-tip-left" style="width:260px;">Total, realizados e faltas ao longo do período. Granularidade diária para períodos de até 62 dias, mensal para períodos maiores.</span></span>
               </span>
@@ -256,7 +256,7 @@
             </span>
             <span class="bi-info" tabindex="0">?<span class="bi-info-tip">Média de ("Fim" − "Início") de todos os agendamentos do período, independente do status.</span></span>
           </div>
-          <div id="kpi-duracao" style="font-size:23px;font-weight:700;color:#111827;line-height:1;">—</div>
+          <div id="kpi-duracao" style="font-size:23px;font-weight:600;color:#111827;line-height:1;">—</div>
           <div style="font-size:13px;color:#6B7280;margin-top:5px;">no período selecionado</div>
         </div>
 
@@ -268,7 +268,7 @@
             </span>
             <span class="bi-info" tabindex="0">?<span class="bi-info-tip">Total de salas marcadas como "Sala ativa" cadastradas na empresa (não depende do período).</span></span>
           </div>
-          <div id="kpi-salas-ativas" style="font-size:23px;font-weight:700;color:#111827;line-height:1;">—</div>
+          <div id="kpi-salas-ativas" style="font-size:23px;font-weight:600;color:#111827;line-height:1;">—</div>
           <div style="font-size:13px;color:#6B7280;margin-top:5px;">cadastradas na empresa</div>
         </div>
 
@@ -280,7 +280,7 @@
             </span>
             <span class="bi-info" tabindex="0">?<span class="bi-info-tip">Salas ativas que tiveram pelo menos 1 agendamento (campo Sala) no período selecionado.</span></span>
           </div>
-          <div id="kpi-salas-uso" style="font-size:23px;font-weight:700;color:#111827;line-height:1;">—</div>
+          <div id="kpi-salas-uso" style="font-size:23px;font-weight:600;color:#111827;line-height:1;">—</div>
           <div id="kpi-salas-uso-sub" style="font-size:13px;color:#6B7280;margin-top:5px;">—</div>
         </div>
       </div>
@@ -289,7 +289,7 @@
         <div class="bi-card" id="card-por-profissional" style="padding:20px 24px;display:flex;flex-direction:column;">
           <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:8px;margin-bottom:14px;">
             <div>
-              <span style="font-size:15.5px;font-weight:600;color:#111827;">Por profissional</span>
+              <span style="font-size:15.5px;font-weight:500;color:#111827;">Por profissional</span>
               <div style="font-size:14px;color:#9CA3AF;margin-top:3px;">Volume, horas agendadas e taxa de falta de cada profissional ativo</div>
             </div>
             <button type="button" id="btn-expandir-profissional" title="Expandir" style="display:flex;align-items:center;justify-content:center;width:26px;height:26px;border-radius:8px;border:1px solid #EFEDF9;background:#fff;color:#6B7280;cursor:pointer;padding:0;flex-shrink:0;"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3H5a2 2 0 0 0-2 2v3M16 3h3a2 2 0 0 1 2 2v3M8 21H5a2 2 0 0 1-2-2v-3M16 21h3a2 2 0 0 0 2-2v-3"/></svg></button>
@@ -300,7 +300,7 @@
         <div class="bi-card" id="card-por-sala" style="padding:20px 24px;display:flex;flex-direction:column;">
           <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:8px;margin-bottom:14px;">
             <div>
-              <span style="font-size:15.5px;font-weight:600;color:#111827;">Por sala</span>
+              <span style="font-size:15.5px;font-weight:500;color:#111827;">Por sala</span>
               <div style="font-size:14px;color:#9CA3AF;margin-top:3px;">Volume e horas ocupadas de cada sala ativa</div>
             </div>
             <button type="button" id="btn-expandir-sala" title="Expandir" style="display:flex;align-items:center;justify-content:center;width:26px;height:26px;border-radius:8px;border:1px solid #EFEDF9;background:#fff;color:#6B7280;cursor:pointer;padding:0;flex-shrink:0;"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3H5a2 2 0 0 0-2 2v3M16 3h3a2 2 0 0 1 2 2v3M8 21H5a2 2 0 0 1-2-2v-3M16 21h3a2 2 0 0 0 2-2v-3"/></svg></button>
@@ -321,7 +321,7 @@
             </span>
             <span class="bi-info" tabindex="0">?<span class="bi-info-tip">Média de ("Início" − data de criação do agendamento): quanto tempo antes do horário marcado o agendamento foi criado.</span></span>
           </div>
-          <div id="kpi-antecedencia" style="font-size:23px;font-weight:700;color:#111827;line-height:1;">—</div>
+          <div id="kpi-antecedencia" style="font-size:23px;font-weight:600;color:#111827;line-height:1;">—</div>
           <div style="font-size:13px;color:#6B7280;margin-top:5px;">no período selecionado</div>
         </div>
 
@@ -333,7 +333,7 @@
             </span>
             <span class="bi-info" tabindex="0">?<span class="bi-info-tip">Agendamentos criados com menos de 24h de antecedência ÷ total no período.</span></span>
           </div>
-          <div id="kpi-cima-hora" style="font-size:23px;font-weight:700;color:#111827;line-height:1;">—</div>
+          <div id="kpi-cima-hora" style="font-size:23px;font-weight:600;color:#111827;line-height:1;">—</div>
           <div style="font-size:13px;color:#6B7280;margin-top:5px;">antecedência menor que 24h</div>
         </div>
       </div>
@@ -341,7 +341,7 @@
       <div style="display:grid;grid-template-columns:1fr;gap:20px;flex:none;">
         <div class="bi-card" style="padding:24px;display:flex;flex-direction:column;overflow-x:auto;">
           <div style="margin-bottom:16px;">
-            <span style="display:flex;align-items:center;gap:6px;font-size:17.5px;font-weight:700;color:#111827;">
+            <span style="display:flex;align-items:center;gap:6px;font-size:17.5px;font-weight:600;color:#111827;">
               Horários de pico
               <span class="bi-info" tabindex="0">?<span class="bi-info-tip bi-info-tip-left" style="width:260px;">Quantidade de agendamentos por dia da semana e hora do dia (horário de Brasília). Quanto mais escuro, maior o volume.</span></span>
             </span>
@@ -354,7 +354,7 @@
       <div style="display:grid;grid-template-columns:1fr;gap:20px;flex:none;">
         <div class="bi-card" style="padding:24px;display:flex;flex-direction:column;">
           <div style="margin-bottom:16px;">
-            <span style="font-size:15.5px;font-weight:600;color:#111827;">Distribuição por dia da semana</span>
+            <span style="font-size:15.5px;font-weight:500;color:#111827;">Distribuição por dia da semana</span>
             <div style="font-size:14px;color:#9CA3AF;margin-top:3px;">Total de agendamentos por dia da semana, no período selecionado</div>
           </div>
           <div id="chart-dia-semana-skeleton" class="bi-skeleton" style="width:100%;height:180px;display:none;"></div>
@@ -374,7 +374,7 @@
             </span>
             <span class="bi-info" tabindex="0">?<span class="bi-info-tip">Soma do campo "Valor da Consulta (para projeção)" de todos os agendamentos do período, independente do status.</span></span>
           </div>
-          <div id="kpi-valor-previsto" style="font-size:23px;font-weight:700;color:#111827;line-height:1;">—</div>
+          <div id="kpi-valor-previsto" style="font-size:23px;font-weight:600;color:#111827;line-height:1;">—</div>
           <div id="kpi-valor-previsto-sub" style="font-size:13px;color:#6B7280;margin-top:5px;">—</div>
         </div>
 
@@ -386,7 +386,7 @@
             </span>
             <span class="bi-info" tabindex="0">?<span class="bi-info-tip">Soma do campo "Valor de Consulta" apenas dos agendamentos com Status = "Realizada" no período.</span></span>
           </div>
-          <div id="kpi-valor-realizado" style="font-size:23px;font-weight:700;color:#111827;line-height:1;">—</div>
+          <div id="kpi-valor-realizado" style="font-size:23px;font-weight:600;color:#111827;line-height:1;">—</div>
           <div id="kpi-valor-realizado-sub" style="font-size:13px;color:#6B7280;margin-top:5px;">—</div>
         </div>
 
@@ -398,7 +398,7 @@
             </span>
             <span class="bi-info" tabindex="0">?<span class="bi-info-tip">Valor realizado ÷ valor previsto no período. Mede quanto do valor previsto efetivamente aconteceu.</span></span>
           </div>
-          <div id="kpi-aderencia" style="font-size:23px;font-weight:700;color:#111827;line-height:1;">—</div>
+          <div id="kpi-aderencia" style="font-size:23px;font-weight:600;color:#111827;line-height:1;">—</div>
           <div id="kpi-aderencia-sub" style="font-size:13px;color:#6B7280;margin-top:5px;">—</div>
         </div>
       </div>
@@ -412,7 +412,7 @@
             </span>
             <span class="bi-info" tabindex="0">?<span class="bi-info-tip">Agendamentos "Realizada" com "Enviar para Pagamento" desmarcado ÷ total de agendamentos "Realizada" no período.</span></span>
           </div>
-          <div id="kpi-sem-pagamento" style="font-size:23px;font-weight:700;color:#111827;line-height:1;">—</div>
+          <div id="kpi-sem-pagamento" style="font-size:23px;font-weight:600;color:#111827;line-height:1;">—</div>
           <div id="kpi-sem-pagamento-sub" style="font-size:13px;color:#6B7280;margin-top:5px;">—</div>
         </div>
 
@@ -424,7 +424,7 @@
             </span>
             <span class="bi-info" tabindex="0">?<span class="bi-info-tip">Soma do campo "Valor da Consulta (para projeção)" dos agendamentos com Status = "Falta" no período — estimativa do que se perdeu em no-shows.</span></span>
           </div>
-          <div id="kpi-receita-perdida" style="font-size:23px;font-weight:700;color:#111827;line-height:1;">—</div>
+          <div id="kpi-receita-perdida" style="font-size:23px;font-weight:600;color:#111827;line-height:1;">—</div>
           <div id="kpi-receita-perdida-sub" style="font-size:13px;color:#6B7280;margin-top:5px;">—</div>
         </div>
       </div>
@@ -537,7 +537,7 @@
     const color = positivo ? '#1D8A4A' : '#C0392B';
     const arrow = value >= 0 ? '▲' : '▼';
     const suffix = isPP ? 'p.p.' : '%';
-    el.innerHTML = `<span style="color:${color};font-weight:600;">${arrow} ${Math.abs(value)}${suffix}</span> vs ${compareLabel}`;
+    el.innerHTML = `<span style="color:${color};font-weight:500;">${arrow} ${Math.abs(value)}${suffix}</span> vs ${compareLabel}`;
   }
 
   const RESUMO_KPI_IDS = ['kpi-total', 'kpi-realizacao', 'kpi-falta', 'kpi-recorrentes', 'kpi-valor-previsto', 'kpi-valor-realizado', 'kpi-aderencia', 'kpi-sem-pagamento', 'kpi-receita-perdida'];
@@ -608,7 +608,7 @@
       return `
         <div style="padding:9px 0;border-bottom:1px solid #E3E1EE;">
           <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;">
-            <span style="font-size:15px;font-weight:600;color:#111827;">${item.nome}</span>
+            <span style="font-size:15px;font-weight:500;color:#111827;">${item.nome}</span>
             <span style="font-size:14px;color:#9CA3AF;">${item.total} (${pctDoTotal}%)</span>
           </div>
           <div style="height:7px;background:#F1F0F7;border-radius:999px;margin-top:5px;overflow:hidden;">
@@ -632,11 +632,11 @@
       const faltaColor = falta === null ? '#C4C1D6' : (falta <= 5 ? '#1D8A4A' : falta <= 15 ? '#B7791F' : '#C0392B');
       return `
         <div style="display:flex;align-items:center;gap:12px;padding:9px 0;border-bottom:1px solid #E3E1EE;">
-          <div style="width:18px;flex-shrink:0;font-size:12.5px;font-weight:700;color:#C4C1D6;text-align:center;">${idx + 1}</div>
+          <div style="width:18px;flex-shrink:0;font-size:12.5px;font-weight:600;color:#C4C1D6;text-align:center;">${idx + 1}</div>
           <div style="flex:1;min-width:0;">
             <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;">
-              <span style="font-size:15px;font-weight:600;color:#111827;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${item.nome}</span>
-              <span style="font-size:12.5px;font-weight:700;color:${faltaColor};white-space:nowrap;flex-shrink:0;">${fmtPct(falta)} falta</span>
+              <span style="font-size:15px;font-weight:500;color:#111827;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${item.nome}</span>
+              <span style="font-size:12.5px;font-weight:600;color:${faltaColor};white-space:nowrap;flex-shrink:0;">${fmtPct(falta)} falta</span>
             </div>
             <div style="height:7px;background:#F1F0F7;border-radius:999px;margin-top:5px;overflow:hidden;">
               <div style="height:100%;width:${pct}%;background:#2ABCD4;border-radius:999px;"></div>
@@ -659,9 +659,9 @@
       const pct = Math.max(2, Math.round((item.totalAgendamentos / maxTotal) * 100));
       return `
         <div style="display:flex;align-items:center;gap:12px;padding:9px 0;border-bottom:1px solid #E3E1EE;">
-          <div style="width:18px;flex-shrink:0;font-size:12.5px;font-weight:700;color:#C4C1D6;text-align:center;">${idx + 1}</div>
+          <div style="width:18px;flex-shrink:0;font-size:12.5px;font-weight:600;color:#C4C1D6;text-align:center;">${idx + 1}</div>
           <div style="flex:1;min-width:0;">
-            <span style="font-size:15px;font-weight:600;color:#111827;">${item.nome}</span>
+            <span style="font-size:15px;font-weight:500;color:#111827;">${item.nome}</span>
             <div style="height:7px;background:#F1F0F7;border-radius:999px;margin-top:5px;overflow:hidden;">
               <div style="height:100%;width:${pct}%;background:#8B7FE8;border-radius:999px;"></div>
             </div>
@@ -744,7 +744,7 @@
       { name: 'Realizados', color: '#22C55E' },
       { name: 'Faltas', color: '#C0392B' },
     ].map((s) => `
-      <span style="display:inline-flex;align-items:center;gap:7px;font-size:15px;font-weight:700;color:#111827;margin-right:22px;">
+      <span style="display:inline-flex;align-items:center;gap:7px;font-size:15px;font-weight:600;color:#111827;margin-right:22px;">
         <span style="width:11px;height:11px;border-radius:3px;background:${s.color};display:inline-block;"></span>${s.name}
       </span>
     `).join('');
@@ -991,7 +991,7 @@
       if (muted) cls.push('muted');
       if (inRange) cls.push('in-range');
       if (isEdge) cls.push('range-edge');
-      const style = isToday && !isEdge ? 'font-weight:700;text-decoration:underline;' : '';
+      const style = isToday && !isEdge ? 'font-weight:600;text-decoration:underline;' : '';
       return `<div class="${cls.join(' ')}" data-date="${toISODate(d)}" style="${style}">${d.getDate()}</div>`;
     }).join('');
 

@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <title>Tipos de Pagamento &mdash; Vitta Sistemas</title>
+  <title>Categorias de Despesa &mdash; Vitta Sistemas</title>
   <link rel="icon" type="image/png" href="../img/favicon.png" />
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
@@ -25,6 +25,7 @@
   <script src="../assets/js/access-guard.js?v=2"></script>
   <script src="../assets/js/admin-empresa-context.js?v=1"></script>
   <script src="../assets/js/notifications.js?v=3"></script>
+  <script src="../assets/js/catdesp-icons.js?v=1"></script>
   <style>
     .sidebar-nav::-webkit-scrollbar { width:3px; }
     .sidebar-nav::-webkit-scrollbar-thumb { background:rgba(255,255,255,.1); border-radius:4px; }
@@ -78,16 +79,16 @@
     </div>
 
     <div class="pt-1"></div>
-    <button onclick="toggleMenu('servicos')" class="w-full flex items-center gap-3 px-3 py-2.5 mx-2 rounded-xl text-[0.83rem] font-medium text-vitta-400 bg-vitta-500/10 transition-colors duration-150 cursor-pointer mb-0.5" style="width:calc(100% - 16px)">
+    <button onclick="toggleMenu('servicos')" class="w-full flex items-center gap-3 px-3 py-2.5 mx-2 rounded-xl text-[0.83rem] font-medium text-gray-400 hover:bg-white/10 hover:text-white transition-colors duration-150 cursor-pointer mb-0.5" style="width:calc(100% - 16px)">
       <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>Outros Cadastros
-      <svg id="chev-servicos" class="chevron open w-3.5 h-3.5 ml-auto text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+      <svg id="chev-servicos" class="chevron w-3.5 h-3.5 ml-auto text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
     </button>
-    <div id="sub-servicos" class="submenu open">
+    <div id="sub-servicos" class="submenu">
       <a href="servicos.html" class="flex items-center gap-2 pl-10 pr-3 py-2 mx-2 rounded-xl text-[0.8rem] text-gray-500 hover:bg-white/5 hover:text-gray-300 transition-colors cursor-pointer">Servi&ccedil;os</a>
       <a href="salas.html" class="flex items-center gap-2 pl-10 pr-3 py-2 mx-2 rounded-xl text-[0.8rem] text-gray-500 hover:bg-white/5 hover:text-gray-300 transition-colors cursor-pointer">Salas</a>
       <a href="especialidades.html" class="flex items-center gap-2 pl-10 pr-3 py-2 mx-2 rounded-xl text-[0.8rem] text-gray-500 hover:bg-white/5 hover:text-gray-300 transition-colors cursor-pointer">Especialidades</a>
       <a href="grupo.html" class="flex items-center gap-2 pl-10 pr-3 py-2 mx-2 rounded-xl text-[0.8rem] text-gray-500 hover:bg-white/5 hover:text-gray-300 transition-colors cursor-pointer">Grupo</a>
-      <a href="tipospagamento.html" class="flex items-center gap-2 pl-10 pr-3 py-2 mx-2 rounded-xl text-[0.8rem] font-semibold text-vitta-400 bg-vitta-500/10 transition-colors cursor-pointer">Tipos de Pagamento</a>
+      <a href="tipospagamento.html" class="flex items-center gap-2 pl-10 pr-3 py-2 mx-2 rounded-xl text-[0.8rem] text-gray-500 hover:bg-white/5 hover:text-gray-300 transition-colors cursor-pointer">Tipos de Pagamento</a>
       <a href="tiposacompanhamento.html" class="flex items-center gap-2 pl-10 pr-3 py-2 mx-2 rounded-xl text-[0.8rem] text-gray-500 hover:bg-white/5 hover:text-gray-300 transition-colors cursor-pointer">Tipos de Acomp.</a>
     </div>
 
@@ -103,13 +104,13 @@
 
         <div id="sectionDespesas">
 <div class="pt-1"></div>
-    <button onclick="toggleMenu('despesas')" class="w-full flex items-center gap-3 px-3 py-2.5 mx-2 rounded-xl text-[0.83rem] font-medium text-gray-400 hover:bg-white/10 hover:text-white transition-colors duration-150 cursor-pointer mb-0.5" style="width:calc(100% - 16px)">
+    <button onclick="toggleMenu('despesas')" class="w-full flex items-center gap-3 px-3 py-2.5 mx-2 rounded-xl text-[0.83rem] font-semibold text-vitta-400 bg-vitta-500/10 transition-colors duration-150 cursor-pointer mb-0.5" style="width:calc(100% - 16px)">
       <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M4 2v20l2-1 2 1 2-1 2 1 2-1 2 1 2-1 2 1V2l-2 1-2-1-2 1-2-1-2 1-2-1-2 1z"/><path d="M16 8h-6a2 2 0 1 0 0 4h4a2 2 0 1 1 0 4H8"/><path d="M12 17.5v-11"/></svg>Despesas
-      <svg id="chev-despesas" class="chevron w-3.5 h-3.5 ml-auto text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+      <svg id="chev-despesas" class="chevron open w-3.5 h-3.5 ml-auto text-vitta-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
     </button>
-    <div id="sub-despesas" class="submenu">
+    <div id="sub-despesas" class="submenu open">
       <a href="despesas.html" class="flex items-center gap-2 pl-10 pr-3 py-2 mx-2 rounded-xl text-[0.8rem] text-gray-500 hover:bg-white/5 hover:text-gray-300 transition-colors cursor-pointer">Cadastro Despesa</a>
-      <a href="categorias-despesa.html" class="flex items-center gap-2 pl-10 pr-3 py-2 mx-2 rounded-xl text-[0.8rem] text-gray-500 hover:bg-white/5 hover:text-gray-300 transition-colors cursor-pointer">Categorias</a>
+      <a href="categorias-despesa.html" class="flex items-center gap-2 pl-10 pr-3 py-2 mx-2 rounded-xl text-[0.8rem] font-semibold text-vitta-400 bg-vitta-500/10 transition-colors cursor-pointer">Categorias</a>
     </div>
     </div>
 
@@ -178,8 +179,8 @@
       </svg>
     </button>
     <div class="flex-1">
-      <h1 class="text-[1rem] font-bold text-gray-800 leading-tight">Tipos de Pagamento</h1>
-      <p id="header-date" class="text-[0.7rem] text-gray-400 leading-tight">Gest&atilde;o de tipos de pagamento</p>
+      <h1 class="text-[1rem] font-bold text-gray-800 leading-tight">Categorias de Despesa</h1>
+      <p id="header-date" class="text-[0.7rem] text-gray-400 leading-tight">Categorias de despesas</p>
     </div>
     <div class="hidden md:flex items-center gap-2 px-3 py-2 bg-gray-50 border border-gray-200 rounded-xl">
       <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-vitta-500 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
@@ -208,22 +209,6 @@
   </header>
 
   <main class="flex-1 p-5 lg:p-6">
-    <!-- STATS -->
-    <div class="grid grid-cols-3 gap-2.5 mb-6">
-      <div class="bg-white rounded-xl p-3 shadow-sm border border-gray-100">
-        <p class="text-[0.68rem] font-semibold text-gray-400 uppercase tracking-wider mb-1">Total</p>
-        <p id="statTotal" class="text-[1.4375rem] font-semibold text-gray-800">&mdash;</p>
-      </div>
-      <div class="bg-white rounded-xl p-3 shadow-sm border border-gray-100">
-        <p class="text-[0.68rem] font-semibold text-gray-400 uppercase tracking-wider mb-1">Ativos</p>
-        <p id="statAtivos" class="text-[1.4375rem] font-semibold text-vitta-600">&mdash;</p>
-      </div>
-      <div class="bg-white rounded-xl p-3 shadow-sm border border-gray-100">
-        <p class="text-[0.68rem] font-semibold text-gray-400 uppercase tracking-wider mb-1">Inativos</p>
-        <p id="statInat" class="text-[1.4375rem] font-semibold text-red-500">&mdash;</p>
-      </div>
-    </div>
-
     <!-- FILTROS -->
     <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-4 mb-4">
       <div class="flex flex-wrap gap-3 items-center">
@@ -232,16 +217,9 @@
           <input id="filterSearch" type="text" placeholder="Buscar por nome&hellip;" oninput="applyFilters()"
             class="w-full pl-9 pr-3 py-2.5 text-sm border border-gray-200 rounded-xl outline-none focus:border-vitta-500 focus:ring-2 focus:ring-vitta-500/20" />
         </div>
-        <select id="filterEmpAdmin" onchange="applyFilters()" class="hidden py-2.5 px-3 text-sm border border-gray-200 rounded-xl outline-none focus:border-vitta-500 bg-white min-w-[180px]">
-          <option value="">Todas as empresas</option>
-        </select>
-        <label class="flex items-center gap-2 text-sm text-gray-600 cursor-pointer select-none whitespace-nowrap">
-          <input id="toggleInativos" type="checkbox" onchange="applyFilters()" class="w-4 h-4 rounded accent-vitta-500" />
-          Ver inativos
-        </label>
         <button onclick="openFormModal()" class="flex items-center gap-2 px-4 py-2.5 bg-vitta-500 text-white text-sm font-semibold rounded-xl shadow-sm hover:bg-vitta-600 transition-colors ml-auto whitespace-nowrap">
           <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-          Novo Tipo
+          Nova Categoria
         </button>
       </div>
     </div>
@@ -257,84 +235,56 @@
           <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/>
           <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"/>
         </svg>
-        <span class="text-sm">Carregando tipos de pagamento&hellip;</span>
+        <span class="text-sm">Carregando categorias&hellip;</span>
       </div>
       <div id="tableWrap" class="hidden">
         <div class="hidden sm:block overflow-x-auto">
           <table class="w-full text-sm">
             <thead>
               <tr class="border-b border-gray-100 bg-gray-50 text-[0.72rem] font-semibold text-gray-500 uppercase tracking-wider">
-                <th class="px-5 py-3 text-left">Nome</th>
-                <th class="px-5 py-3 text-left">Descri&ccedil;&atilde;o</th>
-                <th class="px-5 py-3 text-left">PIX</th>
-                <th id="colEmp" class="px-5 py-3 text-left hidden">Empresa</th>
-                <th class="px-5 py-3 text-left">Status</th>
+                <th class="px-5 py-3 text-left">Categoria</th>
+                <th class="px-5 py-3 text-left">Cadastrada em</th>
                 <th class="px-5 py-3 text-right">A&ccedil;&otilde;es</th>
               </tr>
             </thead>
-            <tbody id="tippagBody"></tbody>
+            <tbody id="catBody"></tbody>
           </table>
         </div>
         <div id="mobileList" class="sm:hidden divide-y divide-gray-100"></div>
         <div id="pagination" class="flex items-center gap-1.5 justify-end px-5 py-3.5 border-t border-gray-100"></div>
       </div>
       <div id="tableEmpty" class="hidden py-16 text-center">
-        <svg xmlns="http://www.w3.org/2000/svg" class="w-10 h-10 text-gray-300 mx-auto mb-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="1"/></svg>
-        <p class="text-gray-400 text-sm">Nenhum tipo de pagamento encontrado</p>
+        <svg xmlns="http://www.w3.org/2000/svg" class="w-10 h-10 text-gray-300 mx-auto mb-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/></svg>
+        <p id="emptyMsg" class="text-gray-400 text-sm">Nenhuma categoria cadastrada</p>
       </div>
     </div>
   </main>
+</div>
 </div>
 
 <!-- ====== MODAL FORM ====== -->
 <div id="modalForm" class="modal-overlay" onclick="if(event.target===this)closeFormModal()">
   <div class="bg-white rounded-2xl shadow-xl w-full max-w-md modal-scroll overflow-y-auto max-h-[90vh]" onclick="event.stopPropagation()">
     <div class="flex items-center justify-between px-5 py-3 border-b border-gray-100">
-      <div>
-        <h2 id="formTitle" class="text-[0.95rem] font-bold text-gray-800">Novo Tipo de Pagamento</h2>
-        <p id="formSubtitle" class="text-[0.72rem] text-gray-400">Preencha os dados do tipo de pagamento</p>
-      </div>
-      <button onclick="closeFormModal()" class="w-7 h-7 rounded-full bg-gray-100 hover:bg-gray-200 text-gray-500 flex items-center justify-center transition-colors">
+      <h2 id="formTitle" class="text-[0.95rem] font-bold text-gray-800">Nova categoria</h2>
+      <button type="button" onclick="closeFormModal()" class="w-7 h-7 rounded-full bg-gray-100 hover:bg-gray-200 text-gray-500 flex items-center justify-center transition-colors" title="Fechar">
         <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
       </button>
     </div>
-    <form id="tippagForm" onsubmit="saveTipPag(event)" class="p-5 flex flex-col gap-3">
-      <input type="hidden" id="fId" />
-      <!-- Empresa (ADMIN_GLOBAL only) -->
-      <div id="rowEmpresa" class="hidden">
-        <label class="block text-[0.78rem] font-semibold text-gray-600 mb-1">Empresa <span class="text-red-500">*</span></label>
-        <select id="fEmpresa" class="w-full py-2.5 px-3 text-sm border border-gray-200 rounded-xl outline-none focus:border-vitta-500 focus:ring-2 focus:ring-vitta-500/20 bg-white">
-          <option value="">Selecione a empresa&hellip;</option>
-        </select>
-      </div>
-      <!-- Nome -->
+    <form id="catForm" onsubmit="saveCategoria(event)" class="p-5 flex flex-col gap-3">
       <div>
-        <label class="block text-[0.78rem] font-semibold text-gray-600 mb-1">Nome <span class="text-red-500">*</span></label>
-        <input id="fNome" type="text" maxlength="100" placeholder="Ex.: PIX, Cart&atilde;o de Cr&eacute;dito, Dinheiro&hellip;" required
+        <label for="fNome" class="block text-[0.78rem] font-semibold text-gray-600 mb-1">Nome da categoria <span class="text-red-500">*</span></label>
+        <input id="fNome" type="text" maxlength="60" placeholder="Ex.: Telefonia" required
           class="w-full py-2.5 px-3 text-sm border border-gray-200 rounded-xl outline-none focus:border-vitta-500 focus:ring-2 focus:ring-vitta-500/20" />
       </div>
-      <!-- Descrição -->
       <div>
-        <label class="block text-[0.78rem] font-semibold text-gray-600 mb-1">Descri&ccedil;&atilde;o</label>
-        <input id="fDescr" type="text" maxlength="255" placeholder="Descri&ccedil;&atilde;o opcional"
-          class="w-full py-2.5 px-3 text-sm border border-gray-200 rounded-xl outline-none focus:border-vitta-500 focus:ring-2 focus:ring-vitta-500/20" />
+        <label class="block text-[0.78rem] font-semibold text-gray-600 mb-2">&Iacute;cone</label>
+        <div id="iconGrid" class="grid grid-cols-6 gap-2"></div>
       </div>
-      <!-- PIX -->
       <div>
-        <label class="flex items-center gap-3 cursor-pointer">
-          <input id="fPix" type="checkbox" class="w-4 h-4 rounded accent-vitta-500" />
-          <span class="text-sm font-medium text-gray-700">Requer Chave PIX</span>
-        </label>
-        <p class="text-[0.72rem] text-gray-400 mt-1 ml-7">Quando marcado, o campo Chave PIX ser&aacute; exibido ao cadastrar um servi&ccedil;o com este tipo.</p>
+        <label class="block text-[0.78rem] font-semibold text-gray-600 mb-2">Cor</label>
+        <div id="colorRow" class="flex flex-wrap gap-2.5"></div>
       </div>
-      <!-- Ativo (edit only) -->
-      <div id="rowAtivo" class="hidden">
-        <label class="flex items-center gap-3 cursor-pointer">
-          <input id="fAtivo" type="checkbox" class="w-4 h-4 rounded accent-vitta-500" />
-          <span class="text-sm font-medium text-gray-700">Tipo ativo</span>
-        </label>
-      </div>
-      <!-- Botões -->
       <div class="flex gap-2.5 pt-1.5">
         <button type="button" onclick="closeFormModal()" class="flex-1 py-2 border border-gray-200 rounded-xl text-sm font-medium text-gray-600 hover:bg-gray-50 transition-colors">Cancelar</button>
         <button type="submit" id="btnSave" class="flex-1 py-2 bg-vitta-500 text-white rounded-xl text-sm font-semibold hover:bg-vitta-600 transition-colors">Salvar</button>
@@ -343,24 +293,32 @@
   </div>
 </div>
 
-<!-- ====== MODAL TOGGLE ====== -->
-<div id="modalToggle" class="modal-overlay" onclick="if(event.target===this)closeToggleModal()">
+<!-- ====== MODAL EXCLUIR ====== -->
+<div id="modalDelete" class="modal-overlay" onclick="if(event.target===this)closeDeleteModal()">
   <div class="bg-white rounded-2xl shadow-xl w-full max-w-sm p-5" onclick="event.stopPropagation()">
-    <h3 id="toggleTitle" class="text-[0.95rem] font-bold text-gray-800 mb-1.5">Desativar Tipo</h3>
-    <p id="toggleMsg" class="text-[0.83rem] text-gray-500 mb-5">Tem certeza?</p>
+    <h3 class="text-[0.95rem] font-bold text-gray-800 mb-1.5">Excluir categoria</h3>
+    <p id="deleteMsg" class="text-[0.83rem] text-gray-500 mb-5">Tem certeza?</p>
     <div class="flex gap-2.5">
-      <button onclick="closeToggleModal()" class="flex-1 py-2 border border-gray-200 rounded-xl text-sm font-medium text-gray-600 hover:bg-gray-50">Cancelar</button>
-      <button id="btnToggleConfirm" onclick="confirmToggle()" class="flex-1 py-2 rounded-xl text-sm font-semibold text-white">Confirmar</button>
+      <button type="button" onclick="closeDeleteModal()" class="flex-1 py-2 border border-gray-200 rounded-xl text-sm font-medium text-gray-600 hover:bg-gray-50">Cancelar</button>
+      <button type="button" id="btnDeleteConfirm" onclick="confirmDelete()" class="flex-1 py-2 rounded-xl text-sm font-semibold text-white bg-red-500 hover:bg-red-600">Excluir</button>
     </div>
   </div>
 </div>
 
-
 <script>
-let allTipPag = [], filtered = [], editId = null, toggleTargetId = null, toggleTargetAtivo = false;
-let currentUserMeta = null, empresas = [];
+let allCats = [], filtered = [], editId = null, deleteId = null, currentUserMeta = null;
 const PAGE_SIZE = 10;
 let currentPage = 1;
+
+const COLORS = ['#2ABCD4','#127A8C','#3B82F6','#10B981','#8B5CF6','#F59E0B','#EF4444','#6B7280'];
+const DEFAULT_ICON = 'phone', DEFAULT_COLOR = COLORS[0];
+let selIcon = DEFAULT_ICON, selColor = DEFAULT_COLOR;
+
+function esc(s) { return String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+function norm(s) { return String(s ?? '').normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase(); }
+function catBadge(c) {
+  return `<span class="w-9 h-9 rounded-xl flex items-center justify-center shrink-0" style="background:${esc(c.COR_CATDESP)}1F">${iconSvg(c.ICONE_CATDESP, 'w-[18px] h-[18px]', esc(c.COR_CATDESP))}</span>`;
+}
 
 function toggleMenu(k) {
   const s=document.getElementById('sub-'+k),c=document.getElementById('chev-'+k);
@@ -374,9 +332,8 @@ function toggleSidebar() {
 }
 async function handleLogout() { await supabase.auth.signOut(); window.location.href='../index.html'; }
 
-
 async function initAuth() {
-  document.getElementById('header-date').textContent = 'Tipos de pagamento — ' + new Date().toLocaleDateString('pt-BR',{weekday:'long',year:'numeric',month:'long',day:'numeric'});
+  document.getElementById('header-date').textContent = 'Categorias — ' + new Date().toLocaleDateString('pt-BR',{weekday:'long',year:'numeric',month:'long',day:'numeric'});
   const { data:{ session } } = await supabase.auth.getSession();
   if (!session) { window.location.href='../index.html'; return false; }
   const meta = session.user.user_metadata;
@@ -393,6 +350,9 @@ async function initAuth() {
     document.getElementById('empresa-nome').textContent = 'Vitta Sistemas';
     document.getElementById('sectionAdmin').classList.remove('hidden');
     AdminEmpresaCtx.initSelector('ADMIN_GLOBAL', session.user.id);
+  } else {
+    const { data: emp } = await supabase.from('EMPRESA').select('NOME_EMP').eq('ID_EMP', meta.ID_EMP || meta.id_emp).maybeSingle();
+    document.getElementById('empresa-nome').textContent = emp?.NOME_EMP || '';
   }
   let temAcessoConsultas = meta.tipo_usu === 'PROFISSIONAL';
   if (['ADMIN_EMPRESA','ADMIN_GLOBAL'].includes(meta.tipo_usu)) {
@@ -404,64 +364,50 @@ async function initAuth() {
   return true;
 }
 
-async function loadEmpresas() {
-  const { data } = await supabase.from('EMPRESA').select('ID_EMP,NOME_EMP').eq('ATIVO_EMP',true).order('NOME_EMP');
-  empresas = data || [];
-  const selF = document.getElementById('filterEmpAdmin');
-  const selE = document.getElementById('fEmpresa');
-  empresas.forEach(e => {
-    selF.insertAdjacentHTML('beforeend',`<option value="${e.ID_EMP}">${e.NOME_EMP}</option>`);
-    selE.insertAdjacentHTML('beforeend',`<option value="${e.ID_EMP}">${e.NOME_EMP}</option>`);
-  });
-  if (currentUserMeta?.tipo_usu !== 'ADMIN_GLOBAL') {
-    const emp = empresas.find(e => e.ID_EMP === (currentUserMeta?.ID_EMP || currentUserMeta?.id_emp));
-    document.getElementById('empresa-nome').textContent = emp?.NOME_EMP || '';
-  }
+function empId() {
+  return AdminEmpresaCtx.resolveIdEmp(currentUserMeta?.tipo_usu, currentUserMeta?.ID_EMP || currentUserMeta?.id_emp);
 }
 
-async function loadTiposPagamento() {
-  let q = supabase.from('TIPPAG').select('ID_TIPPAG,NOME_TIPPAG,DESCR_TIPPAG,PIX_TIPPAG,ATIVO_TIPPAG,DTCRI_TIPPAG,ID_EMP,EMPRESA(NOME_EMP)').order('NOME_TIPPAG');
-  const empIdFiltro = AdminEmpresaCtx.resolveIdEmp(currentUserMeta?.tipo_usu, currentUserMeta?.ID_EMP || currentUserMeta?.id_emp);
-  if (empIdFiltro) q = q.eq('ID_EMP', empIdFiltro);
+async function loadCategorias() {
+  let q = supabase.from('CATDESP').select('ID_CATDESP,NOME_CATDESP,ICONE_CATDESP,COR_CATDESP,DTCRI_CATDESP').order('NOME_CATDESP');
+  const idEmp = empId();
+  if (idEmp) q = q.eq('ID_EMP', idEmp);
   const { data, error } = await q;
-  if (error) { showToast('Erro ao carregar tipos de pagamento', 'error'); return; }
-  allTipPag = data || [];
-  document.getElementById('statTotal').textContent  = allTipPag.length;
-  document.getElementById('statAtivos').textContent = allTipPag.filter(t => t.ATIVO_TIPPAG).length;
-  document.getElementById('statInat').textContent   = allTipPag.filter(t => !t.ATIVO_TIPPAG).length;
+  if (error) { showToast('Erro ao carregar categorias', 'error'); return; }
+  allCats = data || [];
   document.getElementById('tableLoader').classList.add('hidden');
-  document.getElementById('tableWrap').classList.remove('hidden');
   applyFilters();
 }
 
 function applyFilters() {
-  const q     = document.getElementById('filterSearch').value.trim().toLowerCase();
-  const empId = document.getElementById('filterEmpAdmin').value;
-  const showI = document.getElementById('toggleInativos').checked;
-  filtered = allTipPag.filter(t => {
-    if (!showI && !t.ATIVO_TIPPAG) return false;
-    if (empId && t.ID_EMP !== empId) return false;
-    if (q && !t.NOME_TIPPAG?.toLowerCase().includes(q) && !t.DESCR_TIPPAG?.toLowerCase().includes(q)) return false;
-    return true;
-  });
+  const q = norm(document.getElementById('filterSearch').value.trim());
+  filtered = allCats.filter(c => !q || norm(c.NOME_CATDESP).includes(q));
   currentPage = 1;
   renderTable();
 }
 
 function clearFilters() {
   document.getElementById('filterSearch').value = '';
-  document.getElementById('filterEmpAdmin').value = '';
-  document.getElementById('toggleInativos').checked = false;
   applyFilters();
 }
 
+const fmtDate = d => new Date(d).toLocaleDateString('pt-BR');
+const EDIT_SVG = '<svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>';
+const TRASH_SVG = '<svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>';
+
+function actionBtns(c) {
+  return `<button onclick="openEditModal('${c.ID_CATDESP}')" title="Editar" class="p-1.5 rounded-lg text-gray-400 hover:text-vitta-600 hover:bg-vitta-50 transition-colors">${EDIT_SVG}</button>
+          <button onclick="openDeleteModal('${c.ID_CATDESP}')" title="Excluir" class="p-1.5 rounded-lg text-gray-400 hover:text-red-500 hover:bg-red-50 transition-colors">${TRASH_SVG}</button>`;
+}
+
 function renderTable() {
-  const tbody = document.getElementById('tippagBody');
-  document.getElementById('tableCount').innerHTML = `Exibindo <strong class="text-gray-800">${filtered.length}</strong> tipo${filtered.length!==1?'s':''}`;
+  document.getElementById('tableCount').innerHTML = `Exibindo <strong class="text-gray-800">${filtered.length}</strong> categoria${filtered.length!==1?'s':''}`;
   if (!filtered.length) {
     document.getElementById('tableWrap').classList.add('hidden');
     document.getElementById('tableEmpty').classList.remove('hidden');
+    document.getElementById('emptyMsg').textContent = allCats.length ? 'Nenhuma categoria encontrada' : 'Nenhuma categoria cadastrada. Clique em "Nova Categoria" para começar.';
     document.getElementById('mobileList').innerHTML = '';
+    document.getElementById('catBody').innerHTML = '';
     document.getElementById('pagination').innerHTML = '';
     return;
   }
@@ -469,69 +415,27 @@ function renderTable() {
   document.getElementById('tableEmpty').classList.add('hidden');
   const start = (currentPage - 1) * PAGE_SIZE;
   const slice = filtered.slice(start, start + PAGE_SIZE);
-  tbody.innerHTML = slice.map(t => `
+  document.getElementById('catBody').innerHTML = slice.map(c => `
     <tr class="border-b border-gray-50 fade-up">
-      <td class="px-5 py-3.5">
-        <span class="font-semibold text-gray-800 ${!t.ATIVO_TIPPAG?'opacity-50':''}">${t.NOME_TIPPAG}</span>
-      </td>
-      <td class="px-5 py-3.5 text-gray-500 text-[0.82rem]">${t.DESCR_TIPPAG||'&mdash;'}</td>
-      <td class="px-5 py-3.5">
-        ${t.PIX_TIPPAG
-          ? '<span class="inline-flex items-center gap-1 text-[0.72rem] font-bold bg-vitta-50 text-vitta-700 px-2.5 py-1 rounded-full"><span class="w-1.5 h-1.5 bg-vitta-500 rounded-full"></span>Sim</span>'
-          : '<span class="text-[0.82rem] text-gray-400">N&atilde;o</span>'}
-      </td>
-      <td class="px-5 py-3.5">
-        ${t.ATIVO_TIPPAG
-          ? '<span class="inline-flex items-center gap-1 text-[0.72rem] font-bold bg-emerald-50 text-emerald-700 px-2.5 py-1 rounded-full"><span class="w-1.5 h-1.5 bg-emerald-500 rounded-full"></span>Ativo</span>'
-          : '<span class="inline-flex items-center gap-1 text-[0.72rem] font-bold bg-red-50 text-red-600 px-2.5 py-1 rounded-full"><span class="w-1.5 h-1.5 bg-red-400 rounded-full"></span>Inativo</span>'}
-      </td>
-      <td class="px-5 py-3.5 text-right">
-        <div class="flex items-center justify-end gap-1">
-          <button onclick="openEditModal('${t.ID_TIPPAG}')" title="Editar" class="p-1.5 rounded-lg text-gray-400 hover:text-vitta-600 hover:bg-vitta-50 transition-colors">
-            <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
-          </button>
-          <button onclick="openToggleModal('${t.ID_TIPPAG}','${t.NOME_TIPPAG.replace(/'/g,"\\'")}',${t.ATIVO_TIPPAG})" title="${t.ATIVO_TIPPAG?'Desativar':'Ativar'}" class="p-1.5 rounded-lg text-gray-400 hover:text-red-500 hover:bg-red-50 transition-colors">
-            <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="4.93" y1="4.93" x2="19.07" y2="19.07"/></svg>
-          </button>
-        </div>
-      </td>
+      <td class="px-5 py-3.5"><div class="flex items-center gap-3">${catBadge(c)}<span class="font-semibold text-gray-800">${esc(c.NOME_CATDESP)}</span></div></td>
+      <td class="px-5 py-3.5 text-gray-500 text-[0.82rem]">${fmtDate(c.DTCRI_CATDESP)}</td>
+      <td class="px-5 py-3.5 text-right"><div class="flex items-center justify-end gap-1">${actionBtns(c)}</div></td>
     </tr>`).join('');
-  document.getElementById('mobileList').innerHTML = slice.map(renderMobileCard).join('');
-  renderPagination();
-}
-
-function renderMobileCard(t) {
-  return `
-    <div class="px-4 py-3.5">
-      <div class="flex items-start justify-between gap-3">
-        <div class="min-w-0 flex-1">
-          <p class="text-sm font-semibold text-gray-800 ${!t.ATIVO_TIPPAG?'opacity-50':''} truncate">${t.NOME_TIPPAG}</p>
-          <p class="text-xs text-gray-500 mt-0.5 truncate">${t.DESCR_TIPPAG||'&mdash;'}</p>
-          <div class="flex items-center gap-1.5 mt-2 flex-wrap">
-            ${t.ATIVO_TIPPAG
-              ? '<span class="inline-flex items-center gap-1 text-[0.72rem] font-bold bg-emerald-50 text-emerald-700 px-2.5 py-1 rounded-full"><span class="w-1.5 h-1.5 bg-emerald-500 rounded-full"></span>Ativo</span>'
-              : '<span class="inline-flex items-center gap-1 text-[0.72rem] font-bold bg-red-50 text-red-600 px-2.5 py-1 rounded-full"><span class="w-1.5 h-1.5 bg-red-400 rounded-full"></span>Inativo</span>'}
-            ${t.PIX_TIPPAG
-              ? '<span class="inline-flex items-center gap-1 text-[0.72rem] font-bold bg-vitta-50 text-vitta-700 px-2.5 py-1 rounded-full"><span class="w-1.5 h-1.5 bg-vitta-500 rounded-full"></span>PIX</span>'
-              : ''}
-          </div>
-        </div>
-        <div class="flex items-center gap-1 shrink-0">
-          <button onclick="openEditModal('${t.ID_TIPPAG}')" title="Editar" class="p-1.5 rounded-lg text-gray-400 hover:text-vitta-600 hover:bg-vitta-50 transition-colors">
-            <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
-          </button>
-          <button onclick="openToggleModal('${t.ID_TIPPAG}','${t.NOME_TIPPAG.replace(/'/g,"\\'")}',${t.ATIVO_TIPPAG})" title="${t.ATIVO_TIPPAG?'Desativar':'Ativar'}" class="p-1.5 rounded-lg text-gray-400 hover:text-red-500 hover:bg-red-50 transition-colors">
-            <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="4.93" y1="4.93" x2="19.07" y2="19.07"/></svg>
-          </button>
-        </div>
+  document.getElementById('mobileList').innerHTML = slice.map(c => `
+    <div class="px-4 py-3.5 flex items-center gap-3">
+      ${catBadge(c)}
+      <div class="min-w-0 flex-1">
+        <p class="text-sm font-semibold text-gray-800 truncate">${esc(c.NOME_CATDESP)}</p>
+        <p class="text-xs text-gray-400 mt-0.5">Cadastrada em ${fmtDate(c.DTCRI_CATDESP)}</p>
       </div>
-    </div>`;
+      <div class="flex items-center gap-1 shrink-0">${actionBtns(c)}</div>
+    </div>`).join('');
+  renderPagination();
 }
 
 function renderPagination() {
   const total = Math.ceil(filtered.length / PAGE_SIZE);
   const pg = document.getElementById('pagination');
-  if (!pg) return;
   if (total <= 1) { pg.innerHTML = ''; return; }
   const btnBase = 'min-w-[32px] h-8 rounded-lg border border-gray-200 text-xs font-semibold flex items-center justify-center px-2 transition-colors';
   let html = `<button class="${btnBase} hover:bg-gray-50 text-gray-500" onclick="goPage(${currentPage - 1})" ${currentPage === 1 ? 'disabled' : ''}>‹</button>`;
@@ -545,7 +449,6 @@ function renderPagination() {
   html += `<button class="${btnBase} hover:bg-gray-50 text-gray-500" onclick="goPage(${currentPage + 1})" ${currentPage === total ? 'disabled' : ''}>›</button>`;
   pg.innerHTML = html;
 }
-
 function goPage(n) {
   const total = Math.ceil(filtered.length / PAGE_SIZE);
   if (n < 1 || n > total) return;
@@ -553,80 +456,97 @@ function goPage(n) {
   renderTable();
 }
 
+// ---- seletores de ícone e cor ----
+function renderPickers() {
+  document.getElementById('iconGrid').innerHTML = Object.keys(CATDESP_ICONS).map(k => {
+    const on = k === selIcon;
+    return `<button type="button" onclick="pickIcon('${k}')" title="${k}"
+      class="h-11 rounded-xl border flex items-center justify-center transition-colors ${on ? 'border-vitta-500 bg-vitta-50' : 'border-gray-200 hover:bg-gray-50 text-gray-500'}">
+      ${iconSvg(k, 'w-5 h-5', on ? selColor : null)}</button>`;
+  }).join('');
+  document.getElementById('colorRow').innerHTML = COLORS.map(c => {
+    const on = c === selColor;
+    return `<button type="button" onclick="pickColor('${c}')" title="${c}" class="w-8 h-8 rounded-full transition-shadow"
+      style="background:${c};${on ? `box-shadow:0 0 0 2px #fff,0 0 0 4px ${c}` : ''}"></button>`;
+  }).join('');
+}
+function pickIcon(k) { selIcon = k; renderPickers(); }
+function pickColor(c) { selColor = c; renderPickers(); }
+
 function openFormModal() {
   editId = null;
-  document.getElementById('formTitle').textContent    = 'Novo Tipo de Pagamento';
-  document.getElementById('formSubtitle').textContent = 'Preencha os dados do tipo de pagamento';
-  document.getElementById('fId').value    = '';
-  document.getElementById('fNome').value  = '';
-  document.getElementById('fDescr').value = '';
-  document.getElementById('fPix').checked = false;
-  document.getElementById('rowAtivo').classList.add('hidden');
+  document.getElementById('formTitle').textContent = 'Nova categoria';
+  document.getElementById('fNome').value = '';
+  selIcon = DEFAULT_ICON; selColor = DEFAULT_COLOR;
+  renderPickers();
   document.getElementById('modalForm').classList.add('open');
+  setTimeout(() => document.getElementById('fNome').focus(), 50);
 }
 
 function openEditModal(id) {
-  const t = allTipPag.find(x => x.ID_TIPPAG === id);
-  if (!t) return;
+  const c = allCats.find(x => x.ID_CATDESP === id);
+  if (!c) return;
   editId = id;
-  document.getElementById('formTitle').textContent    = 'Editar Tipo de Pagamento';
-  document.getElementById('formSubtitle').textContent = `Editando: ${t.NOME_TIPPAG}`;
-  document.getElementById('fId').value    = t.ID_TIPPAG;
-  document.getElementById('fNome').value  = t.NOME_TIPPAG;
-  document.getElementById('fDescr').value = t.DESCR_TIPPAG || '';
-  document.getElementById('fPix').checked = t.PIX_TIPPAG;
-  document.getElementById('fAtivo').checked = t.ATIVO_TIPPAG;
-  document.getElementById('rowAtivo').classList.remove('hidden');
+  document.getElementById('formTitle').textContent = 'Editar categoria';
+  document.getElementById('fNome').value = c.NOME_CATDESP;
+  selIcon = CATDESP_ICONS[c.ICONE_CATDESP] ? c.ICONE_CATDESP : 'more';
+  selColor = (c.COR_CATDESP || DEFAULT_COLOR).toUpperCase();
+  if (!COLORS.includes(selColor)) COLORS.push(selColor); // cor fora da paleta atual: mantém como opção
+  renderPickers();
   document.getElementById('modalForm').classList.add('open');
 }
-
 function closeFormModal() { document.getElementById('modalForm').classList.remove('open'); }
 
-async function saveTipPag(ev) {
+async function saveCategoria(ev) {
   ev.preventDefault();
   const btn = document.getElementById('btnSave');
+  const nome = document.getElementById('fNome').value.trim();
+  if (!nome) { showToast('Informe o nome da categoria', 'error'); return; }
+  const idEmp = empId();
+  if (!idEmp) { showToast('Selecione a empresa', 'error'); return; }
   btn.disabled = true; btn.textContent = 'Salvando…';
-  const nome  = document.getElementById('fNome').value.trim();
-  const descr = document.getElementById('fDescr').value.trim();
-  const pix   = document.getElementById('fPix').checked;
-  const empId = AdminEmpresaCtx.resolveIdEmp(currentUserMeta?.tipo_usu, currentUserMeta?.ID_EMP || currentUserMeta?.id_emp);
-  if (!empId) { showToast('Selecione a empresa', 'error'); btn.disabled=false; btn.textContent='Salvar'; return; }
   try {
     if (!editId) {
-      const { error } = await supabase.from('TIPPAG').insert({ ID_EMP:empId, NOME_TIPPAG:nome, DESCR_TIPPAG:descr||null, PIX_TIPPAG:pix });
+      const { error } = await supabase.from('CATDESP').insert({ ID_EMP: idEmp, NOME_CATDESP: nome, ICONE_CATDESP: selIcon, COR_CATDESP: selColor });
       if (error) throw error;
-      showToast('Tipo de pagamento criado com sucesso!');
+      showToast('Categoria criada com sucesso!');
     } else {
-      const payload = { NOME_TIPPAG:nome, DESCR_TIPPAG:descr||null, PIX_TIPPAG:pix, ATIVO_TIPPAG:document.getElementById('fAtivo').checked };
-      const { error } = await supabase.from('TIPPAG').update(payload).eq('ID_TIPPAG', editId);
+      const { error } = await supabase.from('CATDESP').update({ NOME_CATDESP: nome, ICONE_CATDESP: selIcon, COR_CATDESP: selColor }).eq('ID_CATDESP', editId);
       if (error) throw error;
-      showToast('Tipo de pagamento atualizado!');
+      showToast('Categoria atualizada!');
     }
     closeFormModal();
-    await loadTiposPagamento();
-  } catch(err) {
-    showToast(err.message || 'Erro ao salvar', 'error');
+    await loadCategorias();
+  } catch (err) {
+    showToast(err.code === '23505' ? 'Já existe uma categoria com esse nome' : (err.message || 'Erro ao salvar'), 'error');
   }
-  btn.disabled=false; btn.textContent='Salvar';
+  btn.disabled = false; btn.textContent = 'Salvar';
 }
 
-function openToggleModal(id, nome, ativo) {
-  toggleTargetId = id; toggleTargetAtivo = ativo;
-  document.getElementById('toggleTitle').textContent = ativo ? 'Desativar Tipo' : 'Ativar Tipo';
-  document.getElementById('toggleMsg').textContent   = ativo ? `Desativar "${nome}"?` : `Ativar "${nome}"?`;
-  const btn = document.getElementById('btnToggleConfirm');
-  btn.className = `flex-1 py-2 rounded-xl text-sm font-semibold text-white ${ativo?'bg-red-500 hover:bg-red-600':'bg-emerald-500 hover:bg-emerald-600'}`;
-  document.getElementById('modalToggle').classList.add('open');
+function openDeleteModal(id) {
+  const c = allCats.find(x => x.ID_CATDESP === id);
+  if (!c) return;
+  deleteId = id;
+  document.getElementById('deleteMsg').textContent = `Excluir a categoria "${c.NOME_CATDESP}"? Esta ação não pode ser desfeita.`;
+  document.getElementById('modalDelete').classList.add('open');
 }
-function closeToggleModal() { document.getElementById('modalToggle').classList.remove('open'); }
+function closeDeleteModal() { document.getElementById('modalDelete').classList.remove('open'); }
 
-async function confirmToggle() {
-  const { error } = await supabase.from('TIPPAG').update({ ATIVO_TIPPAG:!toggleTargetAtivo }).eq('ID_TIPPAG', toggleTargetId);
-  if (error) { showToast(error.message, 'error'); return; }
-  showToast(toggleTargetAtivo ? 'Tipo desativado!' : 'Tipo ativado!');
-  closeToggleModal();
-  await loadTiposPagamento();
+async function confirmDelete() {
+  const btn = document.getElementById('btnDeleteConfirm');
+  btn.disabled = true;
+  const { error } = await supabase.from('CATDESP').delete().eq('ID_CATDESP', deleteId);
+  btn.disabled = false;
+  if (error) {
+    showToast(error.code === '23503' ? 'Categoria em uso por despesas — não pode ser excluída' : (error.message || 'Erro ao excluir'), 'error');
+    return;
+  }
+  showToast('Categoria excluída!');
+  closeDeleteModal();
+  await loadCategorias();
 }
+
+document.addEventListener('keydown', e => { if (e.key === 'Escape') { closeFormModal(); closeDeleteModal(); } });
 
 (async () => {
   const ok = await initAuth();
@@ -635,10 +555,10 @@ async function confirmToggle() {
     AdminEmpresaCtx.renderBloqueio(['main']);
     return;
   }
-  await loadEmpresas();
-  await loadTiposPagamento();
+  await loadCategorias();
 })();
-
+</script>
+<script>
 document.querySelectorAll('#sidebar nav a').forEach(function(link) {
   link.addEventListener('click', function() {
     var sb = document.getElementById('sidebar');

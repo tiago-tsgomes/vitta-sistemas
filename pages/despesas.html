@@ -1,0 +1,915 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>Cadastro de Despesa &mdash; Vitta Sistemas</title>
+  <link rel="icon" type="image/png" href="../img/favicon.png" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: { vitta: { 50:'#f0fbfd',100:'#e0f7fa',300:'#80deea',400:'#4dd9ed',500:'#2ABCD4',600:'#1a96ac',700:'#127a8c' } },
+          fontFamily: { sans: ['Montserrat','system-ui','sans-serif'] }
+        }
+      }
+    }
+  </script>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+  <script src="../assets/js/config.js?v=3"></script>
+  <script src="../assets/js/toast.js?v=1"></script>
+  <script src="../assets/js/access-guard.js?v=2"></script>
+  <script src="../assets/js/admin-empresa-context.js?v=1"></script>
+  <script src="../assets/js/notifications.js?v=3"></script>
+  <script src="../assets/js/catdesp-icons.js?v=1"></script>
+  <style>
+    .sidebar-nav::-webkit-scrollbar { width:3px; }
+    .sidebar-nav::-webkit-scrollbar-thumb { background:rgba(255,255,255,.1); border-radius:4px; }
+    .submenu { overflow:hidden; max-height:0; opacity:0; transition:max-height .25s ease,opacity .2s ease; }
+    .submenu.open { max-height:500px; opacity:1; }
+    .chevron { transition:transform .25s ease; display:inline-block; }
+    .chevron.open { transform:rotate(180deg); }
+    @keyframes fadeUp { from{opacity:0;transform:translateY(8px)} to{opacity:1;transform:translateY(0)} }
+    .fade-up { animation:fadeUp .35s ease forwards; }
+    .modal-overlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,.5); z-index:300; align-items:flex-start; justify-content:center; padding:24px 16px; overflow-y:auto; }
+    .modal-overlay.open { display:flex; }
+    .modal-scroll::-webkit-scrollbar { width:4px; }
+    .modal-scroll::-webkit-scrollbar-thumb { background:#e5e7eb; border-radius:4px; }
+    tbody tr { transition:background .15s; }
+    tbody tr:hover { background:#f9fafb; }
+  </style>
+</head>
+
+<body class="bg-[#F0F2F5] font-sans antialiased">
+<div class="flex min-h-screen">
+
+<!-- ====== SIDEBAR ====== -->
+<aside id="sidebar" class="fixed inset-y-0 left-0 w-[220px] bg-[#111827] flex flex-col z-30 -translate-x-full lg:translate-x-0 transition-transform duration-300">
+  <div class="flex flex-col items-center justify-center gap-1 py-4 px-5 border-b border-white/10 shrink-0">
+    <img src="../img/logo.png" alt="Vitta Sistemas" class="h-12 w-auto brightness-0 invert" />
+    <p class="text-[0.6rem] text-gray-500 tracking-wide">v1.2.2</p>
+  </div>
+  <nav class="flex-1 overflow-y-auto sidebar-nav py-3">
+    <p class="block text-[0.6rem] font-bold text-gray-500 uppercase tracking-widest px-4 pb-1 pt-3">Principal</p>
+    <a href="dashboard.html" class="flex items-center gap-3 px-3 py-2.5 mx-2 rounded-xl text-[0.83rem] font-medium text-gray-400 hover:bg-white/10 hover:text-white transition-colors duration-150 mb-0.5">
+      <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>Dashboard
+    </a>
+    <a href="agendamentos.html" class="flex items-center gap-3 px-3 py-2.5 mx-2 rounded-xl text-[0.83rem] font-medium text-gray-400 hover:bg-white/10 hover:text-white transition-colors duration-150 mb-0.5">
+      <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>Agendamentos
+    </a>
+    <a href="consultas.html" class="flex items-center gap-3 px-3 py-2.5 mx-2 rounded-xl text-[0.83rem] font-medium text-gray-400 hover:bg-white/10 hover:text-white transition-colors duration-150 mb-0.5">
+      <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>Consultas
+    </a>
+
+    <div class="pt-1"></div>
+    <button onclick="toggleMenu('cadastros')" class="w-full flex items-center gap-3 px-3 py-2.5 mx-2 rounded-xl text-[0.83rem] font-medium text-gray-400 hover:bg-white/10 hover:text-white transition-colors duration-150 mb-0.5" style="width:calc(100% - 16px)">
+      <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>Cadastros
+      <svg id="chev-cadastros" class="chevron w-3.5 h-3.5 ml-auto text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+    </button>
+    <div id="sub-cadastros" class="submenu">
+      <a href="pacientes.html" class="flex items-center gap-2 pl-10 pr-3 py-2 mx-2 rounded-xl text-[0.8rem] text-gray-500 hover:bg-white/5 hover:text-gray-300 transition-colors cursor-pointer">Pacientes</a>
+      <a href="profissionais.html" class="flex items-center gap-2 pl-10 pr-3 py-2 mx-2 rounded-xl text-[0.8rem] text-gray-500 hover:bg-white/5 hover:text-gray-300 transition-colors cursor-pointer">Profissionais</a>
+      <a href="usuarios-empresa.html" class="flex items-center gap-2 pl-10 pr-3 py-2 mx-2 rounded-xl text-[0.8rem] text-gray-500 hover:bg-white/5 hover:text-gray-300 transition-colors cursor-pointer">Usu&aacute;rios</a>
+      <div class="hidden" id="menuDocumentosWrap"><a href="documentos.html" class="flex items-center gap-2 pl-10 pr-3 py-2 mx-2 rounded-xl text-[0.8rem] text-gray-500 hover:bg-white/5 hover:text-gray-300 transition-colors cursor-pointer w-full">Documentos</a></div>
+      <a href="leads.html" id="menuLeads" class="flex items-center gap-2 pl-10 pr-3 py-2 mx-2 rounded-xl text-[0.8rem] text-gray-500 hover:bg-white/5 hover:text-gray-300 transition-colors cursor-pointer">Leads</a>
+    </div>
+
+    <div class="pt-1"></div>
+    <button onclick="toggleMenu('servicos')" class="w-full flex items-center gap-3 px-3 py-2.5 mx-2 rounded-xl text-[0.83rem] font-medium text-gray-400 hover:bg-white/10 hover:text-white transition-colors duration-150 cursor-pointer mb-0.5" style="width:calc(100% - 16px)">
+      <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>Outros Cadastros
+      <svg id="chev-servicos" class="chevron w-3.5 h-3.5 ml-auto text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+    </button>
+    <div id="sub-servicos" class="submenu">
+      <a href="servicos.html" class="flex items-center gap-2 pl-10 pr-3 py-2 mx-2 rounded-xl text-[0.8rem] text-gray-500 hover:bg-white/5 hover:text-gray-300 transition-colors cursor-pointer">Servi&ccedil;os</a>
+      <a href="salas.html" class="flex items-center gap-2 pl-10 pr-3 py-2 mx-2 rounded-xl text-[0.8rem] text-gray-500 hover:bg-white/5 hover:text-gray-300 transition-colors cursor-pointer">Salas</a>
+      <a href="especialidades.html" class="flex items-center gap-2 pl-10 pr-3 py-2 mx-2 rounded-xl text-[0.8rem] text-gray-500 hover:bg-white/5 hover:text-gray-300 transition-colors cursor-pointer">Especialidades</a>
+      <a href="grupo.html" class="flex items-center gap-2 pl-10 pr-3 py-2 mx-2 rounded-xl text-[0.8rem] text-gray-500 hover:bg-white/5 hover:text-gray-300 transition-colors cursor-pointer">Grupo</a>
+      <a href="tipospagamento.html" class="flex items-center gap-2 pl-10 pr-3 py-2 mx-2 rounded-xl text-[0.8rem] text-gray-500 hover:bg-white/5 hover:text-gray-300 transition-colors cursor-pointer">Tipos de Pagamento</a>
+      <a href="tiposacompanhamento.html" class="flex items-center gap-2 pl-10 pr-3 py-2 mx-2 rounded-xl text-[0.8rem] text-gray-500 hover:bg-white/5 hover:text-gray-300 transition-colors cursor-pointer">Tipos de Acomp.</a>
+    </div>
+
+    <div class="pt-1"></div>
+    <button onclick="toggleMenu('financeiro')" class="w-full flex items-center gap-3 px-3 py-2.5 mx-2 rounded-xl text-[0.83rem] font-medium text-gray-400 hover:bg-white/10 hover:text-white transition-colors duration-150 cursor-pointer mb-0.5" style="width:calc(100% - 16px)">
+      <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>Financeiro
+      <svg id="chev-financeiro" class="chevron w-3.5 h-3.5 ml-auto text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+    </button>
+    <div id="sub-financeiro" class="submenu">
+      <a href="financeiro.html" class="flex items-center gap-2 pl-10 pr-3 py-2 mx-2 rounded-xl text-[0.8rem] text-gray-500 hover:bg-white/5 hover:text-gray-300 transition-colors cursor-pointer">Lan&ccedil;amentos</a>
+      <a href="relatorios.html" class="flex items-center gap-2 pl-10 pr-3 py-2 mx-2 rounded-xl text-[0.8rem] text-gray-500 hover:bg-white/5 hover:text-gray-300 transition-colors cursor-pointer">Relat&oacute;rios</a>
+    </div>
+
+        <div id="sectionDespesas">
+<div class="pt-1"></div>
+    <button onclick="toggleMenu('despesas')" class="w-full flex items-center gap-3 px-3 py-2.5 mx-2 rounded-xl text-[0.83rem] font-semibold text-vitta-400 bg-vitta-500/10 transition-colors duration-150 cursor-pointer mb-0.5" style="width:calc(100% - 16px)">
+      <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M4 2v20l2-1 2 1 2-1 2 1 2-1 2 1 2-1 2 1V2l-2 1-2-1-2 1-2-1-2 1-2-1-2 1z"/><path d="M16 8h-6a2 2 0 1 0 0 4h4a2 2 0 1 1 0 4H8"/><path d="M12 17.5v-11"/></svg>Despesas
+      <svg id="chev-despesas" class="chevron open w-3.5 h-3.5 ml-auto text-vitta-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+    </button>
+    <div id="sub-despesas" class="submenu open">
+      <a href="despesas.html" class="flex items-center gap-2 pl-10 pr-3 py-2 mx-2 rounded-xl text-[0.8rem] font-semibold text-vitta-400 bg-vitta-500/10 transition-colors cursor-pointer">Cadastro Despesa</a>
+      <a href="categorias-despesa.html" class="flex items-center gap-2 pl-10 pr-3 py-2 mx-2 rounded-xl text-[0.8rem] text-gray-500 hover:bg-white/5 hover:text-gray-300 transition-colors cursor-pointer">Categorias</a>
+    </div>
+    </div>
+
+
+    <div id="sectionMinhaEmpresa" class="hidden">
+    <div class="pt-1"></div>
+    <button onclick="toggleMenu('minhaempresa')" class="w-full flex items-center gap-3 px-3 py-2.5 mx-2 rounded-xl text-[0.83rem] font-medium text-gray-400 hover:bg-white/10 hover:text-white transition-colors duration-150 cursor-pointer mb-0.5" style="width:calc(100% - 16px)">
+      <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>Minha Empresa
+      <svg id="chev-minhaempresa" class="chevron w-3.5 h-3.5 ml-auto text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+    </button>
+    <div id="sub-minhaempresa" class="submenu">
+      <a href="minha-empresa.html" class="flex items-center gap-2 pl-10 pr-3 py-2 mx-2 rounded-xl text-[0.8rem] text-gray-500 hover:bg-white/5 hover:text-gray-300 transition-colors cursor-pointer">Meus Dados</a>
+      <a href="faturas.html" class="flex items-center gap-2 pl-10 pr-3 py-2 mx-2 rounded-xl text-[0.8rem] text-gray-500 hover:bg-white/5 hover:text-gray-300 transition-colors cursor-pointer">Minhas Faturas</a>
+    </div>
+    </div>
+    <div id="sectionVittaBI" class="hidden">
+    <div class="pt-1"></div>
+    <a id="linkVittaBI" href="https://bi.vittasistemas.com.br" target="_blank" rel="noopener"
+       class="flex items-center gap-3 px-3 py-2.5 mx-2 rounded-xl text-[0.83rem] font-medium text-gray-400 hover:bg-white/10 hover:text-white transition-colors duration-150 cursor-pointer mb-0.5">
+      <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+        <path d="M3 3v18h18"/><path d="M18.7 8l-5.3 5.3-3-3L4 16.3"/>
+      </svg>
+      Vitta BI
+      <span class="ml-auto text-[0.55rem] font-bold text-violet-300 bg-violet-500/20 px-1.5 py-0.5 rounded">BI</span>
+    </a>
+    </div>
+
+    <div id="sectionAdmin" class="hidden">
+    <div class="pt-1"></div>
+    <button onclick="toggleMenu('admin')" class="w-full flex items-center gap-3 px-3 py-2.5 mx-2 rounded-xl text-[0.83rem] font-medium text-gray-400 hover:bg-white/10 hover:text-white transition-colors duration-150 mb-0.5" style="width:calc(100% - 16px)">
+      <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14M4.93 4.93a10 10 0 0 0 0 14.14"/></svg>Administra&ccedil;&atilde;o
+      <svg id="chev-admin" class="chevron w-3.5 h-3.5 ml-auto text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+    </button>
+    <div id="sub-admin" class="submenu">
+      <a href="empresas.html" class="flex items-center gap-2 pl-10 pr-3 py-2 mx-2 rounded-xl text-[0.8rem] text-gray-500 hover:bg-white/5 hover:text-gray-300 transition-colors cursor-pointer">Empresas</a>
+      <a href="usuarios.html" class="flex items-center gap-2 pl-10 pr-3 py-2 mx-2 rounded-xl text-[0.8rem] text-gray-500 hover:bg-white/5 hover:text-gray-300 transition-colors cursor-pointer">Usu&aacute;rios Admin</a>
+      <a href="planos.html" class="flex items-center gap-2 pl-10 pr-3 py-2 mx-2 rounded-xl text-[0.8rem] text-gray-500 hover:bg-white/5 hover:text-gray-300 transition-colors cursor-pointer">Planos</a>
+      <a href="configuracoes.html" class="flex items-center gap-2 pl-10 pr-3 py-2 mx-2 rounded-xl text-[0.8rem] text-gray-500 hover:bg-white/5 hover:text-gray-300 transition-colors cursor-pointer">Configura&ccedil;&otilde;es</a>
+      <a href="logs.html" class="flex items-center gap-2 pl-10 pr-3 py-2 mx-2 rounded-xl text-[0.8rem] text-gray-500 hover:bg-white/5 hover:text-gray-300 transition-colors cursor-pointer">Log</a>
+      <a href="cadastros_admin.html" class="flex items-center gap-2 pl-10 pr-3 py-2 mx-2 rounded-xl text-[0.8rem] text-gray-500 hover:bg-white/5 hover:text-gray-300 transition-colors cursor-pointer">Cadastros</a>
+    </div>
+    </div>
+    <div class="h-4"></div>
+  </nav>
+  <div class="shrink-0 border-t border-white/10 p-3">
+    <div class="group flex items-center gap-2.5 p-2.5 rounded-xl hover:bg-white/5 cursor-pointer">
+      <div id="user-avatar" class="w-8 h-8 rounded-full bg-vitta-500 flex items-center justify-center text-white text-xs font-bold shrink-0">A</div>
+      <div class="flex-1 min-w-0">
+        <p id="user-name" class="text-white text-[0.8rem] font-semibold truncate">Usu&aacute;rio</p>
+        <p id="user-role" class="text-gray-500 text-[0.7rem] truncate">Admin</p>
+      </div>
+      <button onclick="handleLogout()" title="Sair" class="text-gray-600 hover:text-red-400 transition-colors opacity-0 group-hover:opacity-100">
+        <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+      </button>
+    </div>
+  </div>
+</aside>
+
+<div id="overlay" class="fixed inset-0 bg-black/50 z-20 hidden lg:hidden" onclick="toggleSidebar()"></div>
+
+<div class="flex-1 lg:ml-[220px] flex flex-col min-h-screen">
+  <header class="sticky top-0 z-20 h-16 bg-white border-b border-gray-200 flex items-center px-5 gap-3 shadow-sm">
+    <button onclick="toggleSidebar()" class="lg:hidden p-2 rounded-lg hover:bg-gray-100 text-gray-500">
+      <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+        <line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/>
+      </svg>
+    </button>
+    <div class="flex-1">
+      <h1 class="text-[1rem] font-bold text-gray-800 leading-tight">Cadastro de Despesa</h1>
+      <p id="header-date" class="text-[0.7rem] text-gray-400 leading-tight">Gest&atilde;o de despesas</p>
+    </div>
+    <div class="hidden md:flex items-center gap-2 px-3 py-2 bg-gray-50 border border-gray-200 rounded-xl">
+      <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-vitta-500 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+        <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/>
+      </svg>
+      <span id="empresa-nome" class="text-[0.78rem] font-semibold text-gray-700">Cl&iacute;nica</span>
+    </div>
+    <button class="relative p-2.5 rounded-xl hover:bg-gray-100 text-gray-500 transition-colors">
+      <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+        <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/>
+      </svg>
+      <span class="absolute top-1.5 right-1.5 w-2 h-2 bg-red-500 rounded-full border-2 border-white"></span>
+    </button>
+    <div class="flex items-center gap-2.5">
+      <div id="header-avatar" class="w-9 h-9 rounded-full bg-vitta-500 flex items-center justify-center text-white text-sm font-bold shrink-0">A</div>
+      <div class="hidden sm:block">
+        <p id="header-user-name" class="text-[0.8rem] font-semibold text-gray-800 leading-tight">Usu&aacute;rio</p>
+        <p id="header-user-role" class="text-[0.7rem] text-gray-400 leading-tight">Administrador</p>
+      </div>
+    </div>
+    <button onclick="handleLogout()" class="p-2.5 rounded-xl hover:bg-red-50 text-gray-400 hover:text-red-500 transition-colors" title="Sair">
+      <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+        <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/>
+      </svg>
+    </button>
+  </header>
+
+  <main class="flex-1 p-5 lg:p-6">
+    <!-- RESUMO DO MÊS -->
+    <div class="grid grid-cols-2 lg:grid-cols-4 gap-2.5 mb-6">
+      <div class="bg-white rounded-xl p-3 shadow-sm border border-gray-100">
+        <p class="text-[0.68rem] font-semibold text-gray-400 uppercase tracking-wider mb-1">Total do m&ecirc;s</p>
+        <p id="statTotal" class="text-[1.4375rem] font-semibold text-gray-800">&mdash;</p>
+      </div>
+      <div class="bg-white rounded-xl p-3 shadow-sm border border-gray-100">
+        <p class="text-[0.68rem] font-semibold text-gray-400 uppercase tracking-wider mb-1">Pago</p>
+        <p id="statPago" class="text-[1.4375rem] font-semibold text-emerald-600">&mdash;</p>
+      </div>
+      <div class="bg-white rounded-xl p-3 shadow-sm border border-gray-100">
+        <p class="text-[0.68rem] font-semibold text-gray-400 uppercase tracking-wider mb-1">A pagar</p>
+        <p id="statAPagar" class="text-[1.4375rem] font-semibold text-amber-600">&mdash;</p>
+      </div>
+      <div class="bg-white rounded-xl p-3 shadow-sm border border-gray-100">
+        <p class="text-[0.68rem] font-semibold text-gray-400 uppercase tracking-wider mb-1">Vencidas</p>
+        <p id="statVencidas" class="text-[1.4375rem] font-semibold text-red-500">&mdash;</p>
+        <p id="statVencidasQtd" class="text-[0.68rem] text-gray-400 mt-0.5">&nbsp;</p>
+      </div>
+    </div>
+
+    <!-- FILTROS -->
+    <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-4 mb-4">
+      <div class="flex flex-wrap gap-3 items-center">
+        <div class="flex items-center border border-gray-200 rounded-xl overflow-hidden">
+          <button type="button" onclick="changeMonth(-1)" class="px-3 py-2.5 text-gray-500 hover:bg-gray-50" title="M&ecirc;s anterior">
+            <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><polyline points="15 18 9 12 15 6"/></svg>
+          </button>
+          <span id="monthLabel" class="px-3 text-sm font-semibold text-gray-700 min-w-[130px] text-center select-none">&mdash;</span>
+          <button type="button" onclick="changeMonth(1)" class="px-3 py-2.5 text-gray-500 hover:bg-gray-50" title="Pr&oacute;ximo m&ecirc;s">
+            <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg>
+          </button>
+        </div>
+        <div class="relative flex-1 min-w-[180px]">
+          <svg xmlns="http://www.w3.org/2000/svg" class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+          <input id="filterSearch" type="text" placeholder="Buscar por descri&ccedil;&atilde;o&hellip;" oninput="applyFilters()"
+            class="w-full pl-9 pr-3 py-2.5 text-sm border border-gray-200 rounded-xl outline-none focus:border-vitta-500 focus:ring-2 focus:ring-vitta-500/20" />
+        </div>
+        <select id="filterCat" onchange="applyFilters()" class="py-2.5 px-3 text-sm border border-gray-200 rounded-xl outline-none focus:border-vitta-500 bg-white min-w-[160px]">
+          <option value="">Todas as categorias</option>
+        </select>
+        <select id="filterStatus" onchange="applyFilters()" class="py-2.5 px-3 text-sm border border-gray-200 rounded-xl outline-none focus:border-vitta-500 bg-white">
+          <option value="">Todos os status</option>
+          <option value="pago">Pagas</option>
+          <option value="pendente">A vencer</option>
+          <option value="vencida">Vencidas</option>
+        </select>
+        <button onclick="openFormModal()" class="flex items-center gap-2 px-4 py-2.5 bg-vitta-500 text-white text-sm font-semibold rounded-xl shadow-sm hover:bg-vitta-600 transition-colors ml-auto whitespace-nowrap">
+          <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          Nova Despesa
+        </button>
+      </div>
+    </div>
+
+    <!-- TABELA -->
+    <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+      <div class="flex items-center justify-between px-5 py-3.5 border-b border-gray-100">
+        <p id="tableCount" class="text-sm text-gray-500">Carregando&hellip;</p>
+        <button onclick="clearFilters()" class="text-[0.75rem] text-vitta-600 hover:text-vitta-700 font-medium">Limpar filtros</button>
+      </div>
+      <div id="tableLoader" class="py-16 flex items-center justify-center gap-3 text-gray-400">
+        <svg class="w-5 h-5 animate-spin" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+          <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/>
+          <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"/>
+        </svg>
+        <span class="text-sm">Carregando despesas&hellip;</span>
+      </div>
+      <div id="tableWrap" class="hidden">
+        <div class="hidden sm:block overflow-x-auto">
+          <table class="w-full text-sm">
+            <thead>
+              <tr class="border-b border-gray-100 bg-gray-50 text-[0.72rem] font-semibold text-gray-500 uppercase tracking-wider">
+                <th class="px-5 py-3 text-left">Vencimento</th>
+                <th class="px-5 py-3 text-left">Descri&ccedil;&atilde;o</th>
+                <th class="px-5 py-3 text-left">Categoria</th>
+                <th class="px-5 py-3 text-right">Valor</th>
+                <th class="px-5 py-3 text-left">Status</th>
+                <th class="px-5 py-3 text-right">A&ccedil;&otilde;es</th>
+              </tr>
+            </thead>
+            <tbody id="despBody"></tbody>
+          </table>
+        </div>
+        <div id="mobileList" class="sm:hidden divide-y divide-gray-100"></div>
+        <div id="pagination" class="flex items-center gap-1.5 justify-end px-5 py-3.5 border-t border-gray-100"></div>
+      </div>
+      <div id="tableEmpty" class="hidden py-16 text-center">
+        <svg xmlns="http://www.w3.org/2000/svg" class="w-10 h-10 text-gray-300 mx-auto mb-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path d="M4 2v20l2-1 2 1 2-1 2 1 2-1 2 1 2-1 2 1V2l-2 1-2-1-2 1-2-1-2 1-2-1-2 1z"/><path d="M16 8h-6a2 2 0 1 0 0 4h4a2 2 0 1 1 0 4H8"/><path d="M12 17.5v-11"/></svg>
+        <p id="emptyMsg" class="text-gray-400 text-sm">Nenhuma despesa neste m&ecirc;s</p>
+      </div>
+    </div>
+  </main>
+</div>
+</div>
+
+<!-- ====== MODAL FORM ====== -->
+<div id="modalForm" class="modal-overlay" onclick="if(event.target===this)closeFormModal()">
+  <div class="bg-white rounded-2xl shadow-xl w-full max-w-lg modal-scroll overflow-y-auto max-h-[90vh]" onclick="event.stopPropagation()">
+    <div class="flex items-center justify-between px-5 py-3 border-b border-gray-100">
+      <h2 id="formTitle" class="text-[0.95rem] font-bold text-gray-800">Nova despesa</h2>
+      <button type="button" onclick="closeFormModal()" class="w-7 h-7 rounded-full bg-gray-100 hover:bg-gray-200 text-gray-500 flex items-center justify-center transition-colors" title="Fechar">
+        <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+    <form id="despForm" onsubmit="saveDespesa(event)" class="p-5 flex flex-col gap-3">
+      <div id="noCatWarn" class="hidden bg-amber-50 border border-amber-200 rounded-xl px-4 py-3 text-[0.8rem] text-amber-700">
+        Nenhuma categoria cadastrada. <a href="categorias-despesa.html" class="font-semibold underline">Cadastre uma categoria</a> antes de lan&ccedil;ar despesas.
+      </div>
+      <div>
+        <label for="fDescr" class="block text-[0.78rem] font-semibold text-gray-600 mb-1">Descri&ccedil;&atilde;o <span class="text-red-500">*</span></label>
+        <input id="fDescr" type="text" maxlength="120" placeholder="Ex.: Aluguel da sala" required
+          class="w-full py-2.5 px-3 text-sm border border-gray-200 rounded-xl outline-none focus:border-vitta-500 focus:ring-2 focus:ring-vitta-500/20" />
+      </div>
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+        <div>
+          <label for="fCat" class="block text-[0.78rem] font-semibold text-gray-600 mb-1">Categoria <span class="text-red-500">*</span></label>
+          <select id="fCat" required class="w-full py-2.5 px-3 text-sm border border-gray-200 rounded-xl outline-none focus:border-vitta-500 focus:ring-2 focus:ring-vitta-500/20 bg-white"></select>
+        </div>
+        <div>
+          <label for="fValor" class="block text-[0.78rem] font-semibold text-gray-600 mb-1">Valor (R$) <span class="text-red-500">*</span></label>
+          <input id="fValor" type="text" inputmode="numeric" maxlength="14" placeholder="0,00" required oninput="maskMoney(this)"
+            class="w-full py-2.5 px-3 text-sm border border-gray-200 rounded-xl outline-none focus:border-vitta-500 focus:ring-2 focus:ring-vitta-500/20" />
+        </div>
+        <div>
+          <label for="fVenc" class="block text-[0.78rem] font-semibold text-gray-600 mb-1">Vencimento <span class="text-red-500">*</span></label>
+          <input id="fVenc" type="date" required oninput="updateRecHint()"
+            class="w-full py-2.5 px-3 text-sm border border-gray-200 rounded-xl outline-none focus:border-vitta-500 focus:ring-2 focus:ring-vitta-500/20" />
+        </div>
+        <div>
+          <label for="fTipPag" class="block text-[0.78rem] font-semibold text-gray-600 mb-1">Forma de pagamento</label>
+          <select id="fTipPag" class="w-full py-2.5 px-3 text-sm border border-gray-200 rounded-xl outline-none focus:border-vitta-500 focus:ring-2 focus:ring-vitta-500/20 bg-white"></select>
+        </div>
+      </div>
+
+      <!-- Recorrência (só ao criar) -->
+      <div id="rowRec">
+        <label class="block text-[0.78rem] font-semibold text-gray-600 mb-1.5">Recorr&ecirc;ncia</label>
+        <div id="recSeg" class="grid grid-cols-3 gap-1 bg-gray-100 rounded-xl p-1"></div>
+        <div id="rowQtd" class="hidden mt-3">
+          <label for="fQtd" class="block text-[0.78rem] font-semibold text-gray-600 mb-1">Quantidade de repeti&ccedil;&otilde;es <span class="text-red-500">*</span></label>
+          <input id="fQtd" type="number" min="2" max="60" step="1" value="2" oninput="updateRecHint()"
+            class="w-32 py-2.5 px-3 text-sm border border-gray-200 rounded-xl outline-none focus:border-vitta-500 focus:ring-2 focus:ring-vitta-500/20" />
+        </div>
+        <p id="recHint" class="text-[0.72rem] text-gray-400 mt-2"></p>
+      </div>
+      <div id="rowSerieInfo" class="hidden bg-vitta-50 border border-vitta-100 rounded-xl px-4 py-3 text-[0.78rem] text-vitta-700"></div>
+
+      <!-- Pagamento -->
+      <div>
+        <label class="flex items-center gap-3 cursor-pointer">
+          <input id="fPago" type="checkbox" onchange="togglePago()" class="w-4 h-4 rounded accent-vitta-500" />
+          <span class="text-sm font-medium text-gray-700">J&aacute; foi paga</span>
+        </label>
+        <div id="rowDtPag" class="hidden mt-3">
+          <label for="fDtPag" class="block text-[0.78rem] font-semibold text-gray-600 mb-1">Data do pagamento</label>
+          <input id="fDtPag" type="date" class="w-full sm:w-56 py-2.5 px-3 text-sm border border-gray-200 rounded-xl outline-none focus:border-vitta-500 focus:ring-2 focus:ring-vitta-500/20" />
+          <p id="pagoHint" class="hidden text-[0.72rem] text-gray-400 mt-1">Ao repetir, apenas o primeiro lan&ccedil;amento &eacute; marcado como pago.</p>
+        </div>
+      </div>
+      <div>
+        <label for="fObs" class="block text-[0.78rem] font-semibold text-gray-600 mb-1">Observa&ccedil;&atilde;o</label>
+        <textarea id="fObs" rows="2" maxlength="500" placeholder="Opcional"
+          class="w-full py-2.5 px-3 text-sm border border-gray-200 rounded-xl outline-none focus:border-vitta-500 focus:ring-2 focus:ring-vitta-500/20 resize-none"></textarea>
+      </div>
+      <div class="flex gap-2.5 pt-1.5">
+        <button type="button" onclick="closeFormModal()" class="flex-1 py-2 border border-gray-200 rounded-xl text-sm font-medium text-gray-600 hover:bg-gray-50 transition-colors">Cancelar</button>
+        <button type="submit" id="btnSave" class="flex-1 py-2 bg-vitta-500 text-white rounded-xl text-sm font-semibold hover:bg-vitta-600 transition-colors">Salvar</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- ====== MODAL CONFIRMAÇÃO / ESCOPO DA SÉRIE ====== -->
+<div id="modalScope" class="modal-overlay" onclick="if(event.target===this)closeScope(null)">
+  <div class="bg-white rounded-2xl shadow-xl w-full max-w-sm p-5" onclick="event.stopPropagation()">
+    <h3 id="scopeTitle" class="text-[0.95rem] font-bold text-gray-800 mb-1.5">Confirmar</h3>
+    <p id="scopeMsg" class="text-[0.83rem] text-gray-500 mb-3.5"></p>
+    <div id="scopeOpts" class="hidden space-y-2 mb-4">
+      <label class="flex items-start gap-3 p-3 border border-gray-200 rounded-xl cursor-pointer hover:bg-gray-50">
+        <input type="radio" name="scope" value="one" checked class="mt-0.5 accent-vitta-500" />
+        <span class="text-sm text-gray-700"><strong>Somente esta</strong><br><span class="text-[0.75rem] text-gray-400">Os demais lan&ccedil;amentos da s&eacute;rie n&atilde;o mudam.</span></span>
+      </label>
+      <label class="flex items-start gap-3 p-3 border border-gray-200 rounded-xl cursor-pointer hover:bg-gray-50">
+        <input type="radio" name="scope" value="next" class="mt-0.5 accent-vitta-500" />
+        <span class="text-sm text-gray-700"><strong>Esta e as pr&oacute;ximas</strong><br><span id="scopeNextHint" class="text-[0.75rem] text-gray-400"></span></span>
+      </label>
+    </div>
+    <div class="flex gap-2.5">
+      <button type="button" onclick="closeScope(null)" class="flex-1 py-2 border border-gray-200 rounded-xl text-sm font-medium text-gray-600 hover:bg-gray-50">Cancelar</button>
+      <button type="button" id="btnScopeOk" onclick="confirmScope()" class="flex-1 py-2 rounded-xl text-sm font-semibold text-white bg-vitta-500 hover:bg-vitta-600">Confirmar</button>
+    </div>
+  </div>
+</div>
+
+<script>
+let monthData = [], filtered = [], cats = [], tiposPag = [], editItem = null, currentUserMeta = null;
+const PAGE_SIZE = 10;
+const FIXA_MESES = 12;
+let currentPage = 1, saving = false;
+let curMonth = null;          // 'YYYY-MM'
+let recTipo = 'UNICA';
+
+// ---------- utilitários ----------
+const pad = n => String(n).padStart(2, '0');
+function todayStr() { const d = new Date(); return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`; }
+function esc(s) { return String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+function norm(s) { return String(s ?? '').normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase(); }
+function fmtDate(s) { if (!s) return '—'; const [y,m,d] = s.split('-'); return `${d}/${m}/${y}`; }
+const fmtMoney = v => Number(v || 0).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+function addMonths(dateStr, n) { // mantém o dia; em meses menores usa o último dia (31/jan -> 28/fev)
+  const [y, m, d] = dateStr.split('-').map(Number);
+  const tot = (m - 1) + n, ny = y + Math.floor(tot / 12), nm = ((tot % 12) + 12) % 12;
+  const dim = new Date(ny, nm + 1, 0).getDate();
+  return `${ny}-${pad(nm + 1)}-${pad(Math.min(d, dim))}`;
+}
+function maskMoney(el) {
+  const d = el.value.replace(/\D/g, '');
+  el.value = d ? (parseInt(d, 10) / 100).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : '';
+}
+function parseMoney(s) { return parseFloat(String(s).replace(/\./g, '').replace(',', '.')); }
+function statusOf(d) {
+  if (d.DTPAG_DESP) return 'pago';
+  return d.DTVENC_DESP < todayStr() ? 'vencida' : 'pendente';
+}
+const catById = id => cats.find(c => c.ID_CATDESP === id);
+
+function toggleMenu(k) {
+  const s=document.getElementById('sub-'+k),c=document.getElementById('chev-'+k);
+  const o=s.classList.contains('open');
+  s.classList.toggle('open',!o); if(c)c.classList.toggle('open',!o);
+}
+function toggleSidebar() {
+  const sb=document.getElementById('sidebar'),ov=document.getElementById('overlay');
+  const o=sb.classList.contains('-translate-x-full');
+  sb.classList.toggle('-translate-x-full',!o); ov.classList.toggle('hidden',!o);
+}
+async function handleLogout() { await supabase.auth.signOut(); window.location.href='../index.html'; }
+
+async function initAuth() {
+  document.getElementById('header-date').textContent = 'Despesas — ' + new Date().toLocaleDateString('pt-BR',{weekday:'long',year:'numeric',month:'long',day:'numeric'});
+  const { data:{ session } } = await supabase.auth.getSession();
+  if (!session) { window.location.href='../index.html'; return false; }
+  const meta = session.user.user_metadata;
+  currentUserMeta = meta;
+  if (!['ADMIN_EMPRESA','ADMIN_GLOBAL','SECRETARIA'].includes(meta.tipo_usu)) { window.location.href='dashboard.html'; return false; }
+  const TIPO_LABELS = {'ADMIN_GLOBAL':'Admin Global','ADMIN_EMPRESA':'Administrador','SECRETARIA':'Secretaria','PROFISSIONAL':'Profissional'};
+  const label = TIPO_LABELS[meta.tipo_usu] || meta.tipo_usu;
+  const nome = meta.nome_usu || session.user.email;
+  const ini = nome.split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase();
+  ['user-name','header-user-name'].forEach(id=>document.getElementById(id).textContent=nome);
+  ['user-role','header-user-role'].forEach(id=>document.getElementById(id).textContent=label);
+  ['user-avatar','header-avatar'].forEach(id=>document.getElementById(id).textContent=ini);
+  if (meta.tipo_usu === 'ADMIN_GLOBAL') {
+    document.getElementById('empresa-nome').textContent = 'Vitta Sistemas';
+    document.getElementById('sectionAdmin').classList.remove('hidden');
+    AdminEmpresaCtx.initSelector('ADMIN_GLOBAL', session.user.id);
+  } else {
+    const { data: emp } = await supabase.from('EMPRESA').select('NOME_EMP').eq('ID_EMP', meta.ID_EMP || meta.id_emp).maybeSingle();
+    document.getElementById('empresa-nome').textContent = emp?.NOME_EMP || '';
+  }
+  let temAcessoConsultas = meta.tipo_usu === 'PROFISSIONAL';
+  if (['ADMIN_EMPRESA','ADMIN_GLOBAL'].includes(meta.tipo_usu)) {
+    const uOwn = await getUsuarioAtual('PROF_USU', session);
+    temAcessoConsultas = !!(uOwn?.PROF_USU);
+  }
+  if (!temAcessoConsultas)
+    document.querySelector('a[href="consultas.html"]')?.classList.add('hidden');
+  return true;
+}
+
+function empId() {
+  return AdminEmpresaCtx.resolveIdEmp(currentUserMeta?.tipo_usu, currentUserMeta?.ID_EMP || currentUserMeta?.id_emp);
+}
+
+// ---------- carga de dados ----------
+async function loadAux() {
+  const idEmp = empId();
+  let qc = supabase.from('CATDESP').select('ID_CATDESP,NOME_CATDESP,ICONE_CATDESP,COR_CATDESP').order('NOME_CATDESP');
+  let qt = supabase.from('TIPPAG').select('ID_TIPPAG,NOME_TIPPAG,ATIVO_TIPPAG').order('NOME_TIPPAG');
+  if (idEmp) { qc = qc.eq('ID_EMP', idEmp); qt = qt.eq('ID_EMP', idEmp); }
+  const [rc, rt] = await Promise.all([qc, qt]);
+  if (rc.error) showToast('Erro ao carregar categorias', 'error');
+  cats = rc.data || [];
+  tiposPag = rt.data || [];
+  document.getElementById('filterCat').innerHTML = '<option value="">Todas as categorias</option>' +
+    cats.map(c => `<option value="${c.ID_CATDESP}">${esc(c.NOME_CATDESP)}</option>`).join('');
+}
+
+async function loadDespesas() {
+  const [y, m] = curMonth.split('-').map(Number);
+  const first = `${curMonth}-01`, last = `${curMonth}-${pad(new Date(y, m, 0).getDate())}`;
+  let q = supabase.from('DESPESA').select('*').gte('DTVENC_DESP', first).lte('DTVENC_DESP', last)
+    .order('DTVENC_DESP').order('DESCR_DESP');
+  const idEmp = empId();
+  if (idEmp) q = q.eq('ID_EMP', idEmp);
+  const { data, error } = await q;
+  if (error) { showToast('Erro ao carregar despesas', 'error'); return; }
+  monthData = data || [];
+  document.getElementById('tableLoader').classList.add('hidden');
+  renderStats();
+  applyFilters();
+}
+
+function renderMonthLabel() {
+  const [y, m] = curMonth.split('-').map(Number);
+  const t = new Date(y, m - 1, 1).toLocaleDateString('pt-BR', { month: 'long', year: 'numeric' });
+  document.getElementById('monthLabel').textContent = t.charAt(0).toUpperCase() + t.slice(1);
+}
+function setMonth(ym) { curMonth = ym; renderMonthLabel(); return loadDespesas(); }
+function changeMonth(delta) { return setMonth(addMonths(curMonth + '-01', delta).slice(0, 7)); }
+
+function renderStats() {
+  const sum = arr => arr.reduce((a, d) => a + Number(d.VALOR_DESP), 0);
+  const pagas = monthData.filter(d => d.DTPAG_DESP);
+  const abertas = monthData.filter(d => !d.DTPAG_DESP);
+  const venc = monthData.filter(d => statusOf(d) === 'vencida');
+  document.getElementById('statTotal').textContent = fmtMoney(sum(monthData));
+  document.getElementById('statPago').textContent = fmtMoney(sum(pagas));
+  document.getElementById('statAPagar').textContent = fmtMoney(sum(abertas));
+  document.getElementById('statVencidas').textContent = fmtMoney(sum(venc));
+  document.getElementById('statVencidasQtd').textContent = venc.length ? `${venc.length} despesa${venc.length!==1?'s':''}` : ' ';
+}
+
+// ---------- lista ----------
+function applyFilters() {
+  const q = norm(document.getElementById('filterSearch').value.trim());
+  const cat = document.getElementById('filterCat').value;
+  const st = document.getElementById('filterStatus').value;
+  filtered = monthData.filter(d =>
+    (!q || norm(d.DESCR_DESP).includes(q)) &&
+    (!cat || d.ID_CATDESP === cat) &&
+    (!st || statusOf(d) === st));
+  currentPage = 1;
+  renderTable();
+}
+function clearFilters() {
+  document.getElementById('filterSearch').value = '';
+  document.getElementById('filterCat').value = '';
+  document.getElementById('filterStatus').value = '';
+  applyFilters();
+}
+
+const CHECK_SVG = '<svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>';
+const UNDO_SVG = '<svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/></svg>';
+const EDIT_SVG = '<svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>';
+const TRASH_SVG = '<svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>';
+
+function catBadge(id) {
+  const c = catById(id);
+  if (!c) return '<span class="text-gray-400 text-[0.82rem]">—</span>';
+  return `<span class="inline-flex items-center gap-2 min-w-0"><span class="w-7 h-7 rounded-lg flex items-center justify-center shrink-0" style="background:${esc(c.COR_CATDESP)}1F">${iconSvg(c.ICONE_CATDESP, 'w-3.5 h-3.5', esc(c.COR_CATDESP))}</span><span class="text-[0.82rem] text-gray-600 truncate">${esc(c.NOME_CATDESP)}</span></span>`;
+}
+function statusBadge(d) {
+  const st = statusOf(d);
+  if (st === 'pago') return `<span class="inline-flex items-center gap-1 text-[0.72rem] font-bold bg-emerald-50 text-emerald-700 px-2.5 py-1 rounded-full whitespace-nowrap"><span class="w-1.5 h-1.5 bg-emerald-500 rounded-full"></span>Pago em ${fmtDate(d.DTPAG_DESP).slice(0,5)}</span>`;
+  if (st === 'vencida') return '<span class="inline-flex items-center gap-1 text-[0.72rem] font-bold bg-red-50 text-red-600 px-2.5 py-1 rounded-full"><span class="w-1.5 h-1.5 bg-red-400 rounded-full"></span>Vencida</span>';
+  return '<span class="inline-flex items-center gap-1 text-[0.72rem] font-bold bg-amber-50 text-amber-700 px-2.5 py-1 rounded-full"><span class="w-1.5 h-1.5 bg-amber-400 rounded-full"></span>A vencer</span>';
+}
+function recBadge(d) {
+  if (d.REC_DESP === 'FIXA') return '<span class="text-[0.65rem] font-bold bg-violet-50 text-violet-600 px-1.5 py-0.5 rounded">FIXA</span>';
+  if (d.REC_DESP === 'REPETIR') return `<span class="text-[0.65rem] font-bold bg-vitta-50 text-vitta-700 px-1.5 py-0.5 rounded">${d.PARCELA_DESP}/${d.TOTAL_PARC_DESP}</span>`;
+  return '';
+}
+function actionBtns(d) {
+  const pago = !!d.DTPAG_DESP;
+  return `<button onclick="togglePagamento('${d.ID_DESP}')" title="${pago ? 'Desfazer pagamento' : 'Marcar como paga'}" class="p-1.5 rounded-lg text-gray-400 ${pago ? 'hover:text-amber-600 hover:bg-amber-50' : 'hover:text-emerald-600 hover:bg-emerald-50'} transition-colors">${pago ? UNDO_SVG : CHECK_SVG}</button>
+          <button onclick="openEditModal('${d.ID_DESP}')" title="Editar" class="p-1.5 rounded-lg text-gray-400 hover:text-vitta-600 hover:bg-vitta-50 transition-colors">${EDIT_SVG}</button>
+          ${pago
+            ? `<button disabled title="Despesa paga não pode ser excluída. Desfaça o pagamento para excluir." class="p-1.5 rounded-lg text-gray-300 cursor-not-allowed">${TRASH_SVG}</button>`
+            : `<button onclick="deleteDespesa('${d.ID_DESP}')" title="Excluir" class="p-1.5 rounded-lg text-gray-400 hover:text-red-500 hover:bg-red-50 transition-colors">${TRASH_SVG}</button>`}`;
+}
+
+function renderTable() {
+  document.getElementById('tableCount').innerHTML = `Exibindo <strong class="text-gray-800">${filtered.length}</strong> despesa${filtered.length!==1?'s':''}`;
+  if (!filtered.length) {
+    document.getElementById('tableWrap').classList.add('hidden');
+    document.getElementById('tableEmpty').classList.remove('hidden');
+    document.getElementById('emptyMsg').textContent = monthData.length ? 'Nenhuma despesa encontrada com esses filtros' : 'Nenhuma despesa neste mês';
+    document.getElementById('despBody').innerHTML = '';
+    document.getElementById('mobileList').innerHTML = '';
+    document.getElementById('pagination').innerHTML = '';
+    return;
+  }
+  document.getElementById('tableWrap').classList.remove('hidden');
+  document.getElementById('tableEmpty').classList.add('hidden');
+  const start = (currentPage - 1) * PAGE_SIZE;
+  const slice = filtered.slice(start, start + PAGE_SIZE);
+  document.getElementById('despBody').innerHTML = slice.map(d => `
+    <tr class="border-b border-gray-50 fade-up">
+      <td class="px-5 py-3.5 text-gray-600 text-[0.82rem] whitespace-nowrap">${fmtDate(d.DTVENC_DESP)}</td>
+      <td class="px-5 py-3.5"><div class="flex items-center gap-2"><span class="font-semibold text-gray-800">${esc(d.DESCR_DESP)}</span>${recBadge(d)}</div></td>
+      <td class="px-5 py-3.5">${catBadge(d.ID_CATDESP)}</td>
+      <td class="px-5 py-3.5 text-right font-semibold text-gray-800 whitespace-nowrap">${fmtMoney(d.VALOR_DESP)}</td>
+      <td class="px-5 py-3.5">${statusBadge(d)}</td>
+      <td class="px-5 py-3.5 text-right"><div class="flex items-center justify-end gap-1">${actionBtns(d)}</div></td>
+    </tr>`).join('');
+  document.getElementById('mobileList').innerHTML = slice.map(d => `
+    <div class="px-4 py-3.5">
+      <div class="flex items-start justify-between gap-3">
+        <div class="min-w-0 flex-1">
+          <div class="flex items-center gap-2"><p class="text-sm font-semibold text-gray-800 truncate">${esc(d.DESCR_DESP)}</p>${recBadge(d)}</div>
+          <div class="mt-1">${catBadge(d.ID_CATDESP)}</div>
+          <p class="text-xs text-gray-400 mt-1">Vence em ${fmtDate(d.DTVENC_DESP)}</p>
+          <div class="mt-2">${statusBadge(d)}</div>
+        </div>
+        <div class="text-right shrink-0">
+          <p class="text-sm font-bold text-gray-800">${fmtMoney(d.VALOR_DESP)}</p>
+          <div class="flex items-center justify-end gap-0.5 mt-1">${actionBtns(d)}</div>
+        </div>
+      </div>
+    </div>`).join('');
+  renderPagination();
+}
+
+function renderPagination() {
+  const total = Math.ceil(filtered.length / PAGE_SIZE);
+  const pg = document.getElementById('pagination');
+  if (total <= 1) { pg.innerHTML = ''; return; }
+  const btnBase = 'min-w-[32px] h-8 rounded-lg border border-gray-200 text-xs font-semibold flex items-center justify-center px-2 transition-colors';
+  let html = `<button class="${btnBase} hover:bg-gray-50 text-gray-500" onclick="goPage(${currentPage - 1})" ${currentPage === 1 ? 'disabled' : ''}>‹</button>`;
+  for (let i = 1; i <= total; i++) {
+    if (total > 7 && i > 3 && i < total - 1 && Math.abs(i - currentPage) > 1) {
+      if (i === 4 || i === total - 2) html += `<button class="${btnBase} text-gray-400 cursor-default" disabled>…</button>`;
+      continue;
+    }
+    html += `<button class="${btnBase} ${i === currentPage ? 'bg-vitta-500 text-white border-vitta-500' : 'hover:bg-gray-50 text-gray-600'}" onclick="goPage(${i})">${i}</button>`;
+  }
+  html += `<button class="${btnBase} hover:bg-gray-50 text-gray-500" onclick="goPage(${currentPage + 1})" ${currentPage === total ? 'disabled' : ''}>›</button>`;
+  pg.innerHTML = html;
+}
+function goPage(n) {
+  const total = Math.ceil(filtered.length / PAGE_SIZE);
+  if (n < 1 || n > total) return;
+  currentPage = n;
+  renderTable();
+}
+
+// ---------- confirmação / escopo da série ----------
+let scopeResolve = null;
+function askScope({ title, msg, confirmLabel, danger, serie, nextHint }) {
+  return new Promise(resolve => {
+    scopeResolve = resolve;
+    document.getElementById('scopeTitle').textContent = title;
+    document.getElementById('scopeMsg').textContent = msg;
+    document.getElementById('scopeOpts').classList.toggle('hidden', !serie);
+    document.getElementById('scopeNextHint').textContent = nextHint || '';
+    document.querySelector('input[name="scope"][value="one"]').checked = true;
+    const btn = document.getElementById('btnScopeOk');
+    btn.textContent = confirmLabel;
+    btn.className = `flex-1 py-2 rounded-xl text-sm font-semibold text-white ${danger ? 'bg-red-500 hover:bg-red-600' : 'bg-vitta-500 hover:bg-vitta-600'}`;
+    document.getElementById('modalScope').classList.add('open');
+  });
+}
+function closeScope(v) {
+  document.getElementById('modalScope').classList.remove('open');
+  if (scopeResolve) { const r = scopeResolve; scopeResolve = null; r(v); }
+}
+function confirmScope() {
+  const opts = !document.getElementById('scopeOpts').classList.contains('hidden');
+  closeScope(opts ? document.querySelector('input[name="scope"]:checked').value : 'one');
+}
+
+// ---------- modal de despesa ----------
+const REC_LABELS = { UNICA: 'Única', FIXA: 'Fixa', REPETIR: 'Repetir' };
+function renderRecSeg() {
+  document.getElementById('recSeg').innerHTML = Object.keys(REC_LABELS).map(k =>
+    `<button type="button" onclick="setRec('${k}')" class="py-2 rounded-lg text-sm font-semibold transition-colors ${k === recTipo ? 'bg-white text-gray-800 shadow-sm' : 'text-gray-500 hover:text-gray-700'}">${REC_LABELS[k]}</button>`).join('');
+  document.getElementById('rowQtd').classList.toggle('hidden', recTipo !== 'REPETIR');
+  document.getElementById('pagoHint').classList.toggle('hidden', recTipo === 'UNICA' || !!editItem);
+  updateRecHint();
+}
+function setRec(k) { recTipo = k; renderRecSeg(); }
+function updateRecHint() {
+  const el = document.getElementById('recHint');
+  const venc = document.getElementById('fVenc').value;
+  const qtd = parseInt(document.getElementById('fQtd').value, 10);
+  if (recTipo === 'UNICA') { el.textContent = 'Lançamento único, sem repetição.'; return; }
+  if (recTipo === 'FIXA') {
+    el.textContent = `Repete todo mês, gerando ${FIXA_MESES} lançamentos` + (venc ? ` (de ${fmtDate(venc)} a ${fmtDate(addMonths(venc, FIXA_MESES - 1))}).` : '.');
+    return;
+  }
+  el.textContent = qtd >= 2
+    ? `Gera ${qtd} lançamentos mensais, incluindo este` + (venc ? ` (o último vence em ${fmtDate(addMonths(venc, qtd - 1))}).` : '.')
+    : 'Informe pelo menos 2 repetições.';
+}
+function togglePago() {
+  const on = document.getElementById('fPago').checked;
+  document.getElementById('rowDtPag').classList.toggle('hidden', !on);
+  if (on && !document.getElementById('fDtPag').value) document.getElementById('fDtPag').value = todayStr();
+}
+function fillSelects(selCat, selTipPag) {
+  const fc = document.getElementById('fCat');
+  fc.innerHTML = '<option value="">Selecione…</option>' + cats.map(c => `<option value="${c.ID_CATDESP}">${esc(c.NOME_CATDESP)}</option>`).join('');
+  fc.value = selCat || '';
+  const ft = document.getElementById('fTipPag');
+  ft.innerHTML = '<option value="">Não informada</option>' + tiposPag
+    .filter(t => t.ATIVO_TIPPAG || t.ID_TIPPAG === selTipPag)
+    .map(t => `<option value="${t.ID_TIPPAG}">${esc(t.NOME_TIPPAG)}${t.ATIVO_TIPPAG ? '' : ' (inativa)'}</option>`).join('');
+  ft.value = selTipPag || '';
+  document.getElementById('noCatWarn').classList.toggle('hidden', cats.length > 0);
+}
+
+function openFormModal() {
+  editItem = null; recTipo = 'UNICA';
+  document.getElementById('formTitle').textContent = 'Nova despesa';
+  document.getElementById('despForm').reset();
+  fillSelects('', '');
+  document.getElementById('fVenc').value = todayStr();
+  document.getElementById('fQtd').value = 2;
+  document.getElementById('fPago').checked = false;
+  document.getElementById('rowDtPag').classList.add('hidden');
+  document.getElementById('rowRec').classList.remove('hidden');
+  document.getElementById('rowSerieInfo').classList.add('hidden');
+  renderRecSeg();
+  document.getElementById('modalForm').classList.add('open');
+  setTimeout(() => document.getElementById('fDescr').focus(), 50);
+}
+
+function openEditModal(id) {
+  const d = monthData.find(x => x.ID_DESP === id);
+  if (!d) return;
+  editItem = d;
+  document.getElementById('formTitle').textContent = 'Editar despesa';
+  document.getElementById('despForm').reset();
+  fillSelects(d.ID_CATDESP, d.ID_TIPPAG);
+  document.getElementById('fDescr').value = d.DESCR_DESP;
+  document.getElementById('fValor').value = Number(d.VALOR_DESP).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  document.getElementById('fVenc').value = d.DTVENC_DESP;
+  document.getElementById('fObs').value = d.OBS_DESP || '';
+  document.getElementById('fPago').checked = !!d.DTPAG_DESP;
+  document.getElementById('fDtPag').value = d.DTPAG_DESP || '';
+  document.getElementById('rowDtPag').classList.toggle('hidden', !d.DTPAG_DESP);
+  document.getElementById('pagoHint').classList.add('hidden');
+  document.getElementById('rowRec').classList.add('hidden'); // recorrência só é definida ao criar
+  const info = document.getElementById('rowSerieInfo');
+  if (d.ID_SERIE_DESP) {
+    info.textContent = d.REC_DESP === 'FIXA'
+      ? `Despesa fixa mensal (lançamento ${d.PARCELA_DESP}). Ao salvar, você escolhe se a alteração vale só para esta ou também para as próximas.`
+      : `Repetição ${d.PARCELA_DESP} de ${d.TOTAL_PARC_DESP}. Ao salvar, você escolhe se a alteração vale só para esta ou também para as próximas.`;
+    info.classList.remove('hidden');
+  } else info.classList.add('hidden');
+  document.getElementById('modalForm').classList.add('open');
+}
+function closeFormModal() { document.getElementById('modalForm').classList.remove('open'); }
+
+function readForm() {
+  const valor = parseMoney(document.getElementById('fValor').value);
+  return {
+    ID_CATDESP: document.getElementById('fCat').value,
+    ID_TIPPAG: document.getElementById('fTipPag').value || null,
+    DESCR_DESP: document.getElementById('fDescr').value.trim(),
+    VALOR_DESP: valor,
+    OBS_DESP: document.getElementById('fObs').value.trim() || null,
+    venc: document.getElementById('fVenc').value,
+    dtpag: document.getElementById('fPago').checked ? (document.getElementById('fDtPag').value || todayStr()) : null
+  };
+}
+
+async function saveDespesa(ev) {
+  ev.preventDefault();
+  if (saving) return;
+  const f = readForm();
+  if (!f.DESCR_DESP) { showToast('Informe a descrição', 'error'); return; }
+  if (!f.ID_CATDESP) { showToast('Selecione a categoria', 'error'); return; }
+  if (!(f.VALOR_DESP > 0)) { showToast('Informe um valor maior que zero', 'error'); return; }
+  if (!f.venc) { showToast('Informe o vencimento', 'error'); return; }
+  const idEmp = empId();
+  if (!idEmp) { showToast('Selecione a empresa', 'error'); return; }
+  const common = { ID_CATDESP: f.ID_CATDESP, ID_TIPPAG: f.ID_TIPPAG, DESCR_DESP: f.DESCR_DESP, VALOR_DESP: f.VALOR_DESP, OBS_DESP: f.OBS_DESP };
+
+  let scope = 'one';
+  if (editItem?.ID_SERIE_DESP) {
+    scope = await askScope({ title: 'Salvar alterações', msg: 'Esta despesa faz parte de uma série. Onde aplicar as alterações?', confirmLabel: 'Salvar', serie: true,
+      nextHint: 'Descrição, categoria, valor, forma de pagamento e observação. Vencimento e pagamento mudam só nesta.' });
+    if (!scope) return;
+  }
+  let qtd = 1;
+  if (!editItem && recTipo === 'REPETIR') {
+    qtd = parseInt(document.getElementById('fQtd').value, 10);
+    if (!(qtd >= 2 && qtd <= 60)) { showToast('Informe de 2 a 60 repetições', 'error'); return; }
+  }
+
+  saving = true;
+  const btn = document.getElementById('btnSave');
+  btn.disabled = true; btn.textContent = 'Salvando…';
+  try {
+    if (!editItem) {
+      let rows;
+      if (recTipo === 'UNICA') {
+        rows = [{ ID_EMP: idEmp, ...common, DTVENC_DESP: f.venc, DTPAG_DESP: f.dtpag, REC_DESP: 'UNICA' }];
+      } else {
+        const n = recTipo === 'FIXA' ? FIXA_MESES : qtd, serie = crypto.randomUUID();
+        rows = Array.from({ length: n }, (_, i) => ({
+          ID_EMP: idEmp, ...common, DTVENC_DESP: addMonths(f.venc, i), DTPAG_DESP: i === 0 ? f.dtpag : null,
+          REC_DESP: recTipo, ID_SERIE_DESP: serie, PARCELA_DESP: i + 1, TOTAL_PARC_DESP: recTipo === 'FIXA' ? null : n
+        }));
+      }
+      const { error } = await supabase.from('DESPESA').insert(rows);
+      if (error) throw error;
+      showToast(rows.length > 1 ? `${rows.length} despesas criadas com sucesso!` : 'Despesa criada com sucesso!');
+    } else {
+      const { error } = await supabase.from('DESPESA').update({ ...common, DTVENC_DESP: f.venc, DTPAG_DESP: f.dtpag }).eq('ID_DESP', editItem.ID_DESP);
+      if (error) throw error;
+      if (scope === 'next') {
+        const { error: e2 } = await supabase.from('DESPESA').update(common)
+          .eq('ID_SERIE_DESP', editItem.ID_SERIE_DESP).gt('PARCELA_DESP', editItem.PARCELA_DESP);
+        if (e2) throw e2;
+      }
+      showToast(scope === 'next' ? 'Despesa e próximas atualizadas!' : 'Despesa atualizada!');
+    }
+    closeFormModal();
+    await setMonth(f.venc.slice(0, 7)); // mostra o mês do vencimento salvo
+  } catch (err) {
+    showToast(err.message || 'Erro ao salvar', 'error');
+  }
+  saving = false;
+  btn.disabled = false; btn.textContent = 'Salvar';
+}
+
+async function togglePagamento(id) {
+  const d = monthData.find(x => x.ID_DESP === id);
+  if (!d) return;
+  const { error } = await supabase.from('DESPESA').update({ DTPAG_DESP: d.DTPAG_DESP ? null : todayStr() }).eq('ID_DESP', id);
+  if (error) { showToast(error.message || 'Erro ao atualizar', 'error'); return; }
+  showToast(d.DTPAG_DESP ? 'Pagamento desfeito' : 'Despesa marcada como paga!');
+  await loadDespesas();
+}
+
+async function deleteDespesa(id) {
+  const d = monthData.find(x => x.ID_DESP === id);
+  if (!d) return;
+  if (d.DTPAG_DESP) { showToast('Despesa paga não pode ser excluída. Desfaça o pagamento antes.', 'error'); return; }
+  const serie = !!d.ID_SERIE_DESP;
+  const scope = await askScope({
+    title: 'Excluir despesa',
+    msg: serie ? `"${d.DESCR_DESP}" faz parte de uma série. O que excluir?` : `Excluir "${d.DESCR_DESP}"? Esta ação não pode ser desfeita.`,
+    confirmLabel: 'Excluir', danger: true, serie,
+    nextHint: 'Exclui este lançamento e os seguintes da série. Lançamentos já pagos são mantidos.'
+  });
+  if (!scope) return;
+  // .is(DTPAG_DESP, null): despesas pagas nunca são excluídas (o banco também bloqueia)
+  let q = supabase.from('DESPESA').delete().is('DTPAG_DESP', null);
+  q = scope === 'next' ? q.eq('ID_SERIE_DESP', d.ID_SERIE_DESP).gte('PARCELA_DESP', d.PARCELA_DESP) : q.eq('ID_DESP', id);
+  const { data, error } = await q.select('ID_DESP');
+  if (error) { showToast(error.message || 'Erro ao excluir', 'error'); return; }
+  if (!data?.length) showToast('Nada foi excluído', 'error');
+  else showToast(scope === 'next' && data.length > 1 ? `${data.length} despesas excluídas!` : 'Despesa excluída!');
+  await loadDespesas();
+}
+
+document.addEventListener('keydown', e => {
+  if (e.key !== 'Escape') return;
+  if (document.getElementById('modalScope').classList.contains('open')) closeScope(null);
+  else closeFormModal();
+});
+
+(async () => {
+  const ok = await initAuth();
+  if (!ok) return;
+  if (currentUserMeta?.tipo_usu === 'ADMIN_GLOBAL' && !AdminEmpresaCtx.get()) {
+    AdminEmpresaCtx.renderBloqueio(['main']);
+    return;
+  }
+  await loadAux();
+  await setMonth(todayStr().slice(0, 7));
+})();
+</script>
+<script>
+document.querySelectorAll('#sidebar nav a').forEach(function(link) {
+  link.addEventListener('click', function() {
+    var sb = document.getElementById('sidebar');
+    var ov = document.getElementById('overlay');
+    if (sb && !sb.classList.contains('-translate-x-full')) {
+      sb.classList.add('-translate-x-full');
+      if (ov) ov.classList.add('hidden');
+    }
+  });
+});
+</script>
+<script>
+(async () => {
+  try {
+    const { data: { session } } = await supabase.auth.getSession();
+    if (['ADMIN_EMPRESA'].includes(session?.user?.user_metadata?.tipo_usu)) {
+      const el = document.getElementById('sectionMinhaEmpresa');
+      if (el) el.classList.remove('hidden');
+    }
+  } catch (_) {}
+})();
+</script>
+<script>
+(async () => {
+  try {
+    const { data: { session } } = await supabase.auth.getSession();
+    if (!session) return;
+    const u = await getUsuarioAtual('TIPO_USU,ID_EMP', session);
+    if (u && u.ID_EMP === '22ff26b9-3839-45ed-8a1d-df4a488d3aab' && ['ADMIN_EMPRESA','SECRETARIA'].includes(u.TIPO_USU)) {
+      document.getElementById('menuDocumentosWrap')?.classList.remove('hidden');
+    }
+  } catch (_) {}
+})();
+</script>
+</body>
+</html>

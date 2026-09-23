@@ -14,8 +14,8 @@
   .bi-card { background: #FFFFFF; border: 1px solid #F1F0F7; border-radius: 16px; box-shadow: 0 2px 8px rgba(109,93,246,.04); }
   .bi-kpi-icon { width: 36px; height: 36px; border-radius: 10px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
   .bi-filter { font-size: 14px; font-weight: 500; color: #6B7280; background: #FFFFFF; border: 1px solid #EFEDF9; border-radius: 9px; padding: 7px 12px; display: flex; align-items: center; gap: 6px; cursor: pointer; }
-  .bi-kpi-title { display: flex; align-items: center; gap: 6px; font-size: 13px; font-weight: 600; color: #6B7280; }
-  .bi-info { position: relative; width: 15px; height: 15px; border-radius: 50%; border: 1.3px solid #CBC8DC; color: #9C99B8; background: transparent; font-size: 10.5px; font-weight: 700; display: flex; align-items: center; justify-content: center; cursor: help; flex-shrink: 0; }
+  .bi-kpi-title { display: flex; align-items: center; gap: 6px; font-size: 13px; font-weight: 500; color: #6B7280; }
+  .bi-info { position: relative; width: 15px; height: 15px; border-radius: 50%; border: 1.3px solid #CBC8DC; color: #9C99B8; background: transparent; font-size: 10.5px; font-weight: 600; display: flex; align-items: center; justify-content: center; cursor: help; flex-shrink: 0; }
   .bi-info-tip { visibility: hidden; opacity: 0; position: absolute; top: calc(100% + 9px); right: -10px; width: 220px; background: #1F2937; color: #fff; font-size: 12.5px; font-weight: 500; line-height: 1.45; padding: 10px 12px; border-radius: 8px; box-shadow: 0 6px 20px rgba(0,0,0,.18); transition: opacity .15s ease; z-index: 30; text-align: left; pointer-events: none; }
   .bi-info-tip::after { content: ''; position: absolute; bottom: 100%; right: 13px; border: 5px solid transparent; border-bottom-color: #1F2937; }
   .bi-info:hover .bi-info-tip, .bi-info:focus .bi-info-tip { visibility: visible; opacity: 1; }
@@ -24,13 +24,13 @@
 
   .bi-period-panel { display: none; position: absolute; top: calc(100% + 8px); left: 0; width: 250px; background: #FFFFFF; border: 1px solid #F1F0F7; border-radius: 14px; box-shadow: 0 14px 34px rgba(17,17,17,.14); z-index: 40; padding: 10px; cursor: default; }
   .bi-period-panel.open { display: block; }
-  .bi-period-panel-title { font-size: 11.5px; font-weight: 700; color: #9C99B8; letter-spacing: .05em; text-transform: uppercase; padding: 4px 10px 8px; }
+  .bi-period-panel-title { font-size: 11.5px; font-weight: 600; color: #9C99B8; letter-spacing: .05em; text-transform: uppercase; padding: 4px 10px 8px; }
   .bi-period-opt { display: flex; align-items: center; gap: 10px; padding: 9px 10px; border-radius: 10px; cursor: pointer; }
   .bi-period-opt:hover { background: #F7F6FC; }
   .bi-period-opt.active { background: #FDECEC; }
   .bi-period-opt-icon { width: 15px; height: 15px; flex-shrink: 0; color: #9C99B8; }
   .bi-period-opt-text { flex: 1; min-width: 0; }
-  .bi-period-opt-title { font-size: 14px; font-weight: 600; color: #111827; }
+  .bi-period-opt-title { font-size: 14px; font-weight: 500; color: #111827; }
   .bi-period-opt.active .bi-period-opt-title { color: #C0392B; }
   .bi-period-opt-sub { font-size: 12px; color: #9CA3AF; margin-top: 1px; }
   .bi-period-opt-check { color: #C0392B; font-size: 14.5px; flex-shrink: 0; }
@@ -39,18 +39,18 @@
   .bi-period-back:hover { background: #F7F6FC; }
   .bi-range-input { flex: 1; border: 1.5px solid #EFEDF9; border-radius: 10px; padding: 7px 10px; cursor: pointer; }
   .bi-range-input.active { border-color: #E4534B; }
-  .bi-range-input-label { font-size: 10px; font-weight: 700; color: #9C99B8; text-transform: uppercase; letter-spacing: .03em; }
-  .bi-range-input-value { font-size: 13px; font-weight: 600; color: #111827; margin-top: 1px; }
+  .bi-range-input-label { font-size: 10px; font-weight: 600; color: #9C99B8; text-transform: uppercase; letter-spacing: .03em; }
+  .bi-range-input-value { font-size: 13px; font-weight: 500; color: #111827; margin-top: 1px; }
   .bi-cal-nav-btn { border: none; background: transparent; color: #6B7280; font-size: 16.5px; cursor: pointer; width: 24px; height: 24px; border-radius: 6px; }
   .bi-cal-nav-btn:hover { background: #F7F6FC; }
   .bi-cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 2px; }
-  .bi-cal-dow { font-size: 11px; font-weight: 700; color: #C4C1D6; text-align: center; padding: 4px 0; }
+  .bi-cal-dow { font-size: 11px; font-weight: 600; color: #C4C1D6; text-align: center; padding: 4px 0; }
   .bi-cal-day { font-size: 12.5px; text-align: center; padding: 7px 0; border-radius: 8px; cursor: pointer; color: #111827; }
   .bi-cal-day:hover { background: #F7F6FC; }
   .bi-cal-day.muted { color: #C4C1D6; }
   .bi-cal-day.in-range { background: #FCEAEA; }
-  .bi-cal-day.range-edge { background: #E4534B !important; color: #fff; font-weight: 600; }
-  .bi-pill { font-size: 11.5px; font-weight: 600; padding: 6px 10px; border-radius: 999px; border: 1px solid #EFEDF9; background: #fff; color: #6B7280; cursor: pointer; }
+  .bi-cal-day.range-edge { background: #E4534B !important; color: #fff; font-weight: 500; }
+  .bi-pill { font-size: 11.5px; font-weight: 500; padding: 6px 10px; border-radius: 999px; border: 1px solid #EFEDF9; background: #fff; color: #6B7280; cursor: pointer; }
   .bi-pill:hover { background: #F7F6FC; }
   @keyframes bi-skeleton-shimmer { 0% { background-position: 100% 50%; } 100% { background-position: 0 50%; } }
   .bi-skeleton { display: inline-block; background: linear-gradient(90deg, #F1F0F7 25%, #E9E7F3 37%, #F1F0F7 63%); background-size: 400% 100%; border-radius: 6px; animation: bi-skeleton-shimmer 1.4s ease infinite; vertical-align: middle; }
@@ -106,7 +106,7 @@
             <div id="periodo-view-custom" style="display:none;">
               <div style="display:flex;align-items:center;gap:2px;margin-bottom:10px;">
                 <button type="button" class="bi-period-back" id="periodo-custom-voltar">←</button>
-                <span style="font-size:13px;font-weight:700;color:#111827;">Personalizado</span>
+                <span style="font-size:13px;font-weight:600;color:#111827;">Personalizado</span>
               </div>
               <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px;">
                 <div class="bi-range-input active" id="range-input-ini">
@@ -121,7 +121,7 @@
               </div>
               <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;">
                 <button type="button" class="bi-cal-nav-btn" id="cal-prev">‹</button>
-                <span id="cal-month-label" style="font-size:13px;font-weight:600;color:#111827;"></span>
+                <span id="cal-month-label" style="font-size:13px;font-weight:500;color:#111827;"></span>
                 <button type="button" class="bi-cal-nav-btn" id="cal-next">›</button>
               </div>
               <div class="bi-cal-grid" id="cal-dow"></div>
@@ -135,8 +135,8 @@
                 <button type="button" class="bi-pill" data-preset="ano">Ano (YTD)</button>
               </div>
               <div style="display:flex;gap:8px;">
-                <button type="button" id="periodo-custom-cancelar" style="flex:1;padding:9px;border-radius:10px;border:1px solid #EFEDF9;background:#fff;color:#6B7280;font-size:13px;font-weight:600;cursor:pointer;">Cancelar</button>
-                <button type="button" id="periodo-custom-aplicar" style="flex:1;padding:9px;border-radius:10px;border:none;background:#E4847D;color:#fff;font-size:13px;font-weight:600;cursor:pointer;">Aplicar período</button>
+                <button type="button" id="periodo-custom-cancelar" style="flex:1;padding:9px;border-radius:10px;border:1px solid #EFEDF9;background:#fff;color:#6B7280;font-size:13px;font-weight:500;cursor:pointer;">Cancelar</button>
+                <button type="button" id="periodo-custom-aplicar" style="flex:1;padding:9px;border-radius:10px;border:none;background:#E4847D;color:#fff;font-size:13px;font-weight:500;cursor:pointer;">Aplicar período</button>
               </div>
             </div>
           </div>
@@ -159,7 +159,7 @@
             </span>
             <span class="bi-info" tabindex="0">?<span class="bi-info-tip">Total de pacientes com ATIVO_PAC = true na base hoje. Não segue o filtro de período do topo.</span></span>
           </div>
-          <div id="kpi-ativos" style="font-size:23px;font-weight:700;color:#111827;line-height:1;">—</div>
+          <div id="kpi-ativos" style="font-size:23px;font-weight:600;color:#111827;line-height:1;">—</div>
           <div style="font-size:13px;color:#6B7280;margin-top:5px;">Base atual</div>
         </div>
 
@@ -171,7 +171,7 @@
             </span>
             <span class="bi-info" tabindex="0">?<span class="bi-info-tip">Pacientes cadastrados (DTCRI_PAC) dentro do período selecionado. Compara com o mesmo intervalo do período anterior.</span></span>
           </div>
-          <div id="kpi-novos" style="font-size:23px;font-weight:700;color:#111827;line-height:1;">—</div>
+          <div id="kpi-novos" style="font-size:23px;font-weight:600;color:#111827;line-height:1;">—</div>
           <div id="kpi-novos-sub" style="font-size:13px;color:#6B7280;margin-top:5px;">—</div>
         </div>
 
@@ -183,7 +183,7 @@
             </span>
             <span class="bi-info" tabindex="0">?<span class="bi-info-tip">Registros de CONSULTA (DT_CONS) dentro do período selecionado. Compara com o mesmo intervalo do período anterior.</span></span>
           </div>
-          <div id="kpi-consultas" style="font-size:23px;font-weight:700;color:#111827;line-height:1;">—</div>
+          <div id="kpi-consultas" style="font-size:23px;font-weight:600;color:#111827;line-height:1;">—</div>
           <div id="kpi-consultas-sub" style="font-size:13px;color:#6B7280;margin-top:5px;">—</div>
         </div>
 
@@ -195,7 +195,7 @@
             </span>
             <span class="bi-info" tabindex="0">?<span class="bi-info-tip bi-info-tip-left">Valor médio de PAGAMENTO (VL_PGTO), excluindo estornados, no período selecionado.</span></span>
           </div>
-          <div id="kpi-ticket" style="font-size:23px;font-weight:700;color:#111827;line-height:1;">—</div>
+          <div id="kpi-ticket" style="font-size:23px;font-weight:600;color:#111827;line-height:1;">—</div>
           <div id="kpi-ticket-sub" style="font-size:13px;color:#6B7280;margin-top:5px;">—</div>
         </div>
       </div>
@@ -204,7 +204,7 @@
         <div class="bi-card" style="padding:24px;display:flex;flex-direction:column;">
           <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:18px;flex-wrap:wrap;">
             <div>
-              <span style="display:flex;align-items:center;gap:6px;font-size:17.5px;font-weight:700;color:#111827;">
+              <span style="display:flex;align-items:center;gap:6px;font-size:17.5px;font-weight:600;color:#111827;">
                 Evolução mensal de pacientes
                 <span class="bi-info" tabindex="0">?<span class="bi-info-tip bi-info-tip-left" style="width:260px;">Pacientes ativos (snapshot no fim de cada mês) e novos pacientes cadastrados no mês, desde janeiro do ano atual. Não segue o filtro de período do topo da página.</span></span>
               </span>
@@ -221,7 +221,7 @@
       <div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:20px;flex:none;">
         <div class="bi-card" style="padding:20px 24px;display:flex;flex-direction:column;">
           <div style="margin-bottom:14px;">
-            <span style="font-size:15.5px;font-weight:600;color:#111827;">Por profissional</span>
+            <span style="font-size:15.5px;font-weight:500;color:#111827;">Por profissional</span>
             <div style="font-size:14px;color:#9CA3AF;margin-top:3px;">Distribuição da base de pacientes ativos por profissional (PACIENTE_PROFISSIONAL)</div>
           </div>
           <div id="lista-por-profissional" style="display:flex;flex-direction:column;max-height:306px;overflow-y:auto;padding-right:10px;">—</div>
@@ -229,7 +229,7 @@
 
         <div class="bi-card" style="padding:20px 24px;display:flex;flex-direction:column;">
           <div style="margin-bottom:14px;">
-            <span style="font-size:15.5px;font-weight:600;color:#111827;">Por faixa etária</span>
+            <span style="font-size:15.5px;font-weight:500;color:#111827;">Por faixa etária</span>
             <div style="font-size:14px;color:#9CA3AF;margin-top:3px;">Idade calculada a partir de DTNASC_PAC, base de pacientes ativos</div>
           </div>
           <div id="lista-por-faixa-etaria" style="display:flex;flex-direction:column;">—</div>
@@ -239,7 +239,7 @@
       <div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:20px;flex:none;">
         <div class="bi-card" style="padding:20px 24px;display:flex;flex-direction:column;">
           <div style="margin-bottom:14px;">
-            <span style="font-size:15.5px;font-weight:600;color:#111827;">Por grupo/convênio</span>
+            <span style="font-size:15.5px;font-weight:500;color:#111827;">Por grupo/convênio</span>
             <div style="font-size:14px;color:#9CA3AF;margin-top:3px;">Distribuição da base de pacientes ativos por GRUPO</div>
           </div>
           <div id="lista-por-grupo" style="display:flex;flex-direction:column;">—</div>
@@ -247,14 +247,14 @@
 
         <div class="bi-card" style="padding:20px 24px;display:flex;flex-direction:column;">
           <div style="margin-bottom:14px;">
-            <span style="font-size:15.5px;font-weight:600;color:#111827;">Por sexo</span>
+            <span style="font-size:15.5px;font-weight:500;color:#111827;">Por sexo</span>
             <div style="font-size:14px;color:#9CA3AF;margin-top:3px;">Distribuição da base de pacientes ativos (SEXO_PAC)</div>
           </div>
           <div id="lista-por-sexo" style="display:flex;flex-direction:column;">—</div>
         </div>
       </div>
 
-      <div style="font-size:19px;font-weight:700;color:#111827;margin-top:4px;">Frequência e esporadicidade</div>
+      <div style="font-size:19px;font-weight:600;color:#111827;margin-top:4px;">Frequência e esporadicidade</div>
 
       <div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;">
         <div class="bi-card" style="padding:14px 16px;">
@@ -265,7 +265,7 @@
             </span>
             <span class="bi-info" tabindex="0">?<span class="bi-info-tip">Média dos intervalos (em dias) entre consultas consecutivas de cada paciente (CONSULTA.DT_CONS), considerando todo o histórico. Não segue o filtro de período do topo.</span></span>
           </div>
-          <div id="kpi-intervalo-medio" style="font-size:23px;font-weight:700;color:#111827;line-height:1;">—</div>
+          <div id="kpi-intervalo-medio" style="font-size:23px;font-weight:600;color:#111827;line-height:1;">—</div>
           <div style="font-size:13px;color:#6B7280;margin-top:5px;">dias, em média, entre visitas</div>
         </div>
 
@@ -277,7 +277,7 @@
             </span>
             <span class="bi-info" tabindex="0">?<span class="bi-info-tip">% de pacientes com apenas 1 consulta registrada (CONSULTA) em todo o histórico, ou seja, que nunca retornaram.</span></span>
           </div>
-          <div id="kpi-pct-so-uma" style="font-size:23px;font-weight:700;color:#111827;line-height:1;">—</div>
+          <div id="kpi-pct-so-uma" style="font-size:23px;font-weight:600;color:#111827;line-height:1;">—</div>
           <div style="font-size:13px;color:#6B7280;margin-top:5px;">dos pacientes com histórico de consultas</div>
         </div>
 
@@ -289,7 +289,7 @@
             </span>
             <span class="bi-info" tabindex="0">?<span class="bi-info-tip bi-info-tip-left">Desvio-padrão médio (em dias) do intervalo entre consultas por paciente. Quanto maior, mais irregular é o padrão de retorno da base.</span></span>
           </div>
-          <div id="kpi-desvio-medio" style="font-size:23px;font-weight:700;color:#111827;line-height:1;">—</div>
+          <div id="kpi-desvio-medio" style="font-size:23px;font-weight:600;color:#111827;line-height:1;">—</div>
           <div style="font-size:13px;color:#6B7280;margin-top:5px;">desvio-padrão médio, em dias</div>
         </div>
       </div>
@@ -297,14 +297,14 @@
       <div style="display:grid;grid-template-columns:1fr;gap:20px;flex:none;">
         <div class="bi-card" style="padding:20px 24px;display:flex;flex-direction:column;">
           <div style="margin-bottom:14px;">
-            <span style="font-size:15.5px;font-weight:600;color:#111827;">Distribuição por faixa de frequência</span>
+            <span style="font-size:15.5px;font-weight:500;color:#111827;">Distribuição por faixa de frequência</span>
             <div style="font-size:14px;color:#9CA3AF;margin-top:3px;">Pacientes agrupados pelo intervalo médio entre consultas (todo o histórico)</div>
           </div>
           <div id="lista-distribuicao-frequencia" style="display:flex;flex-direction:column;">—</div>
         </div>
       </div>
 
-      <div style="font-size:19px;font-weight:700;color:#111827;margin-top:4px;">Rotatividade e retenção</div>
+      <div style="font-size:19px;font-weight:600;color:#111827;margin-top:4px;">Rotatividade e retenção</div>
 
       <div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;">
         <div class="bi-card" style="padding:14px 16px;">
@@ -315,7 +315,7 @@
             </span>
             <span class="bi-info" tabindex="0">?<span class="bi-info-tip">Pacientes sem nenhum agendamento REALIZADA há mais de 90 dias (ou sem retorno em 90 dias após o cadastro, para quem nunca veio). Baseado em AGENDAMENTO, independe do filtro de período do topo.</span></span>
           </div>
-          <div id="kpi-perdidos" style="font-size:23px;font-weight:700;color:#111827;line-height:1;">—</div>
+          <div id="kpi-perdidos" style="font-size:23px;font-weight:600;color:#111827;line-height:1;">—</div>
           <div id="kpi-perdidos-sub" style="font-size:13px;color:#6B7280;margin-top:5px;">há mais de 90 dias sem visita</div>
         </div>
 
@@ -327,7 +327,7 @@
             </span>
             <span class="bi-info" tabindex="0">?<span class="bi-info-tip bi-info-tip-left">% do total de pacientes cadastrados da empresa que está sem retorno há mais de 90 dias.</span></span>
           </div>
-          <div id="kpi-perdidos-pct" style="font-size:23px;font-weight:700;color:#111827;line-height:1;">—</div>
+          <div id="kpi-perdidos-pct" style="font-size:23px;font-weight:600;color:#111827;line-height:1;">—</div>
           <div style="font-size:13px;color:#6B7280;margin-top:5px;">do total de pacientes cadastrados</div>
         </div>
       </div>
@@ -335,7 +335,7 @@
       <div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:20px;flex:none;">
         <div class="bi-card" style="padding:24px;display:flex;flex-direction:column;">
           <div style="margin-bottom:14px;">
-            <span style="display:flex;align-items:center;gap:6px;font-size:15.5px;font-weight:600;color:#111827;">
+            <span style="display:flex;align-items:center;gap:6px;font-size:15.5px;font-weight:500;color:#111827;">
               Taxa de churn mensal
               <span class="bi-info" tabindex="0">?<span class="bi-info-tip" style="width:250px;">% da base ativa no início do mês (que já cruzou 90 dias sem retorno) que "virou perdida" naquele mês. Ano corrente, janeiro até o mês atual.</span></span>
             </span>
@@ -347,7 +347,7 @@
 
         <div class="bi-card" style="padding:24px;display:flex;flex-direction:column;">
           <div style="margin-bottom:14px;">
-            <span style="display:flex;align-items:center;gap:6px;font-size:15.5px;font-weight:600;color:#111827;">
+            <span style="display:flex;align-items:center;gap:6px;font-size:15.5px;font-weight:500;color:#111827;">
               Crescimento líquido
               <span class="bi-info" tabindex="0">?<span class="bi-info-tip bi-info-tip-left" style="width:250px;">Novos pacientes cadastrados menos pacientes que se tornaram "perdidos" (90+ dias sem retorno) em cada mês. Ano corrente.</span></span>
             </span>
@@ -361,7 +361,7 @@
       <div style="display:grid;grid-template-columns:1fr;gap:20px;flex:none;">
         <div class="bi-card" style="padding:24px;display:flex;flex-direction:column;">
           <div style="margin-bottom:14px;">
-            <span style="display:flex;align-items:center;gap:6px;font-size:17.5px;font-weight:700;color:#111827;">
+            <span style="display:flex;align-items:center;gap:6px;font-size:17.5px;font-weight:600;color:#111827;">
               Curva de retenção por coorte
               <span class="bi-info" tabindex="0">?<span class="bi-info-tip bi-info-tip-left" style="width:260px;">Coorte = pacientes cadastrados no mesmo mês (DTCRI_PAC). Cada coluna mostra o % da coorte com ao menos 1 agendamento REALIZADA naquele mês seguinte. Ano corrente.</span></span>
             </span>
@@ -371,7 +371,7 @@
         </div>
       </div>
 
-      <div style="font-size:19px;font-weight:700;color:#111827;margin-top:4px;">Valor e segmentação</div>
+      <div style="font-size:19px;font-weight:600;color:#111827;margin-top:4px;">Valor e segmentação</div>
 
       <div style="display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px;">
         <div class="bi-card" style="padding:14px 16px;">
@@ -382,7 +382,7 @@
             </span>
             <span class="bi-info" tabindex="0">?<span class="bi-info-tip">Soma de PAGAMENTO.VL_PGTO (excluindo estornados) por paciente, em média, considerando todo o histórico. Não segue o filtro de período do topo.</span></span>
           </div>
-          <div id="kpi-ltv-medio" style="font-size:23px;font-weight:700;color:#111827;line-height:1;">—</div>
+          <div id="kpi-ltv-medio" style="font-size:23px;font-weight:600;color:#111827;line-height:1;">—</div>
           <div style="font-size:13px;color:#6B7280;margin-top:5px;">receita total por paciente pagante</div>
         </div>
 
@@ -395,11 +395,11 @@
             <span class="bi-info" tabindex="0">?<span class="bi-info-tip">Por visita: valor médio de cada pagamento (VL_PGTO). Por paciente: valor médio total pago por cada paciente (igual ao LTV médio). Todo o histórico.</span></span>
           </div>
           <div style="display:flex;align-items:baseline;gap:6px;">
-            <div id="kpi-ticket-visita" style="font-size:19px;font-weight:700;color:#111827;line-height:1;">—</div>
+            <div id="kpi-ticket-visita" style="font-size:19px;font-weight:600;color:#111827;line-height:1;">—</div>
             <span style="font-size:12px;color:#9CA3AF;">/ visita</span>
           </div>
           <div style="display:flex;align-items:baseline;gap:6px;margin-top:4px;">
-            <div id="kpi-ticket-paciente" style="font-size:15px;font-weight:600;color:#6B7280;line-height:1;">—</div>
+            <div id="kpi-ticket-paciente" style="font-size:15px;font-weight:500;color:#6B7280;line-height:1;">—</div>
             <span style="font-size:12px;color:#9CA3AF;">/ paciente</span>
           </div>
         </div>
@@ -412,7 +412,7 @@
             </span>
             <span class="bi-info" tabindex="0">?<span class="bi-info-tip bi-info-tip-left">Soma de todos os PAGAMENTO.VL_PGTO não estornados, todo o histórico.</span></span>
           </div>
-          <div id="kpi-receita-total" style="font-size:23px;font-weight:700;color:#111827;line-height:1;">—</div>
+          <div id="kpi-receita-total" style="font-size:23px;font-weight:600;color:#111827;line-height:1;">—</div>
           <div id="kpi-receita-total-sub" style="font-size:13px;color:#6B7280;margin-top:5px;">—</div>
         </div>
 
@@ -424,7 +424,7 @@
             </span>
             <span class="bi-info" tabindex="0">?<span class="bi-info-tip bi-info-tip-left">% da receita total concentrada nos 20% de pacientes que mais pagaram (todo o histórico).</span></span>
           </div>
-          <div id="kpi-pareto-top20" style="font-size:23px;font-weight:700;color:#111827;line-height:1;">—</div>
+          <div id="kpi-pareto-top20" style="font-size:23px;font-weight:600;color:#111827;line-height:1;">—</div>
           <div style="font-size:13px;color:#6B7280;margin-top:5px;">da receita nos 20% que mais pagam</div>
         </div>
       </div>
@@ -432,7 +432,7 @@
       <div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:20px;flex:none;">
         <div class="bi-card" style="padding:20px 24px;display:flex;flex-direction:column;">
           <div style="margin-bottom:14px;">
-            <span style="font-size:15.5px;font-weight:600;color:#111827;">Top pacientes por receita</span>
+            <span style="font-size:15.5px;font-weight:500;color:#111827;">Top pacientes por receita</span>
             <div style="font-size:14px;color:#9CA3AF;margin-top:3px;">Maiores pagadores da base, todo o histórico</div>
           </div>
           <div id="lista-top-pacientes" style="display:flex;flex-direction:column;">—</div>
@@ -440,7 +440,7 @@
 
         <div class="bi-card" style="padding:24px;display:flex;flex-direction:column;">
           <div style="margin-bottom:14px;">
-            <span style="display:flex;align-items:center;gap:6px;font-size:15.5px;font-weight:600;color:#111827;">
+            <span style="display:flex;align-items:center;gap:6px;font-size:15.5px;font-weight:500;color:#111827;">
               Curva de Pareto
               <span class="bi-info" tabindex="0">?<span class="bi-info-tip" style="width:250px;">Eixo X: % acumulado de pacientes pagantes, ordenados do maior para o menor pagador. Eixo Y: % acumulado da receita.</span></span>
             </span>
@@ -451,12 +451,12 @@
         </div>
       </div>
 
-      <div style="font-size:19px;font-weight:700;color:#111827;margin-top:4px;">Ciclo de vida e segmentação RFM</div>
+      <div style="font-size:19px;font-weight:600;color:#111827;margin-top:4px;">Ciclo de vida e segmentação RFM</div>
 
       <div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:20px;flex:none;">
         <div class="bi-card" style="padding:20px 24px;display:flex;flex-direction:column;">
           <div style="margin-bottom:14px;">
-            <span style="display:flex;align-items:center;gap:6px;font-size:15.5px;font-weight:600;color:#111827;">
+            <span style="display:flex;align-items:center;gap:6px;font-size:15.5px;font-weight:500;color:#111827;">
               Funil Lead → Paciente → Recorrente → Fiel
               <span class="bi-info" tabindex="0">?<span class="bi-info-tip" style="width:260px;">Leads = total de LEADS cadastrados. Paciente = com 1ª consulta. Recorrente = 2ª+ consulta. Fiel = 3+ consultas. Perdidos = sem consulta há mais de 180 dias (não é um degrau sequencial do funil).</span></span>
             </span>
@@ -467,7 +467,7 @@
 
         <div class="bi-card" style="padding:20px 24px;display:flex;flex-direction:column;">
           <div style="margin-bottom:14px;">
-            <span style="display:flex;align-items:center;gap:6px;font-size:15.5px;font-weight:600;color:#111827;">
+            <span style="display:flex;align-items:center;gap:6px;font-size:15.5px;font-weight:500;color:#111827;">
               Segmentos RFM
               <span class="bi-info" tabindex="0">?<span class="bi-info-tip bi-info-tip-left" style="width:260px;">Recência (dias desde a última consulta) + Frequência (nº de consultas) + Valor (total pago), cruzados em 6 segmentos. Só entram pacientes com pelo menos 1 consulta.</span></span>
             </span>
@@ -477,7 +477,7 @@
         </div>
       </div>
 
-      <div style="font-size:19px;font-weight:700;color:#111827;margin-top:4px;">Complementos clínicos</div>
+      <div style="font-size:19px;font-weight:600;color:#111827;margin-top:4px;">Complementos clínicos</div>
 
       <div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;">
         <div class="bi-card" style="padding:14px 16px;">
@@ -488,7 +488,7 @@
             </span>
             <span class="bi-info" tabindex="0">?<span class="bi-info-tip">% de pacientes ativos com pelo menos 1 registro em ALERGIA marcado como ativo.</span></span>
           </div>
-          <div id="kpi-pct-alergia" style="font-size:23px;font-weight:700;color:#111827;line-height:1;">—</div>
+          <div id="kpi-pct-alergia" style="font-size:23px;font-weight:600;color:#111827;line-height:1;">—</div>
           <div id="kpi-pct-alergia-sub" style="font-size:13px;color:#6B7280;margin-top:5px;">—</div>
         </div>
 
@@ -500,7 +500,7 @@
             </span>
             <span class="bi-info" tabindex="0">?<span class="bi-info-tip">% de agendamentos REALIZADA com pelo menos 1 registro em SINAL_VITAL vinculado.</span></span>
           </div>
-          <div id="kpi-pct-sinais-vitais" style="font-size:23px;font-weight:700;color:#111827;line-height:1;">—</div>
+          <div id="kpi-pct-sinais-vitais" style="font-size:23px;font-weight:600;color:#111827;line-height:1;">—</div>
           <div id="kpi-pct-sinais-vitais-sub" style="font-size:13px;color:#6B7280;margin-top:5px;">—</div>
         </div>
 
@@ -512,7 +512,7 @@
             </span>
             <span class="bi-info" tabindex="0">?<span class="bi-info-tip bi-info-tip-left">% de CONSULTA com RASCUNHO = true (não finalizadas), sobre o total de consultas.</span></span>
           </div>
-          <div id="kpi-pct-rascunho" style="font-size:23px;font-weight:700;color:#111827;line-height:1;">—</div>
+          <div id="kpi-pct-rascunho" style="font-size:23px;font-weight:600;color:#111827;line-height:1;">—</div>
           <div id="kpi-pct-rascunho-sub" style="font-size:13px;color:#6B7280;margin-top:5px;">—</div>
         </div>
       </div>
@@ -520,7 +520,7 @@
       <div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:20px;flex:none;">
         <div class="bi-card" style="padding:20px 24px;display:flex;flex-direction:column;">
           <div style="margin-bottom:14px;">
-            <span style="font-size:15.5px;font-weight:600;color:#111827;">Diagnósticos mais comuns</span>
+            <span style="font-size:15.5px;font-weight:500;color:#111827;">Diagnósticos mais comuns</span>
             <div style="font-size:14px;color:#9CA3AF;margin-top:3px;">Top CIDs registrados em CONSULTA, todo o histórico</div>
           </div>
           <div id="lista-diagnosticos" style="display:flex;flex-direction:column;">—</div>
@@ -529,11 +529,11 @@
         <div class="bi-card" style="padding:20px 24px;display:flex;flex-direction:column;">
           <div style="margin-bottom:14px;display:flex;align-items:center;justify-content:space-between;gap:8px;">
             <div>
-              <span style="font-size:15.5px;font-weight:600;color:#111827;">Cross-sell por especialidade</span>
+              <span style="font-size:15.5px;font-weight:500;color:#111827;">Cross-sell por especialidade</span>
               <div style="font-size:14px;color:#9CA3AF;margin-top:3px;">Especialidade "porta de entrada" entre quem passou por 2+ especialidades</div>
             </div>
             <div style="text-align:right;flex-shrink:0;">
-              <div id="kpi-pct-cross-sell" style="font-size:19px;font-weight:700;color:#111827;line-height:1;">—</div>
+              <div id="kpi-pct-cross-sell" style="font-size:19px;font-weight:600;color:#111827;line-height:1;">—</div>
               <div style="font-size:11.5px;color:#9CA3AF;margin-top:2px;">atendidos por 2+ especialidades</div>
             </div>
           </div>
@@ -628,7 +628,7 @@
     const positivo = value >= 0;
     const color = positivo ? '#1D8A4A' : '#C0392B';
     const arrow = value >= 0 ? '▲' : '▼';
-    el.innerHTML = `<span style="color:${color};font-weight:600;">${arrow} ${Math.abs(value)}%</span> vs ${compareLabel}`;
+    el.innerHTML = `<span style="color:${color};font-weight:500;">${arrow} ${Math.abs(value)}%</span> vs ${compareLabel}`;
   }
 
   function skeletonListRows(n = 4) {
@@ -731,7 +731,7 @@
       { name: 'Pacientes ativos', color: '#6D5DF6' },
       { name: 'Novos pacientes', color: '#22C55E' },
     ].map((s) => `
-      <span style="display:inline-flex;align-items:center;gap:7px;font-size:15px;font-weight:700;color:#111827;margin-right:22px;">
+      <span style="display:inline-flex;align-items:center;gap:7px;font-size:15px;font-weight:600;color:#111827;margin-right:22px;">
         <span style="width:11px;height:11px;border-radius:3px;background:${s.color};display:inline-block;"></span>${s.name}
       </span>
     `).join('');
@@ -756,7 +756,7 @@
       return `
         <div style="padding:9px 0;border-bottom:1px solid #E3E1EE;">
           <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;">
-            <span style="font-size:15px;font-weight:600;color:#111827;">${item.nome}</span>
+            <span style="font-size:15px;font-weight:500;color:#111827;">${item.nome}</span>
             <span style="font-size:14px;color:#9CA3AF;">${item.total} (${pctDoTotal}%)</span>
           </div>
           <div style="height:7px;background:#F1F0F7;border-radius:999px;margin-top:5px;overflow:hidden;">
@@ -860,7 +860,7 @@
       return;
     }
     const maxK = Math.max(...coortes.flatMap((c) => c.pontos.map((p) => p.k)));
-    const headerCols = Array.from({ length: maxK + 1 }, (_, k) => `<th style="padding:8px 10px;font-size:12px;font-weight:700;color:#9C99B8;text-align:center;white-space:nowrap;">Mês ${k}</th>`).join('');
+    const headerCols = Array.from({ length: maxK + 1 }, (_, k) => `<th style="padding:8px 10px;font-size:12px;font-weight:600;color:#9C99B8;text-align:center;white-space:nowrap;">Mês ${k}</th>`).join('');
 
     const rows = coortes.map((c) => {
       const cells = Array.from({ length: maxK + 1 }, (_, k) => {
@@ -869,14 +869,14 @@
           return '<td style="padding:8px 10px;text-align:center;color:#C4C1D6;font-size:13px;">—</td>';
         }
         const alpha = Math.max(0.08, Math.min(1, ponto.pct / 100));
-        return `<td style="padding:8px 10px;text-align:center;font-size:13px;font-weight:600;color:#111827;background:rgba(109,93,246,${alpha});border-radius:6px;">${ponto.pct}%</td>`;
+        return `<td style="padding:8px 10px;text-align:center;font-size:13px;font-weight:500;color:#111827;background:rgba(109,93,246,${alpha});border-radius:6px;">${ponto.pct}%</td>`;
       }).join('');
-      return `<tr><td style="padding:8px 10px;font-size:13.5px;font-weight:600;color:#111827;white-space:nowrap;">${MONTH_ABBR[c.mes - 1]} (${c.tamanho})</td>${cells}</tr>`;
+      return `<tr><td style="padding:8px 10px;font-size:13.5px;font-weight:500;color:#111827;white-space:nowrap;">${MONTH_ABBR[c.mes - 1]} (${c.tamanho})</td>${cells}</tr>`;
     }).join('');
 
     container.innerHTML = `
       <table style="border-collapse:separate;border-spacing:4px 4px;width:100%;">
-        <thead><tr><th style="padding:8px 10px;font-size:12px;font-weight:700;color:#9C99B8;text-align:left;">Coorte</th>${headerCols}</tr></thead>
+        <thead><tr><th style="padding:8px 10px;font-size:12px;font-weight:600;color:#9C99B8;text-align:left;">Coorte</th>${headerCols}</tr></thead>
         <tbody>${rows}</tbody>
       </table>
     `;
@@ -941,10 +941,10 @@
       const pct = Math.max(2, Math.round((item.totalPago / maxTotal) * 100));
       return `
         <div style="display:flex;align-items:center;gap:12px;padding:9px 0;border-bottom:1px solid #E3E1EE;">
-          <div style="width:18px;flex-shrink:0;font-size:12.5px;font-weight:700;color:#C4C1D6;text-align:center;">${idx + 1}</div>
+          <div style="width:18px;flex-shrink:0;font-size:12.5px;font-weight:600;color:#C4C1D6;text-align:center;">${idx + 1}</div>
           <div style="flex:1;min-width:0;">
             <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;">
-              <span style="font-size:15px;font-weight:600;color:#111827;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${item.nome}</span>
+              <span style="font-size:15px;font-weight:500;color:#111827;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${item.nome}</span>
               <span style="font-size:13px;color:#6B7280;white-space:nowrap;flex-shrink:0;">${fmtBRL(item.totalPago)}</span>
             </div>
             <div style="height:7px;background:#F1F0F7;border-radius:999px;margin-top:5px;overflow:hidden;">
@@ -981,7 +981,7 @@
       return `
         <div style="padding:9px 0;border-bottom:1px solid #E3E1EE;">
           <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;">
-            <span style="display:flex;align-items:center;gap:7px;font-size:15px;font-weight:600;color:#111827;">
+            <span style="display:flex;align-items:center;gap:7px;font-size:15px;font-weight:500;color:#111827;">
               <span style="width:9px;height:9px;border-radius:50%;background:${cor};display:inline-block;flex-shrink:0;"></span>${item.nome}
             </span>
             <span style="font-size:14px;color:#9CA3AF;white-space:nowrap;">${item.total} (${pctDoTotal}%) · ${fmtBRL(item.valorMedio)}</span>
@@ -1008,8 +1008,8 @@
       return `
         <div style="padding:9px 0;">
           <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:5px;">
-            <span style="font-size:14.5px;font-weight:600;color:#111827;">${e.nome}</span>
-            <span style="font-size:14px;font-weight:700;color:#111827;">${e.valor}</span>
+            <span style="font-size:14.5px;font-weight:500;color:#111827;">${e.nome}</span>
+            <span style="font-size:14px;font-weight:600;color:#111827;">${e.valor}</span>
           </div>
           <div style="height:14px;background:#F1F0F7;border-radius:999px;overflow:hidden;">
             <div style="height:100%;width:${pct}%;background:${e.cor};border-radius:999px;"></div>
@@ -1018,8 +1018,8 @@
       `;
     }).join('') + `
       <div style="margin-top:10px;padding-top:14px;border-top:1px solid #E3E1EE;display:flex;align-items:center;justify-content:space-between;">
-        <span style="font-size:14.5px;font-weight:600;color:#C0392B;">Perdidos (180+ dias sem consulta)</span>
-        <span style="font-size:14px;font-weight:700;color:#C0392B;">${funil.perdidos}</span>
+        <span style="font-size:14.5px;font-weight:500;color:#C0392B;">Perdidos (180+ dias sem consulta)</span>
+        <span style="font-size:14px;font-weight:600;color:#C0392B;">${funil.perdidos}</span>
       </div>
     `;
   }
@@ -1219,7 +1219,7 @@
       if (muted) cls.push('muted');
       if (inRange) cls.push('in-range');
       if (isEdge) cls.push('range-edge');
-      const style = isToday && !isEdge ? 'font-weight:700;text-decoration:underline;' : '';
+      const style = isToday && !isEdge ? 'font-weight:600;text-decoration:underline;' : '';
       return `<div class="${cls.join(' ')}" data-date="${toISODate(d)}" style="${style}">${d.getDate()}</div>`;
     }).join('');
 

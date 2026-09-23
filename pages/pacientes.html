@@ -14,14 +14,14 @@
           colors: {
             vitta: { 50:'#f0fbfd', 100:'#e0f7fa', 300:'#80deea', 400:'#4dd9ed', 500:'#2ABCD4', 600:'#1a96ac', 700:'#127a8c' }
           },
-          fontFamily: { sans: ['Inter','system-ui','sans-serif'] }
+          fontFamily: { sans: ['Montserrat','system-ui','sans-serif'] }
         }
       }
     }
   </script>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
 
   <style>
     .sidebar-nav::-webkit-scrollbar { width:3px; }
@@ -102,7 +102,7 @@
       Consultas
     </a>
 
-    <p class="block text-[0.6rem] font-bold text-gray-500 uppercase tracking-widest px-4 pb-1 pt-4">Cadastros</p>
+    <div class="pt-1"></div>
 
     <button onclick="toggleMenu('cadastros')"
             class="w-full flex items-center gap-3 px-3 py-2.5 mx-2 rounded-xl text-[0.83rem] font-medium text-vitta-400 bg-vitta-500/10 transition-colors duration-150 cursor-pointer mb-0.5" style="width:calc(100% - 16px)">
@@ -118,10 +118,10 @@
       <a href="profissionais.html" class="flex items-center gap-2 pl-10 pr-3 py-2 mx-2 rounded-xl text-[0.8rem] text-gray-500 hover:bg-white/5 hover:text-gray-300 transition-colors cursor-pointer">Profissionais</a>
       <a href="usuarios-empresa.html" class="flex items-center gap-2 pl-10 pr-3 py-2 mx-2 rounded-xl text-[0.8rem] text-gray-500 hover:bg-white/5 hover:text-gray-300 transition-colors cursor-pointer">Usuários</a>
       <div class="hidden" id="menuDocumentosWrap"><a href="documentos.html" class="flex items-center gap-2 pl-10 pr-3 py-2 mx-2 rounded-xl text-[0.8rem] text-gray-500 hover:bg-white/5 hover:text-gray-300 transition-colors cursor-pointer w-full">Documentos</a></div>
-      <a href="leads.html" class="flex items-center gap-2 pl-10 pr-3 py-2 mx-2 rounded-xl text-[0.8rem] text-gray-500 hover:bg-white/5 hover:text-gray-300 transition-colors cursor-pointer">Leads</a>
+      <a href="leads.html" id="menuLeads" class="flex items-center gap-2 pl-10 pr-3 py-2 mx-2 rounded-xl text-[0.8rem] text-gray-500 hover:bg-white/5 hover:text-gray-300 transition-colors cursor-pointer">Leads</a>
     </div>
 
-    <p class="block text-[0.6rem] font-bold text-gray-500 uppercase tracking-widest px-4 pb-1 pt-4">Outros Cadastros</p>
+    <div class="pt-1"></div>
 
     <button onclick="toggleMenu('servicos')"
             class="w-full flex items-center gap-3 px-3 py-2.5 mx-2 rounded-xl text-[0.83rem] font-medium text-gray-400 hover:bg-white/10 hover:text-white transition-colors duration-150 cursor-pointer mb-0.5" style="width:calc(100% - 16px)">
@@ -140,7 +140,7 @@
       <a href="tiposacompanhamento.html" class="flex items-center gap-2 pl-10 pr-3 py-2 mx-2 rounded-xl text-[0.8rem] text-gray-500 hover:bg-white/5 hover:text-gray-300 transition-colors cursor-pointer">Tipos de Acomp.</a>
     </div>
 
-    <p class="block text-[0.6rem] font-bold text-gray-500 uppercase tracking-widest px-4 pb-1 pt-4">Financeiro</p>
+    <div class="pt-1"></div>
 
     <button onclick="toggleMenu('financeiro')"
             class="w-full flex items-center gap-3 px-3 py-2.5 mx-2 rounded-xl text-[0.83rem] font-medium text-gray-400 hover:bg-white/10 hover:text-white transition-colors duration-150 cursor-pointer mb-0.5" style="width:calc(100% - 16px)">
@@ -155,10 +155,22 @@
       <a href="relatorios.html" class="flex items-center gap-2 pl-10 pr-3 py-2 mx-2 rounded-xl text-[0.8rem] text-gray-500 hover:bg-white/5 hover:text-gray-300 transition-colors cursor-pointer">Relat&oacute;rios</a>
     </div>
 
+        <div id="sectionDespesas">
+<div class="pt-1"></div>
+    <button onclick="toggleMenu('despesas')" class="w-full flex items-center gap-3 px-3 py-2.5 mx-2 rounded-xl text-[0.83rem] font-medium text-gray-400 hover:bg-white/10 hover:text-white transition-colors duration-150 cursor-pointer mb-0.5" style="width:calc(100% - 16px)">
+      <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M4 2v20l2-1 2 1 2-1 2 1 2-1 2 1 2-1 2 1V2l-2 1-2-1-2 1-2-1-2 1-2-1-2 1z"/><path d="M16 8h-6a2 2 0 1 0 0 4h4a2 2 0 1 1 0 4H8"/><path d="M12 17.5v-11"/></svg>Despesas
+      <svg id="chev-despesas" class="chevron w-3.5 h-3.5 ml-auto text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+    </button>
+    <div id="sub-despesas" class="submenu">
+      <a href="despesas.html" class="flex items-center gap-2 pl-10 pr-3 py-2 mx-2 rounded-xl text-[0.8rem] text-gray-500 hover:bg-white/5 hover:text-gray-300 transition-colors cursor-pointer">Cadastro Despesa</a>
+      <a href="categorias-despesa.html" class="flex items-center gap-2 pl-10 pr-3 py-2 mx-2 rounded-xl text-[0.8rem] text-gray-500 hover:bg-white/5 hover:text-gray-300 transition-colors cursor-pointer">Categorias</a>
+    </div>
+    </div>
+
     <!-- SISTEMA (apenas ADMIN_GLOBAL) -->
 
     <div id="sectionMinhaEmpresa" class="hidden">
-    <p class="block text-[0.6rem] font-bold text-gray-500 uppercase tracking-widest px-4 pb-1 pt-4">Minha Empresa</p>
+    <div class="pt-1"></div>
     <button onclick="toggleMenu('minhaempresa')" class="w-full flex items-center gap-3 px-3 py-2.5 mx-2 rounded-xl text-[0.83rem] font-medium text-gray-400 hover:bg-white/10 hover:text-white transition-colors duration-150 cursor-pointer mb-0.5" style="width:calc(100% - 16px)">
       <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>Minha Empresa
       <svg id="chev-minhaempresa" class="chevron w-3.5 h-3.5 ml-auto text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
@@ -169,7 +181,7 @@
     </div>
     </div>
     <div id="sectionVittaBI" class="hidden">
-    <p class="block text-[0.6rem] font-bold text-gray-500 uppercase tracking-widest px-4 pb-1 pt-4">Vitta BI</p>
+    <div class="pt-1"></div>
     <a id="linkVittaBI" href="https://bi.vittasistemas.com.br" target="_blank" rel="noopener"
        class="flex items-center gap-3 px-3 py-2.5 mx-2 rounded-xl text-[0.83rem] font-medium text-gray-400 hover:bg-white/10 hover:text-white transition-colors duration-150 cursor-pointer mb-0.5">
       <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
@@ -181,7 +193,7 @@
     </div>
 
     <div id="sectionAdmin" class="hidden">
-    <p class="block text-[0.6rem] font-bold text-gray-500 uppercase tracking-widest px-4 pb-1 pt-4">Sistema</p>
+    <div class="pt-1"></div>
     <button onclick="toggleMenu('admin')"
             class="w-full flex items-center gap-3 px-3 py-2.5 mx-2 rounded-xl text-[0.83rem] font-medium text-gray-400 hover:bg-white/10 hover:text-white transition-colors duration-150 cursor-pointer mb-0.5" style="width:calc(100% - 16px)">
       <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
@@ -283,12 +295,12 @@
     </div>
 
     <!-- Stats -->
-    <div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
+    <div class="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
 
-      <div class="bg-white rounded-2xl p-5 border border-gray-100 shadow-sm hover:shadow-md transition-shadow">
-        <div class="flex items-center gap-4">
-          <div class="w-12 h-12 rounded-2xl bg-blue-50 flex items-center justify-center shrink-0">
-            <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6 text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8">
+      <div class="bg-white rounded-xl p-3.5 border border-gray-100 shadow-sm">
+        <div class="flex items-center gap-3">
+          <div class="w-9 h-9 rounded-xl bg-blue-50 flex items-center justify-center shrink-0">
+            <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8">
               <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" stroke-linecap="round"/>
               <circle cx="9" cy="7" r="4"/>
               <path d="M23 21v-2a4 4 0 0 0-3-3.87" stroke-linecap="round"/>
@@ -296,34 +308,34 @@
             </svg>
           </div>
           <div>
-            <p class="text-[1.75rem] font-extrabold text-gray-800 leading-none" id="statTotal">—</p>
-            <p class="text-[0.75rem] font-medium text-gray-500 mt-1">Total de Pacientes</p>
-            <p class="text-[0.68rem] text-gray-400 mt-0.5">cadastrados na clínica</p>
+            <p class="text-[1.4375rem] font-semibold text-gray-800 leading-none" id="statTotal">—</p>
+            <p class="text-[0.72rem] font-medium text-gray-500 mt-0.5">Total de Pacientes</p>
+            <p class="text-[0.65rem] text-gray-400 mt-0.5">cadastrados na clínica</p>
           </div>
         </div>
       </div>
 
-      <div class="bg-white rounded-2xl p-5 border border-gray-100 shadow-sm hover:shadow-md transition-shadow">
-        <div class="flex items-center gap-4">
-          <div class="w-12 h-12 rounded-2xl bg-[#e0f7fa] flex items-center justify-center shrink-0">
-            <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6 text-[#2ABCD4]" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8">
+      <div class="bg-white rounded-xl p-3.5 border border-gray-100 shadow-sm">
+        <div class="flex items-center gap-3">
+          <div class="w-9 h-9 rounded-xl bg-[#e0f7fa] flex items-center justify-center shrink-0">
+            <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-[#2ABCD4]" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8">
               <circle cx="9" cy="7" r="4"/>
               <path d="M2 20c0-3.5 3.1-6 7-6s7 2.5 7 6" stroke-linecap="round"/>
               <path d="M16 11l2 2 4-4" stroke-linecap="round" stroke-linejoin="round"/>
             </svg>
           </div>
           <div>
-            <p class="text-[1.75rem] font-extrabold text-gray-800 leading-none" id="statAtivos">—</p>
-            <p class="text-[0.75rem] font-medium text-gray-500 mt-1">Ativos</p>
-            <p class="text-[0.68rem] text-gray-400 mt-0.5">em acompanhamento</p>
+            <p class="text-[1.4375rem] font-semibold text-gray-800 leading-none" id="statAtivos">—</p>
+            <p class="text-[0.72rem] font-medium text-gray-500 mt-0.5">Ativos</p>
+            <p class="text-[0.65rem] text-gray-400 mt-0.5">em acompanhamento</p>
           </div>
         </div>
       </div>
 
-      <div class="bg-white rounded-2xl p-5 border border-gray-100 shadow-sm hover:shadow-md transition-shadow">
-        <div class="flex items-center gap-4">
-          <div class="w-12 h-12 rounded-2xl bg-red-50 flex items-center justify-center shrink-0">
-            <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6 text-red-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8">
+      <div class="bg-white rounded-xl p-3.5 border border-gray-100 shadow-sm">
+        <div class="flex items-center gap-3">
+          <div class="w-9 h-9 rounded-xl bg-red-50 flex items-center justify-center shrink-0">
+            <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-red-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8">
               <circle cx="9" cy="7" r="4"/>
               <path d="M2 20c0-3.5 3.1-6 7-6s7 2.5 7 6" stroke-linecap="round"/>
               <line x1="17" y1="10" x2="22" y2="15" stroke-linecap="round"/>
@@ -331,26 +343,26 @@
             </svg>
           </div>
           <div>
-            <p class="text-[1.75rem] font-extrabold text-gray-800 leading-none" id="statInativos">—</p>
-            <p class="text-[0.75rem] font-medium text-gray-500 mt-1">Inativos</p>
-            <p class="text-[0.68rem] text-gray-400 mt-0.5">fora do acompanhamento</p>
+            <p class="text-[1.4375rem] font-semibold text-gray-800 leading-none" id="statInativos">—</p>
+            <p class="text-[0.72rem] font-medium text-gray-500 mt-0.5">Inativos</p>
+            <p class="text-[0.65rem] text-gray-400 mt-0.5">fora do acompanhamento</p>
           </div>
         </div>
       </div>
 
-      <div class="bg-white rounded-2xl p-5 border border-gray-100 shadow-sm hover:shadow-md transition-shadow">
-        <div class="flex items-center gap-4">
-          <div class="w-12 h-12 rounded-2xl bg-purple-50 flex items-center justify-center shrink-0">
-            <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6 text-purple-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8">
+      <div class="bg-white rounded-xl p-3.5 border border-gray-100 shadow-sm">
+        <div class="flex items-center gap-3">
+          <div class="w-9 h-9 rounded-xl bg-purple-50 flex items-center justify-center shrink-0">
+            <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-purple-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8">
               <path d="M12 2a4 4 0 1 0 0 8 4 4 0 0 0 0-8z"/>
               <path d="M4 20c0-4 3.6-7 8-7s8 3 8 7" stroke-linecap="round"/>
               <path d="M9 6h.01M12 6h.01M15 6h.01" stroke-linecap="round"/>
             </svg>
           </div>
           <div>
-            <p class="text-[1.75rem] font-extrabold text-gray-800 leading-none" id="statMenores">—</p>
-            <p class="text-[0.75rem] font-medium text-gray-500 mt-1">Menores de Idade</p>
-            <p class="text-[0.68rem] text-gray-400 mt-0.5">abaixo de 18 anos</p>
+            <p class="text-[1.4375rem] font-semibold text-gray-800 leading-none" id="statMenores">—</p>
+            <p class="text-[0.72rem] font-medium text-gray-500 mt-0.5">Menores de Idade</p>
+            <p class="text-[0.65rem] text-gray-400 mt-0.5">abaixo de 18 anos</p>
           </div>
         </div>
       </div>
@@ -412,8 +424,7 @@
           <thead>
             <tr class="bg-gray-50 border-b border-gray-100">
               <th class="px-5 py-3 text-[0.7rem] font-bold text-gray-500 uppercase tracking-wider">Paciente</th>
-              <th class="px-4 py-3 text-[0.7rem] font-bold text-gray-500 uppercase tracking-wider">Telefone</th>
-              <th class="px-4 py-3 text-[0.7rem] font-bold text-gray-500 uppercase tracking-wider">E-mail</th>
+              <th class="px-4 py-3 text-[0.7rem] font-bold text-gray-500 uppercase tracking-wider">Contato</th>
               <th class="px-4 py-3 text-[0.7rem] font-bold text-gray-500 uppercase tracking-wider">Profissional(is)</th>
               <th class="px-4 py-3 text-[0.7rem] font-bold text-gray-500 uppercase tracking-wider">Frequência</th>
               <th class="px-4 py-3 text-[0.7rem] font-bold text-gray-500 uppercase tracking-wider">Status</th>
@@ -438,49 +449,52 @@
   <div class="bg-white rounded-2xl w-full max-w-[720px] shadow-2xl mx-auto my-auto modal-scroll overflow-y-auto max-h-[90vh]">
 
     <!-- Topbar -->
-    <div class="sticky top-0 bg-white flex items-center gap-3 px-6 py-4 border-b border-gray-100 rounded-t-2xl z-10">
-      <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-vitta-500 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
-      <h2 class="text-base font-bold text-gray-800 flex-1">Ficha do Paciente</h2>
+    <div class="sticky top-0 bg-white flex items-center gap-2.5 px-5 py-3 border-b border-gray-100 rounded-t-2xl z-10">
+      <div class="w-9 h-9 rounded-xl bg-vitta-100 flex items-center justify-center shrink-0 text-vitta-600">
+        <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+      </div>
+      <h2 class="text-[0.95rem] font-bold text-gray-800 flex-1">Ficha do Paciente</h2>
       <button id="btnVwEdit1" onclick="switchToEdit()" class="flex items-center gap-1.5 px-3 py-1.5 bg-vitta-500 hover:bg-vitta-600 text-white text-xs font-semibold rounded-lg transition-colors">
         <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
         Editar
       </button>
-      <button onclick="closeViewModal()" class="w-8 h-8 flex items-center justify-center rounded-full bg-gray-100 hover:bg-gray-200 text-gray-500 transition-colors">
+      <button onclick="closeViewModal()" class="w-7 h-7 flex items-center justify-center rounded-full bg-gray-100 hover:bg-gray-200 text-gray-500 transition-colors shrink-0">
         <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
       </button>
     </div>
 
     <!-- Hero -->
-    <div class="flex items-center gap-5 px-6 py-5 border-b border-gray-100">
-      <div id="vAvatar" class="w-16 h-16 rounded-full flex items-center justify-center text-white text-2xl font-bold shrink-0 shadow-md">AB</div>
+    <div class="flex items-center gap-3 px-5 py-3.5 border-b border-gray-100">
+      <div id="vAvatar" class="w-11 h-11 rounded-full flex items-center justify-center text-white text-sm font-bold shrink-0 shadow-md">AB</div>
       <div class="flex-1 min-w-0">
-        <div class="text-xl font-extrabold text-gray-800 leading-tight" id="vNome">—</div>
-        <div class="flex flex-wrap gap-2 mt-2 items-center">
+        <div class="text-[1.05rem] font-extrabold text-gray-800 leading-tight" id="vNome">—</div>
+        <div class="flex flex-wrap gap-1.5 mt-1.5 items-center">
           <span id="vStatusBadge"></span>
           <span id="vMenorBadge"></span>
+          <span id="vProfsSep" class="text-[0.8rem] text-gray-400">-</span>
+          <span id="vProfs" class="text-[0.8rem] text-gray-500">—</span>
         </div>
-        <div class="text-sm text-gray-500 mt-2" id="vProfs">—</div>
       </div>
     </div>
 
     <!-- Seção: Dados Pessoais -->
     <div class="border-b border-gray-100">
-      <button onclick="toggleViewSection(this)" class="w-full flex items-center gap-3 px-6 py-3.5 hover:bg-gray-50 transition-colors">
+      <button onclick="toggleViewSection(this)" class="w-full flex items-center gap-2.5 px-5 py-3 hover:bg-gray-50 transition-colors">
         <span class="text-gray-400"><svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z"/></svg></span>
-        <span class="text-sm font-bold text-gray-700 flex-1 text-left">Dados Pessoais</span>
+        <span class="text-[0.82rem] font-bold text-gray-700 flex-1 text-left">Dados Pessoais</span>
         <svg class="w-4 h-4 text-gray-400 chevron open" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
       </button>
-      <div class="sec-body px-6 pb-5">
-        <div class="grid grid-cols-2 sm:grid-cols-3 gap-4">
-          <div><p class="text-[0.65rem] font-bold uppercase tracking-wider text-gray-400 mb-1">CPF</p><p class="text-sm font-medium text-gray-800" id="vCpf">—</p></div>
-          <div><p class="text-[0.65rem] font-bold uppercase tracking-wider text-gray-400 mb-1">Nascimento</p><p class="text-sm font-medium text-gray-800" id="vNascimento">—</p></div>
-          <div><p class="text-[0.65rem] font-bold uppercase tracking-wider text-gray-400 mb-1">Sexo</p><p class="text-sm font-medium text-gray-800" id="vSexo">—</p></div>
-          <div><p class="text-[0.65rem] font-bold uppercase tracking-wider text-gray-400 mb-1">Telefone</p><p class="text-sm font-medium text-gray-800" id="vTel">—</p></div>
-          <div class="col-span-2"><p class="text-[0.65rem] font-bold uppercase tracking-wider text-gray-400 mb-1">E-mail</p><p class="text-sm font-medium text-gray-800" id="vEmail">—</p></div>
+      <div class="sec-body px-5 pb-4">
+        <div class="grid grid-cols-2 sm:grid-cols-3 gap-3">
+          <div><p class="text-[0.65rem] font-bold uppercase tracking-wider text-gray-400 mb-1">CPF</p><p class="text-[0.82rem] font-medium text-gray-800" id="vCpf">—</p></div>
+          <div><p class="text-[0.65rem] font-bold uppercase tracking-wider text-gray-400 mb-1">Nascimento</p><p class="text-[0.82rem] font-medium text-gray-800" id="vNascimento">—</p></div>
+          <div><p class="text-[0.65rem] font-bold uppercase tracking-wider text-gray-400 mb-1">Sexo</p><p class="text-[0.82rem] font-medium text-gray-800" id="vSexo">—</p></div>
+          <div><p class="text-[0.65rem] font-bold uppercase tracking-wider text-gray-400 mb-1">Telefone</p><p class="text-[0.82rem] font-medium text-gray-800" id="vTel">—</p></div>
+          <div class="col-span-2"><p class="text-[0.65rem] font-bold uppercase tracking-wider text-gray-400 mb-1">E-mail</p><p class="text-[0.82rem] font-medium text-gray-800" id="vEmail">—</p></div>
           <div id="vRespWrap" class="col-span-2 sm:col-span-3 hidden">
-            <div class="mt-2 pt-3 border-t border-dashed border-gray-200 grid grid-cols-2 gap-4">
-              <div><p class="text-[0.65rem] font-bold uppercase tracking-wider text-gray-400 mb-1">Nome do Responsável</p><p class="text-sm font-medium text-gray-800" id="vNomeResp">—</p></div>
-              <div><p class="text-[0.65rem] font-bold uppercase tracking-wider text-gray-400 mb-1">CPF do Responsável</p><p class="text-sm font-medium text-gray-800" id="vCpfResp">—</p></div>
+            <div class="mt-1.5 pt-2.5 border-t border-dashed border-gray-200 grid grid-cols-2 gap-3">
+              <div><p class="text-[0.65rem] font-bold uppercase tracking-wider text-gray-400 mb-1">Nome do Responsável</p><p class="text-[0.82rem] font-medium text-gray-800" id="vNomeResp">—</p></div>
+              <div><p class="text-[0.65rem] font-bold uppercase tracking-wider text-gray-400 mb-1">CPF do Responsável</p><p class="text-[0.82rem] font-medium text-gray-800" id="vCpfResp">—</p></div>
             </div>
           </div>
         </div>
@@ -489,41 +503,41 @@
 
     <!-- Seção: Endereço -->
     <div class="border-b border-gray-100">
-      <button onclick="toggleViewSection(this)" class="w-full flex items-center gap-3 px-6 py-3.5 hover:bg-gray-50 transition-colors">
+      <button onclick="toggleViewSection(this)" class="w-full flex items-center gap-2.5 px-5 py-3 hover:bg-gray-50 transition-colors">
         <span class="text-gray-400"><svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M15 10.5a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1115 0z"/></svg></span>
-        <span class="text-sm font-bold text-gray-700 flex-1 text-left">Endereço</span>
+        <span class="text-[0.82rem] font-bold text-gray-700 flex-1 text-left">Endereço</span>
         <svg class="w-4 h-4 text-gray-400 chevron open" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
       </button>
-      <div class="sec-body px-6 pb-5">
-        <div class="grid grid-cols-2 sm:grid-cols-3 gap-4">
-          <div><p class="text-[0.65rem] font-bold uppercase tracking-wider text-gray-400 mb-1">CEP</p><p class="text-sm font-medium text-gray-800" id="vCep">—</p></div>
-          <div><p class="text-[0.65rem] font-bold uppercase tracking-wider text-gray-400 mb-1">Número</p><p class="text-sm font-medium text-gray-800" id="vNro">—</p></div>
-          <div class="col-span-2"><p class="text-[0.65rem] font-bold uppercase tracking-wider text-gray-400 mb-1">Logradouro</p><p class="text-sm font-medium text-gray-800" id="vRua">—</p></div>
-          <div><p class="text-[0.65rem] font-bold uppercase tracking-wider text-gray-400 mb-1">Complemento</p><p class="text-sm font-medium text-gray-800" id="vComple">—</p></div>
-          <div><p class="text-[0.65rem] font-bold uppercase tracking-wider text-gray-400 mb-1">Bairro</p><p class="text-sm font-medium text-gray-800" id="vBairro">—</p></div>
-          <div><p class="text-[0.65rem] font-bold uppercase tracking-wider text-gray-400 mb-1">Cidade / UF</p><p class="text-sm font-medium text-gray-800" id="vCidadeUf">—</p></div>
+      <div class="sec-body px-5 pb-4">
+        <div class="grid grid-cols-2 sm:grid-cols-3 gap-3">
+          <div><p class="text-[0.65rem] font-bold uppercase tracking-wider text-gray-400 mb-1">CEP</p><p class="text-[0.82rem] font-medium text-gray-800" id="vCep">—</p></div>
+          <div><p class="text-[0.65rem] font-bold uppercase tracking-wider text-gray-400 mb-1">Número</p><p class="text-[0.82rem] font-medium text-gray-800" id="vNro">—</p></div>
+          <div class="col-span-2"><p class="text-[0.65rem] font-bold uppercase tracking-wider text-gray-400 mb-1">Logradouro</p><p class="text-[0.82rem] font-medium text-gray-800" id="vRua">—</p></div>
+          <div><p class="text-[0.65rem] font-bold uppercase tracking-wider text-gray-400 mb-1">Complemento</p><p class="text-[0.82rem] font-medium text-gray-800" id="vComple">—</p></div>
+          <div><p class="text-[0.65rem] font-bold uppercase tracking-wider text-gray-400 mb-1">Bairro</p><p class="text-[0.82rem] font-medium text-gray-800" id="vBairro">—</p></div>
+          <div><p class="text-[0.65rem] font-bold uppercase tracking-wider text-gray-400 mb-1">Cidade / UF</p><p class="text-[0.82rem] font-medium text-gray-800" id="vCidadeUf">—</p></div>
         </div>
       </div>
     </div>
 
     <!-- Seção: Dados Adicionais -->
     <div>
-      <button onclick="toggleViewSection(this)" class="w-full flex items-center gap-3 px-6 py-3.5 hover:bg-gray-50 transition-colors">
+      <button onclick="toggleViewSection(this)" class="w-full flex items-center gap-2.5 px-5 py-3 hover:bg-gray-50 transition-colors">
         <span class="text-gray-400"><svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg></span>
-        <span class="text-sm font-bold text-gray-700 flex-1 text-left">Dados Adicionais</span>
+        <span class="text-[0.82rem] font-bold text-gray-700 flex-1 text-left">Dados Adicionais</span>
         <svg class="w-4 h-4 text-gray-400 chevron open" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
       </button>
-      <div class="sec-body px-6 pb-6">
-        <div class="grid grid-cols-2 gap-4">
-          <div><p class="text-[0.65rem] font-bold uppercase tracking-wider text-gray-400 mb-1">Grupo</p><p class="text-sm font-medium text-gray-800" id="vGrupo">—</p></div>
-          <div><p class="text-[0.65rem] font-bold uppercase tracking-wider text-gray-400 mb-1">Frequência</p><p class="text-sm font-medium text-gray-800" id="vFreq">—</p></div>
-          <div><p class="text-[0.65rem] font-bold uppercase tracking-wider text-gray-400 mb-1">Contrato</p><p class="text-sm font-medium text-gray-800" id="vContrato">—</p></div>
-          <div class="col-span-2"><p class="text-[0.65rem] font-bold uppercase tracking-wider text-gray-400 mb-1">Observações</p><p class="text-sm text-gray-700 whitespace-pre-wrap leading-relaxed" id="vObs">—</p></div>
+      <div class="sec-body px-5 pb-5">
+        <div class="grid grid-cols-2 gap-3">
+          <div><p class="text-[0.65rem] font-bold uppercase tracking-wider text-gray-400 mb-1">Grupo</p><p class="text-[0.82rem] font-medium text-gray-800" id="vGrupo">—</p></div>
+          <div><p class="text-[0.65rem] font-bold uppercase tracking-wider text-gray-400 mb-1">Frequência</p><p class="text-[0.82rem] font-medium text-gray-800" id="vFreq">—</p></div>
+          <div><p class="text-[0.65rem] font-bold uppercase tracking-wider text-gray-400 mb-1">Contrato</p><p class="text-[0.82rem] font-medium text-gray-800" id="vContrato">—</p></div>
+          <div class="col-span-2"><p class="text-[0.65rem] font-bold uppercase tracking-wider text-gray-400 mb-1">Observações</p><p class="text-[0.82rem] text-gray-700 whitespace-pre-wrap leading-relaxed" id="vObs">—</p></div>
         </div>
       </div>
     </div>
 
-    <div class="flex justify-end gap-3 px-6 py-4 border-t border-gray-100">
+    <div class="flex justify-end gap-2.5 px-5 py-3 border-t border-gray-100">
       <button onclick="closeViewModal()" class="px-4 py-2 border border-gray-200 rounded-xl text-sm font-semibold text-gray-600 hover:bg-gray-50 transition-colors">Fechar</button>
       <button id="btnVwEdit2" onclick="switchToEdit()" class="px-4 py-2 bg-vitta-500 hover:bg-vitta-600 text-white text-sm font-semibold rounded-xl transition-colors">Editar Cadastro</button>
     </div>
@@ -536,13 +550,15 @@
 <div class="modal-overlay" id="formModal">
   <div class="bg-white rounded-2xl w-full max-w-[780px] shadow-2xl mx-auto my-auto">
 
-    <div class="sticky top-0 bg-white flex items-center gap-3 px-6 py-4 border-b border-gray-100 rounded-t-2xl z-10">
-      <span id="formIcon" class="text-vitta-500"><svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z"/></svg></span>
-      <div class="flex-1">
-        <h2 id="formTitle" class="text-base font-bold text-gray-800">Novo Paciente</h2>
-        <p id="formSubtitle" class="text-xs text-gray-400"></p>
+    <div class="sticky top-0 bg-white flex items-center gap-2.5 px-5 py-3 border-b border-gray-100 rounded-t-2xl z-10">
+      <div class="w-9 h-9 rounded-xl bg-vitta-100 flex items-center justify-center shrink-0 text-vitta-600" id="formIcon">
+        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z"/></svg>
       </div>
-      <button onclick="closeFormModal()" class="w-8 h-8 flex items-center justify-center rounded-full bg-gray-100 hover:bg-gray-200 text-gray-500 transition-colors">
+      <div class="flex-1">
+        <h2 id="formTitle" class="text-[0.95rem] font-bold text-gray-800">Novo Paciente</h2>
+        <p id="formSubtitle" class="text-[0.72rem] text-gray-400"></p>
+      </div>
+      <button onclick="closeFormModal()" class="w-7 h-7 flex items-center justify-center rounded-full bg-gray-100 hover:bg-gray-200 text-gray-500 transition-colors shrink-0">
         <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
       </button>
     </div>
@@ -551,47 +567,47 @@
       <input type="hidden" id="fId">
 
       <!-- Alert de validação (dentro do scroll) -->
-      <div id="formAlert" class="mx-6 mt-4"></div>
+      <div id="formAlert" class="mx-5 mt-3"></div>
 
       <!-- SEÇÃO: DADOS PESSOAIS -->
       <div class="border-b border-gray-100">
-        <button type="button" onclick="toggleFormSection(this)" class="w-full flex items-center gap-3 px-6 py-3.5 hover:bg-gray-50 transition-colors">
-          <span class="text-gray-400"><svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z"/></svg></span><span class="text-sm font-bold text-gray-700 flex-1 text-left">Dados Pessoais</span>
+        <button type="button" onclick="toggleFormSection(this)" class="w-full flex items-center gap-2.5 px-5 py-3 hover:bg-gray-50 transition-colors">
+          <span class="text-gray-400"><svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z"/></svg></span><span class="text-[0.82rem] font-bold text-gray-700 flex-1 text-left">Dados Pessoais</span>
           <svg class="w-4 h-4 text-gray-400 chevron open" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
         </button>
-        <div class="sec-body px-6 pb-5">
-          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div class="sec-body px-5 pb-4">
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <div class="sm:col-span-2 flex flex-col gap-1.5">
-              <label class="text-xs font-semibold text-gray-600">Nome Completo <span class="text-red-500">*</span></label>
+              <label class="text-[0.78rem] font-semibold text-gray-600">Nome Completo <span class="text-red-500">*</span></label>
               <input id="fNome" type="text" placeholder="Nome completo do paciente" required
-                     class="px-3 py-2.5 border-[1.5px] border-gray-200 rounded-xl text-sm bg-gray-50 outline-none focus:border-vitta-500 focus:bg-white transition-colors">
+                     class="px-3 py-2.5 border border-gray-200 rounded-xl text-sm outline-none focus:border-vitta-500 focus:ring-2 focus:ring-vitta-500/20">
             </div>
             <div class="flex flex-col gap-1.5">
-              <label class="text-xs font-semibold text-gray-600">CPF</label>
+              <label class="text-[0.78rem] font-semibold text-gray-600">CPF</label>
               <input id="fCpf" type="text" placeholder="000.000.000-00" maxlength="14"
-                     class="px-3 py-2.5 border-[1.5px] border-gray-200 rounded-xl text-sm bg-gray-50 outline-none focus:border-vitta-500 focus:bg-white transition-colors">
+                     class="px-3 py-2.5 border border-gray-200 rounded-xl text-sm outline-none focus:border-vitta-500 focus:ring-2 focus:ring-vitta-500/20">
             </div>
             <div class="flex flex-col gap-1.5">
-              <label class="text-xs font-semibold text-gray-600">Data de Nascimento <span class="text-red-500">*</span></label>
+              <label class="text-[0.78rem] font-semibold text-gray-600">Data de Nascimento <span class="text-red-500">*</span></label>
               <input id="fNascimento" type="date" required
-                     class="px-3 py-2.5 border-[1.5px] border-gray-200 rounded-xl text-sm bg-gray-50 outline-none focus:border-vitta-500 focus:bg-white transition-colors">
+                     class="px-3 py-2.5 border border-gray-200 rounded-xl text-sm outline-none focus:border-vitta-500 focus:ring-2 focus:ring-vitta-500/20">
             </div>
             <div class="flex flex-col gap-1.5">
-              <label class="text-xs font-semibold text-gray-600">Sexo</label>
-              <select id="fSexo" class="px-3 py-2.5 border-[1.5px] border-gray-200 rounded-xl text-sm bg-gray-50 outline-none focus:border-vitta-500 focus:bg-white transition-colors">
+              <label class="text-[0.78rem] font-semibold text-gray-600">Sexo</label>
+              <select id="fSexo" class="px-3 py-2.5 border border-gray-200 rounded-xl text-sm outline-none focus:border-vitta-500 focus:ring-2 focus:ring-vitta-500/20">
                 <option value="">Selecione...</option>
                 <option>Masculino</option><option>Feminino</option><option>Outro</option><option>Prefiro não informar</option>
               </select>
             </div>
             <div class="flex flex-col gap-1.5">
-              <label class="text-xs font-semibold text-gray-600">Telefone <span class="text-red-500">*</span></label>
+              <label class="text-[0.78rem] font-semibold text-gray-600">Telefone <span class="text-red-500">*</span></label>
               <input id="fTel" type="tel" placeholder="(00) 00000-0000" maxlength="15" required
-                     class="px-3 py-2.5 border-[1.5px] border-gray-200 rounded-xl text-sm bg-gray-50 outline-none focus:border-vitta-500 focus:bg-white transition-colors">
+                     class="px-3 py-2.5 border border-gray-200 rounded-xl text-sm outline-none focus:border-vitta-500 focus:ring-2 focus:ring-vitta-500/20">
             </div>
             <div class="flex flex-col gap-1.5">
-              <label class="text-xs font-semibold text-gray-600">E-mail</label>
+              <label class="text-[0.78rem] font-semibold text-gray-600">E-mail</label>
               <input id="fEmail" type="email" placeholder="email@exemplo.com"
-                     class="px-3 py-2.5 border-[1.5px] border-gray-200 rounded-xl text-sm bg-gray-50 outline-none focus:border-vitta-500 focus:bg-white transition-colors">
+                     class="px-3 py-2.5 border border-gray-200 rounded-xl text-sm outline-none focus:border-vitta-500 focus:ring-2 focus:ring-vitta-500/20">
             </div>
 
             <!-- Menor toggle -->
@@ -609,16 +625,16 @@
 
             <!-- Campos do responsável (ocultos por padrão) -->
             <div id="respFields" class="sm:col-span-2 hidden">
-              <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-3 border-t border-dashed border-gray-200">
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-3 border-t border-dashed border-gray-200">
                 <div class="flex flex-col gap-1.5">
-                  <label class="text-xs font-semibold text-gray-600">Nome do Responsável</label>
+                  <label class="text-[0.78rem] font-semibold text-gray-600">Nome do Responsável</label>
                   <input id="fNomeResp" type="text" placeholder="Nome completo do responsável"
-                         class="px-3 py-2.5 border-[1.5px] border-gray-200 rounded-xl text-sm bg-gray-50 outline-none focus:border-vitta-500 focus:bg-white transition-colors">
+                         class="px-3 py-2.5 border border-gray-200 rounded-xl text-sm outline-none focus:border-vitta-500 focus:ring-2 focus:ring-vitta-500/20">
                 </div>
                 <div class="flex flex-col gap-1.5">
-                  <label class="text-xs font-semibold text-gray-600">CPF do Responsável</label>
+                  <label class="text-[0.78rem] font-semibold text-gray-600">CPF do Responsável</label>
                   <input id="fCpfResp" type="text" placeholder="000.000.000-00" maxlength="14"
-                         class="px-3 py-2.5 border-[1.5px] border-gray-200 rounded-xl text-sm bg-gray-50 outline-none focus:border-vitta-500 focus:bg-white transition-colors">
+                         class="px-3 py-2.5 border border-gray-200 rounded-xl text-sm outline-none focus:border-vitta-500 focus:ring-2 focus:ring-vitta-500/20">
                 </div>
               </div>
             </div>
@@ -628,50 +644,50 @@
 
       <!-- SEÇÃO: ENDEREÇO -->
       <div class="border-b border-gray-100">
-        <button type="button" onclick="toggleFormSection(this)" class="w-full flex items-center gap-3 px-6 py-3.5 hover:bg-gray-50 transition-colors">
-          <span class="text-gray-400"><svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M15 10.5a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1115 0z"/></svg></span><span class="text-sm font-bold text-gray-700 flex-1 text-left">Endereço</span>
+        <button type="button" onclick="toggleFormSection(this)" class="w-full flex items-center gap-2.5 px-5 py-3 hover:bg-gray-50 transition-colors">
+          <span class="text-gray-400"><svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M15 10.5a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1115 0z"/></svg></span><span class="text-[0.82rem] font-bold text-gray-700 flex-1 text-left">Endereço</span>
           <svg class="w-4 h-4 text-gray-400 chevron open" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
         </button>
-        <div class="sec-body px-6 pb-5">
-          <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+        <div class="sec-body px-5 pb-4">
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
             <div class="flex flex-col gap-1.5">
-              <label class="text-xs font-semibold text-gray-600">CEP</label>
+              <label class="text-[0.78rem] font-semibold text-gray-600">CEP</label>
               <div class="flex gap-2 min-w-0">
                 <input id="fCep" type="text" placeholder="00000-000" maxlength="9"
-                       class="min-w-0 flex-1 px-3 py-2.5 border-[1.5px] border-gray-200 rounded-xl text-sm bg-gray-50 outline-none focus:border-vitta-500 focus:bg-white transition-colors">
+                       class="min-w-0 flex-1 px-3 py-2.5 border border-gray-200 rounded-xl text-sm outline-none focus:border-vitta-500 focus:ring-2 focus:ring-vitta-500/20">
                 <button type="button" onclick="buscarCEP()"
                         class="shrink-0 px-3 py-2.5 bg-vitta-500 hover:bg-vitta-600 text-white text-xs font-semibold rounded-xl transition-colors whitespace-nowrap">Buscar</button>
               </div>
             </div>
             <div class="sm:col-span-2 flex flex-col gap-1.5">
-              <label class="text-xs font-semibold text-gray-600">Rua / Av.</label>
+              <label class="text-[0.78rem] font-semibold text-gray-600">Rua / Av.</label>
               <input id="fRua" type="text" placeholder="Rua"
-                     class="px-3 py-2.5 border-[1.5px] border-gray-200 rounded-xl text-sm bg-gray-50 outline-none focus:border-vitta-500 focus:bg-white transition-colors">
+                     class="px-3 py-2.5 border border-gray-200 rounded-xl text-sm outline-none focus:border-vitta-500 focus:ring-2 focus:ring-vitta-500/20">
             </div>
             <div class="flex flex-col gap-1.5">
-              <label class="text-xs font-semibold text-gray-600">Número</label>
+              <label class="text-[0.78rem] font-semibold text-gray-600">Número</label>
               <input id="fNro" type="text" placeholder="Nº"
-                     class="px-3 py-2.5 border-[1.5px] border-gray-200 rounded-xl text-sm bg-gray-50 outline-none focus:border-vitta-500 focus:bg-white transition-colors">
+                     class="px-3 py-2.5 border border-gray-200 rounded-xl text-sm outline-none focus:border-vitta-500 focus:ring-2 focus:ring-vitta-500/20">
             </div>
             <div class="flex flex-col gap-1.5">
-              <label class="text-xs font-semibold text-gray-600">Complemento</label>
+              <label class="text-[0.78rem] font-semibold text-gray-600">Complemento</label>
               <input id="fComple" type="text" placeholder="Apto, sala..."
-                     class="px-3 py-2.5 border-[1.5px] border-gray-200 rounded-xl text-sm bg-gray-50 outline-none focus:border-vitta-500 focus:bg-white transition-colors">
+                     class="px-3 py-2.5 border border-gray-200 rounded-xl text-sm outline-none focus:border-vitta-500 focus:ring-2 focus:ring-vitta-500/20">
             </div>
             <div class="flex flex-col gap-1.5">
-              <label class="text-xs font-semibold text-gray-600">Bairro</label>
+              <label class="text-[0.78rem] font-semibold text-gray-600">Bairro</label>
               <input id="fBairro" type="text" placeholder="Bairro"
-                     class="px-3 py-2.5 border-[1.5px] border-gray-200 rounded-xl text-sm bg-gray-50 outline-none focus:border-vitta-500 focus:bg-white transition-colors">
+                     class="px-3 py-2.5 border border-gray-200 rounded-xl text-sm outline-none focus:border-vitta-500 focus:ring-2 focus:ring-vitta-500/20">
             </div>
             <div class="flex flex-col gap-1.5">
-              <label class="text-xs font-semibold text-gray-600">Cidade</label>
+              <label class="text-[0.78rem] font-semibold text-gray-600">Cidade</label>
               <input id="fCidade" type="text" placeholder="Cidade"
-                     class="px-3 py-2.5 border-[1.5px] border-gray-200 rounded-xl text-sm bg-gray-50 outline-none focus:border-vitta-500 focus:bg-white transition-colors">
+                     class="px-3 py-2.5 border border-gray-200 rounded-xl text-sm outline-none focus:border-vitta-500 focus:ring-2 focus:ring-vitta-500/20">
             </div>
             <div class="flex flex-col gap-1.5">
-              <label class="text-xs font-semibold text-gray-600">UF</label>
+              <label class="text-[0.78rem] font-semibold text-gray-600">UF</label>
               <input id="fUf" type="text" placeholder="UF" maxlength="2"
-                     class="px-3 py-2.5 border-[1.5px] border-gray-200 rounded-xl text-sm bg-gray-50 outline-none focus:border-vitta-500 focus:bg-white transition-colors uppercase">
+                     class="px-3 py-2.5 border border-gray-200 rounded-xl text-sm outline-none focus:border-vitta-500 focus:ring-2 focus:ring-vitta-500/20 uppercase">
             </div>
           </div>
         </div>
@@ -679,19 +695,19 @@
 
       <!-- SEÇÃO: DADOS ADICIONAIS -->
       <div>
-        <button type="button" onclick="toggleFormSection(this)" class="w-full flex items-center gap-3 px-6 py-3.5 hover:bg-gray-50 transition-colors">
-          <span class="text-gray-400"><svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg></span><span class="text-sm font-bold text-gray-700 flex-1 text-left">Dados Adicionais</span>
+        <button type="button" onclick="toggleFormSection(this)" class="w-full flex items-center gap-2.5 px-5 py-3 hover:bg-gray-50 transition-colors">
+          <span class="text-gray-400"><svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg></span><span class="text-[0.82rem] font-bold text-gray-700 flex-1 text-left">Dados Adicionais</span>
           <svg class="w-4 h-4 text-gray-400 chevron open" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
         </button>
-        <div class="sec-body px-6 pb-6">
-          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div class="sec-body px-5 pb-5">
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
 
             <!-- Multi-select profissionais -->
             <div class="sm:col-span-2 flex flex-col gap-1.5">
-              <label class="text-xs font-semibold text-gray-600">Profissional(is) <span class="text-red-500">*</span></label>
+              <label class="text-[0.78rem] font-semibold text-gray-600">Profissional(is) <span class="text-red-500">*</span></label>
               <div class="relative" id="msWrap">
                 <div id="msTrigger" onclick="toggleMsDropdown()"
-                     class="min-h-[42px] px-3 py-2 border-[1.5px] border-gray-200 rounded-xl bg-gray-50 cursor-pointer flex flex-wrap gap-1.5 items-center focus:border-vitta-500 transition-colors">
+                     class="min-h-[42px] px-3 py-2 border border-gray-200 rounded-xl cursor-pointer flex flex-wrap gap-1.5 items-center focus:border-vitta-500 transition-colors">
                   <span id="msPlaceholder" class="text-sm text-gray-400">Selecione profissionais...</span>
                 </div>
                 <div class="ms-dropdown" id="msDropdown"></div>
@@ -699,15 +715,15 @@
             </div>
 
             <div class="flex flex-col gap-1.5">
-              <label class="text-xs font-semibold text-gray-600">Grupo <span class="text-red-500">*</span></label>
-              <select id="fGrupo" required class="px-3 py-2.5 border-[1.5px] border-gray-200 rounded-xl text-sm bg-gray-50 outline-none focus:border-vitta-500 focus:bg-white transition-colors">
+              <label class="text-[0.78rem] font-semibold text-gray-600">Grupo <span class="text-red-500">*</span></label>
+              <select id="fGrupo" required class="px-3 py-2.5 border border-gray-200 rounded-xl text-sm outline-none focus:border-vitta-500 focus:ring-2 focus:ring-vitta-500/20">
                 <option value="">Selecione um grupo...</option>
               </select>
             </div>
 
             <div class="flex flex-col gap-1.5">
-              <label class="text-xs font-semibold text-gray-600">Frequência</label>
-              <select id="fFreq" class="px-3 py-2.5 border-[1.5px] border-gray-200 rounded-xl text-sm bg-gray-50 outline-none focus:border-vitta-500 focus:bg-white transition-colors">
+              <label class="text-[0.78rem] font-semibold text-gray-600">Frequência</label>
+              <select id="fFreq" class="px-3 py-2.5 border border-gray-200 rounded-xl text-sm outline-none focus:border-vitta-500 focus:ring-2 focus:ring-vitta-500/20">
                 <option value="">Selecione...</option>
                 <option>Semanal</option><option>Quinzenal</option><option>Mensal</option>
                 <option>Bimestral</option><option>Trimestral</option><option>Semestral</option><option>Anual</option>
@@ -715,15 +731,15 @@
             </div>
 
             <div class="flex flex-col gap-1.5">
-              <label class="text-xs font-semibold text-gray-600">Contrato (nome do arquivo)</label>
+              <label class="text-[0.78rem] font-semibold text-gray-600">Contrato (nome do arquivo)</label>
               <input id="fContrato" type="text" placeholder="Ex: contrato_joao.pdf"
-                     class="px-3 py-2.5 border-[1.5px] border-gray-200 rounded-xl text-sm bg-gray-50 outline-none focus:border-vitta-500 focus:bg-white transition-colors">
+                     class="px-3 py-2.5 border border-gray-200 rounded-xl text-sm outline-none focus:border-vitta-500 focus:ring-2 focus:ring-vitta-500/20">
             </div>
 
             <div class="sm:col-span-2 flex flex-col gap-1.5">
-              <label class="text-xs font-semibold text-gray-600">Observações</label>
+              <label class="text-[0.78rem] font-semibold text-gray-600">Observações</label>
               <textarea id="fObs" rows="3" placeholder="Observações sobre o paciente..."
-                        class="px-3 py-2.5 border-[1.5px] border-gray-200 rounded-xl text-sm bg-gray-50 outline-none focus:border-vitta-500 focus:bg-white transition-colors resize-none"></textarea>
+                        class="px-3 py-2.5 border border-gray-200 rounded-xl text-sm outline-none focus:border-vitta-500 focus:ring-2 focus:ring-vitta-500/20 resize-none"></textarea>
             </div>
 
             <div class="sm:col-span-2 flex items-center gap-3">
@@ -741,10 +757,10 @@
       </div>
     </form>
 
-    <div class="flex justify-end gap-3 px-6 py-4 border-t border-gray-100">
-      <button type="button" onclick="closeFormModal()" class="px-4 py-2.5 border border-gray-200 rounded-xl text-sm font-semibold text-gray-600 hover:bg-gray-50 transition-colors">Cancelar</button>
+    <div class="flex justify-end gap-2.5 px-5 py-3 border-t border-gray-100">
+      <button type="button" onclick="closeFormModal()" class="px-4 py-2 border border-gray-200 rounded-xl text-sm font-semibold text-gray-600 hover:bg-gray-50 transition-colors">Cancelar</button>
       <button type="button" onclick="savePatient()" id="btnSave"
-              class="flex items-center gap-2 px-5 py-2.5 bg-vitta-500 hover:bg-vitta-600 text-white text-sm font-semibold rounded-xl transition-colors">
+              class="flex items-center gap-2 px-4 py-2 bg-vitta-500 hover:bg-vitta-600 text-white text-sm font-semibold rounded-xl transition-colors">
         <svg id="saveSpin" class="hidden animate-spin w-4 h-4" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/></svg>
         <svg id="saveIcon" xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
         <span id="saveTxt">Salvar Paciente</span>
@@ -757,16 +773,16 @@
      MODAL: CONFIRMAR EXCLUSÃO
 ══════════════════════════════════ -->
 <div class="modal-overlay" id="deleteModal">
-  <div class="bg-white rounded-2xl w-full max-w-[420px] shadow-2xl mx-auto my-auto p-6">
-    <div class="w-14 h-14 rounded-full bg-red-50 flex items-center justify-center mx-auto mb-4 text-red-500"><svg class="w-7 h-7" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0"/></svg></div>
-    <h3 class="text-base font-bold text-gray-800 text-center mb-2">Excluir Paciente?</h3>
-    <p class="text-sm text-gray-500 text-center mb-5">
+  <div class="bg-white rounded-2xl w-full max-w-[420px] shadow-2xl mx-auto my-auto p-5">
+    <div class="w-12 h-12 rounded-full bg-red-50 flex items-center justify-center mx-auto mb-3 text-red-500"><svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0"/></svg></div>
+    <h3 class="text-[0.95rem] font-bold text-gray-800 text-center mb-1.5">Excluir Paciente?</h3>
+    <p class="text-[0.83rem] text-gray-500 text-center mb-4">
       Esta ação não pode ser desfeita. O paciente <strong id="deleteNome" class="text-gray-800"></strong> será removido permanentemente.
     </p>
-    <div class="flex gap-3">
-      <button onclick="closeDeleteModal()" class="flex-1 py-2.5 border border-gray-200 rounded-xl text-sm font-semibold text-gray-600 hover:bg-gray-50 transition-colors">Cancelar</button>
+    <div class="flex gap-2.5">
+      <button onclick="closeDeleteModal()" class="flex-1 py-2 border border-gray-200 rounded-xl text-sm font-semibold text-gray-600 hover:bg-gray-50 transition-colors">Cancelar</button>
       <button onclick="confirmDelete()" id="btnDeleteConfirm"
-              class="flex-1 flex items-center justify-center gap-2 py-2.5 bg-red-500 hover:bg-red-600 text-white text-sm font-semibold rounded-xl transition-colors">
+              class="flex-1 flex items-center justify-center gap-2 py-2 bg-red-500 hover:bg-red-600 text-white text-sm font-semibold rounded-xl transition-colors">
         <svg id="delSpin" class="hidden animate-spin w-4 h-4" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/></svg>
         Excluir
       </button>
@@ -779,17 +795,22 @@
 ══════════════════════════════════ -->
 <div id="modalPacAgd" class="modal-overlay" onclick="if(event.target===this)closeAgdModal()">
   <div class="bg-white rounded-2xl shadow-xl w-full max-w-lg modal-scroll overflow-y-auto max-h-[95vh]" onclick="event.stopPropagation()">
-    <div class="flex items-center justify-between px-6 py-4 border-b border-gray-100">
-      <div>
-        <h2 class="text-[1rem] font-bold text-gray-800">Novo Agendamento</h2>
-        <p id="agdModalSubtitle" class="text-[0.72rem] text-gray-400 truncate max-w-[280px]"></p>
+    <div class="flex items-center justify-between px-5 py-3 border-b border-gray-100">
+      <div class="flex items-center gap-2.5">
+        <div class="w-9 h-9 rounded-xl bg-vitta-100 flex items-center justify-center shrink-0 text-vitta-600">
+          <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+        </div>
+        <div>
+          <h2 class="text-[0.95rem] font-bold text-gray-800">Novo Agendamento</h2>
+          <p id="agdModalSubtitle" class="text-[0.72rem] text-gray-400 truncate max-w-[280px]"></p>
+        </div>
       </div>
-      <button onclick="closeAgdModal()" class="text-gray-400 hover:text-gray-600 transition-colors p-1">
-        <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      <button onclick="closeAgdModal()" class="w-7 h-7 rounded-full bg-gray-100 hover:bg-gray-200 text-gray-500 flex items-center justify-center transition-colors">
+        <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
       </button>
     </div>
 
-    <form id="agdPacForm" onsubmit="saveAgd(event)" class="px-6 pb-6 pt-4 space-y-4">
+    <form id="agdPacForm" onsubmit="saveAgd(event)" class="px-5 pb-5 pt-3 space-y-3">
 
       <!-- Paciente (somente leitura) -->
       <div>
@@ -800,7 +821,7 @@
       <!-- Profissional -->
       <div>
         <label class="block text-[0.78rem] font-semibold text-gray-600 mb-1">Profissional <span class="text-red-500">*</span></label>
-        <select id="agdFProf" required class="w-full py-2.5 px-3 text-sm border border-gray-200 rounded-xl outline-none focus:border-vitta-500 bg-white">
+        <select id="agdFProf" required class="w-full py-2.5 px-3 text-sm border border-gray-200 rounded-xl outline-none focus:border-vitta-500 focus:ring-2 focus:ring-vitta-500/20 bg-white">
           <option value="">Selecione o profissional…</option>
         </select>
         <p id="agdProfEmptyHint" class="hidden text-[0.72rem] text-amber-600 mt-1">Nenhum profissional vinculado a este paciente. Verifique o cadastro.</p>
@@ -810,11 +831,11 @@
       <div class="grid grid-cols-2 gap-3">
         <div>
           <label class="block text-[0.78rem] font-semibold text-gray-600 mb-1">Início <span class="text-red-500">*</span></label>
-          <input id="agdFInicio" type="datetime-local" required class="w-full py-2.5 px-3 text-sm border border-gray-200 rounded-xl outline-none focus:border-vitta-500" />
+          <input id="agdFInicio" type="datetime-local" required class="w-full py-2.5 px-3 text-sm border border-gray-200 rounded-xl outline-none focus:border-vitta-500 focus:ring-2 focus:ring-vitta-500/20" />
         </div>
         <div>
           <label class="block text-[0.78rem] font-semibold text-gray-600 mb-1">Fim <span class="text-red-500">*</span></label>
-          <input id="agdFFim" type="datetime-local" required class="w-full py-2.5 px-3 text-sm border border-gray-200 rounded-xl outline-none focus:border-vitta-500" />
+          <input id="agdFFim" type="datetime-local" required class="w-full py-2.5 px-3 text-sm border border-gray-200 rounded-xl outline-none focus:border-vitta-500 focus:ring-2 focus:ring-vitta-500/20" />
         </div>
       </div>
 
@@ -842,7 +863,7 @@
       <!-- Sala -->
       <div id="agdRowSala">
         <label class="block text-[0.78rem] font-semibold text-gray-600 mb-1">Sala <span class="text-red-500">*</span></label>
-        <select id="agdFSala" required class="w-full py-2.5 px-3 text-sm border border-gray-200 rounded-xl outline-none focus:border-vitta-500 bg-white">
+        <select id="agdFSala" required class="w-full py-2.5 px-3 text-sm border border-gray-200 rounded-xl outline-none focus:border-vitta-500 focus:ring-2 focus:ring-vitta-500/20 bg-white">
           <option value="">Selecione a sala…</option>
         </select>
       </div>
@@ -875,7 +896,7 @@
         <div id="agdRowRepetirOpts" class="hidden mt-3 space-y-3 border border-gray-200 rounded-xl p-3">
           <div>
             <label class="block text-[0.78rem] font-semibold text-gray-600 mb-1">Frequência</label>
-            <select id="agdFRepFreq" onchange="renderAgdRecorrenciaPreview()" class="w-full py-2.5 px-3 text-sm border border-gray-200 rounded-xl outline-none focus:border-vitta-500 bg-white">
+            <select id="agdFRepFreq" onchange="renderAgdRecorrenciaPreview()" class="w-full py-2.5 px-3 text-sm border border-gray-200 rounded-xl outline-none focus:border-vitta-500 focus:ring-2 focus:ring-vitta-500/20 bg-white">
               <option value="SEMANAL">Semanal</option>
               <option value="QUINZENAL">Quinzenal (a cada 2 semanas)</option>
               <option value="MENSAL">Mensal (mesmo dia)</option>
@@ -888,13 +909,13 @@
               <label class="flex items-center gap-2 text-[0.8rem] text-gray-700 cursor-pointer">
                 <input type="radio" name="agdFRepAteTipo" value="count" checked onchange="renderAgdRecorrenciaPreview()" class="accent-vitta-500" /> Nº de sessões
               </label>
-              <input id="agdFRepCount" type="number" min="2" max="52" value="8" oninput="renderAgdRecorrenciaPreview()" class="w-20 py-1.5 px-2 text-sm border border-gray-200 rounded-lg outline-none focus:border-vitta-500" />
+              <input id="agdFRepCount" type="number" min="2" max="52" value="8" oninput="renderAgdRecorrenciaPreview()" class="w-20 py-1.5 px-2 text-sm border border-gray-200 rounded-lg outline-none focus:border-vitta-500 focus:ring-2 focus:ring-vitta-500/20" />
             </div>
             <div class="flex items-center gap-2">
               <label class="flex items-center gap-2 text-[0.8rem] text-gray-700 cursor-pointer">
                 <input type="radio" name="agdFRepAteTipo" value="data" onchange="renderAgdRecorrenciaPreview()" class="accent-vitta-500" /> Data final
               </label>
-              <input id="agdFRepData" type="date" onchange="renderAgdRecorrenciaPreview()" class="py-1.5 px-2 text-sm border border-gray-200 rounded-lg outline-none focus:border-vitta-500" />
+              <input id="agdFRepData" type="date" onchange="renderAgdRecorrenciaPreview()" class="py-1.5 px-2 text-sm border border-gray-200 rounded-lg outline-none focus:border-vitta-500 focus:ring-2 focus:ring-vitta-500/20" />
             </div>
           </div>
 
@@ -910,13 +931,13 @@
       <!-- Observação -->
       <div>
         <label class="block text-[0.78rem] font-semibold text-gray-600 mb-1">Observação</label>
-        <textarea id="agdFObs" rows="2" placeholder="Observações opcionais…" class="w-full py-2.5 px-3 text-sm border border-gray-200 rounded-xl outline-none focus:border-vitta-500 resize-none"></textarea>
+        <textarea id="agdFObs" rows="2" placeholder="Observações opcionais…" class="w-full py-2.5 px-3 text-sm border border-gray-200 rounded-xl outline-none focus:border-vitta-500 focus:ring-2 focus:ring-vitta-500/20 resize-none"></textarea>
       </div>
 
       <!-- Botões -->
-      <div class="flex gap-3 pt-2">
-        <button type="button" onclick="closeAgdModal()" class="flex-1 py-2.5 border border-gray-200 rounded-xl text-sm font-medium text-gray-600 hover:bg-gray-50 transition-colors">Cancelar</button>
-        <button type="submit" id="agdBtnSave" class="flex-1 py-2.5 bg-vitta-500 text-white rounded-xl text-sm font-semibold hover:bg-vitta-600 transition-colors">Salvar</button>
+      <div class="flex gap-2.5 pt-1.5">
+        <button type="button" onclick="closeAgdModal()" class="flex-1 py-2 border border-gray-200 rounded-xl text-sm font-medium text-gray-600 hover:bg-gray-50 transition-colors">Cancelar</button>
+        <button type="submit" id="agdBtnSave" class="flex-1 py-2 bg-vitta-500 text-white rounded-xl text-sm font-semibold hover:bg-vitta-600 transition-colors">Salvar</button>
       </div>
     </form>
   </div>
@@ -925,20 +946,20 @@
 <!-- MODAL RECONEXÃO GOOGLE MEET -->
 <div id="modalGoogleReconnect" class="modal-overlay" onclick="if(event.target===this)closeGoogleReconnectModal()">
   <div class="bg-white rounded-2xl shadow-xl w-full max-w-sm" onclick="event.stopPropagation()">
-    <div class="p-6">
-      <div class="flex items-center gap-4 mb-4">
-        <div class="w-11 h-11 rounded-full bg-amber-100 flex items-center justify-center shrink-0">
-          <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-amber-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M12 9v4"/><path d="M12 17h.01"/><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0Z"/></svg>
+    <div class="p-5">
+      <div class="flex items-center gap-3.5 mb-3">
+        <div class="w-9 h-9 rounded-full bg-amber-100 flex items-center justify-center shrink-0">
+          <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-amber-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M12 9v4"/><path d="M12 17h.01"/><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0Z"/></svg>
         </div>
         <div>
           <h3 class="text-[0.95rem] font-bold text-gray-800">Reconectar Google Meet</h3>
-          <p class="text-[0.78rem] text-gray-400 mt-0.5">A conexão desta empresa expirou ou foi revogada.</p>
+          <p class="text-[0.72rem] text-gray-400 mt-0.5">A conexão desta empresa expirou ou foi revogada.</p>
         </div>
       </div>
-      <p class="text-[0.83rem] text-gray-600 mb-5">Para agendar consultas online é necessário reconectar a conta Google desta empresa. Você será redirecionado para autorizar o acesso.</p>
-      <div class="flex gap-3">
-        <button onclick="closeGoogleReconnectModal()" class="flex-1 py-2.5 border border-gray-200 rounded-xl text-sm font-medium text-gray-600 hover:bg-gray-50 transition-colors">Cancelar</button>
-        <button onclick="iniciarConexaoGoogleAgd()" class="flex-1 py-2.5 bg-vitta-500 text-white rounded-xl text-sm font-semibold hover:bg-vitta-600 transition-colors">Reconectar</button>
+      <p class="text-[0.83rem] text-gray-600 mb-4">Para agendar consultas online é necessário reconectar a conta Google desta empresa. Você será redirecionado para autorizar o acesso.</p>
+      <div class="flex gap-2.5">
+        <button onclick="closeGoogleReconnectModal()" class="flex-1 py-2 border border-gray-200 rounded-xl text-sm font-medium text-gray-600 hover:bg-gray-50 transition-colors">Cancelar</button>
+        <button onclick="iniciarConexaoGoogleAgd()" class="flex-1 py-2 bg-vitta-500 text-white rounded-xl text-sm font-semibold hover:bg-vitta-600 transition-colors">Reconectar</button>
       </div>
     </div>
   </div>
@@ -946,7 +967,7 @@
 
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
-<script src="../assets/js/config.js?v=2"></script>
+<script src="../assets/js/config.js?v=3"></script>
 <script src="../assets/js/toast.js?v=1"></script>
   <script src="../assets/js/access-guard.js?v=2"></script>
   <script src="../assets/js/admin-empresa-context.js?v=1"></script>
@@ -1204,13 +1225,14 @@ function renderTable() {
     `Exibindo <strong class="text-gray-800">${totalCount}</strong> paciente${totalCount !== 1 ? 's' : ''}`;
 
   if (!slice.length) {
-    tbody.innerHTML = `<tr><td colspan="7" class="text-center py-14 text-gray-400 text-sm">Nenhum paciente encontrado.</td></tr>`;
+    tbody.innerHTML = `<tr><td colspan="6" class="text-center py-14 text-gray-400 text-sm">Nenhum paciente encontrado.</td></tr>`;
     return;
   }
 
   tbody.innerHTML = slice.map(p => {
-    const profsStr = p._profs.length ? p._profs.map(x => x.nome).join(', ') : '—';
-    const ini  = initials(p.NOME_PAC);
+    const profsHtml = p._profs.length
+      ? p._profs.map(x => `<div class="truncate" title="${x.nome}">${x.nome}</div>`).join('')
+      : '<span class="text-gray-300">—</span>';
     const age  = calcAge(p.DTNASC_PAC);
     const idShort = p.ID_PAC.slice(0, 6).toUpperCase();
     const podeVerProntuario = isProfissional || (ownProfissionalId && p._profs.some(r => r.id === ownProfissionalId));
@@ -1228,18 +1250,21 @@ function renderTable() {
     return `
     <tr class="border-b border-gray-50">
       <td class="px-5 py-3.5">
-        <div class="flex items-center gap-3">
-          <div class="w-9 h-9 rounded-full ${avColor(p.NOME_PAC)} flex items-center justify-center text-white text-xs font-bold shrink-0">${ini}</div>
-          <div>
-            <div class="text-[0.85rem] font-semibold text-gray-800 ${!p.ATIVO_PAC ? 'opacity-50' : ''}">${p.NOME_PAC}${p.MENOS_PAC ? ' <span class="inline-flex items-center gap-0.5 text-[0.65rem] font-bold bg-purple-100 text-purple-700 px-1.5 py-0.5 rounded-full ml-1">👶 menor</span>' : ''}</div>
-            <div class="text-[0.7rem] text-gray-400">${age ? `${age} anos` : ''}</div>
-          </div>
+        <div class="text-[0.85rem] font-semibold text-gray-800 ${!p.ATIVO_PAC ? 'opacity-50' : ''}">${p.NOME_PAC}${p.MENOS_PAC ? ' <span class="inline-flex items-center gap-0.5 text-[0.65rem] font-bold bg-purple-100 text-purple-700 px-1.5 py-0.5 rounded-full ml-1">👶 menor</span>' : ''}</div>
+        <div class="text-[0.7rem] text-gray-400">${age ? `${age} anos` : ''}</div>
+      </td>
+      <td class="px-4 py-3.5 text-[0.82rem] max-w-[200px]">
+        <div class="flex items-center gap-1.5 text-gray-600">
+          <svg class="w-3.5 h-3.5 text-gray-400 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+          <span class="truncate">${fmtTel(p.TEL_PAC) || '—'}</span>
+        </div>
+        <div class="flex items-center gap-1.5 mt-0.5 text-gray-600">
+          <svg class="w-3.5 h-3.5 text-gray-400 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="M22 6l-10 7L2 6"/></svg>
+          <span class="truncate">${p.EMAIL_PAC || '—'}</span>
         </div>
       </td>
-      <td class="px-4 py-3.5 text-[0.82rem] text-gray-600 whitespace-nowrap">${fmtTel(p.TEL_PAC) || '—'}</td>
-      <td class="px-4 py-3.5 text-[0.82rem] text-gray-500 max-w-[180px] truncate">${p.EMAIL_PAC || '—'}</td>
-      <td class="px-4 py-3.5 text-[0.82rem] text-gray-600 max-w-[200px]">
-        <span class="truncate block" title="${profsStr}">${profsStr}</span>
+      <td class="px-4 py-3.5 text-[0.82rem] text-gray-600 max-w-[200px] space-y-0.5">
+        ${profsHtml}
       </td>
       <td class="px-4 py-3.5">
         ${p.FREQ_PAC
@@ -1317,7 +1342,7 @@ function openViewModal(id) {
   const ini = initials(p.NOME_PAC);
   const av  = document.getElementById('vAvatar');
   av.textContent = ini;
-  av.className   = `w-16 h-16 rounded-full flex items-center justify-center text-white text-2xl font-bold shrink-0 shadow-md ${avColor(p.NOME_PAC)}`;
+  av.className   = `w-11 h-11 rounded-full flex items-center justify-center text-white text-sm font-bold shrink-0 shadow-md ${avColor(p.NOME_PAC)}`;
 
   document.getElementById('vNome').textContent = p.NOME_PAC;
   document.getElementById('vStatusBadge').innerHTML = p.ATIVO_PAC

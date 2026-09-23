@@ -1,0 +1,828 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Despesas — Vitta BI</title>
+<link rel="icon" type="image/png" href="../img/Icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  * { box-sizing: border-box; }
+  body { margin: 0; font-family: 'Montserrat', system-ui, sans-serif; background: #FAFAFC; }
+  .bi-card { background: #FFFFFF; border: 1px solid #F1F0F7; border-radius: 16px; box-shadow: 0 2px 8px rgba(109,93,246,.04); }
+  .bi-filter { font-size: 14px; font-weight: 500; color: #6B7280; background: #FFFFFF; border: 1px solid #EFEDF9; border-radius: 9px; padding: 7px 12px; display: flex; align-items: center; gap: 6px; cursor: pointer; }
+  .bi-kpi-title { display: flex; align-items: center; gap: 6px; font-size: 13px; font-weight: 500; color: #6B7280; }
+  .bi-info { position: relative; width: 15px; height: 15px; border-radius: 50%; border: 1.3px solid #CBC8DC; color: #9C99B8; background: transparent; font-size: 10.5px; font-weight: 600; display: flex; align-items: center; justify-content: center; cursor: help; flex-shrink: 0; }
+  .bi-info-tip { visibility: hidden; opacity: 0; position: absolute; top: calc(100% + 9px); right: -10px; width: 240px; background: #1F2937; color: #fff; font-size: 12.5px; font-weight: 500; line-height: 1.45; padding: 10px 12px; border-radius: 8px; box-shadow: 0 6px 20px rgba(0,0,0,.18); transition: opacity .15s ease; z-index: 30; text-align: left; pointer-events: none; }
+  .bi-info-tip::after { content: ''; position: absolute; bottom: 100%; right: 13px; border: 5px solid transparent; border-bottom-color: #1F2937; }
+  .bi-info:hover .bi-info-tip, .bi-info:focus .bi-info-tip { visibility: visible; opacity: 1; }
+  .bi-info-tip.bi-info-tip-left { left: -10px; right: auto; }
+  .bi-info-tip.bi-info-tip-left::after { left: 13px; right: auto; }
+
+  .bi-period-panel { display: none; position: absolute; top: calc(100% + 8px); left: 0; width: 290px; background: #FFFFFF; border: 1px solid #F1F0F7; border-radius: 14px; box-shadow: 0 14px 34px rgba(17,17,17,.14); z-index: 40; padding: 10px; cursor: default; }
+  .bi-period-panel.open { display: block; }
+  .bi-period-panel-title { font-size: 11.5px; font-weight: 600; color: #9C99B8; letter-spacing: .05em; text-transform: uppercase; padding: 4px 10px 8px; }
+  .bi-period-opt { display: flex; align-items: center; gap: 10px; padding: 9px 10px; border-radius: 10px; cursor: pointer; }
+  .bi-period-opt:hover { background: #F7F6FC; }
+  .bi-period-opt.active { background: #F3F1FE; }
+  .bi-period-opt-text { flex: 1; min-width: 0; }
+  .bi-period-opt-title { font-size: 14px; font-weight: 500; color: #111827; }
+  .bi-period-opt.active .bi-period-opt-title { color: #4F3DD1; }
+  .bi-period-opt-sub { font-size: 12px; color: #9CA3AF; margin-top: 1px; }
+  .bi-period-opt-check { color: #6D5DF6; font-size: 14.5px; flex-shrink: 0; }
+  .bi-date-input { width: 100%; border: 1.5px solid #EFEDF9; border-radius: 10px; padding: 8px 10px; font: inherit; font-size: 13px; font-weight: 500; color: #111827; background: #fff; }
+  .bi-date-input:focus { outline: none; border-color: #6D5DF6; }
+
+  @keyframes bi-skeleton-shimmer { 0% { background-position: 100% 50%; } 100% { background-position: 0 50%; } }
+  .bi-skeleton { display: inline-block; background: linear-gradient(90deg, #F1F0F7 25%, #E9E7F3 37%, #F1F0F7 63%); background-size: 400% 100%; border-radius: 6px; animation: bi-skeleton-shimmer 1.4s ease infinite; vertical-align: middle; }
+  @keyframes bi-spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+  .bi-spin { animation: bi-spin .8s linear infinite; transform-origin: center; }
+  #btn-atualizar:disabled { opacity: .6; cursor: default; }
+
+  .bi-chip { font-size: 12px; font-weight: 500; padding: 3px 9px; border-radius: 999px; white-space: nowrap; }
+  .bi-chip-pago { background: #E8F6EE; color: #1D8A4A; }
+  .bi-chip-vencida { background: #FDECEC; color: #C0392B; }
+  .bi-chip-aVencer { background: #FEF5E0; color: #B7791F; }
+  .bi-tipo { font-size: 11.5px; font-weight: 500; padding: 2px 8px; border-radius: 6px; background: #F3F1FE; color: #4F3DD1; white-space: nowrap; }
+
+  .bi-tbl { width: 100%; border-collapse: collapse; }
+  .bi-tbl th { text-align: left; font-size: 11.5px; font-weight: 600; color: #9C99B8; letter-spacing: .04em; text-transform: uppercase; padding: 8px 10px; border-bottom: 1px solid #F1F0F7; white-space: nowrap; }
+  .bi-tbl td { font-size: 13.5px; color: #111827; padding: 11px 10px; border-bottom: 1px solid #F5F4FA; vertical-align: middle; }
+  .bi-tbl tr:last-child td { border-bottom: none; }
+  .bi-tbl .num { text-align: right; white-space: nowrap; font-weight: 500; }
+
+  .bi-page-btn { font-size: 12.5px; font-weight: 500; padding: 5px 11px; border-radius: 8px; border: 1px solid #EFEDF9; background: #fff; color: #6B7280; cursor: pointer; }
+  .bi-page-btn:disabled { opacity: .4; cursor: default; }
+
+  #evo-tip { position: fixed; display: none; z-index: 60; pointer-events: none; background: #1F2937; color: #fff; font-size: 12.5px; line-height: 1.5; padding: 10px 12px; border-radius: 8px; box-shadow: 0 6px 20px rgba(0,0,0,.18); min-width: 190px; }
+
+  .bi-grid-kpi { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; }
+  .bi-grid-2 { display: grid; grid-template-columns: minmax(0, 3fr) minmax(0, 2fr); gap: 20px; }
+  .bi-grid-2e { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 20px; }
+  @media (max-width: 1100px) { .bi-grid-2, .bi-grid-2e { grid-template-columns: 1fr; } }
+  @media (max-width: 800px) { .bi-grid-kpi { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+</style>
+</head>
+<body>
+<!-- Relatório de Despesas do Vitta BI. Todos os números vêm de RPCs SECURITY DEFINER
+     (bi_despesas_resumo, bi_despesas_por_categoria, bi_despesas_evolucao,
+     bi_despesas_lancamentos — supabase/migrations/20260921160000_bi_despesas.sql), que
+     validam o vínculo do usuário com a empresa (bi_check_access) antes de calcular.
+     Nenhum filtro de empresa é feito no navegador.
+
+     Vínculo com o recebimento (resultado líquido):
+       Recebido            = pagamentos não estornados no período (regra do Financeiro)
+       Repasse à Clínica   = recebido × % da clínica de cada profissional (receita da clínica)
+       Despesas pagas      = DESPESA com data de pagamento no período (regime de caixa)
+       Resultado líquido   = Repasse à Clínica − Despesas pagas
+       Resultado projetado = Resultado líquido − despesas ainda em aberto do período
+     Despesas em aberto usam o vencimento: nos períodos Este mês / Trimestre / Ano
+     incluem também o que vence até o fim do mês (ou do ano), para mostrar o que ainda vem. -->
+<div style="display:flex;height:100vh;overflow:hidden;">
+  <div id="bi-sidebar"></div>
+  <div style="flex:1;display:flex;flex-direction:column;min-width:0;background:#FAFAFC;">
+    <div id="bi-header"></div>
+
+    <main style="flex:1;overflow:auto;padding:24px 28px;display:flex;flex-direction:column;gap:20px;">
+
+      <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
+        <div class="bi-filter" id="filtro-periodo-btn" style="position:relative;">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#9CA3AF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="17" rx="2"/><path d="M3 9h18M8 2v4M16 2v4"/></svg>
+          <span id="filtro-periodo-label">Este mês</span>
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#C4C1D6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>
+
+          <div class="bi-period-panel" id="periodo-panel">
+            <div id="periodo-view-main">
+              <div class="bi-period-panel-title">Período</div>
+              <div id="periodo-opcoes"></div>
+            </div>
+            <div id="periodo-view-custom" style="display:none;">
+              <div style="display:flex;align-items:center;gap:6px;margin-bottom:12px;">
+                <button type="button" id="periodo-custom-voltar" style="border:none;background:transparent;color:#6B7280;font-size:16.5px;cursor:pointer;padding:2px 6px 2px 2px;">←</button>
+                <span style="font-size:13px;font-weight:600;color:#111827;">Personalizado</span>
+              </div>
+              <label style="display:block;font-size:10.5px;font-weight:600;color:#9C99B8;text-transform:uppercase;letter-spacing:.03em;margin-bottom:4px;">Início</label>
+              <input type="date" id="custom-ini" class="bi-date-input" style="margin-bottom:10px;">
+              <label style="display:block;font-size:10.5px;font-weight:600;color:#9C99B8;text-transform:uppercase;letter-spacing:.03em;margin-bottom:4px;">Fim</label>
+              <input type="date" id="custom-fim" class="bi-date-input" style="margin-bottom:14px;">
+              <div id="custom-erro" style="display:none;font-size:12px;color:#C0392B;margin:-6px 0 10px;">Informe um intervalo válido (início antes do fim).</div>
+              <div style="display:flex;gap:8px;">
+                <button type="button" id="periodo-custom-cancelar" style="flex:1;padding:9px;border-radius:10px;border:1px solid #EFEDF9;background:#fff;color:#6B7280;font-size:13px;font-weight:500;cursor:pointer;">Cancelar</button>
+                <button type="button" id="periodo-custom-aplicar" style="flex:1;padding:9px;border-radius:10px;border:none;background:#6D5DF6;color:#fff;font-size:13px;font-weight:500;cursor:pointer;">Aplicar</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div style="flex:1;"></div>
+        <span id="bi-ultima-atualizacao" style="font-size:13px;color:#9CA3AF;"></span>
+        <button type="button" id="btn-atualizar" class="bi-filter">
+          <svg id="btn-atualizar-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#6B7280" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 4v6h-6"/><path d="M1 20v-6h6"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
+          Atualizar
+        </button>
+      </div>
+
+      <!-- Do recebimento ao líquido -->
+      <div class="bi-card" style="padding:22px 24px;">
+        <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:16px;flex-wrap:wrap;">
+          <div>
+            <span style="display:flex;align-items:center;gap:6px;font-size:17.5px;font-weight:600;color:#111827;">
+              Do recebimento ao líquido
+              <span class="bi-info" tabindex="0">?<span class="bi-info-tip bi-info-tip-left" style="width:290px;">Repasse à Clínica é a parte do recebido que fica com a clínica (recebido × percentual de cada profissional). Resultado líquido = Repasse à Clínica − despesas pagas no período. O projetado desconta também as despesas que ainda estão em aberto.</span></span>
+            </span>
+            <div style="font-size:14px;color:#9CA3AF;margin-top:3px;">Quanto entrou, quanto foi para os profissionais, quanto saiu em despesas e o que sobrou</div>
+          </div>
+          <div id="resultado-badge"></div>
+        </div>
+        <div id="waterfall"></div>
+      </div>
+
+      <div class="bi-grid-kpi" id="kpis"></div>
+
+      <!-- Evolução anual -->
+      <div class="bi-card" style="padding:24px;">
+        <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:18px;flex-wrap:wrap;">
+          <div>
+            <span style="display:flex;align-items:center;gap:6px;font-size:17.5px;font-weight:600;color:#111827;">
+              Recebimento x despesas
+              <span class="bi-info" tabindex="0">?<span class="bi-info-tip bi-info-tip-left" style="width:270px;">Mês a mês desde janeiro: Repasse à Clínica (receita da clínica) contra despesas pagas e em aberto, com o resultado líquido de cada mês. Não segue o filtro de período.</span></span>
+            </span>
+            <div style="font-size:14px;color:#9CA3AF;margin-top:3px;">Repasse à Clínica, despesas e resultado líquido por mês</div>
+          </div>
+          <span id="evo-sub" class="bi-filter" style="cursor:default;"></span>
+        </div>
+        <div id="evo-legend" style="display:flex;flex-wrap:wrap;gap:8px 22px;margin-bottom:14px;"></div>
+        <div id="evo-skeleton" class="bi-skeleton" style="width:100%;height:260px;display:none;"></div>
+        <div id="evo-chart" style="width:100%;"></div>
+        <div style="font-size:12.5px;color:#9CA3AF;margin-top:10px;">Passe o mouse (ou toque) sobre um mês para ver o detalhe.</div>
+      </div>
+
+      <div class="bi-grid-2">
+        <div class="bi-card" style="padding:20px 24px;">
+          <span style="display:flex;align-items:center;gap:6px;font-size:15.5px;font-weight:500;color:#111827;">
+            Por categoria
+            <span class="bi-info" tabindex="0">?<span class="bi-info-tip bi-info-tip-left" style="width:260px;">Despesas pagas no período + em aberto com vencimento no período. A variação compara as despesas pagas com o período imediatamente anterior.</span></span>
+          </span>
+          <div style="font-size:14px;color:#9CA3AF;margin:3px 0 14px;">Onde o dinheiro está indo</div>
+          <div id="lista-categorias">—</div>
+        </div>
+
+        <div style="display:flex;flex-direction:column;gap:20px;">
+          <div class="bi-card" style="padding:20px 24px;">
+            <span style="font-size:15.5px;font-weight:500;color:#111827;">Fixas, parceladas e avulsas</span>
+            <div style="font-size:14px;color:#9CA3AF;margin:3px 0 14px;">Perfil das despesas lançadas no período</div>
+            <div id="perfil-tipos">—</div>
+          </div>
+          <div class="bi-card" style="padding:20px 24px;">
+            <span style="font-size:15.5px;font-weight:500;color:#111827;">Por forma de pagamento</span>
+            <div style="font-size:14px;color:#9CA3AF;margin:3px 0 14px;">Como as despesas são quitadas</div>
+            <div id="lista-formas">—</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="bi-grid-2e">
+        <div class="bi-card" style="padding:20px 24px;">
+          <span style="font-size:15.5px;font-weight:500;color:#111827;">Contas em aberto</span>
+          <div style="font-size:14px;color:#9CA3AF;margin:3px 0 10px;">Vencidas primeiro, depois as próximas a vencer</div>
+          <div id="lista-abertas">—</div>
+        </div>
+        <div class="bi-card" style="padding:20px 24px;">
+          <span style="font-size:15.5px;font-weight:500;color:#111827;">Maiores despesas</span>
+          <div style="font-size:14px;color:#9CA3AF;margin:3px 0 10px;">As 5 maiores do período</div>
+          <div id="lista-maiores">—</div>
+        </div>
+      </div>
+
+      <div class="bi-card" style="padding:20px 24px;">
+        <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:10px;flex-wrap:wrap;">
+          <div>
+            <span style="font-size:15.5px;font-weight:500;color:#111827;">Lançamentos</span>
+            <div id="lanc-sub" style="font-size:14px;color:#9CA3AF;margin-top:3px;">Todas as despesas do período</div>
+          </div>
+          <div style="display:flex;align-items:center;gap:6px;" id="lanc-filtros"></div>
+        </div>
+        <div style="overflow-x:auto;">
+          <table class="bi-tbl">
+            <thead><tr>
+              <th>Vencimento</th><th>Descrição</th><th>Categoria</th><th>Tipo</th><th>Forma</th><th style="text-align:right;">Valor</th><th>Situação</th>
+            </tr></thead>
+            <tbody id="lanc-body"><tr><td colspan="7" style="color:#9CA3AF;">—</td></tr></tbody>
+          </table>
+        </div>
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-top:12px;flex-wrap:wrap;gap:8px;">
+          <span id="lanc-info" style="font-size:13px;color:#9CA3AF;"></span>
+          <div style="display:flex;gap:6px;">
+            <button type="button" class="bi-page-btn" id="lanc-prev">Anterior</button>
+            <button type="button" class="bi-page-btn" id="lanc-next">Próxima</button>
+          </div>
+        </div>
+      </div>
+
+    </main>
+  </div>
+</div>
+<div id="evo-tip"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<script src="../assets/js/bi-auth.js"></script>
+<script src="../assets/js/bi-menu.js"></script>
+<script>
+  let idEmp = null;
+  let periodo = 'mes';
+  let customIni = null; // 'YYYY-MM-DD'
+  let customFim = null;
+
+  const COMPARE_LABEL = {
+    hoje: 'ontem', ontem: 'dois dias atrás', '7dias': '7 dias anteriores', '30dias': '30 dias anteriores',
+    mes: 'mês anterior', mes_passado: 'mês anterior', trimestre: 'trimestre anterior', ano: 'ano anterior',
+    custom: 'período anterior equivalente',
+  };
+
+  const PERIOD_PRESETS = [
+    { value: 'hoje', label: 'Hoje' },
+    { value: 'ontem', label: 'Ontem' },
+    { value: '7dias', label: 'Últimos 7 dias' },
+    { value: '30dias', label: 'Últimos 30 dias' },
+    { value: 'mes', label: 'Este mês' },
+    { value: 'mes_passado', label: 'Mês passado' },
+    { value: 'trimestre', label: 'Trimestre' },
+    { value: 'ano', label: 'Ano (YTD)' },
+  ];
+
+  const MONTH_ABBR = ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'];
+
+  const C = { recebido: '#6D5DF6', repasse: '#2ABCD4', despesa: '#F0716A', aberta: '#F7B5B0', ok: '#1D8A4A', ruim: '#C0392B', neutro: '#C4C1D6' };
+
+  function esc(s) {
+    return String(s == null ? '' : s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+  }
+  function fmtBRL(v) { return (v || 0).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL', maximumFractionDigits: 0 }); }
+  function fmtBRL2(v) { return (v || 0).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL', minimumFractionDigits: 2, maximumFractionDigits: 2 }); }
+  function fmtK(v) {
+    const a = Math.abs(v || 0);
+    const s = v < 0 ? '-' : '';
+    if (a >= 1000000) return `${s}R$ ${(a / 1000000).toFixed(1).replace('.', ',')}M`;
+    if (a >= 1000) return `${s}R$ ${(a / 1000).toFixed(a >= 10000 ? 0 : 1).replace('.', ',')}k`;
+    return `${s}R$ ${Math.round(a)}`;
+  }
+  function fmtPct(v) { return v == null ? '—' : `${String(v).replace('.', ',')}%`; }
+  function fmtData(iso) { return iso ? iso.split('-').reverse().join('/') : '—'; }
+  function isoLocal(d) { return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0'); }
+
+  function rpcParams() {
+    return {
+      p_id_emp: idEmp,
+      p_period: periodo,
+      p_data_ini: periodo === 'custom' ? customIni : null,
+      p_data_fim: periodo === 'custom' ? customFim : null,
+    };
+  }
+
+  function deltaLine(value, { invert = false } = {}) {
+    const label = COMPARE_LABEL[periodo] || 'período anterior';
+    if (value === null || value === undefined) return `<span style="color:#9CA3AF;">sem dados do ${label}</span>`;
+    const bom = invert ? value <= 0 : value >= 0;
+    return `<span style="color:${bom ? C.ok : C.ruim};font-weight:500;">${value >= 0 ? '▲' : '▼'} ${Math.abs(value).toString().replace('.', ',')}%</span> vs ${label}`;
+  }
+
+  /* ---------- Do recebimento ao líquido ---------- */
+  function renderWaterfall(d) {
+    const linhas = [
+      { rot: 'Recebido no período', val: d.recebido, cor: C.recebido, sinal: '', dica: 'Pagamentos recebidos (não estornados)' },
+      { rot: 'Líquido dos profissionais', val: -d.liquidoProf, cor: C.neutro, sinal: '−', dica: 'Parte que fica com os profissionais' },
+      { rot: 'Repasse à Clínica', val: d.repasseClinica, cor: C.repasse, sinal: '=', dica: 'Receita da clínica' , forte: true },
+      { rot: 'Despesas pagas', val: -d.despesasPagas, cor: C.despesa, sinal: '−', dica: `${d.despesasPagasQtd} lançamento(s) pago(s)` },
+      { rot: 'Resultado líquido', val: d.resultado, cor: d.resultado >= 0 ? C.ok : C.ruim, sinal: '=', dica: d.margemPct == null ? 'Sem repasse no período' : `Margem de ${fmtPct(d.margemPct)} sobre o repasse`, forte: true },
+      { rot: 'Despesas em aberto', val: -d.abertas, cor: C.aberta, sinal: '−', dica: `${d.abertasQtd} conta(s) a pagar`, suave: true },
+      { rot: 'Resultado projetado', val: d.resultadoProjetado, cor: d.resultadoProjetado >= 0 ? C.ok : C.ruim, sinal: '=', dica: 'Se todas as contas em aberto forem pagas', forte: true, suave: true },
+    ];
+    const COLS = 'grid-template-columns:minmax(0,1fr) 120px minmax(110px,150px);';
+    const linhaHtml = (l) => {
+      const pctRec = d.recebido > 0 ? Math.round((l.val / d.recebido) * 1000) / 10 : null;
+      const pctTxt = pctRec == null ? '—' : l.rot === 'Recebido no período' ? '100%' : `${pctRec < 0 ? '−' : ''}${Math.abs(pctRec).toString().replace('.', ',')}${Number.isInteger(Math.abs(pctRec)) ? ',0' : ''}%`;
+      const valTxt = l.sinal === '−' ? `− ${fmtBRL(Math.abs(l.val))}` : fmtBRL(l.val);
+      const forte = l.forte || l.rot === 'Recebido no período';
+      const valCor = l.val < 0 && l.sinal === '=' ? C.ruim : (forte ? '#111827' : '#6B7280');
+      return `
+        <div style="display:grid;${COLS}align-items:center;gap:14px;padding:11px 0;">
+          <div style="display:flex;align-items:center;gap:14px;min-width:0;">
+            <span style="width:12px;height:12px;border-radius:50%;background:${l.cor};flex-shrink:0;"></span>
+            <div style="min-width:0;">
+              <div style="font-size:15px;font-weight:${forte ? 600 : 500};color:#111827;">${l.sinal && l.sinal !== '' ? `${l.sinal} ` : ''}${l.rot}</div>
+              <div style="font-size:12.5px;color:#9CA3AF;margin-top:1px;">${esc(l.dica)}</div>
+            </div>
+          </div>
+          <div style="text-align:right;font-size:14px;font-weight:500;color:#6B7280;white-space:nowrap;">${pctTxt}</div>
+          <div style="text-align:right;font-size:${forte ? 18 : 16}px;font-weight:${forte ? 600 : 500};color:${valCor};white-space:nowrap;">${valTxt}</div>
+        </div>`;
+    };
+    const idxProj = linhas.findIndex((l) => l.rot === 'Despesas em aberto');
+    document.getElementById('waterfall').innerHTML = `
+      <div style="display:grid;${COLS}gap:14px;padding:0 0 10px;border-bottom:1px solid #F1F0F7;font-size:11.5px;font-weight:600;color:#9C99B8;letter-spacing:.06em;text-transform:uppercase;">
+        <div>Item</div><div style="text-align:right;">% do recebido</div><div style="text-align:right;">Valor</div>
+      </div>
+      ${linhas.slice(0, idxProj).map(linhaHtml).join('')}
+      <div style="margin-top:8px;padding-top:14px;border-top:1px dashed #E3E1EE;font-size:11.5px;font-weight:600;color:#9C99B8;letter-spacing:.06em;text-transform:uppercase;">Projeção · se todas as contas em aberto forem pagas</div>
+      ${linhas.slice(idxProj).map(linhaHtml).join('')}`;
+
+    const badge = document.getElementById('resultado-badge');
+    if (d.repasseClinica === 0 && d.despesasPagas === 0) { badge.innerHTML = ''; return; }
+    const ok = d.resultado >= 0;
+    badge.innerHTML = `<span class="bi-chip" style="font-size:13px;padding:6px 12px;${ok ? 'background:#E8F6EE;color:#1D8A4A;' : 'background:#FDECEC;color:#C0392B;'}">${ok ? 'Sobrou' : 'Faltou'} ${fmtBRL(Math.abs(d.resultado))} no período</span>`;
+  }
+
+  /* ---------- KPIs ---------- */
+  function kpiCard({ titulo, icone, cor, dica, valor, sub, valorCor = '#111827' }) {
+    return `
+      <div class="bi-card" style="padding:14px 16px;">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">
+          <span class="bi-kpi-title">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="${cor}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${icone}</svg>
+            ${titulo}
+          </span>
+          <span class="bi-info" tabindex="0">?<span class="bi-info-tip">${dica}</span></span>
+        </div>
+        <div style="font-size:23px;font-weight:600;color:${valorCor};line-height:1;">${valor}</div>
+        <div style="font-size:13px;color:#6B7280;margin-top:5px;">${sub}</div>
+      </div>`;
+  }
+
+  const IC = {
+    money: '<circle cx="12" cy="12" r="9"/><path d="M12 7v10M9.5 9.5c0-1.4 1.2-2.2 2.5-2.2s2.5.8 2.5 2c0 2.4-5 1.6-5 4 0 1.2 1.2 2.2 2.5 2.2s2.5-.8 2.5-2.2"/>',
+    wallet: '<path d="M20 12V8H6a2 2 0 0 1-2-2c0-1.1.9-2 2-2h12v4"/><path d="M4 6v12c0 1.1.9 2 2 2h14v-4"/><path d="M18 12a2 2 0 0 0 0 4h4v-4Z"/>',
+    receipt: '<path d="M6 2h12v20l-3-2-3 2-3-2-3 2z"/><path d="M9 7h6M9 11h6"/>',
+    trend: '<path d="M4 19V9M4 9l4-5 4 5M12 19v-6M12 13l4-3 4 3M20 19v-3"/>',
+    alert: '<path d="M12 9v4M12 17h.01"/><path d="M10.3 3.9L2.4 18a1.7 1.7 0 0 0 1.5 2.5h16.2a1.7 1.7 0 0 0 1.5-2.5L13.7 3.9a1.7 1.7 0 0 0-3 0z"/>',
+    clock: '<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>',
+  };
+
+  function renderKpis(d) {
+    document.getElementById('kpis').innerHTML = [
+      kpiCard({ titulo: 'Recebido no período', icone: IC.money, cor: '#1a96ac', valor: fmtBRL(d.recebido),
+        dica: 'Soma dos pagamentos recebidos (não estornados), vinculados a um agendamento, no período.',
+        sub: `Líquido dos profissionais ${fmtBRL(d.liquidoProf)}` }),
+      kpiCard({ titulo: 'Repasse à Clínica', icone: IC.wallet, cor: '#1a96ac', valor: fmtBRL(d.repasseClinica),
+        dica: 'Receita da clínica: recebido × percentual cadastrado de cada profissional. É a base para o resultado líquido.',
+        sub: deltaLine(d.repasseDeltaPct) }),
+      kpiCard({ titulo: 'Despesas pagas', icone: IC.receipt, cor: '#6D5DF6', valor: fmtBRL(d.despesasPagas),
+        dica: 'Despesas com data de pagamento dentro do período. Uma redução é mostrada em verde.',
+        sub: deltaLine(d.despesasPagasDeltaPct, { invert: true }) }),
+      kpiCard({ titulo: 'Resultado líquido', icone: IC.trend, cor: d.resultado >= 0 ? C.ok : C.ruim,
+        valor: fmtBRL(d.resultado), valorCor: d.resultado >= 0 ? C.ok : C.ruim,
+        dica: 'Repasse à Clínica − despesas pagas no período. Mostra o que realmente sobrou para a clínica.',
+        sub: deltaLine(d.resultadoDeltaPct) }),
+      kpiCard({ titulo: 'Despesas em aberto', icone: IC.clock, cor: '#6D5DF6', valor: fmtBRL(d.abertas),
+        dica: 'Contas ainda não pagas com vencimento no período (nos filtros Este mês, Trimestre e Ano, inclui o que vence até o fim do mês/ano).',
+        sub: `${d.abertasQtd} conta(s) · A vencer ${fmtBRL(d.aVencer)}` }),
+      kpiCard({ titulo: 'Vencidas', icone: IC.alert, cor: C.ruim, valor: fmtBRL(d.vencidas), valorCor: d.vencidas > 0 ? C.ruim : '#111827',
+        dica: 'Contas em aberto cujo vencimento já passou.',
+        sub: d.vencidasQtd ? `${d.vencidasQtd} conta(s) atrasada(s)` : 'Nenhuma conta atrasada' }),
+      kpiCard({ titulo: 'Comprometimento do repasse', icone: IC.trend, cor: '#1a96ac',
+        valor: d.comprometimentoPct == null ? '—' : fmtPct(d.comprometimentoPct),
+        valorCor: d.comprometimentoPct != null && d.comprometimentoPct > 100 ? C.ruim : '#111827',
+        dica: 'Despesas pagas ÷ Repasse à Clínica. Acima de 100% significa que as despesas superaram a receita da clínica no período.',
+        sub: d.comprometimentoPct == null ? 'Sem repasse no período' : (d.comprometimentoPct > 100 ? 'Despesas maiores que a receita da clínica' : 'do repasse foi gasto com despesas') }),
+      kpiCard({ titulo: 'Total lançado', icone: IC.receipt, cor: '#6D5DF6', valor: fmtBRL(d.lancado),
+        dica: 'Todas as despesas com vencimento no período (pagas e em aberto).',
+        sub: `${d.lancadoQtd} lançamento(s)` }),
+      kpiCard({ titulo: 'Margem líquida', icone: IC.trend, cor: d.resultado >= 0 ? C.ok : C.ruim,
+        valor: d.margemPct == null ? '—' : fmtPct(d.margemPct), valorCor: d.margemPct != null && d.margemPct < 0 ? C.ruim : '#111827',
+        dica: 'Resultado líquido ÷ Repasse à Clínica.',
+        sub: `Projetada: ${d.repasseClinica ? fmtPct(Math.round((d.resultadoProjetado / d.repasseClinica) * 1000) / 10) : '—'}` }),
+    ].join('');
+  }
+
+  /* ---------- Listas simples ---------- */
+  function barList(items, { total, valFn, labelFn, corFn, subFn }) {
+    if (!items.length) return '<div style="font-size:14px;color:#9CA3AF;padding:8px 0;">Sem despesas no período.</div>';
+    const max = Math.max(...items.map(valFn), 1);
+    return items.map((it) => {
+      const v = valFn(it);
+      const pct = Math.max(2, Math.round((v / max) * 100));
+      const share = total ? Math.round((v / total) * 1000) / 10 : 0;
+      return `
+        <div style="padding:9px 0;border-bottom:1px solid #F1F0F7;">
+          <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;">
+            <div style="display:flex;align-items:center;gap:8px;min-width:0;">
+              <span style="width:10px;height:10px;border-radius:3px;background:${corFn(it)};flex-shrink:0;"></span>
+              <span style="font-size:14px;font-weight:500;color:#111827;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${esc(labelFn(it))}</span>
+            </div>
+            <div style="text-align:right;white-space:nowrap;">
+              <span style="font-size:14px;font-weight:600;color:#111827;">${fmtBRL(v)}</span>
+              <span style="font-size:12.5px;color:#9CA3AF;margin-left:6px;">${fmtPct(share)}</span>
+            </div>
+          </div>
+          <div style="height:7px;background:#F5F4FA;border-radius:999px;margin-top:7px;overflow:hidden;">
+            <div style="height:100%;width:${pct}%;background:${corFn(it)};border-radius:999px;"></div>
+          </div>
+          <div style="font-size:12.5px;color:#9CA3AF;margin-top:5px;">${subFn(it)}</div>
+        </div>`;
+    }).join('');
+  }
+
+  function renderCategorias(data) {
+    const cats = data.categorias || [];
+    const total = cats.reduce((s, c) => s + c.total, 0);
+    document.getElementById('lista-categorias').innerHTML = barList(cats, {
+      total,
+      valFn: (c) => c.total,
+      labelFn: (c) => c.nome,
+      corFn: (c) => c.cor || C.recebido,
+      subFn: (c) => {
+        const partes = [`Pago ${fmtBRL(c.pago)}`];
+        if (c.aberto > 0) partes.push(`Em aberto ${fmtBRL(c.aberto)}`);
+        const delta = c.deltaPct == null ? '' : ` · <span style="color:${c.deltaPct <= 0 ? C.ok : C.ruim};font-weight:500;">${c.deltaPct >= 0 ? '▲' : '▼'} ${Math.abs(c.deltaPct).toString().replace('.', ',')}%</span> vs anterior`;
+        return partes.join(' · ') + delta;
+      },
+    });
+
+    const formas = data.formasPagamento || [];
+    const totalF = formas.reduce((s, f) => s + f.total, 0);
+    document.getElementById('lista-formas').innerHTML = barList(formas, {
+      total: totalF,
+      valFn: (f) => f.total,
+      labelFn: (f) => f.nome,
+      corFn: () => C.recebido,
+      subFn: (f) => `Pago ${fmtBRL(f.pago)}${f.aberto > 0 ? ` · Em aberto ${fmtBRL(f.aberto)}` : ''}`,
+    });
+  }
+
+  function renderTipos(d) {
+    const itens = [
+      { nome: 'Fixas', val: d.fixas, cor: C.recebido, dica: 'Recorrentes mensais (aluguel, contas, assinaturas…)' },
+      { nome: 'Parceladas', val: d.parceladas, cor: C.repasse, dica: 'Compras divididas em parcelas' },
+      { nome: 'Avulsas', val: d.avulsas, cor: C.despesa, dica: 'Lançamentos únicos' },
+    ];
+    const total = itens.reduce((s, i) => s + i.val, 0);
+    if (!total) { document.getElementById('perfil-tipos').innerHTML = '<div style="font-size:14px;color:#9CA3AF;">Sem despesas no período.</div>'; return; }
+    const faixa = itens.filter((i) => i.val > 0).map((i) => `<div title="${i.nome}: ${fmtBRL(i.val)}" style="width:${(i.val / total) * 100}%;background:${i.cor};height:100%;"></div>`).join('');
+    document.getElementById('perfil-tipos').innerHTML = `
+      <div style="display:flex;height:14px;border-radius:999px;overflow:hidden;background:#F5F4FA;margin-bottom:14px;">${faixa}</div>
+      ${itens.map((i) => `
+        <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;padding:6px 0;">
+          <div style="display:flex;align-items:center;gap:8px;min-width:0;">
+            <span style="width:10px;height:10px;border-radius:3px;background:${i.cor};flex-shrink:0;"></span>
+            <div><div style="font-size:14px;font-weight:500;color:#111827;">${i.nome}</div><div style="font-size:12px;color:#9CA3AF;">${i.dica}</div></div>
+          </div>
+          <div style="text-align:right;white-space:nowrap;"><span style="font-size:14px;font-weight:600;color:#111827;">${fmtBRL(i.val)}</span><span style="font-size:12.5px;color:#9CA3AF;margin-left:6px;">${fmtPct(Math.round((i.val / total) * 1000) / 10)}</span></div>
+        </div>`).join('')}`;
+  }
+
+  /* ---------- Lançamentos ---------- */
+  const TIPO_LABEL = { FIXA: 'Fixa', REPETIR: 'Parcelada', UNICA: 'Avulsa' };
+  const STATUS_LABEL = { pago: 'Pago', vencida: 'Vencida', aVencer: 'A vencer' };
+  let lancamentos = [];
+  let lancTotal = 0;
+  let lancFiltro = 'todos';
+  let lancPag = 0;
+  const LANC_PAGE = 10;
+
+  function tipoTxt(l) {
+    const base = TIPO_LABEL[l.recorrencia] || 'Avulsa';
+    if (l.recorrencia === 'REPETIR' && l.parcela) return `${base} ${l.parcela}/${l.totalParcelas || '?'}`;
+    return base;
+  }
+
+  function linhaConta(l) {
+    return `
+      <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;padding:9px 0;border-bottom:1px solid #F1F0F7;">
+        <div style="min-width:0;">
+          <div style="font-size:14px;font-weight:500;color:#111827;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${esc(l.descricao)}</div>
+          <div style="font-size:12.5px;color:#9CA3AF;margin-top:2px;">${esc(l.categoria || 'Sem categoria')} · vence ${fmtData(l.vencimento)}</div>
+        </div>
+        <div style="text-align:right;white-space:nowrap;">
+          <div style="font-size:14px;font-weight:600;color:#111827;">${fmtBRL2(l.valor)}</div>
+          <span class="bi-chip bi-chip-${l.status}" style="margin-top:3px;display:inline-block;">${STATUS_LABEL[l.status]}</span>
+        </div>
+      </div>`;
+  }
+
+  function renderListasLancamentos() {
+    const abertas = lancamentos.filter((l) => l.status !== 'pago')
+      .sort((a, b) => (a.status === b.status ? a.vencimento.localeCompare(b.vencimento) : (a.status === 'vencida' ? -1 : 1)))
+      .slice(0, 6);
+    document.getElementById('lista-abertas').innerHTML = abertas.length
+      ? abertas.map(linhaConta).join('')
+      : '<div style="font-size:14px;color:#9CA3AF;padding:8px 0;">Nenhuma conta em aberto no período.</div>';
+
+    const maiores = [...lancamentos].sort((a, b) => b.valor - a.valor).slice(0, 5);
+    document.getElementById('lista-maiores').innerHTML = maiores.length
+      ? maiores.map(linhaConta).join('')
+      : '<div style="font-size:14px;color:#9CA3AF;padding:8px 0;">Sem despesas no período.</div>';
+  }
+
+  function renderLancFiltros() {
+    const opts = [['todos', 'Todas'], ['pago', 'Pagas'], ['aVencer', 'A vencer'], ['vencida', 'Vencidas']];
+    document.getElementById('lanc-filtros').innerHTML = opts.map(([v, t]) => `
+      <button type="button" data-f="${v}" style="font-size:12px;font-weight:500;padding:5px 11px;border-radius:999px;border:1px solid #EFEDF9;cursor:pointer;background:${lancFiltro === v ? '#6D5DF6' : '#fff'};color:${lancFiltro === v ? '#fff' : '#6B7280'};">${t}</button>`).join('');
+    document.querySelectorAll('#lanc-filtros button').forEach((b) => b.addEventListener('click', () => { lancFiltro = b.dataset.f; lancPag = 0; renderLancFiltros(); renderTabela(); }));
+  }
+
+  function renderTabela() {
+    const filtradas = lancFiltro === 'todos' ? lancamentos : lancamentos.filter((l) => l.status === lancFiltro);
+    const paginas = Math.max(1, Math.ceil(filtradas.length / LANC_PAGE));
+    if (lancPag >= paginas) lancPag = paginas - 1;
+    const fatia = filtradas.slice(lancPag * LANC_PAGE, (lancPag + 1) * LANC_PAGE);
+    document.getElementById('lanc-body').innerHTML = fatia.length ? fatia.map((l) => `
+      <tr>
+        <td style="white-space:nowrap;">${fmtData(l.vencimento)}</td>
+        <td style="font-weight:500;">${esc(l.descricao)}${l.pagamento ? `<div style="font-size:12px;font-weight:500;color:#9CA3AF;">pago em ${fmtData(l.pagamento)}</div>` : ''}</td>
+        <td><span style="display:inline-flex;align-items:center;gap:6px;"><span style="width:9px;height:9px;border-radius:3px;background:${esc(l.cor || C.neutro)};"></span>${esc(l.categoria || '—')}</span></td>
+        <td><span class="bi-tipo">${tipoTxt(l)}</span></td>
+        <td>${esc(l.forma || '—')}</td>
+        <td class="num">${fmtBRL2(l.valor)}</td>
+        <td><span class="bi-chip bi-chip-${l.status}">${STATUS_LABEL[l.status]}</span></td>
+      </tr>`).join('') : '<tr><td colspan="7" style="color:#9CA3AF;">Nenhum lançamento neste filtro.</td></tr>';
+    const soma = filtradas.reduce((s, l) => s + l.valor, 0);
+    document.getElementById('lanc-info').textContent = filtradas.length
+      ? `${lancPag * LANC_PAGE + 1}–${lancPag * LANC_PAGE + fatia.length} de ${filtradas.length} · total ${fmtBRL2(soma)}`
+      : '';
+    document.getElementById('lanc-prev').disabled = lancPag === 0;
+    document.getElementById('lanc-next').disabled = lancPag >= paginas - 1;
+    document.getElementById('lanc-sub').textContent = lancTotal > lancamentos.length
+      ? `Exibindo as ${lancamentos.length} primeiras de ${lancTotal} despesas do período`
+      : 'Todas as despesas do período';
+  }
+
+  /* ---------- Evolução anual (SVG próprio: aceita resultado negativo) ---------- */
+  let evoData = null;
+
+  function renderEvolucao() {
+    if (!evoData) return;
+    const wrap = document.getElementById('evo-chart');
+    const meses = evoData.meses;
+    const W = Math.max(wrap.clientWidth, 320);
+    const H = 260, padL = 56, padR = 12, padT = 12, padB = 26;
+    const innerW = W - padL - padR, innerH = H - padT - padB;
+
+    const tops = meses.map((m) => Math.max(m.repasse, m.pagas + m.abertas, 0));
+    const bots = meses.map((m) => Math.min(m.resultado, 0));
+    let yMax = Math.max(...tops, 1);
+    let yMin = Math.min(...bots, 0);
+    const step = niceStep((yMax - yMin) / 4);
+    yMax = Math.ceil(yMax / step) * step;
+    yMin = Math.floor(yMin / step) * step;
+    const y = (v) => padT + innerH - ((v - yMin) / (yMax - yMin)) * innerH;
+    const colW = innerW / meses.length;
+    const barW = Math.min(18, colW * 0.28);
+
+    let g = '';
+    for (let v = yMin; v <= yMax + 1e-6; v += step) {
+      g += `<line x1="${padL}" x2="${W - padR}" y1="${y(v)}" y2="${y(v)}" stroke="${v === 0 ? '#D9D6EA' : '#F1F0F7'}" stroke-width="1"/>`;
+      g += `<text x="${padL - 8}" y="${y(v) + 4}" text-anchor="end" font-size="11" fill="#9CA3AF">${fmtK(v)}</text>`;
+    }
+
+    let bars = '', pts = [];
+    meses.forEach((m, i) => {
+      const cx = padL + colW * i + colW / 2;
+      const atual = m.mes === evoData.mesAtual;
+      if (atual) bars += `<rect x="${cx - colW / 2 + 2}" y="${padT}" width="${colW - 4}" height="${innerH}" rx="8" fill="#F8F7FD"/>`;
+      if (m.repasse > 0) bars += `<rect x="${cx - barW - 1.5}" y="${y(m.repasse)}" width="${barW}" height="${Math.max(0, y(0) - y(m.repasse))}" rx="3" fill="${C.repasse}"/>`;
+      if (m.pagas > 0) bars += `<rect x="${cx + 1.5}" y="${y(m.pagas)}" width="${barW}" height="${Math.max(0, y(0) - y(m.pagas))}" rx="3" fill="${C.despesa}"/>`;
+      if (m.abertas > 0) bars += `<rect x="${cx + 1.5}" y="${y(m.pagas + m.abertas)}" width="${barW}" height="${Math.max(0, y(m.pagas) - y(m.pagas + m.abertas))}" rx="3" fill="${C.aberta}"/>`;
+      if (m.repasse > 0 || m.pagas > 0) pts.push([cx, y(m.resultado), m]);
+      bars += `<text x="${cx}" y="${H - 8}" text-anchor="middle" font-size="11.5" font-weight="${atual ? 600 : 500}" fill="${atual ? '#4F3DD1' : '#9CA3AF'}">${MONTH_ABBR[m.mes - 1]}</text>`;
+      bars += `<rect class="evo-hit" data-i="${i}" x="${cx - colW / 2}" y="${padT}" width="${colW}" height="${innerH + padB}" fill="transparent"/>`;
+    });
+
+    const linha = pts.length > 1
+      ? `<polyline points="${pts.map((p) => `${p[0]},${p[1]}`).join(' ')}" fill="none" stroke="${C.recebido}" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round"/>` : '';
+    const dots = pts.map((p) => `<circle cx="${p[0]}" cy="${p[1]}" r="3.6" fill="#fff" stroke="${p[2].resultado >= 0 ? C.ok : C.ruim}" stroke-width="2.2"/>`).join('');
+
+    wrap.innerHTML = `<svg width="${W}" height="${H}" viewBox="0 0 ${W} ${H}" style="display:block;">${g}${bars}${linha}${dots}</svg>`;
+
+    const tip = document.getElementById('evo-tip');
+    wrap.querySelectorAll('.evo-hit').forEach((el) => {
+      const show = (ev) => {
+        const m = meses[+el.dataset.i];
+        tip.innerHTML = `
+          <div style="font-weight:600;margin-bottom:4px;">${MONTH_ABBR[m.mes - 1]}/${evoData.ano}</div>
+          <div>Recebido: <b>${fmtBRL(m.recebido)}</b></div>
+          <div>Repasse à Clínica: <b>${fmtBRL(m.repasse)}</b></div>
+          <div>Despesas pagas: <b>${fmtBRL(m.pagas)}</b></div>
+          <div>Em aberto: <b>${fmtBRL(m.abertas)}</b></div>
+          <div style="margin-top:4px;padding-top:4px;border-top:1px solid rgba(255,255,255,.2);">Resultado: <b style="color:${m.resultado >= 0 ? '#7DE0A6' : '#FFA39B'};">${fmtBRL(m.resultado)}</b></div>`;
+        tip.style.display = 'block';
+        const x = (ev.touches ? ev.touches[0].clientX : ev.clientX);
+        const yy = (ev.touches ? ev.touches[0].clientY : ev.clientY);
+        tip.style.left = Math.min(x + 14, window.innerWidth - tip.offsetWidth - 10) + 'px';
+        tip.style.top = Math.min(yy + 14, window.innerHeight - tip.offsetHeight - 10) + 'px';
+      };
+      el.addEventListener('mousemove', show);
+      el.addEventListener('touchstart', show, { passive: true });
+      el.addEventListener('mouseleave', () => { tip.style.display = 'none'; });
+    });
+    document.addEventListener('touchstart', (ev) => { if (!ev.target.classList || !ev.target.classList.contains('evo-hit')) tip.style.display = 'none'; }, { passive: true, once: true });
+  }
+
+  function niceStep(raw) {
+    if (raw <= 0) return 1;
+    const p = Math.pow(10, Math.floor(Math.log10(raw)));
+    const n = raw / p;
+    return (n <= 1 ? 1 : n <= 2 ? 2 : n <= 5 ? 5 : 10) * p;
+  }
+
+  function legendItem(cor, nome, tipo = 'box') {
+    const marca = tipo === 'line'
+      ? `<span style="width:16px;height:0;border-top:2.5px solid ${cor};display:inline-block;"></span>`
+      : `<span style="width:11px;height:11px;border-radius:3px;background:${cor};display:inline-block;"></span>`;
+    return `<span style="display:inline-flex;align-items:center;gap:7px;font-size:14px;font-weight:600;color:#111827;">${marca}${nome}</span>`;
+  }
+
+  /* ---------- Carga dos dados ---------- */
+  function setLoading() {
+    document.getElementById('waterfall').innerHTML = [0, 1, 2, 3, 4].map(() => '<div class="bi-skeleton" style="width:100%;height:28px;margin:6px 0;"></div>').join('');
+    document.getElementById('kpis').innerHTML = Array.from({ length: 9 }).map(() => `
+      <div class="bi-card" style="padding:14px 16px;">
+        <div class="bi-skeleton" style="width:120px;height:13px;margin-bottom:12px;"></div>
+        <div class="bi-skeleton" style="width:80px;height:22px;margin-bottom:8px;"></div>
+        <div class="bi-skeleton" style="width:140px;height:13px;"></div>
+      </div>`).join('');
+    ['lista-categorias', 'lista-formas', 'perfil-tipos', 'lista-abertas', 'lista-maiores'].forEach((id) => {
+      document.getElementById(id).innerHTML = '<div class="bi-skeleton" style="width:100%;height:60px;"></div>';
+    });
+    document.getElementById('lanc-body').innerHTML = '<tr><td colspan="7"><div class="bi-skeleton" style="width:100%;height:60px;"></div></td></tr>';
+  }
+
+  function erro(id, rpc, error) {
+    console.error(rpc + ':', error);
+    document.getElementById(id).innerHTML = '<div style="font-size:14px;color:#9CA3AF;padding:8px 0;">Erro ao carregar dados.</div>';
+  }
+
+  async function loadResumo() {
+    const { data, error } = await BIAuth.client.rpc('bi_despesas_resumo', rpcParams());
+    if (error) { erro('waterfall', 'bi_despesas_resumo', error); erro('kpis', 'bi_despesas_resumo', error); erro('perfil-tipos', 'bi_despesas_resumo', error); return; }
+    renderWaterfall(data);
+    renderKpis(data);
+    renderTipos(data);
+  }
+
+  async function loadCategorias() {
+    const { data, error } = await BIAuth.client.rpc('bi_despesas_por_categoria', rpcParams());
+    if (error) { erro('lista-categorias', 'bi_despesas_por_categoria', error); erro('lista-formas', 'bi_despesas_por_categoria', error); return; }
+    renderCategorias(data);
+  }
+
+  async function loadLancamentos() {
+    const { data, error } = await BIAuth.client.rpc('bi_despesas_lancamentos', rpcParams());
+    if (error) {
+      erro('lista-abertas', 'bi_despesas_lancamentos', error); erro('lista-maiores', 'bi_despesas_lancamentos', error);
+      document.getElementById('lanc-body').innerHTML = '<tr><td colspan="7" style="color:#9CA3AF;">Erro ao carregar dados.</td></tr>';
+      return;
+    }
+    lancamentos = data.itens || [];
+    lancTotal = data.total || 0;
+    lancPag = 0;
+    renderListasLancamentos();
+    renderLancFiltros();
+    renderTabela();
+  }
+
+  async function loadEvolucao() {
+    document.getElementById('evo-skeleton').style.display = 'block';
+    document.getElementById('evo-chart').style.display = 'none';
+    const { data, error } = await BIAuth.client.rpc('bi_despesas_evolucao', { p_id_emp: idEmp });
+    document.getElementById('evo-skeleton').style.display = 'none';
+    document.getElementById('evo-chart').style.display = '';
+    if (error) { erro('evo-chart', 'bi_despesas_evolucao', error); return; }
+    evoData = data;
+    document.getElementById('evo-sub').textContent = `Jan – Dez / ${data.ano}`;
+    document.getElementById('evo-legend').innerHTML = [
+      legendItem(C.repasse, 'Repasse à Clínica'),
+      legendItem(C.despesa, 'Despesas pagas'),
+      legendItem(C.aberta, 'Despesas em aberto'),
+      legendItem(C.recebido, 'Resultado líquido', 'line'),
+    ].join('');
+    renderEvolucao();
+  }
+
+  async function refreshData({ manual = false } = {}) {
+    const btn = document.getElementById('btn-atualizar');
+    const icon = document.getElementById('btn-atualizar-icon');
+    if (manual) { btn.disabled = true; icon.classList.add('bi-spin'); }
+    setLoading();
+    await Promise.all([loadResumo(), loadCategorias(), loadLancamentos(), loadEvolucao()]);
+    const now = new Date();
+    document.getElementById('bi-ultima-atualizacao').textContent = `Atualizado às ${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
+    if (manual) { btn.disabled = false; icon.classList.remove('bi-spin'); }
+  }
+
+  /* ---------- Filtro de período ---------- */
+  function applyPeriodoLabel() {
+    const label = document.getElementById('filtro-periodo-label');
+    if (periodo === 'custom' && customIni && customFim) {
+      label.textContent = customIni === customFim ? fmtData(customIni) : `${fmtData(customIni)} → ${fmtData(customFim)}`;
+    } else {
+      const p = PERIOD_PRESETS.find((x) => x.value === periodo);
+      label.textContent = p ? p.label : 'Este mês';
+    }
+  }
+
+  function presetRange(value) {
+    const hoje = new Date(); hoje.setHours(0, 0, 0, 0);
+    const add = (d, n) => { const r = new Date(d); r.setDate(r.getDate() + n); return r; };
+    switch (value) {
+      case 'hoje': return [hoje, hoje];
+      case 'ontem': return [add(hoje, -1), add(hoje, -1)];
+      case '7dias': return [add(hoje, -6), hoje];
+      case '30dias': return [add(hoje, -29), hoje];
+      case 'mes': return [new Date(hoje.getFullYear(), hoje.getMonth(), 1), hoje];
+      case 'mes_passado': return [new Date(hoje.getFullYear(), hoje.getMonth() - 1, 1), new Date(hoje.getFullYear(), hoje.getMonth(), 0)];
+      case 'trimestre': return [new Date(hoje.getFullYear(), hoje.getMonth() - 2, 1), hoje];
+      case 'ano': return [new Date(hoje.getFullYear(), 0, 1), hoje];
+      default: return [hoje, hoje];
+    }
+  }
+
+  function renderPeriodoOpcoes() {
+    const rows = PERIOD_PRESETS.map((p) => {
+      const [ini, fim] = presetRange(p.value);
+      const txt = isoLocal(ini) === isoLocal(fim) ? fmtData(isoLocal(ini)) : `${fmtData(isoLocal(ini))} → ${fmtData(isoLocal(fim))}`;
+      const on = periodo === p.value;
+      return `<div class="bi-period-opt${on ? ' active' : ''}" data-value="${p.value}">
+        <div class="bi-period-opt-text"><div class="bi-period-opt-title">${p.label}</div><div class="bi-period-opt-sub">${txt}</div></div>
+        ${on ? '<span class="bi-period-opt-check">✓</span>' : ''}
+      </div>`;
+    }).join('');
+    const on = periodo === 'custom';
+    const sub = on && customIni ? `${fmtData(customIni)} → ${fmtData(customFim)}` : 'Escolha um intervalo';
+    const custom = `<div class="bi-period-opt${on ? ' active' : ''}" id="periodo-opt-custom">
+      <div class="bi-period-opt-text"><div class="bi-period-opt-title">Personalizado...</div><div class="bi-period-opt-sub">${sub}</div></div>
+      ${on ? '<span class="bi-period-opt-check">✓</span>' : '<span style="color:#C4C1D6;font-size:15.5px;">›</span>'}
+    </div>`;
+    const box = document.getElementById('periodo-opcoes');
+    box.innerHTML = rows + custom;
+    box.querySelectorAll('.bi-period-opt[data-value]').forEach((el) => el.addEventListener('click', () => {
+      periodo = el.dataset.value; customIni = customFim = null;
+      applyPeriodoLabel(); closePanel(); lancFiltro = 'todos'; refreshData();
+    }));
+    document.getElementById('periodo-opt-custom').addEventListener('click', () => {
+      document.getElementById('periodo-view-main').style.display = 'none';
+      document.getElementById('periodo-view-custom').style.display = 'block';
+      document.getElementById('custom-ini').value = customIni || '';
+      document.getElementById('custom-fim').value = customFim || '';
+      document.getElementById('custom-erro').style.display = 'none';
+    });
+  }
+
+  function openPanel() {
+    document.getElementById('periodo-view-custom').style.display = 'none';
+    document.getElementById('periodo-view-main').style.display = 'block';
+    renderPeriodoOpcoes();
+    document.getElementById('periodo-panel').classList.add('open');
+  }
+  function closePanel() { document.getElementById('periodo-panel').classList.remove('open'); }
+
+  function setupPeriodo() {
+    applyPeriodoLabel();
+    document.getElementById('filtro-periodo-btn').addEventListener('click', (ev) => {
+      ev.stopPropagation();
+      document.getElementById('periodo-panel').classList.contains('open') ? closePanel() : openPanel();
+    });
+    document.getElementById('periodo-panel').addEventListener('click', (ev) => ev.stopPropagation());
+    document.addEventListener('click', closePanel);
+    document.getElementById('periodo-custom-voltar').addEventListener('click', openPanel);
+    document.getElementById('periodo-custom-cancelar').addEventListener('click', closePanel);
+    document.getElementById('periodo-custom-aplicar').addEventListener('click', () => {
+      const ini = document.getElementById('custom-ini').value;
+      const fim = document.getElementById('custom-fim').value;
+      if (!ini || !fim || fim < ini) { document.getElementById('custom-erro').style.display = 'block'; return; }
+      periodo = 'custom'; customIni = ini; customFim = fim;
+      applyPeriodoLabel(); closePanel(); lancFiltro = 'todos'; refreshData();
+    });
+  }
+
+  (async () => {
+    const user = await BIAuth.getCurrentUser();
+    if (!user) return;
+    idEmp = user.idEmp;
+
+    BIMenu.renderBISidebar('#bi-sidebar', { active: 'despesas', empresaNome: user.empresaNome });
+    BIMenu.renderBIHeader('#bi-header', {
+      title: 'Despesas',
+      subtitle: `Despesas e resultado líquido — ${user.empresaNome}`,
+      userName: user.userName,
+      userRole: user.userRole,
+      avatarLetter: user.avatarLetter,
+    });
+
+    if (!idEmp) {
+      console.error('Vitta BI: não foi possível identificar a empresa ativa do usuário.');
+      return;
+    }
+
+    setupPeriodo();
+    document.getElementById('btn-atualizar').addEventListener('click', () => refreshData({ manual: true }));
+    document.getElementById('lanc-prev').addEventListener('click', () => { lancPag = Math.max(0, lancPag - 1); renderTabela(); });
+    document.getElementById('lanc-next').addEventListener('click', () => { lancPag += 1; renderTabela(); });
+    let rz;
+    window.addEventListener('resize', () => { clearTimeout(rz); rz = setTimeout(renderEvolucao, 150); });
+
+    refreshData();
+  })();
+</script>
+</body>
+</html>

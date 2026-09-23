@@ -11,16 +11,16 @@
       theme: {
         extend: {
           colors: { vitta: { 50:'#f0fbfd',100:'#e0f7fa',300:'#80deea',400:'#4dd9ed',500:'#2ABCD4',600:'#1a96ac',700:'#127a8c' } },
-          fontFamily: { sans: ['Inter','system-ui','sans-serif'] }
+          fontFamily: { sans: ['Montserrat','system-ui','sans-serif'] }
         }
       }
     }
   </script>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
-  <script src="../assets/js/config.js?v=2"></script>
+  <script src="../assets/js/config.js?v=3"></script>
   <script src="../assets/js/toast.js?v=1"></script>
   <script src="../assets/js/access-guard.js?v=2"></script>
   <script src="../assets/js/admin-empresa-context.js?v=1"></script>
@@ -65,7 +65,7 @@
       <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>Consultas
     </a>
 
-    <p class="block text-[0.6rem] font-bold text-gray-500 uppercase tracking-widest px-4 pb-1 pt-4">Cadastros</p>
+    <div class="pt-1"></div>
     <button onclick="toggleMenu('cadastros')" class="w-full flex items-center gap-3 px-3 py-2.5 mx-2 rounded-xl text-[0.83rem] font-medium text-gray-400 hover:bg-white/10 hover:text-white transition-colors duration-150 mb-0.5" style="width:calc(100% - 16px)">
       <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>Cadastros
       <svg id="chev-cadastros" class="chevron w-3.5 h-3.5 ml-auto text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
@@ -75,10 +75,10 @@
       <a href="profissionais.html" class="flex items-center gap-2 pl-10 pr-3 py-2 mx-2 rounded-xl text-[0.8rem] text-gray-500 hover:bg-white/5 hover:text-gray-300 transition-colors cursor-pointer">Profissionais</a>
       <a href="usuarios-empresa.html" class="flex items-center gap-2 pl-10 pr-3 py-2 mx-2 rounded-xl text-[0.8rem] text-gray-500 hover:bg-white/5 hover:text-gray-300 transition-colors cursor-pointer">Usu&aacute;rios</a>
       <div class="hidden" id="menuDocumentosWrap"><a href="documentos.html" class="flex items-center gap-2 pl-10 pr-3 py-2 mx-2 rounded-xl text-[0.8rem] text-gray-500 hover:bg-white/5 hover:text-gray-300 transition-colors cursor-pointer w-full">Documentos</a></div>
-      <a href="leads.html" class="flex items-center gap-2 pl-10 pr-3 py-2 mx-2 rounded-xl text-[0.8rem] text-gray-500 hover:bg-white/5 hover:text-gray-300 transition-colors cursor-pointer">Leads</a>
+      <a href="leads.html" id="menuLeads" class="flex items-center gap-2 pl-10 pr-3 py-2 mx-2 rounded-xl text-[0.8rem] text-gray-500 hover:bg-white/5 hover:text-gray-300 transition-colors cursor-pointer">Leads</a>
     </div>
 
-    <p class="block text-[0.6rem] font-bold text-gray-500 uppercase tracking-widest px-4 pb-1 pt-4">Outros Cadastros</p>
+    <div class="pt-1"></div>
     <button onclick="toggleMenu('servicos')" class="w-full flex items-center gap-3 px-3 py-2.5 mx-2 rounded-xl text-[0.83rem] font-medium text-gray-400 hover:bg-white/10 hover:text-white transition-colors duration-150 cursor-pointer mb-0.5" style="width:calc(100% - 16px)">
       <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>Outros Cadastros
       <svg id="chev-servicos" class="chevron w-3.5 h-3.5 ml-auto text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
@@ -92,7 +92,7 @@
       <a href="tiposacompanhamento.html" class="flex items-center gap-2 pl-10 pr-3 py-2 mx-2 rounded-xl text-[0.8rem] text-gray-500 hover:bg-white/5 hover:text-gray-300 transition-colors cursor-pointer">Tipos de Acomp.</a>
     </div>
 
-    <p class="block text-[0.6rem] font-bold text-gray-500 uppercase tracking-widest px-4 pb-1 pt-4">Financeiro</p>
+    <div class="pt-1"></div>
     <button onclick="toggleMenu('financeiro')" class="w-full flex items-center gap-3 px-3 py-2.5 mx-2 rounded-xl text-[0.83rem] font-semibold text-vitta-400 bg-vitta-500/10 transition-colors duration-150 cursor-pointer mb-0.5" style="width:calc(100% - 16px)">
       <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>Financeiro
       <svg id="chev-financeiro" class="chevron open w-3.5 h-3.5 ml-auto text-vitta-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
@@ -102,9 +102,21 @@
       <a href="relatorios.html" class="flex items-center gap-2 pl-10 pr-3 py-2 mx-2 rounded-xl text-[0.8rem] text-gray-500 hover:bg-white/5 hover:text-gray-300 transition-colors cursor-pointer">Relat&oacute;rios</a>
     </div>
 
+        <div id="sectionDespesas">
+<div class="pt-1"></div>
+    <button onclick="toggleMenu('despesas')" class="w-full flex items-center gap-3 px-3 py-2.5 mx-2 rounded-xl text-[0.83rem] font-medium text-gray-400 hover:bg-white/10 hover:text-white transition-colors duration-150 cursor-pointer mb-0.5" style="width:calc(100% - 16px)">
+      <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M4 2v20l2-1 2 1 2-1 2 1 2-1 2 1 2-1 2 1V2l-2 1-2-1-2 1-2-1-2 1-2-1-2 1z"/><path d="M16 8h-6a2 2 0 1 0 0 4h4a2 2 0 1 1 0 4H8"/><path d="M12 17.5v-11"/></svg>Despesas
+      <svg id="chev-despesas" class="chevron w-3.5 h-3.5 ml-auto text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+    </button>
+    <div id="sub-despesas" class="submenu">
+      <a href="despesas.html" class="flex items-center gap-2 pl-10 pr-3 py-2 mx-2 rounded-xl text-[0.8rem] text-gray-500 hover:bg-white/5 hover:text-gray-300 transition-colors cursor-pointer">Cadastro Despesa</a>
+      <a href="categorias-despesa.html" class="flex items-center gap-2 pl-10 pr-3 py-2 mx-2 rounded-xl text-[0.8rem] text-gray-500 hover:bg-white/5 hover:text-gray-300 transition-colors cursor-pointer">Categorias</a>
+    </div>
+    </div>
+
 
     <div id="sectionMinhaEmpresa" class="hidden">
-    <p class="block text-[0.6rem] font-bold text-gray-500 uppercase tracking-widest px-4 pb-1 pt-4">Minha Empresa</p>
+    <div class="pt-1"></div>
     <button onclick="toggleMenu('minhaempresa')" class="w-full flex items-center gap-3 px-3 py-2.5 mx-2 rounded-xl text-[0.83rem] font-medium text-gray-400 hover:bg-white/10 hover:text-white transition-colors duration-150 cursor-pointer mb-0.5" style="width:calc(100% - 16px)">
       <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>Minha Empresa
       <svg id="chev-minhaempresa" class="chevron w-3.5 h-3.5 ml-auto text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
@@ -115,7 +127,7 @@
     </div>
     </div>
     <div id="sectionVittaBI" class="hidden">
-    <p class="block text-[0.6rem] font-bold text-gray-500 uppercase tracking-widest px-4 pb-1 pt-4">Vitta BI</p>
+    <div class="pt-1"></div>
     <a id="linkVittaBI" href="https://bi.vittasistemas.com.br" target="_blank" rel="noopener"
        class="flex items-center gap-3 px-3 py-2.5 mx-2 rounded-xl text-[0.83rem] font-medium text-gray-400 hover:bg-white/10 hover:text-white transition-colors duration-150 cursor-pointer mb-0.5">
       <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
@@ -127,7 +139,7 @@
     </div>
 
     <div id="sectionAdmin" class="hidden">
-    <p class="block text-[0.6rem] font-bold text-gray-500 uppercase tracking-widest px-4 pb-1 pt-4">Sistema</p>
+    <div class="pt-1"></div>
     <button onclick="toggleMenu('admin')" class="w-full flex items-center gap-3 px-3 py-2.5 mx-2 rounded-xl text-[0.83rem] font-medium text-gray-400 hover:bg-white/10 hover:text-white transition-colors duration-150 mb-0.5" style="width:calc(100% - 16px)">
       <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14M4.93 4.93a10 10 0 0 0 0 14.14"/></svg>Administra&ccedil;&atilde;o
       <svg id="chev-admin" class="chevron w-3.5 h-3.5 ml-auto text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
@@ -296,75 +308,75 @@
         <p class="text-[0.8rem] font-semibold text-gray-500">Atualizando dados...</p>
       </div>
       <div id="kpiGrid" class="grid grid-cols-2 lg:grid-cols-4 gap-4 transition-opacity duration-300">
-        <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-4">
-          <div class="flex items-center gap-3 mb-3">
-            <div class="w-9 h-9 rounded-xl bg-emerald-100 flex items-center justify-center shrink-0">
-              <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-emerald-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>
+        <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-3">
+          <div class="flex items-center gap-2.5 mb-2">
+            <div class="w-8 h-8 rounded-xl bg-emerald-100 flex items-center justify-center shrink-0">
+              <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-emerald-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>
             </div>
             <p class="text-[0.72rem] font-bold text-gray-400 uppercase tracking-wider leading-tight">Recebido</p>
           </div>
-          <p id="kpi-recebido" class="text-[1.35rem] font-extrabold text-gray-800 leading-none">R$ 0,00</p>
-          <p class="text-[0.68rem] text-gray-400 mt-1">pago no per&iacute;odo</p>
+          <p id="kpi-recebido" class="text-[1.4375rem] font-semibold text-gray-800 leading-none">R$ 0,00</p>
+          <p class="text-[0.65rem] text-gray-400 mt-0.5">pago no per&iacute;odo</p>
         </div>
-        <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-4">
-          <div class="flex items-center gap-3 mb-3">
-            <div class="w-9 h-9 rounded-xl bg-rose-100 flex items-center justify-center shrink-0">
-              <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-rose-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><line x1="19" y1="5" x2="5" y2="19"/><circle cx="6.5" cy="6.5" r="2.5"/><circle cx="17.5" cy="17.5" r="2.5"/></svg>
+        <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-3">
+          <div class="flex items-center gap-2.5 mb-2">
+            <div class="w-8 h-8 rounded-xl bg-rose-100 flex items-center justify-center shrink-0">
+              <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-rose-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><line x1="19" y1="5" x2="5" y2="19"/><circle cx="6.5" cy="6.5" r="2.5"/><circle cx="17.5" cy="17.5" r="2.5"/></svg>
             </div>
             <p class="text-[0.72rem] font-bold text-gray-400 uppercase tracking-wider leading-tight">Repasse &agrave; Cl&iacute;nica</p>
           </div>
-          <p id="kpi-repasse" class="text-[1.35rem] font-extrabold text-gray-800 leading-none">R$ 0,00</p>
-          <p class="text-[0.68rem] text-gray-400 mt-1">% cadastrado por profissional</p>
+          <p id="kpi-repasse" class="text-[1.4375rem] font-semibold text-gray-800 leading-none">R$ 0,00</p>
+          <p class="text-[0.65rem] text-gray-400 mt-0.5">% cadastrado por profissional</p>
         </div>
-        <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-4">
-          <div class="flex items-center gap-3 mb-3">
-            <div class="w-9 h-9 rounded-xl bg-teal-100 flex items-center justify-center shrink-0">
-              <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-teal-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M20 12V8H6a2 2 0 0 1-2-2c0-1.1.9-2 2-2h12v4"/><path d="M4 6v12c0 1.1.9 2 2 2h14v-4"/><path d="M18 12a2 2 0 0 0 0 4h4v-4Z"/></svg>
+        <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-3">
+          <div class="flex items-center gap-2.5 mb-2">
+            <div class="w-8 h-8 rounded-xl bg-teal-100 flex items-center justify-center shrink-0">
+              <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-teal-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M20 12V8H6a2 2 0 0 1-2-2c0-1.1.9-2 2-2h12v4"/><path d="M4 6v12c0 1.1.9 2 2 2h14v-4"/><path d="M18 12a2 2 0 0 0 0 4h4v-4Z"/></svg>
             </div>
             <p class="text-[0.72rem] font-bold text-gray-400 uppercase tracking-wider leading-tight">L&iacute;quido Profissionais</p>
           </div>
-          <p id="kpi-liquido" class="text-[1.35rem] font-extrabold text-gray-800 leading-none">R$ 0,00</p>
-          <p class="text-[0.68rem] text-gray-400 mt-1">recebido menos repasse</p>
+          <p id="kpi-liquido" class="text-[1.4375rem] font-semibold text-gray-800 leading-none">R$ 0,00</p>
+          <p class="text-[0.65rem] text-gray-400 mt-0.5">recebido menos repasse</p>
         </div>
-        <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-4">
-          <div class="flex items-center gap-3 mb-3">
-            <div class="w-9 h-9 rounded-xl bg-vitta-100 flex items-center justify-center shrink-0">
-              <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-vitta-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+        <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-3">
+          <div class="flex items-center gap-2.5 mb-2">
+            <div class="w-8 h-8 rounded-xl bg-vitta-100 flex items-center justify-center shrink-0">
+              <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-vitta-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
             </div>
             <p class="text-[0.72rem] font-bold text-gray-400 uppercase tracking-wider leading-tight">Consultas Pagas</p>
           </div>
-          <p id="kpi-pagos" class="text-[1.35rem] font-extrabold text-gray-800 leading-none">0</p>
-          <p class="text-[0.68rem] text-gray-400 mt-1">no per&iacute;odo</p>
+          <p id="kpi-pagos" class="text-[1.4375rem] font-semibold text-gray-800 leading-none">0</p>
+          <p class="text-[0.65rem] text-gray-400 mt-0.5">no per&iacute;odo</p>
         </div>
-        <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-4">
-          <div class="flex items-center gap-3 mb-3">
-            <div class="w-9 h-9 rounded-xl bg-amber-100 flex items-center justify-center shrink-0">
-              <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-amber-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+        <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-3">
+          <div class="flex items-center gap-2.5 mb-2">
+            <div class="w-8 h-8 rounded-xl bg-amber-100 flex items-center justify-center shrink-0">
+              <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-amber-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
             </div>
             <p class="text-[0.72rem] font-bold text-gray-400 uppercase tracking-wider leading-tight">Pendentes</p>
           </div>
-          <p id="kpi-pendentes" class="text-[1.35rem] font-extrabold text-gray-800 leading-none">0</p>
-          <p class="text-[0.68rem] text-gray-400 mt-1">aguardando pagamento</p>
+          <p id="kpi-pendentes" class="text-[1.4375rem] font-semibold text-gray-800 leading-none">0</p>
+          <p class="text-[0.65rem] text-gray-400 mt-0.5">aguardando pagamento</p>
         </div>
-        <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-4">
-          <div class="flex items-center gap-3 mb-3">
-            <div class="w-9 h-9 rounded-xl bg-purple-100 flex items-center justify-center shrink-0">
-              <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-purple-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
+        <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-3">
+          <div class="flex items-center gap-2.5 mb-2">
+            <div class="w-8 h-8 rounded-xl bg-purple-100 flex items-center justify-center shrink-0">
+              <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-purple-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
             </div>
             <p class="text-[0.72rem] font-bold text-gray-400 uppercase tracking-wider leading-tight">Ticket M&eacute;dio</p>
           </div>
-          <p id="kpi-ticket" class="text-[1.35rem] font-extrabold text-gray-800 leading-none">R$ 0,00</p>
-          <p class="text-[0.68rem] text-gray-400 mt-1">por consulta</p>
+          <p id="kpi-ticket" class="text-[1.4375rem] font-semibold text-gray-800 leading-none">R$ 0,00</p>
+          <p class="text-[0.65rem] text-gray-400 mt-0.5">por consulta</p>
         </div>
-        <div class="bg-gradient-to-br from-vitta-500 to-vitta-700 rounded-2xl shadow-sm p-4 text-white">
-          <div class="flex items-center gap-3 mb-3">
-            <div class="w-9 h-9 rounded-xl bg-white/20 flex items-center justify-center shrink-0">
-              <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+        <div class="bg-gradient-to-br from-vitta-500 to-vitta-700 rounded-2xl shadow-sm p-3 text-white">
+          <div class="flex items-center gap-2.5 mb-2">
+            <div class="w-8 h-8 rounded-xl bg-white/20 flex items-center justify-center shrink-0">
+              <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
             </div>
             <p class="text-[0.72rem] font-bold text-white/80 uppercase tracking-wider leading-tight">Proje&ccedil;&atilde;o 30 dias</p>
           </div>
-          <p id="kpi-proj" class="text-[1.35rem] font-extrabold leading-none">R$ 0,00</p>
-          <p class="text-[0.68rem] text-white/70 mt-1">baseado na agenda futura</p>
+          <p id="kpi-proj" class="text-[1.4375rem] font-semibold leading-none">R$ 0,00</p>
+          <p class="text-[0.65rem] text-white/70 mt-0.5">baseado na agenda futura</p>
         </div>
       </div>
       </div>
@@ -432,16 +444,16 @@
 <!-- ===== PAYMENT MODAL ===== -->
 <div id="modalPgto" class="modal-overlay" onclick="if(event.target===this)closeModal()">
   <div class="bg-white rounded-2xl shadow-xl w-full max-w-md overflow-y-auto max-h-[95vh]" onclick="event.stopPropagation()">
-    <div class="flex items-center justify-between px-6 py-4 border-b border-gray-100">
+    <div class="flex items-center justify-between px-5 py-3 border-b border-gray-100">
       <div>
-        <h2 id="pgtoModalTitle" class="text-[1rem] font-bold text-gray-800">Registrar Pagamento</h2>
+        <h2 id="pgtoModalTitle" class="text-[0.95rem] font-bold text-gray-800">Registrar Pagamento</h2>
         <p id="modalSubtitle" class="text-[0.72rem] text-gray-400 mt-0.5"></p>
       </div>
-      <button onclick="closeModal()" class="text-gray-400 hover:text-gray-600 p-1">
-        <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      <button onclick="closeModal()" class="w-7 h-7 rounded-full bg-gray-100 hover:bg-gray-200 text-gray-500 flex items-center justify-center transition-colors">
+        <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
       </button>
     </div>
-    <form id="pgtoForm" onsubmit="savePayment(event)" class="px-6 pb-6 pt-4 space-y-4">
+    <form id="pgtoForm" onsubmit="savePayment(event)" class="px-5 pb-5 pt-3 space-y-3">
       <input type="hidden" id="fPgtoAgdId" />
 
       <!-- Patient + date info -->
@@ -457,7 +469,7 @@
         <div class="relative">
           <span class="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-gray-400 font-medium">R$</span>
           <input id="fVlPgto" type="text" inputmode="decimal" autocomplete="off" required placeholder="0,00"
-            class="w-full py-2.5 pl-9 pr-3 text-sm border border-gray-200 rounded-xl outline-none focus:border-vitta-500" />
+            class="w-full py-2.5 pl-9 pr-3 text-sm border border-gray-200 rounded-xl outline-none focus:border-vitta-500 focus:ring-2 focus:ring-vitta-500/20" />
         </div>
       </div>
 
@@ -465,11 +477,11 @@
       <div class="grid grid-cols-2 gap-3">
         <div>
           <label class="block text-[0.78rem] font-semibold text-gray-600 mb-1">Data do Pagamento <span class="text-red-500">*</span></label>
-          <input id="fDtPgto" type="date" required class="w-full py-2.5 px-3 text-sm border border-gray-200 rounded-xl outline-none focus:border-vitta-500" />
+          <input id="fDtPgto" type="date" required class="w-full py-2.5 px-3 text-sm border border-gray-200 rounded-xl outline-none focus:border-vitta-500 focus:ring-2 focus:ring-vitta-500/20" />
         </div>
         <div>
           <label class="block text-[0.78rem] font-semibold text-gray-600 mb-1">Forma de Pagamento</label>
-          <select id="fTipPagPgto" onchange="onTipPagChangePgto()" class="w-full py-2.5 px-3 text-sm border border-gray-200 rounded-xl outline-none focus:border-vitta-500 bg-white">
+          <select id="fTipPagPgto" onchange="onTipPagChangePgto()" class="w-full py-2.5 px-3 text-sm border border-gray-200 rounded-xl outline-none focus:border-vitta-500 focus:ring-2 focus:ring-vitta-500/20 bg-white">
             <option value="" disabled>Carregando&hellip;</option>
           </select>
         </div>
@@ -520,12 +532,12 @@
       <div>
         <label class="block text-[0.78rem] font-semibold text-gray-600 mb-1">Observa&ccedil;&otilde;es <span class="text-[0.72rem] text-gray-400 font-normal">(opcional)</span></label>
         <textarea id="fObsPgto" rows="2" placeholder="Notas sobre o pagamento&hellip;"
-          class="w-full py-2.5 px-3 text-sm border border-gray-200 rounded-xl outline-none focus:border-vitta-500 resize-none"></textarea>
+          class="w-full py-2.5 px-3 text-sm border border-gray-200 rounded-xl outline-none focus:border-vitta-500 focus:ring-2 focus:ring-vitta-500/20 resize-none"></textarea>
       </div>
 
-      <div class="flex gap-3 pt-1">
-        <button type="button" onclick="closeModal()" class="flex-1 py-2.5 border border-gray-200 rounded-xl text-sm font-medium text-gray-600 hover:bg-gray-50 transition-colors">Cancelar</button>
-        <button type="submit" id="btnSavePgto" class="flex-1 py-2.5 bg-emerald-500 text-white rounded-xl text-sm font-semibold hover:bg-emerald-600 transition-colors shadow-sm">Confirmar Pagamento</button>
+      <div class="flex gap-2.5 pt-1">
+        <button type="button" onclick="closeModal()" class="flex-1 py-2 border border-gray-200 rounded-xl text-sm font-medium text-gray-600 hover:bg-gray-50 transition-colors">Cancelar</button>
+        <button type="submit" id="btnSavePgto" class="flex-1 py-2 bg-emerald-500 text-white rounded-xl text-sm font-semibold hover:bg-emerald-600 transition-colors shadow-sm">Confirmar Pagamento</button>
       </div>
     </form>
   </div>
@@ -534,21 +546,21 @@
 <!-- ===== VIEW PAYMENT MODAL ===== -->
 <div id="modalViewPgto" class="modal-overlay" onclick="if(event.target===this)closeViewModal()">
   <div class="bg-white rounded-2xl shadow-xl w-full max-w-md" onclick="event.stopPropagation()">
-    <div class="flex items-center justify-between px-6 py-4 border-b border-gray-100">
+    <div class="flex items-center justify-between px-5 py-3 border-b border-gray-100">
       <div>
-        <h2 class="text-[1rem] font-bold text-gray-800">Detalhes do Pagamento</h2>
+        <h2 class="text-[0.95rem] font-bold text-gray-800">Detalhes do Pagamento</h2>
         <p id="viewSubtitle" class="text-[0.72rem] text-gray-400 mt-0.5"></p>
       </div>
-      <button onclick="closeViewModal()" class="text-gray-400 hover:text-gray-600 p-1">
-        <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      <button onclick="closeViewModal()" class="w-7 h-7 rounded-full bg-gray-100 hover:bg-gray-200 text-gray-500 flex items-center justify-center transition-colors">
+        <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
       </button>
     </div>
-    <div class="px-6 pb-6 pt-4 space-y-3">
+    <div class="px-5 pb-5 pt-3 space-y-3">
       <div id="viewPacInfo" class="bg-gray-50 rounded-xl px-4 py-3 space-y-1"></div>
       <div class="grid grid-cols-2 gap-3">
         <div class="bg-emerald-50 rounded-xl px-4 py-3">
           <p class="text-[0.68rem] font-bold text-emerald-600 uppercase tracking-wider mb-1">Valor Pago</p>
-          <p id="viewVlPgto" class="text-[1rem] font-extrabold text-emerald-700">—</p>
+          <p id="viewVlPgto" class="text-[1rem] font-semibold text-emerald-700">—</p>
         </div>
         <div class="bg-gray-50 rounded-xl px-4 py-3">
           <p class="text-[0.68rem] font-bold text-gray-500 uppercase tracking-wider mb-1">Pago em</p>
@@ -581,7 +593,7 @@
       <div id="viewEstornadoRow" class="hidden bg-red-50 border border-red-200 rounded-xl px-4 py-3">
         <p class="text-[0.72rem] font-bold text-red-600 uppercase tracking-wider">&#9888; Pagamento Estornado</p>
       </div>
-      <div class="flex gap-3 mt-2">
+      <div class="flex gap-2.5 mt-2">
         <button onclick="closeViewModal()" class="flex-1 py-2 border border-gray-200 rounded-xl text-[0.83rem] font-medium text-gray-600 hover:bg-gray-50 transition-colors">Fechar</button>
         <button id="btnEditar" onclick="openEditPaymentModal(viewAgdId)" class="flex-1 py-2 bg-vitta-500 text-white rounded-xl text-[0.83rem] font-semibold hover:bg-vitta-600 transition-colors">Editar</button>
         <button id="btnEstornar" onclick="estornarPagamento()" class="flex-1 py-2 bg-red-500 text-white rounded-xl text-[0.83rem] font-semibold hover:bg-red-600 transition-colors">Estornar</button>
@@ -593,20 +605,20 @@
 <!-- ══════ MODAL CONFIRMAÇÃO ESTORNO ══════ -->
 <div id="modalConfirmEstorno" class="modal-overlay" onclick="if(event.target===this)closeConfirmEstorno()">
   <div class="bg-white rounded-2xl shadow-xl w-full max-w-sm" onclick="event.stopPropagation()">
-    <div class="p-6">
-      <div class="flex items-center gap-4 mb-4">
-        <div class="w-11 h-11 rounded-full bg-red-100 flex items-center justify-center shrink-0">
-          <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M12 9v4"/><path d="M12 17h.01"/><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0Z"/></svg>
+    <div class="p-5">
+      <div class="flex items-center gap-3.5 mb-3">
+        <div class="w-9 h-9 rounded-full bg-red-100 flex items-center justify-center shrink-0">
+          <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M12 9v4"/><path d="M12 17h.01"/><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0Z"/></svg>
         </div>
         <div>
           <h3 class="text-[0.95rem] font-bold text-gray-800">Estornar pagamento</h3>
-          <p class="text-[0.78rem] text-gray-400 mt-0.5">Esta ação não pode ser desfeita.</p>
+          <p class="text-[0.72rem] text-gray-400 mt-0.5">Esta ação não pode ser desfeita.</p>
         </div>
       </div>
-      <p class="text-[0.83rem] text-gray-600 mb-5">Tem certeza que deseja estornar este pagamento? A consulta voltará a aparecer como pendente.</p>
-      <div class="flex gap-3">
-        <button onclick="closeConfirmEstorno()" class="flex-1 py-2.5 border border-gray-200 rounded-xl text-sm font-medium text-gray-600 hover:bg-gray-50 transition-colors">Cancelar</button>
-        <button onclick="doEstornarPagamento()" id="btnConfirmEstorno" class="flex-1 py-2.5 bg-red-500 text-white rounded-xl text-sm font-semibold hover:bg-red-600 transition-colors">Estornar</button>
+      <p class="text-[0.83rem] text-gray-600 mb-4">Tem certeza que deseja estornar este pagamento? A consulta voltará a aparecer como pendente.</p>
+      <div class="flex gap-2.5">
+        <button onclick="closeConfirmEstorno()" class="flex-1 py-2 border border-gray-200 rounded-xl text-sm font-medium text-gray-600 hover:bg-gray-50 transition-colors">Cancelar</button>
+        <button onclick="doEstornarPagamento()" id="btnConfirmEstorno" class="flex-1 py-2 bg-red-500 text-white rounded-xl text-sm font-semibold hover:bg-red-600 transition-colors">Estornar</button>
       </div>
     </div>
   </div>

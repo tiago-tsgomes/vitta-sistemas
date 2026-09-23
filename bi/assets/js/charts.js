@@ -21,7 +21,7 @@
   function getTooltip() {
     if (!tooltipEl) {
       tooltipEl = document.createElement('div');
-      tooltipEl.style.cssText = 'position:fixed;z-index:9999;pointer-events:none;background:#1F2937;color:#fff;font-family:Montserrat,sans-serif;font-size:14px;font-weight:600;padding:10px 12px;border-radius:8px;box-shadow:0 6px 20px rgba(0,0,0,.22);white-space:nowrap;opacity:0;left:0;top:0;';
+      tooltipEl.style.cssText = 'position:fixed;z-index:9999;pointer-events:none;background:#1F2937;color:#fff;font-family:Montserrat,sans-serif;font-size:14px;font-weight:500;padding:10px 12px;border-radius:8px;box-shadow:0 6px 20px rgba(0,0,0,.22);white-space:nowrap;opacity:0;left:0;top:0;';
       document.body.appendChild(tooltipEl);
     }
     return tooltipEl;
@@ -126,14 +126,14 @@
     [0, 0.5, 1].forEach((f) => {
       const y = PAD_T + innerH * (1 - f);
       svg.appendChild(svgEl('line', { x1: 0, y1: y, x2: VIEW_W, y2: y, stroke: '#EFEEF7', 'stroke-width': 1 }));
-      svg.appendChild(svgEl('text', { x: 0, y: y - 5, 'font-size': 12.5, 'font-weight': 600, fill: '#8B87A0', 'font-family': 'Montserrat, sans-serif' }, yFmt(f * maxVal)));
+      svg.appendChild(svgEl('text', { x: 0, y: y - 5, 'font-size': 12.5, 'font-weight': 500, fill: '#8B87A0', 'font-family': 'Montserrat, sans-serif' }, yFmt(f * maxVal)));
     });
   }
 
   function renderLegend(container, series) {
     if (!container) return;
     container.innerHTML = series.map((s) => `
-      <span style="display:inline-flex;align-items:center;gap:6px;font-size:14.5px;font-weight:600;color:#374151;margin-right:18px;">
+      <span style="display:inline-flex;align-items:center;gap:6px;font-size:14.5px;font-weight:500;color:#374151;margin-right:18px;">
         <span style="width:10px;height:10px;border-radius:3px;background:${s.color};display:inline-block;"></span>${s.name}
       </span>
     `).join('');
@@ -156,7 +156,7 @@
 
     labels.forEach((label, i) => {
       const x = PAD_L + (innerW * i) / Math.max(labels.length - 1, 1);
-      svg.appendChild(svgEl('text', { x, y: height - 6, 'font-size': 12.5, 'font-weight': 600, fill: '#8B87A0', 'text-anchor': 'middle', 'font-family': 'Montserrat, sans-serif' }, label));
+      svg.appendChild(svgEl('text', { x, y: height - 6, 'font-size': 12.5, 'font-weight': 500, fill: '#8B87A0', 'text-anchor': 'middle', 'font-family': 'Montserrat, sans-serif' }, label));
     });
 
     // linha vertical (crosshair) que acompanha o mês sob o mouse
@@ -174,10 +174,10 @@
             <span style="width:8px;height:8px;border-radius:2px;background:${s.color};display:inline-block;flex-shrink:0;"></span>
             ${s.name}
           </span>
-          <span style="font-weight:700;color:#fff;">${tFmt(s.values[i])}</span>
+          <span style="font-weight:600;color:#fff;">${tFmt(s.values[i])}</span>
         </div>
       `).join('');
-      const html = `<div style="font-weight:700;font-size:15px;">${label}</div>${rows}`;
+      const html = `<div style="font-weight:600;font-size:15px;">${label}</div>${rows}`;
       // a área de hover começa perto do ponto mais alto daquele mês, não no
       // topo do gráfico — assim o tooltip só abre dentro da área com dados,
       // não no espaço em branco acima das linhas
@@ -242,7 +242,7 @@
         }
       }
       endLabels.forEach((lbl) => {
-        svg.appendChild(svgEl('text', { x: lbl.x, y: lbl.y, 'font-size': 12.5, 'font-weight': 700, fill: lbl.color, 'font-family': 'Montserrat, sans-serif', 'text-anchor': lbl.anchor }, lbl.text));
+        svg.appendChild(svgEl('text', { x: lbl.x, y: lbl.y, 'font-size': 12.5, 'font-weight': 600, fill: lbl.color, 'font-family': 'Montserrat, sans-serif', 'text-anchor': lbl.anchor }, lbl.text));
       });
     }
   }
@@ -265,7 +265,7 @@
 
     labels.forEach((label, gi) => {
       const groupX = PAD_L + groupW * gi + groupW / 2;
-      svg.appendChild(svgEl('text', { x: groupX, y: height - 6, 'font-size': 12.5, 'font-weight': 600, fill: '#8B87A0', 'text-anchor': 'middle', 'font-family': 'Montserrat, sans-serif' }, label));
+      svg.appendChild(svgEl('text', { x: groupX, y: height - 6, 'font-size': 12.5, 'font-weight': 500, fill: '#8B87A0', 'text-anchor': 'middle', 'font-family': 'Montserrat, sans-serif' }, label));
 
       const totalW = barW * series.length + barGap * (series.length - 1);
       series.forEach((s, si) => {
@@ -276,7 +276,7 @@
         const rect = svgEl('rect', { x, y, width: barW, height: Math.max(barH, 1), rx: 3, fill: s.color, style: 'cursor:pointer;' });
         attachTooltip(rect, `${s.name} — ${label}: ${yFmt(v)}`);
         svg.appendChild(rect);
-        svg.appendChild(svgEl('text', { x: x + barW / 2, y: y - 5, 'font-size': 11.5, 'font-weight': 700, fill: '#111827', 'text-anchor': 'middle', 'font-family': 'Montserrat, sans-serif' }, yFmt(v)));
+        svg.appendChild(svgEl('text', { x: x + barW / 2, y: y - 5, 'font-size': 11.5, 'font-weight': 600, fill: '#111827', 'text-anchor': 'middle', 'font-family': 'Montserrat, sans-serif' }, yFmt(v)));
       });
     });
   }
@@ -298,7 +298,7 @@
 
     labels.forEach((label, gi) => {
       const groupX = PAD_L + groupW * gi + groupW / 2;
-      svg.appendChild(svgEl('text', { x: groupX, y: height - 6, 'font-size': 12.5, 'font-weight': 600, fill: '#8B87A0', 'text-anchor': 'middle', 'font-family': 'Montserrat, sans-serif' }, label));
+      svg.appendChild(svgEl('text', { x: groupX, y: height - 6, 'font-size': 12.5, 'font-weight': 500, fill: '#8B87A0', 'text-anchor': 'middle', 'font-family': 'Montserrat, sans-serif' }, label));
 
       let yCursor = PAD_T + innerH;
       series.forEach((s) => {
@@ -311,7 +311,7 @@
         yCursor = y;
       });
 
-      svg.appendChild(svgEl('text', { x: groupX, y: yCursor - 6, 'font-size': 12, 'font-weight': 700, fill: '#111827', 'text-anchor': 'middle', 'font-family': 'Montserrat, sans-serif' }, yFmt(totals[gi])));
+      svg.appendChild(svgEl('text', { x: groupX, y: yCursor - 6, 'font-size': 12, 'font-weight': 600, fill: '#111827', 'text-anchor': 'middle', 'font-family': 'Montserrat, sans-serif' }, yFmt(totals[gi])));
     });
   }
 
