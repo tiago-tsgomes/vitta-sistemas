@@ -62,9 +62,12 @@
   .bi-skeleton { display: inline-block; background: linear-gradient(90deg, #F1F0F7 25%, #E9E7F3 37%, #F1F0F7 63%); background-size: 400% 100%; border-radius: 6px; animation: bi-skeleton-shimmer 1.4s ease infinite; vertical-align: middle; }
   @keyframes bi-spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
   .bi-spin { animation: bi-spin .8s linear infinite; transform-origin: center; }
-  #btn-atualizar:disabled { opacity: .6; cursor: default; }
+  #btn-atualizar:disabled, #btn-exportar-pdf:disabled { opacity: .6; cursor: default; }
   .bi-fullscreen-backdrop { display: none; position: fixed; inset: 0; background: rgba(17,17,17,.45); z-index: 190; }
   .bi-fullscreen-backdrop.open { display: block; }
+  .bi-pdf-modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,.6); z-index: 300; align-items: center; justify-content: center; padding: 16px; }
+  .bi-pdf-modal.open { display: flex; }
+  .bi-pdf-modal-box { background: #fff; border-radius: 16px; width: 100%; max-width: 768px; height: 90vh; display: flex; flex-direction: column; box-shadow: 0 25px 50px rgba(0,0,0,.25); overflow: hidden; }
   .bi-card-fullscreen { position: fixed !important; inset: 20px !important; z-index: 200; margin: 0 !important; box-shadow: 0 20px 60px rgba(17,17,17,.28) !important; overflow-y: auto; }
 
   .funil-stage { display: flex; flex-direction: column; align-items: center; flex: 1; min-width: 0; }
@@ -153,6 +156,10 @@
         <button type="button" id="btn-atualizar" class="bi-filter">
           <svg id="btn-atualizar-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#6B7280" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 4v6h-6"/><path d="M1 20v-6h6"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
           Atualizar
+        </button>
+        <button type="button" id="btn-exportar-pdf" class="bi-filter">
+          <svg id="btn-exportar-pdf-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#6B7280" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/><path d="M12 18v-6M9 15l3 3 3-3"/></svg>
+          <span id="btn-exportar-pdf-label">Exportar PDF</span>
         </button>
       </div>
 
@@ -348,12 +355,37 @@
 </div>
 <div id="fullscreen-backdrop" class="bi-fullscreen-backdrop"></div>
 
+<div id="pdf-preview-modal" class="bi-pdf-modal">
+  <div class="bi-pdf-modal-box">
+    <div style="flex-shrink:0;padding:12px 20px;border-bottom:1px solid #F1F0F7;display:flex;align-items:center;justify-content:space-between;">
+      <span style="font-size:15px;font-weight:700;color:#111827;">Relatório de Leads</span>
+      <button type="button" id="pdf-preview-fechar-x" title="Fechar" style="width:28px;height:28px;border-radius:50%;border:none;background:#F3F4F6;color:#6B7280;cursor:pointer;display:flex;align-items:center;justify-content:center;">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+    <div style="flex:1;min-height:0;background:#F3F4F6;">
+      <iframe id="pdf-preview-frame" title="Visualização do PDF" style="width:100%;height:100%;border:none;"></iframe>
+    </div>
+    <div style="flex-shrink:0;padding:12px 20px;border-top:1px solid #F1F0F7;display:flex;align-items:center;justify-content:flex-end;gap:8px;">
+      <button type="button" id="pdf-preview-fechar" style="padding:8px 16px;border-radius:12px;border:none;background:transparent;color:#6B7280;font-family:inherit;font-size:14px;font-weight:600;cursor:pointer;">Fechar</button>
+      <button type="button" id="pdf-preview-baixar" style="display:flex;align-items:center;gap:8px;padding:8px 16px;border-radius:12px;border:none;background:#2ABCD4;color:#fff;font-family:inherit;font-size:14px;font-weight:600;cursor:pointer;">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+        Baixar PDF
+      </button>
+    </div>
+  </div>
+</div>
+
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
 <script src="../assets/js/bi-auth.js"></script>
 <script src="../assets/js/bi-menu.js"></script>
 <script src="../assets/js/charts.js"></script>
 <script>
   let idEmp = null;
+  let empresaNome = '';
+  let carregando = false;
+  let lastResumo = null;
+  let lastDimensao = null;
   let periodo = 'mes';
   let customIni = null;
   let customFim = null;
@@ -443,6 +475,7 @@
 
   async function loadResumo() {
     setResumoLoading();
+    lastResumo = null;
     const { data, error } = await BIAuth.client.rpc('bi_leads_resumo', {
       p_id_emp: idEmp,
       p_period: periodo,
@@ -459,6 +492,7 @@
       return;
     }
 
+    lastResumo = data;
     document.getElementById('kpi-total').textContent = data.totalLeads;
     renderDeltaLine('kpi-total-sub', data.totalLeadsDeltaPct);
 
@@ -552,6 +586,7 @@
 
   async function loadEvolucao() {
     setEvolucaoLoading();
+    lastDimensao = null;
     const { data, error } = await BIAuth.client.rpc('bi_leads_por_dimensao', {
       p_id_emp: idEmp,
       p_period: periodo,
@@ -565,6 +600,7 @@
       return;
     }
 
+    lastDimensao = data;
     document.getElementById('chart-evolucao-skeleton').style.display = 'none';
     document.getElementById('chart-evolucao').style.display = '';
 
@@ -721,9 +757,491 @@
     const btn = document.getElementById('btn-atualizar');
     const icon = document.getElementById('btn-atualizar-icon');
     if (manual) { btn.disabled = true; icon.classList.add('bi-spin'); }
+    carregando = true;
     await Promise.all([loadResumo(), loadEvolucao()]);
+    carregando = false;
     updateUltimaAtualizacao();
     if (manual) { btn.disabled = false; icon.classList.remove('bi-spin'); }
+  }
+
+  /* Exportar PDF: desenhado direto com jsPDF, no mesmo padrão visual da receita do
+     app principal (pages/prontuario.html → gerarPdfClinico): barra teal no topo,
+     logo + nome + endereço + CNPJ/telefone da empresa, logo como marca d'água e
+     rodapé com o nome da empresa. Usa os mesmos dados já carregados na tela
+     (lastResumo / lastDimensao), então respeita o filtro de período e a ordenação
+     Volume/Conversão de cada lista; as listas saem completas (sem o corte de 6).
+     Abre num modal de visualização com "Baixar PDF", igual à receita. jsPDF só é
+     carregado no primeiro clique. Fonte helvetica (WinAnsi): nada de ▲▼→ no texto. */
+  const JSPDF_SRC = 'https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js';
+  const PDF_TEAL_DARK = [18, 122, 140], PDF_TEAL = [42, 188, 212], PDF_GREEN = [34, 160, 90], PDF_RED = [192, 57, 43];
+  const PDF_GRAY_LABEL = [140, 140, 140], PDF_GRAY_TEXT = [60, 60, 60], PDF_GRAY_LINE = [230, 230, 230];
+  const PDF_MARGIN_X = 16;
+  let pdfPreview = { blobUrl: null, filename: null };
+  let empresaPdfInfo = null;
+
+  function loadJsPdf() {
+    if (window.jspdf) return Promise.resolve();
+    return new Promise((resolve, reject) => {
+      const s = document.createElement('script');
+      s.src = JSPDF_SRC;
+      s.onload = resolve;
+      s.onerror = () => reject(new Error('Falha ao carregar jsPDF'));
+      document.head.appendChild(s);
+    });
+  }
+
+  async function loadEmpresaPdfInfo() {
+    if (empresaPdfInfo) return empresaPdfInfo;
+    const { data } = await BIAuth.client.from('EMPRESA')
+      .select('NOME_EMP,LOGO_EMP,TEL_EMP,CNPJ_EMP,LOGRADOURO_EMP,NUMERO_EMP,BAIRRO_EMP,CIDADE_EMP,UF_EMP')
+      .eq('ID_EMP', idEmp).maybeSingle();
+    empresaPdfInfo = data || {};
+    return empresaPdfInfo;
+  }
+
+  function loadImageAsBase64(url) {
+    if (!url) return Promise.resolve(null);
+    return fetch(url).then((r) => r.blob()).then((blob) => new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = () => resolve(reader.result);
+      reader.onerror = reject;
+      reader.readAsDataURL(blob);
+    })).catch(() => null);
+  }
+
+  function getImageDimensions(dataUrl) {
+    return new Promise((resolve, reject) => {
+      const img = new Image();
+      img.onload = () => resolve({ w: img.naturalWidth, h: img.naturalHeight });
+      img.onerror = reject;
+      img.src = dataUrl;
+    });
+  }
+
+  function fitImageBox(dims, maxW, maxH) {
+    if (!dims || !dims.w || !dims.h) return { w: maxW, h: maxH };
+    const ratio = Math.min(maxW / dims.w, maxH / dims.h);
+    return { w: dims.w * ratio, h: dims.h * ratio };
+  }
+
+  function dataUrlImgFormat(dataUrl) {
+    const m = /^data:image\/(png|jpe?g|webp)/i.exec(dataUrl || '');
+    if (!m) return 'PNG';
+    const t = m[1].toLowerCase();
+    return t === 'jpg' ? 'JPEG' : t.toUpperCase();
+  }
+
+  function fmtTel(v) {
+    const d = (v || '').replace(/\D/g, '');
+    if (d.length === 11) return d.replace(/(\d{2})(\d{5})(\d{4})/, '($1) $2-$3');
+    if (d.length === 10) return d.replace(/(\d{2})(\d{4})(\d{4})/, '($1) $2-$3');
+    return v || '';
+  }
+
+  function fmtDocEmpresa(v) {
+    const d = (v || '').replace(/\D/g, '');
+    if (d.length === 11) return d.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, '$1.$2.$3-$4');
+    return d.replace(/(\d{2})(\d)/, '$1.$2').replace(/(\d{3})(\d)/, '$1.$2').replace(/(\d{3})(\d)/, '$1/$2').replace(/(\d{4})(\d{1,2})$/, '$1-$2').substring(0, 18);
+  }
+
+  function fmtEnderecoEmpresa(e) {
+    if (!e) return '';
+    const parts = [];
+    if (e.LOGRADOURO_EMP) parts.push(e.LOGRADOURO_EMP + (e.NUMERO_EMP ? ', ' + e.NUMERO_EMP : ''));
+    if (e.BAIRRO_EMP) parts.push(e.BAIRRO_EMP);
+    const cidadeUf = [e.CIDADE_EMP, e.UF_EMP].filter(Boolean).join('/');
+    if (cidadeUf) parts.push(cidadeUf);
+    return parts.join(' - ');
+  }
+
+  function periodoAtual() {
+    if (periodo === 'custom' && customIni && customFim) return { ini: customIni, fim: customFim };
+    return presetRange(periodo);
+  }
+
+  function sortedDimension(key) {
+    const state = listState[key];
+    return (listaDataCache[key] || []).slice().sort((a, b) => {
+      if (state.sort === 'conversao') {
+        const ca = (a.taxaConversaoPct === null || a.taxaConversaoPct === undefined) ? -1 : a.taxaConversaoPct;
+        const cb = (b.taxaConversaoPct === null || b.taxaConversaoPct === undefined) ? -1 : b.taxaConversaoPct;
+        if (cb !== ca) return cb - ca;
+      }
+      return b.total - a.total;
+    });
+  }
+
+  function pdfDelta(value, { invertColor = false, isPP = false } = {}) {
+    const compareLabel = COMPARE_LABEL[periodo] || 'período anterior';
+    if (value === null || value === undefined) return { text: `sem dados do ${compareLabel}`, color: PDF_GRAY_LABEL };
+    const positivo = invertColor ? value <= 0 : value >= 0;
+    return {
+      text: `${value >= 0 ? '+' : '-'}${Math.abs(value)}${isPP ? ' p.p.' : '%'} vs ${compareLabel}`,
+      color: positivo ? PDF_GREEN : PDF_RED,
+    };
+  }
+
+  async function gerarPdfLeads() {
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF({ unit: 'mm', format: 'a4' });
+    const pageW = doc.internal.pageSize.getWidth();
+    const pageH = doc.internal.pageSize.getHeight();
+    const mx = PDF_MARGIN_X;
+    const contentW = pageW - mx * 2;
+    const bottomLimit = pageH - 24;
+
+    const emp = await loadEmpresaPdfInfo();
+    const nomeEmp = emp.NOME_EMP || empresaNome || 'Clínica';
+    const endereco = fmtEnderecoEmpresa(emp);
+    const telFmt = emp.TEL_EMP ? fmtTel(emp.TEL_EMP) : '';
+    const cnpjFmt = emp.CNPJ_EMP ? fmtDocEmpresa(emp.CNPJ_EMP) : '';
+    const logoData = await loadImageAsBase64(emp.LOGO_EMP);
+    let logoDims = null;
+    if (logoData) { try { logoDims = await getImageDimensions(logoData); } catch (e) { /* sem logo */ } }
+
+    const { ini, fim } = periodoAtual();
+    const rangeText = sameDay(ini, fim) ? fmtDateBR(ini) : `${fmtDateBR(ini)} a ${fmtDateBR(fim)}`;
+    const presetLabel = document.getElementById('filtro-periodo-label').textContent;
+    const periodoTxt = periodo === 'custom' ? rangeText : `${presetLabel} (${rangeText})`;
+    const agora = new Date();
+    const emitidoEm = `${fmtDateBR(agora)} ${String(agora.getHours()).padStart(2, '0')}:${String(agora.getMinutes()).padStart(2, '0')}`;
+    const filename = `Relatorio de Leads ${toISODate(ini)} a ${toISODate(fim)}.pdf`;
+    doc.setProperties({ title: filename.replace(/\.pdf$/i, '') });
+
+    const setText = (style, size, color) => { doc.setFont('helvetica', style); doc.setFontSize(size); doc.setTextColor(color[0], color[1], color[2]); };
+
+    function drawWatermark() {
+      if (!logoData) return;
+      const { w, h } = fitImageBox(logoDims, 130, 130);
+      doc.setGState(new doc.GState({ opacity: 0.06 }));
+      doc.addImage(logoData, dataUrlImgFormat(logoData), (pageW - w) / 2, (pageH - h) / 2, w, h);
+      doc.setGState(new doc.GState({ opacity: 1 }));
+    }
+
+    function drawTopBar() {
+      doc.setFillColor(PDF_TEAL_DARK[0], PDF_TEAL_DARK[1], PDF_TEAL_DARK[2]);
+      doc.rect(0, 0, pageW, 1.1, 'F');
+    }
+
+    function newPage() {
+      doc.addPage();
+      drawTopBar();
+      drawWatermark();
+      return 16;
+    }
+
+    let y = 0;
+    /* nunca quebra um bloco no meio: se não couber no resto da página, vai inteiro
+       para a próxima (só não pula se já estiver no topo — aí o bloco é maior que a
+       página e só tabelas muito longas chegam nisso, quebrando com cabeçalho repetido) */
+    const PAGE_TOP = 16;
+    function need(h) { if (y + h > bottomLimit && y > PAGE_TOP) y = newPage(); }
+    const TABLE_ROW_H = 6.4, TABLE_HEAD_H = 6.6;
+    const tableHeight = (rows) => (rows.length ? TABLE_HEAD_H + rows.length * TABLE_ROW_H : 10);
+
+    function truncate(text, maxW) {
+      const s = String(text ?? '—');
+      if (doc.getTextWidth(s) <= maxW) return s;
+      let t = s;
+      while (t.length > 1 && doc.getTextWidth(t + '...') > maxW) t = t.slice(0, -1);
+      return t + '...';
+    }
+
+    /* contentH = altura do conteúdo que vem logo abaixo do título — reserva os dois juntos */
+    function sectionTitle(title, sub, contentH = 0) {
+      need((sub ? 9.7 : 5.7) + contentH);
+      setText('bold', 9.5, [50, 50, 50]);
+      doc.text(title.toUpperCase(), mx, y);
+      y += 4.2;
+      if (sub) {
+        setText('normal', 7.5, PDF_GRAY_LABEL);
+        doc.text(sub, mx, y);
+        y += 4;
+      }
+      y += 1.5;
+    }
+
+    /* tabela simples: cols = [{label, w, align}] — quebra página repetindo o cabeçalho */
+    function drawTable(cols, rows, { vazio = 'Sem dados no período.' } = {}) {
+      const rowH = TABLE_ROW_H, headH = TABLE_HEAD_H;
+      const drawHead = () => {
+        doc.setFillColor(240, 248, 250);
+        doc.rect(mx, y, contentW, headH, 'F');
+        setText('bold', 7, PDF_TEAL_DARK);
+        let x = mx;
+        cols.forEach((c) => {
+          const tx = c.align === 'right' ? x + c.w - 2 : x + 2;
+          doc.text(c.label.toUpperCase(), tx, y + 4.4, { align: c.align === 'right' ? 'right' : 'left' });
+          x += c.w;
+        });
+        y += headH;
+      };
+      if (!rows.length) {
+        need(10);
+        setText('normal', 9, [150, 150, 150]);
+        doc.text(vazio, mx, y + 4);
+        y += 10;
+        return;
+      }
+      need(headH + rowH);
+      drawHead();
+      rows.forEach((r) => {
+        if (y + rowH > bottomLimit) { y = newPage(); drawHead(); }
+        let x = mx;
+        cols.forEach((c, i) => {
+          const cell = r[i];
+          const isObj = cell && typeof cell === 'object';
+          const txt = isObj ? cell.text : cell;
+          setText(isObj && cell.bold ? 'bold' : (i === 1 ? 'bold' : 'normal'), 8.5, isObj && cell.color ? cell.color : PDF_GRAY_TEXT);
+          const s = truncate(txt, c.w - 4);
+          const tx = c.align === 'right' ? x + c.w - 2 : x + 2;
+          doc.text(s, tx, y + 4.3, { align: c.align === 'right' ? 'right' : 'left' });
+          x += c.w;
+        });
+        doc.setDrawColor(PDF_GRAY_LINE[0], PDF_GRAY_LINE[1], PDF_GRAY_LINE[2]);
+        doc.setLineWidth(0.15);
+        doc.line(mx, y + rowH, mx + contentW, y + rowH);
+        y += rowH;
+      });
+      y += 8;
+    }
+
+    /* ── cabeçalho (igual à receita) ── */
+    drawTopBar();
+    drawWatermark();
+    doc.setDrawColor(PDF_GRAY_LINE[0], PDF_GRAY_LINE[1], PDF_GRAY_LINE[2]);
+    doc.setLineWidth(0.15);
+    doc.line(0, 32, pageW, 32);
+    let textX = mx;
+    if (logoData) {
+      const box = fitImageBox(logoDims, 18, 18);
+      doc.addImage(logoData, dataUrlImgFormat(logoData), mx, 6 + (18 - box.h) / 2, box.w, box.h);
+      textX = mx + 22;
+    }
+    setText('bold', 14, [25, 25, 25]);
+    doc.text(truncate(nomeEmp, 95), textX, 13);
+    let infoY = 18.5;
+    setText('normal', 7.8, PDF_GRAY_LABEL);
+    if (endereco) { doc.text(truncate(endereco, 105), textX, infoY); infoY += 4.4; }
+    const cnpjTel = [cnpjFmt ? 'CNPJ ' + cnpjFmt : '', telFmt ? 'Tel. ' + telFmt : ''].filter(Boolean).join('   •   ');
+    if (cnpjTel) doc.text(cnpjTel, textX, infoY);
+    setText('bold', 12, [60, 60, 60]);
+    doc.text('RELATÓRIO DE LEADS', pageW - mx, 13, { align: 'right' });
+    setText('normal', 8, PDF_GRAY_LABEL);
+    doc.text('Período: ' + periodoTxt, pageW - mx, 19, { align: 'right' });
+    doc.text('Emitido em ' + emitidoEm, pageW - mx, 23.5, { align: 'right' });
+    y = 42;
+
+    /* ── indicadores ── */
+    const r = lastResumo;
+    const gap = 4, boxW = (contentW - gap * 2) / 3, boxH = 21;
+    sectionTitle('Indicadores do período', null, boxH * 2 + gap);
+    const kpis = [
+      { label: 'Total de leads', valor: String(r.totalLeads), sub: pdfDelta(r.totalLeadsDeltaPct) },
+      { label: 'Taxa de agendamento', valor: fmtPct(r.taxaAgendamentoPct), sub: pdfDelta(r.taxaAgendamentoDeltaPct, { isPP: true }) },
+      { label: 'Conversão em bloco', valor: fmtPct(r.taxaConversaoBlocoPct), sub: pdfDelta(r.taxaConversaoBlocoDeltaPct, { isPP: true }) },
+      { label: 'Conversão sobre agendados', valor: fmtPct(r.taxaConversaoSobreAgendadosPct), sub: pdfDelta(r.taxaConversaoSobreAgendadosDeltaPct, { isPP: true }) },
+      { label: 'Taxa de desistência', valor: fmtPct(r.taxaDesistenciaPct), sub: pdfDelta(r.taxaDesistenciaDeltaPct, { invertColor: true, isPP: true }) },
+      { label: 'Sem profissional definido', valor: String(r.semProfissionalCount), sub: { text: `${fmtPct(r.semProfissionalPct)} do total`, color: PDF_GRAY_LABEL } },
+    ];
+    kpis.forEach((k, i) => {
+      const bx = mx + (i % 3) * (boxW + gap);
+      const by = y + Math.floor(i / 3) * (boxH + gap);
+      doc.setFillColor(248, 250, 251);
+      doc.setDrawColor(PDF_GRAY_LINE[0], PDF_GRAY_LINE[1], PDF_GRAY_LINE[2]);
+      doc.roundedRect(bx, by, boxW, boxH, 2, 2, 'FD');
+      doc.setFillColor(PDF_TEAL[0], PDF_TEAL[1], PDF_TEAL[2]);
+      doc.rect(bx, by + 3, 0.9, boxH - 6, 'F');
+      setText('normal', 6.8, PDF_GRAY_LABEL);
+      doc.text(k.label.toUpperCase(), bx + 4, by + 5.5);
+      setText('bold', 15, [25, 25, 25]);
+      doc.text(k.valor, bx + 4, by + 13);
+      setText('normal', 6.8, k.sub.color);
+      doc.text(truncate(k.sub.text, boxW - 8), bx + 4, by + 18);
+    });
+    y += boxH * 2 + gap + 10;
+
+    /* ── funil ── */
+    const labelW = 34, convW = 34, barH = 8;
+    sectionTitle('Funil de conversão', 'Lead criado, foi agendado e aderiu ao bloco - percentual sobre a etapa anterior', 3 * (barH + 3));
+    const f = r.funil || {};
+    const stages = [
+      { label: 'Lead criado', valor: f.criados || 0, color: PDF_TEAL_DARK },
+      { label: 'Foi agendado', valor: f.agendados || 0, color: PDF_TEAL },
+      { label: 'Aderiu ao bloco', valor: f.aderiuBloco || 0, color: PDF_GREEN },
+    ];
+    const maxF = Math.max(stages[0].valor, 1);
+    const barMaxW = contentW - labelW - convW;
+    stages.forEach((s, i) => {
+      const w = Math.max(8, (s.valor / maxF) * barMaxW);
+      setText('bold', 8.5, PDF_GRAY_TEXT);
+      doc.text(s.label, mx, y + 5.4);
+      doc.setFillColor(s.color[0], s.color[1], s.color[2]);
+      doc.roundedRect(mx + labelW, y, w, barH, 1.5, 1.5, 'F');
+      setText('bold', 9, [255, 255, 255]);
+      doc.text(String(s.valor), mx + labelW + 3, y + 5.5);
+      const pctTopo = Math.round((s.valor / maxF) * 100);
+      const anterior = i > 0 ? stages[i - 1].valor : null;
+      const conv = i > 0 && anterior ? Math.round((s.valor / anterior) * 1000) / 10 : null;
+      setText('normal', 7.5, PDF_GRAY_LABEL);
+      doc.text(`${pctTopo}% do total`, pageW - mx, y + 3.4, { align: 'right' });
+      if (conv !== null) {
+        setText('bold', 7.5, conv >= 70 ? PDF_GREEN : conv >= 40 ? [183, 121, 31] : PDF_RED);
+        doc.text(`${conv}% da etapa anterior`, pageW - mx, y + 7, { align: 'right' });
+      }
+      y += barH + 3;
+    });
+    y += 8;
+
+    /* ── evolução mensal (barras agrupadas) ── */
+    const d = lastDimensao;
+    const meses = d.evolucaoMensal || [];
+    const chartH = 42;
+    sectionTitle(`Evolução mensal de leads - ${d.ano || ''}`, 'Criados vs. convertidos por mês (não segue o filtro de período)', meses.length ? chartH + 10 : 10);
+    if (!meses.length) {
+      setText('normal', 9, [150, 150, 150]);
+      doc.text('Sem dados no ano.', mx, y + 4);
+      y += 10;
+    } else {
+      setText('normal', 7.5, PDF_GRAY_TEXT);
+      doc.setFillColor(PDF_TEAL_DARK[0], PDF_TEAL_DARK[1], PDF_TEAL_DARK[2]);
+      doc.rect(mx, y - 2.2, 2.6, 2.6, 'F');
+      doc.text('Leads criados', mx + 4, y);
+      doc.setFillColor(PDF_GREEN[0], PDF_GREEN[1], PDF_GREEN[2]);
+      doc.rect(mx + 30, y - 2.2, 2.6, 2.6, 'F');
+      doc.text('Convertidos (bloco)', mx + 34, y);
+      y += 5;
+      const maxV = Math.max(...meses.map((m) => Math.max(m.total || 0, m.convertidos || 0)), 1);
+      const baseY = y + chartH;
+      doc.setDrawColor(PDF_GRAY_LINE[0], PDF_GRAY_LINE[1], PDF_GRAY_LINE[2]);
+      doc.line(mx, baseY, pageW - mx, baseY);
+      const slotW = contentW / Math.max(meses.length, 1);
+      const bw = Math.min(6, slotW / 3);
+      meses.forEach((m, i) => {
+        const cx = mx + slotW * i + slotW / 2;
+        [[m.total || 0, PDF_TEAL_DARK, cx - bw - 0.4], [m.convertidos || 0, PDF_GREEN, cx + 0.4]].forEach(([v, color, bx]) => {
+          const h = (v / maxV) * (chartH - 6);
+          if (h > 0) {
+            doc.setFillColor(color[0], color[1], color[2]);
+            doc.rect(bx, baseY - h, bw, h, 'F');
+          }
+          setText('normal', 6.3, PDF_GRAY_TEXT);
+          doc.text(String(v), bx + bw / 2, baseY - h - 1, { align: 'center' });
+        });
+        setText('bold', 7, PDF_GRAY_LABEL);
+        doc.text(MONTH_ABBR[m.mes - 1], cx, baseY + 4, { align: 'center' });
+      });
+      y = baseY + 12;
+    }
+
+    /* ── listas por dimensão ── */
+    const SORT_LABEL = { volume: 'ordenado por volume', conversao: 'ordenado por conversão' };
+    const dimCols = [
+      { label: '#', w: 8 }, { label: 'Nome', w: 66 }, { label: 'Leads', w: 18, align: 'right' },
+      { label: 'Agendados', w: 22, align: 'right' }, { label: '% Agend.', w: 20, align: 'right' },
+      { label: 'Convertidos', w: 24, align: 'right' }, { label: '% Conv.', w: 20, align: 'right' },
+    ];
+    const convColor = (c) => (c === null || c === undefined) ? PDF_GRAY_LABEL : (c >= 30 ? PDF_GREEN : c >= 10 ? [183, 121, 31] : PDF_RED);
+    const dimRows = (key) => sortedDimension(key).map((it, i) => [
+      String(i + 1), it.nome, String(it.total),
+      it.agendados !== undefined ? String(it.agendados) : '—',
+      it.agendados !== undefined ? fmtPct(it.taxaAgendamentoPct) : '—',
+      String(it.convertidos ?? '—'),
+      { text: fmtPct(it.taxaConversaoPct), color: convColor(it.taxaConversaoPct), bold: true },
+    ]);
+    [
+      ['especialidade', 'Por especialidade procurada', 'Volume e taxa de conversão por especialidade (campo Procura)'],
+      ['profissional', 'Por profissional', 'Leads com o campo Profissional preenchido'],
+      ['abordagem', 'Por abordagem', 'Como o lead chegou até a clínica'],
+    ].forEach(([key, title, sub]) => {
+      const rows = dimRows(key);
+      sectionTitle(title, `${sub} - ${SORT_LABEL[listState[key].sort]}`, tableHeight(rows));
+      drawTable(dimCols, rows);
+    });
+
+    const simpleCols = [{ label: '#', w: 8 }, { label: 'Nome', w: 120 }, { label: 'Quantidade', w: 26, align: 'right' }, { label: '% do total', w: 24, align: 'right' }];
+    const simpleRows = (itens) => {
+      const total = (itens || []).reduce((s, i) => s + i.total, 0) || 1;
+      return (itens || []).map((it, i) => [String(i + 1), it.nome, String(it.total), `${Math.round((it.total / total) * 100)}%`]);
+    };
+    const rowsDesfecho = simpleRows(d.distribuicaoAderiuBloco);
+    sectionTitle('Desfecho (Aderiu ao bloco)', 'Distribuição dos valores do campo "Aderiu ao Bloco" no período', tableHeight(rowsDesfecho));
+    drawTable(simpleCols, rowsDesfecho);
+    const rowsDesist = simpleRows(d.motivosDesistencia);
+    sectionTitle('Principais motivos de desistência', 'Só considera leads com o campo "Desistência" preenchido no período', tableHeight(rowsDesist));
+    drawTable(simpleCols, rowsDesist, { vazio: 'Nenhuma desistência registrada no período.' });
+
+    /* ── rodapé em todas as páginas ── */
+    const totalPages = doc.getNumberOfPages();
+    for (let p = 1; p <= totalPages; p++) {
+      doc.setPage(p);
+      const footY = pageH - 16;
+      doc.setDrawColor(PDF_GRAY_LINE[0], PDF_GRAY_LINE[1], PDF_GRAY_LINE[2]);
+      doc.setLineWidth(0.15);
+      doc.line(mx, footY, pageW - mx, footY);
+      setText('bold', 8, [25, 25, 25]);
+      doc.text(truncate(nomeEmp, 120), mx, footY + 5);
+      setText('normal', 7, [140, 140, 140]);
+      doc.text(`Relatório de Leads - período ${rangeText}`, mx, footY + 9);
+      setText('normal', 7, [140, 140, 140]);
+      doc.text(`Página ${p} de ${totalPages}`, pageW - mx, footY + 5, { align: 'right' });
+      setText('normal', 6.5, [170, 170, 170]);
+      doc.text('Gerado por Vitta BI', pageW - mx, footY + 9, { align: 'right' });
+    }
+
+    return { doc, filename };
+  }
+
+  function showPdfPreview(doc, filename) {
+    if (pdfPreview.blobUrl) URL.revokeObjectURL(pdfPreview.blobUrl);
+    const blobUrl = doc.output('bloburl');
+    pdfPreview = { blobUrl, filename };
+    document.getElementById('pdf-preview-frame').src = blobUrl;
+    document.getElementById('pdf-preview-modal').classList.add('open');
+  }
+
+  function closePdfPreview() {
+    document.getElementById('pdf-preview-modal').classList.remove('open');
+    document.getElementById('pdf-preview-frame').src = 'about:blank';
+  }
+
+  function baixarPdfPreview() {
+    if (!pdfPreview.blobUrl) return;
+    const a = document.createElement('a');
+    a.href = pdfPreview.blobUrl;
+    a.download = pdfPreview.filename || 'relatorio-leads.pdf';
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+  }
+
+  function setupPdfPreview() {
+    document.getElementById('pdf-preview-modal').addEventListener('click', (ev) => { if (ev.target.id === 'pdf-preview-modal') closePdfPreview(); });
+    document.getElementById('pdf-preview-fechar').addEventListener('click', closePdfPreview);
+    document.getElementById('pdf-preview-fechar-x').addEventListener('click', closePdfPreview);
+    document.getElementById('pdf-preview-baixar').addEventListener('click', baixarPdfPreview);
+    document.addEventListener('keydown', (ev) => {
+      if (ev.key === 'Escape' && document.getElementById('pdf-preview-modal').classList.contains('open')) closePdfPreview();
+    });
+  }
+
+  async function exportarPdf() {
+    if (carregando || !lastResumo || !lastDimensao) { alert('Aguarde os dados terminarem de carregar.'); return; }
+    const btn = document.getElementById('btn-exportar-pdf');
+    const label = document.getElementById('btn-exportar-pdf-label');
+    btn.disabled = true;
+    label.textContent = 'Gerando…';
+    try {
+      await loadJsPdf();
+      const { doc, filename } = await gerarPdfLeads();
+      showPdfPreview(doc, filename);
+    } catch (err) {
+      console.error('exportar PDF:', err);
+      alert('Não foi possível gerar o PDF. Tente novamente.');
+    } finally {
+      btn.disabled = false;
+      label.textContent = 'Exportar PDF';
+    }
   }
 
   function selecionarPeriodo(value) {
@@ -945,6 +1463,7 @@
     const user = await BIAuth.getCurrentUser();
     if (!user) return;
     idEmp = user.idEmp;
+    empresaNome = user.empresaNome || '';
 
     BIMenu.renderBISidebar('#bi-sidebar', { active: 'leads', empresaNome: user.empresaNome });
     BIMenu.renderBIHeader('#bi-header', {
@@ -969,6 +1488,8 @@
     setupCardFullscreen({ cardId: 'card-aderiu-bloco', btnId: 'btn-expandir-aderiu-bloco' });
     setupCardFullscreen({ cardId: 'card-desistencia', btnId: 'btn-expandir-desistencia' });
     document.getElementById('btn-atualizar').addEventListener('click', () => refreshData({ manual: true }));
+    document.getElementById('btn-exportar-pdf').addEventListener('click', exportarPdf);
+    setupPdfPreview();
 
     refreshData();
   })();

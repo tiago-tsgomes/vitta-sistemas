@@ -237,6 +237,10 @@
             class="pl-8 pr-3 py-1.5 text-[0.8rem] border border-gray-200 rounded-xl outline-none focus:border-vitta-500 bg-white text-gray-700 w-48" />
         </div>
         <div class="flex items-center gap-2 ml-auto">
+          <select id="filterDtTipo" onchange="applyFilters()" title="Critério de data do período" class="py-1.5 px-3 text-[0.8rem] border border-gray-200 rounded-xl outline-none focus:border-vitta-500 bg-white text-gray-700">
+            <option value="agd">Data da consulta</option>
+            <option value="pgto">Data do pagamento</option>
+          </select>
           <input type="date" id="filterDtDe" onchange="applyFilters()" class="py-1.5 px-3 text-[0.8rem] border border-gray-200 rounded-xl outline-none focus:border-vitta-500" />
           <span class="text-[0.8rem] text-gray-400">até</span>
           <input type="date" id="filterDtAte" onchange="applyFilters()" class="py-1.5 px-3 text-[0.8rem] border border-gray-200 rounded-xl outline-none focus:border-vitta-500" />
@@ -766,16 +770,44 @@ async function loadLancamentos(){
   const profFilter=currentProfId||document.getElementById('filterProfLanc').value;
   const dtDe=document.getElementById('filterDtDe').value;
   const dtAte=document.getElementById('filterDtAte').value;
+  /* 'pgto': período pela data do pagamento — mesmo critério do Dashboard Financeiro e do BI (fluxo de caixa).
+     Consultas sem pagamento não têm essa data, então pendentes não aparecem nesse modo. */
+  const porPgto=document.getElementById('filterDtTipo').value==='pgto'&&(dtDe||dtAte);
 
-  let q=supabase.from('AGENDAMENTO')
-    .select('ID_AGD,DT_AGD,PAC_AGD,PROF_AGD,ID_EMP,VALOR_AGD,PACIENTE!PAC_AGD(NOME_PAC),PROFISSIONAL!PROF_AGD(ID_PROF,NOME_PROF),EMPRESA!ID_EMP(NOME_EMP)')
-    .eq('PGTO_AGD',true)
-    .order('DT_AGD',{ascending:false});
-  if(idEmp)q=q.eq('ID_EMP',idEmp);
-  if(profFilter)q=q.eq('PROF_AGD',profFilter);
-  if(dtDe)q=q.gte('DT_AGD',dtDe+'T00:00:00');
-  if(dtAte)q=q.lte('DT_AGD',dtAte+'T23:59:59');
-  const {data:agds}=await q;
+  let pgtoIds=null;
+  if(porPgto){
+    /* há pagamentos sem consulta vinculada (ID_AGD nulo); um null no .in() derruba a consulta inteira */
+    let qp=supabase.from('PAGAMENTO').select('ID_AGD').not('ID_AGD','is',null);
+    if(idEmp)qp=qp.eq('ID_EMP',idEmp);
+    if(dtDe)qp=qp.gte('DT_PGTO',dtDe);
+    if(dtAte)qp=qp.lte('DT_PGTO',dtAte);
+    const {data:pIds}=await qp;
+    pgtoIds=[...new Set((pIds||[]).map(p=>p.ID_AGD).filter(Boolean))];
+  }
+
+  const buildAgdQuery=()=>{
+    let q=supabase.from('AGENDAMENTO')
+      .select('ID_AGD,DT_AGD,PAC_AGD,PROF_AGD,ID_EMP,VALOR_AGD,PACIENTE!PAC_AGD(NOME_PAC),PROFISSIONAL!PROF_AGD(ID_PROF,NOME_PROF),EMPRESA!ID_EMP(NOME_EMP)')
+      .order('DT_AGD',{ascending:false});
+    if(idEmp)q=q.eq('ID_EMP',idEmp);
+    if(profFilter)q=q.eq('PROF_AGD',profFilter);
+    return q;
+  };
+  let agds=[];
+  if(pgtoIds){
+    /* em blocos: uma lista grande de IDs no .in() estoura o tamanho da URL */
+    for(let i=0;i<pgtoIds.length;i+=150){
+      const {data}=await buildAgdQuery().in('ID_AGD',pgtoIds.slice(i,i+150));
+      agds.push(...(data||[]));
+    }
+    agds.sort((a,b)=>b.DT_AGD.localeCompare(a.DT_AGD));
+  }else{
+    let q=buildAgdQuery().eq('PGTO_AGD',true);
+    if(dtDe)q=q.gte('DT_AGD',dtDe+'T00:00:00');
+    if(dtAte)q=q.lte('DT_AGD',dtAte+'T23:59:59');
+    const {data}=await q;
+    agds=data||[];
+  }
   const agdList=agds||[];
 
   /* load payments for these agendamentos */
@@ -803,6 +835,7 @@ function clearFiltersLanc(){
   document.getElementById('filterPacLanc').value='';
   document.getElementById('filterDtDe').value='';
   document.getElementById('filterDtAte').value='';
+  document.getElementById('filterDtTipo').value='agd';
   loadLancamentos();
 }
 
