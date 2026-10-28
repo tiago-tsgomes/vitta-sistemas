@@ -241,6 +241,9 @@
         <select id="filterAno" onchange="applyFilters()" class="py-2.5 px-3 text-sm border border-gray-200 rounded-xl outline-none focus:border-vitta-500 bg-white min-w-[120px]">
           <option value="">Todos os anos</option>
         </select>
+        <select id="filterProf" onchange="applyFilters()" class="py-2.5 px-3 text-sm border border-gray-200 rounded-xl outline-none focus:border-vitta-500 bg-white min-w-[180px]">
+          <option value="">Todos os profissionais</option>
+        </select>
         <select id="filterEmpAdmin" onchange="applyFilters()" class="hidden py-2.5 px-3 text-sm border border-gray-200 rounded-xl outline-none focus:border-vitta-500 bg-white min-w-[180px]">
           <option value="">Todas as empresas</option>
         </select>
@@ -670,6 +673,11 @@ async function loadProfissionais() {
   profissionais = data || [];
   const sel = document.getElementById('fProfissional');
   sel.innerHTML = '<option value="">Selecione&hellip;</option>' + profissionais.map(p => `<option value="${p.ID_PROF}">${p.NOME_PROF}</option>`).join('');
+  const selF = document.getElementById('filterProf');
+  const atual = selF.value;
+  selF.innerHTML = '<option value="">Todos os profissionais</option><option value="__none__">Sem profissional</option>'
+    + profissionais.map(p => `<option value="${p.ID_PROF}">${p.NOME_PROF}</option>`).join('');
+  selF.value = atual;
 }
 
 async function loadOpcoes() {
@@ -803,8 +811,10 @@ function applyFilters() {
   const empId = document.getElementById('filterEmpAdmin').value;
   const mes   = document.getElementById('filterMes').value;
   const ano   = document.getElementById('filterAno').value;
+  const prof  = document.getElementById('filterProf').value;
   filtered = allLeads.filter(l => {
     if (empId && l.ID_EMP !== empId) return false;
+    if (prof === '__none__' ? l.ID_PROF : (prof && l.ID_PROF !== prof)) return false;
     if (q && !l.NOME_LEAD?.toLowerCase().includes(q) && !l.TELEFONE_LEAD?.toLowerCase().includes(q)) return false;
     const d = new Date(l.DTCRI_LEAD);
     if (mes && (d.getMonth()+1) !== Number(mes)) return false;
@@ -820,6 +830,7 @@ function clearFilters() {
   document.getElementById('filterEmpAdmin').value = '';
   document.getElementById('filterMes').value = '';
   document.getElementById('filterAno').value = '';
+  document.getElementById('filterProf').value = '';
   applyFilters();
 }
 

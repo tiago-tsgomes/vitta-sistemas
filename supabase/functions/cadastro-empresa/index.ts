@@ -117,7 +117,7 @@ Deno.serve(async (req: Request) => {
           nomeAdmin:   adminUsu.NOME_USU ?? '',
           nomeEmpresa: emp.NOME_EMP,
         })
-        await enviarEmail({ to: adminUsu.EMAIL_USU, toName: adminUsu.NOME_USU, subject, html })
+        await enviarEmail({ to: adminUsu.EMAIL_USU, toName: adminUsu.NOME_USU, subject, html, conta: 'noreply' })
       }
     }
 

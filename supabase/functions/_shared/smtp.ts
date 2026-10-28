@@ -163,6 +163,9 @@ async function enviarEmailAgora(opts: EnviarEmailOpts) {
   const username = Deno.env.get(prefixo + 'USER')!
   const password = Deno.env.get(prefixo + 'PASS')!
   const fromName = Deno.env.get(prefixo + 'FROM_NAME') ?? 'Vitta Sistemas'
+  // Provedores como a Brevo usam um login SMTP que não é o endereço do remetente;
+  // FROM_ADDR permite definir o remetente real. Sem ele, usa o login (comportamento antigo).
+  const fromAddr = Deno.env.get(prefixo + 'FROM_ADDR') ?? username
   const ehloHost = Deno.env.get('SMTP_EHLO_HOST') ?? 'vittasistemas.com.br'
 
   let conn: Deno.Conn = port === 465
@@ -192,7 +195,7 @@ async function enviarEmailAgora(opts: EnviarEmailOpts) {
     await enviarComando(conn, btoa(password))
     assertCodigo(await lerResposta(conn), 235)
 
-    await enviarComando(conn, `MAIL FROM:<${username}>`)
+    await enviarComando(conn, `MAIL FROM:<${fromAddr}>`)
     assertCodigo(await lerResposta(conn), 250)
 
     await enviarComando(conn, `RCPT TO:<${opts.to}>`)
@@ -203,7 +206,7 @@ async function enviarEmailAgora(opts: EnviarEmailOpts) {
 
     const mensagem = montarMensagem({
       fromName,
-      fromAddr: username,
+      fromAddr,
       toName: opts.toName,
       toAddr: opts.to,
       subject: opts.subject,
