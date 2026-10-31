@@ -4,25 +4,16 @@
    do DOM renderizar. Verificação async atualiza depois.
 ═══════════════════════════════════════════════ */
 ;(function() {
-  // Injeta CSS de controle de features antes de qualquer render
-  const s = document.createElement('style');
-  s.id = '_vitta-plan-style';
-  s.textContent =
-    'html.vitta-no-ia .vitta-ai-feature{display:none!important}' +
-    'html:not(.vitta-no-ia) .vitta-ai-noplan-msg{display:none!important}';
-  document.head.appendChild(s);
-
   // Lê cache do sessionStorage (síncrono — sem flash)
   try {
     const raw = sessionStorage.getItem('vitta_plan');
     if (raw) {
       const plan = JSON.parse(raw);
-      window.VittaPlano = plan;
-      if (plan.temIA === false) document.documentElement.classList.add('vitta-no-ia');
+      window.VittaPlano = { temApp: plan.temApp !== false };
     }
   } catch(_) {}
 
-  if (!window.VittaPlano) window.VittaPlano = { temApp: true, temIA: true };
+  if (!window.VittaPlano) window.VittaPlano = { temApp: true };
 })();
 
 const SUPABASE_URL = 'https://ccdeuabmjwgntwssjfgo.supabase.co';
@@ -477,13 +468,15 @@ async function initVittaBIMenu() {
     const idEmp = meta.ID_EMP || meta.id_emp;
     if (!idEmp) return;
 
+    // Acesso ao BI: incluído no plano (TEM_BI_PLANO, hoje o Pro) ou
+    // liberado manualmente para a empresa pelo Admin Global (BI_ACESSO_EMP).
     const { data: emp } = await supabase
       .from('EMPRESA')
-      .select('BI_ACESSO_EMP')
+      .select('BI_ACESSO_EMP, PLANO:ID_PLANO(TEM_BI_PLANO)')
       .eq('ID_EMP', idEmp)
       .single();
 
-    if (emp?.BI_ACESSO_EMP) el.classList.remove('hidden');
+    if (emp?.BI_ACESSO_EMP || emp?.PLANO?.TEM_BI_PLANO) el.classList.remove('hidden');
   } catch (_) {}
 }
 })();
@@ -500,8 +493,7 @@ async function initVittaBIMenu() {
     const meta = session.user.user_metadata || {};
     if (meta.tipo_usu === 'ADMIN_GLOBAL') {
       sessionStorage.removeItem('vitta_plan');
-      document.documentElement.classList.remove('vitta-no-ia');
-      window.VittaPlano = { temApp: true, temIA: true };
+      window.VittaPlano = { temApp: true };
       return;
     }
 
@@ -510,7 +502,7 @@ async function initVittaBIMenu() {
 
     const { data: emp } = await supabase
       .from('EMPRESA')
-      .select('PLANO:ID_PLANO(TEM_APP_PLANO, TEM_IA_PLANO)')
+      .select('PLANO:ID_PLANO(TEM_APP_PLANO)')
       .eq('ID_EMP', idEmp)
       .single();
 
@@ -518,16 +510,9 @@ async function initVittaBIMenu() {
 
     const plan = {
       temApp: emp.PLANO.TEM_APP_PLANO === true,
-      temIA:  emp.PLANO.TEM_IA_PLANO  === true,
     };
     window.VittaPlano = plan;
     sessionStorage.setItem('vitta_plan', JSON.stringify(plan));
-
-    if (!plan.temIA) {
-      document.documentElement.classList.add('vitta-no-ia');
-    } else {
-      document.documentElement.classList.remove('vitta-no-ia');
-    }
   } catch(_) {}
 })();
 

@@ -8,6 +8,18 @@ const cors = {
 const json = (data: unknown, status = 200) =>
   new Response(JSON.stringify(data), { status, headers: { ...cors, 'Content-Type': 'application/json' } })
 
+// Perfil e empresa vêm da tabela USUARIO — o user_metadata do login pode ser
+// editado pelo próprio usuário e não serve para decidir permissões.
+// deno-lint-ignore no-explicit-any
+async function vinculosAtivos(supabase: any, authId: string): Promise<{ TIPO_USU: string; ID_EMP: string | null }[]> {
+  const { data } = await supabase
+    .from('USUARIO')
+    .select('TIPO_USU, ID_EMP, ATIVO_USU')
+    .eq('AUTH_ID', authId)
+  // deno-lint-ignore no-explicit-any
+  return (data || []).filter((u: any) => u.ATIVO_USU !== false)
+}
+
 Deno.serve(async (req: Request) => {
   if (req.method === 'OPTIONS') return new Response('ok', { headers: cors })
 
@@ -26,24 +38,28 @@ Deno.serve(async (req: Request) => {
     const { data: userData, error: authErr } = await supabase.auth.getUser(token)
     if (authErr || !userData.user) return json({ erro: 'Token inválido' }, 401)
 
-    const meta    = userData.user.user_metadata || {}
-    const tipoUsu = meta.tipo_usu || meta.TIPO_USU
-    const idEmp   = meta.ID_EMP || meta.id_emp
+    const meta  = userData.user.user_metadata || {}
+    const idEmp = meta.ID_EMP || meta.id_emp
+    const vinculos = await vinculosAtivos(supabase, userData.user.id)
 
-    // Só Administrador da empresa acessa o BI, e só se a empresa tiver
-    // contratado o módulo — mesma regra usada para exibir o menu Vitta BI
+    // Só Administrador da empresa acessa o BI, e só se o plano incluir o BI
+    // (TEM_BI_PLANO) ou a empresa tiver liberação manual (BI_ACESSO_EMP) —
+    // mesma regra usada para exibir o menu Vitta BI
     // em assets/js/config.js (initVittaBIMenu). Revalidar aqui evita que
     // alguém chame a função direto e gere um link de acesso sem ter o
     // módulo liberado para a empresa.
-    if (tipoUsu !== 'ADMIN_EMPRESA' || !idEmp) return json({ erro: 'Sem acesso ao Vitta BI' }, 403)
+    if (!idEmp || !vinculos.some((u) => u.TIPO_USU === 'ADMIN_EMPRESA' && u.ID_EMP === idEmp)) {
+      return json({ erro: 'Sem acesso ao Vitta BI' }, 403)
+    }
 
     const { data: emp } = await supabase
       .from('EMPRESA')
-      .select('BI_ACESSO_EMP')
+      .select('BI_ACESSO_EMP, PLANO:ID_PLANO(TEM_BI_PLANO)')
       .eq('ID_EMP', idEmp)
       .single()
 
-    if (!emp?.BI_ACESSO_EMP) return json({ erro: 'Empresa sem acesso ao Vitta BI' }, 403)
+    const plano = emp?.PLANO as { TEM_BI_PLANO?: boolean } | null
+    if (!emp?.BI_ACESSO_EMP && !plano?.TEM_BI_PLANO) return json({ erro: 'Empresa sem acesso ao Vitta BI' }, 403)
     if (!userData.user.email) return json({ erro: 'Usuário sem email cadastrado' }, 400)
 
     // generateLink não envia e-mail nenhum, só emite o token_hash — que o

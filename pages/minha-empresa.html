@@ -141,7 +141,6 @@
       <a href="empresas.html" class="flex items-center gap-2 pl-10 pr-3 py-2 mx-2 rounded-xl text-[0.8rem] text-gray-500 hover:bg-white/5 hover:text-gray-300 transition-colors cursor-pointer">Empresas</a>
       <a href="usuarios.html" class="flex items-center gap-2 pl-10 pr-3 py-2 mx-2 rounded-xl text-[0.8rem] text-gray-500 hover:bg-white/5 hover:text-gray-300 transition-colors cursor-pointer">Usu&aacute;rios Admin</a>
       <a href="planos.html" class="flex items-center gap-2 pl-10 pr-3 py-2 mx-2 rounded-xl text-[0.8rem] text-gray-500 hover:bg-white/5 hover:text-gray-300 transition-colors cursor-pointer">Planos</a>
-      <a href="configuracoes.html" class="flex items-center gap-2 pl-10 pr-3 py-2 mx-2 rounded-xl text-[0.8rem] text-gray-500 hover:bg-white/5 hover:text-gray-300 transition-colors cursor-pointer">Configura&ccedil;&otilde;es</a>
       <a href="logs.html" class="flex items-center gap-2 pl-10 pr-3 py-2 mx-2 rounded-xl text-[0.8rem] text-gray-500 hover:bg-white/5 hover:text-gray-300 transition-colors cursor-pointer">Log</a>
       <a href="cadastros_admin.html" class="flex items-center gap-2 pl-10 pr-3 py-2 mx-2 rounded-xl text-[0.8rem] text-gray-500 hover:bg-white/5 hover:text-gray-300 transition-colors cursor-pointer">Cadastros</a>
     </div>
@@ -1428,7 +1427,7 @@ function featBadge(label, color) {
 function renderFeaturesMp(p) {
   const parts = [];
   if (p.TEM_APP_PLANO)        parts.push(featBadge('App Mobile', 'blue'));
-  if (p.TEM_IA_PLANO)         parts.push(featBadge('Inteligência Artificial', 'violet'));
+  if (p.TEM_BI_PLANO)         parts.push(featBadge('Vitta BI', 'violet'));
   if (p.PERFIL_HIBRIDO_PLANO) parts.push(featBadge('Perfil Híbrido', 'emerald'));
   if (p.MAX_USUARIOS_PLANO)   parts.push(featBadge('Até ' + p.MAX_USUARIOS_PLANO + ' usuários', 'gray'));
   return parts.join('');
@@ -1446,7 +1445,7 @@ async function abrirModalMudarPlano() {
   try {
     const { data: planos } = await supabase
       .from('PLANO')
-      .select('ID_PLANO,NOME_PLANO,PRECO_PLANO,TEM_APP_PLANO,TEM_IA_PLANO,PERFIL_HIBRIDO_PLANO,MAX_USUARIOS_PLANO')
+      .select('ID_PLANO,NOME_PLANO,PRECO_PLANO,TEM_APP_PLANO,TEM_BI_PLANO,PERFIL_HIBRIDO_PLANO,MAX_USUARIOS_PLANO')
       .eq('ATIVO_PLANO', true)
       .order('PRECO_PLANO');
 
@@ -1522,11 +1521,8 @@ async function confirmarMudancaPlano() {
   txt.textContent = 'Processando...';
 
   try {
-    // 1. Atualiza plano no Supabase
-    const { error } = await supabase
-      .from('EMPRESA')
-      .update({ ID_PLANO: _novoPlanoId, DTALTER_EMP: new Date().toISOString() })
-      .eq('ID_EMP', empresaId);
+    // 1. Atualiza plano no Supabase (função que confere se é o Administrador da empresa)
+    const { error } = await supabase.rpc('mudar_plano_empresa', { p_id_plano: _novoPlanoId });
     if (error) throw new Error('Erro ao atualizar plano: ' + error.message);
 
     // 2. Atualiza assinatura no Asaas se existir

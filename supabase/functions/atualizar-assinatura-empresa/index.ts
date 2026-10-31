@@ -12,9 +12,6 @@ Deno.serve(async (req: Request) => {
   if (req.method === 'OPTIONS') return new Response('ok', { headers: cors })
 
   try {
-    const { empresa_id } = await req.json()
-    if (!empresa_id) return json({ erro: 'empresa_id obrigatório' }, 400)
-
     const ASAAS_API_KEY    = Deno.env.get('ASAAS_API_KEY')!
     const ASAAS_BASE_URL   = Deno.env.get('ASAAS_BASE_URL')!
     const SUPABASE_URL     = Deno.env.get('SUPABASE_URL')!
@@ -23,6 +20,29 @@ Deno.serve(async (req: Request) => {
     const supabase = createClient(SUPABASE_URL, SERVICE_ROLE_KEY, {
       auth: { autoRefreshToken: false, persistSession: false },
     })
+
+    // Exige um usuário logado (a chave pública do app não basta)
+    const authHeader = req.headers.get('Authorization')
+    if (!authHeader) return json({ erro: 'Autenticação necessária' }, 401)
+    const token = authHeader.replace('Bearer ', '')
+    const { data: userData, error: authErr } = await supabase.auth.getUser(token)
+    if (authErr || !userData.user) return json({ erro: 'Token inválido' }, 401)
+
+    const { empresa_id } = await req.json()
+    if (!empresa_id) return json({ erro: 'empresa_id obrigatório' }, 400)
+
+    // Permissão vem da tabela USUARIO (não do user_metadata, que o próprio
+    // usuário consegue editar): Admin Global, ou Administrador da própria empresa.
+    const { data: usuarios } = await supabase
+      .from('USUARIO')
+      .select('TIPO_USU, ID_EMP, ATIVO_USU')
+      .eq('AUTH_ID', userData.user.id)
+    const ativos = (usuarios || []).filter((u) => u.ATIVO_USU !== false)
+    const permitido = ativos.some((u) =>
+      u.TIPO_USU === 'ADMIN_GLOBAL' ||
+      (u.TIPO_USU === 'ADMIN_EMPRESA' && u.ID_EMP === empresa_id)
+    )
+    if (!permitido) return json({ erro: 'Acesso negado' }, 403)
 
     // Busca a empresa com seu plano e subscription Asaas
     const { data: emp, error: empErr } = await supabase

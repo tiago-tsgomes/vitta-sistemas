@@ -331,17 +331,16 @@
 
   async function fetchPlanAndSave(meta) {
     const idEmp = meta.ID_EMP || meta.id_emp;
-    if (!idEmp || meta.tipo_usu === 'ADMIN_GLOBAL') return { temApp: true, temIA: true };
+    if (!idEmp || meta.tipo_usu === 'ADMIN_GLOBAL') return { temApp: true };
     try {
       const { data: emp } = await supabase
         .from('EMPRESA')
-        .select('PLANO:ID_PLANO(TEM_APP_PLANO, TEM_IA_PLANO)')
+        .select('PLANO:ID_PLANO(TEM_APP_PLANO)')
         .eq('ID_EMP', idEmp)
         .single();
       if (!emp?.PLANO) return null;
       const plan = {
         temApp: emp.PLANO.TEM_APP_PLANO === true,
-        temIA:  emp.PLANO.TEM_IA_PLANO  === true,
       };
       sessionStorage.setItem('vitta_plan', JSON.stringify(plan));
       return plan;

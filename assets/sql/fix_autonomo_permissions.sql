@@ -4,14 +4,6 @@
 -- ============================================================
 
 -- ------------------------------------------------------------
--- 1. Corrige RLS da tabela AI_CONFIG para incluir AUTONOMO
--- ------------------------------------------------------------
-DROP POLICY IF EXISTS "ai_config_profissional_read" ON public."AI_CONFIG";
-CREATE POLICY "ai_config_profissional_read" ON public."AI_CONFIG"
-  FOR SELECT TO authenticated
-  USING ((auth.jwt()->'user_metadata'->>'tipo_usu') IN ('PROFISSIONAL', 'ADMIN_EMPRESA', 'AUTONOMO'));
-
--- ------------------------------------------------------------
 -- 2. Recria create_usuario_empresa incluindo AUTONOMO
 --    (padrão SECURITY DEFINER com acesso direto ao auth.users)
 -- ------------------------------------------------------------

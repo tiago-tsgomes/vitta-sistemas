@@ -173,7 +173,6 @@
       <a href="usuarios.html" class="flex items-center gap-2 pl-10 pr-3 py-2 mx-2 rounded-xl text-[0.8rem] text-gray-500 hover:bg-white/5 hover:text-gray-300 transition-colors cursor-pointer">Usuários Admin</a>
       <a href="planos.html" class="flex items-center gap-2 pl-10 pr-3 py-2 mx-2 rounded-xl text-[0.8rem] font-semibold text-vitta-400 bg-vitta-500/10 transition-colors cursor-pointer">Planos</a>
       <a href="dashboard-gerencial.html" class="flex items-center gap-2 pl-10 pr-3 py-2 mx-2 rounded-xl text-[0.8rem] text-gray-500 hover:bg-white/5 hover:text-gray-300 transition-colors cursor-pointer">Dashboard Gerencial</a>
-      <a href="configuracoes.html" class="flex items-center gap-2 pl-10 pr-3 py-2 mx-2 rounded-xl text-[0.8rem] text-gray-500 hover:bg-white/5 hover:text-gray-300 transition-colors cursor-pointer">Configurações</a>
       <a href="logs.html" class="flex items-center gap-2 pl-10 pr-3 py-2 mx-2 rounded-xl text-[0.8rem] text-gray-500 hover:bg-white/5 hover:text-gray-300 transition-colors cursor-pointer">Log</a>
       <a href="cadastros_admin.html" class="flex items-center gap-2 pl-10 pr-3 py-2 mx-2 rounded-xl text-[0.8rem] text-gray-500 hover:bg-white/5 hover:text-gray-300 transition-colors cursor-pointer">Cadastros</a>
     </div>
@@ -574,9 +573,9 @@
             <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><rect x="5" y="2" width="14" height="20" rx="2"/><line x1="12" y1="18" x2="12.01" y2="18"/></svg>
             App Mobile
           </span>
-          <span id="vBadgeIA" class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[0.72rem] font-semibold border">
-            <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M12 2L9.5 9.5 2 12l7.5 2.5L12 22l2.5-7.5L22 12l-7.5-2.5z"/></svg>
-            Inteligência Artificial
+          <span id="vBadgeBI" class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[0.72rem] font-semibold border">
+            <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M3 3v18h18"/><path d="M7 15l4-4 3 3 5-6"/></svg>
+            Vitta BI
           </span>
           <span id="vBadgeHibrido" class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[0.72rem] font-semibold border">
             <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
@@ -671,13 +670,13 @@
 
           <label class="flex items-center gap-2.5 cursor-pointer select-none">
             <div class="relative w-10 h-6 shrink-0">
-              <input type="checkbox" id="fTemIA" class="sr-only peer">
-              <div class="w-10 h-6 bg-gray-300 peer-checked:bg-violet-500 rounded-full transition-colors"></div>
+              <input type="checkbox" id="fTemBI" class="sr-only peer">
+              <div class="w-10 h-6 bg-gray-300 peer-checked:bg-indigo-500 rounded-full transition-colors"></div>
               <div class="absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full shadow transition-transform peer-checked:translate-x-4"></div>
             </div>
             <div>
-              <span class="text-sm font-semibold text-gray-700">Inteligência Artificial</span>
-              <p class="text-[0.7rem] text-gray-400">Resumo de prontuário e análises com IA</p>
+              <span class="text-sm font-semibold text-gray-700">Vitta BI</span>
+              <p class="text-[0.7rem] text-gray-400">Painéis de gestão para o Administrador da empresa</p>
             </div>
           </label>
 
@@ -1003,7 +1002,7 @@ async function loadPlanos() {
 
   const { data, error } = await supabase
     .from('PLANO')
-    .select('ID_PLANO,NOME_PLANO,DESCR_PLANO,ATIVO_PLANO,DTCRI_PLANO,PRECO_PLANO,MAX_USUARIOS_PLANO,TEM_APP_PLANO,TEM_IA_PLANO,PERFIL_HIBRIDO_PLANO')
+    .select('ID_PLANO,NOME_PLANO,DESCR_PLANO,ATIVO_PLANO,DTCRI_PLANO,PRECO_PLANO,MAX_USUARIOS_PLANO,TEM_APP_PLANO,TEM_BI_PLANO,PERFIL_HIBRIDO_PLANO')
     .order('PRECO_PLANO', { ascending: true, nullsFirst: false })
 
   if (error) { showToast('Erro ao carregar planos.', 'error'); return }
@@ -1173,7 +1172,7 @@ function openViewModal(id) {
   document.getElementById('vPreco').textContent  = p.PRECO_PLANO != null ? fmtCurrency(p.PRECO_PLANO) + '/mês' : '—'
   document.getElementById('vMaxUsu').textContent = p.MAX_USUARIOS_PLANO != null ? p.MAX_USUARIOS_PLANO + ' usuários' : 'Ilimitado'
   _badgeOn('vBadgeApp',     !!p.TEM_APP_PLANO)
-  _badgeOn('vBadgeIA',      !!p.TEM_IA_PLANO)
+  _badgeOn('vBadgeBI',      !!p.TEM_BI_PLANO)
   _badgeOn('vBadgeHibrido', !!p.PERFIL_HIBRIDO_PLANO)
   const statusEl = document.getElementById('vStatus')
   if (p.ATIVO_PLANO) { statusEl.textContent = 'Ativo';   statusEl.className = 'text-sm font-semibold text-green-600' }
@@ -1202,7 +1201,7 @@ function openEditModal(id) {
   document.getElementById('fPreco').value  = p.PRECO_PLANO != null ? p.PRECO_PLANO : ''
   document.getElementById('fMaxUsu').value = p.MAX_USUARIOS_PLANO != null ? p.MAX_USUARIOS_PLANO : ''
   document.getElementById('fTemApp').checked  = !!p.TEM_APP_PLANO
-  document.getElementById('fTemIA').checked   = !!p.TEM_IA_PLANO
+  document.getElementById('fTemBI').checked   = !!p.TEM_BI_PLANO
   document.getElementById('fHibrido').checked = !!p.PERFIL_HIBRIDO_PLANO
   document.getElementById('fAtivo').checked   = !!p.ATIVO_PLANO
   document.getElementById('formTitle').textContent    = 'Editar Plano'
@@ -1220,7 +1219,7 @@ function resetForm() {
   document.getElementById('fPreco').value  = ''
   document.getElementById('fMaxUsu').value = ''
   document.getElementById('fTemApp').checked  = false
-  document.getElementById('fTemIA').checked   = false
+  document.getElementById('fTemBI').checked   = false
   document.getElementById('fHibrido').checked = false
   document.getElementById('fAtivo').checked   = true
   document.getElementById('formAlert').innerHTML = ''
@@ -1242,7 +1241,7 @@ async function savePlano() {
       PRECO_PLANO:         precoVal  !== '' ? parseFloat(precoVal)  : null,
       MAX_USUARIOS_PLANO:  maxUsuVal !== '' ? parseInt(maxUsuVal)   : null,
       TEM_APP_PLANO:       document.getElementById('fTemApp').checked,
-      TEM_IA_PLANO:        document.getElementById('fTemIA').checked,
+      TEM_BI_PLANO:        document.getElementById('fTemBI').checked,
       PERFIL_HIBRIDO_PLANO: document.getElementById('fHibrido').checked,
       ATIVO_PLANO:         document.getElementById('fAtivo').checked,
     }

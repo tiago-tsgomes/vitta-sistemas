@@ -12,7 +12,6 @@
   <script src="../assets/js/config.js"></script>
   <link rel="stylesheet" href="../assets/css/mobile-dark.css"/>
   <script src="../assets/js/mobile-utils.js"></script>
-  <script src="../assets/js/ai-utils.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/pdfjs-dist@2.16.105/build/pdf.min.js"></script>
   <script>pdfjsLib.GlobalWorkerOptions.workerSrc='https://cdn.jsdelivr.net/npm/pdfjs-dist@2.16.105/build/pdf.worker.min.js';</script>
@@ -24,10 +23,6 @@
     @keyframes slideUp{from{transform:translateY(100%)}to{transform:translateY(0)}}
     .modal-full{position:fixed;inset:0;z-index:50;background:white;display:none;flex-direction:column;padding-top:env(safe-area-inset-top);padding-bottom:env(safe-area-inset-bottom)}
     .modal-full.open{display:flex;animation:slideUp .3s ease}
-    /* AI panel */
-    #ai-panel{transition:max-height .4s ease,opacity .3s ease;overflow:hidden;max-height:0;opacity:0}
-    #ai-panel.open{max-height:9999px;opacity:1}
-    .ai-tag{display:inline-flex;font-size:0.62rem;font-weight:600;padding:2px 7px;border-radius:999px}
     /* Tab system */
     .cons-tab-btn{flex:1;padding:0.6rem 0;font-size:0.78rem;font-weight:600;color:#9ca3af;border-bottom:2px solid transparent;transition:all .15s}
     .cons-tab-btn.active{color:#2ABCD4;border-bottom-color:#2ABCD4}
@@ -150,37 +145,9 @@
         <input id="f-queixa" type="text" placeholder="Ex: Dor de cabeça há 3 dias, tontura…" maxlength="200" class="w-full py-2.5 px-3.5 text-sm border border-gray-200 rounded-xl outline-none focus:border-vitta-500"/>
       </div>
 
-      <!-- AI Summary button -->
+      <!-- Descrição da consulta -->
       <div class="flex items-center justify-between">
         <p class="text-[0.68rem] font-bold text-gray-400 uppercase tracking-wider">Descrição da Consulta</p>
-        <button id="btn-ai" onclick="toggleAI()"
-          class="flex items-center gap-1.5 text-[0.72rem] font-semibold px-2.5 py-1 rounded-lg border border-violet-200 text-violet-600 bg-white transition-all">
-          <svg class="w-3 h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L9.5 9.5 2 12l7.5 2.5L12 22l2.5-7.5L22 12l-7.5-2.5z"/></svg>
-          Resumo IA
-        </button>
-      </div>
-
-      <!-- AI Panel -->
-      <div id="ai-panel">
-        <div class="rounded-2xl border border-violet-200 bg-gradient-to-br from-violet-50 to-blue-50 overflow-hidden">
-          <div class="flex items-center justify-between px-3.5 py-2.5 border-b border-violet-100 bg-violet-100/40">
-            <div class="flex items-center gap-2">
-              <div class="w-5 h-5 rounded-md bg-violet-500 flex items-center justify-center shrink-0"><svg class="w-3 h-3 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 2L9.5 9.5 2 12l7.5 2.5L12 22l2.5-7.5L22 12l-7.5-2.5z"/></svg></div>
-              <span class="text-[0.75rem] font-bold text-violet-800">Resumo IA</span>
-              <span id="ai-badge-count" class="hidden ai-tag bg-violet-100 text-violet-600"></span>
-            </div>
-            <div class="flex items-center gap-2">
-              <button id="btn-ai-refresh" onclick="refreshAI()" class="hidden text-violet-400 p-0.5" title="Atualizar análise">
-                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
-              </button>
-              <button onclick="toggleAI()" class="text-gray-400 p-0.5"><svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
-            </div>
-          </div>
-          <div id="ai-panel-body" class="p-3.5 space-y-3 text-[0.78rem] text-gray-700 leading-relaxed"></div>
-          <div class="px-3.5 py-2 bg-violet-50/50 border-t border-violet-100">
-            <p id="ai-mobile-footer" class="text-[0.62rem] text-gray-400">Resumo gerado por IA — Valide com o histórico completo.</p>
-          </div>
-        </div>
       </div>
 
       <textarea id="f-descricao" rows="8"
@@ -333,7 +300,6 @@
 const AV_COLORS=['bg-blue-500','bg-emerald-500','bg-violet-500','bg-amber-500','bg-rose-500','bg-cyan-500'];
 const STATUS_COLORS={AGENDADO:'#3B82F6',CONFIRMADA:'#10B981',REALIZADA:'#2ABCD4',FALTA:'#EF4444'};
 let viewDate=new Date(), profId=null, idEmp=null, currentAgd=null, allAgds=[], returnPacId=null;
-let _aiPacId=null, _aiPaciente=null, _aiConsultas=[], _aiSv=[], _aiAlergias=[], _aiLoaded=false;
 let modalAgd=null, receitasState=[], examesState=[];
 
 function escHtml(s){return(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
@@ -438,17 +404,6 @@ async function openAtendimentoForAgd(agd){
   calcIMC();
   receitasState=[];examesState=[];renderReceitasList();renderExamesList();
   document.getElementById('m-notice').classList.add('hidden');
-  // Reset painel IA para o novo paciente
-  _aiPacId=agd.PAC_AGD;
-  _aiLoaded=false;
-  _aiPaciente=null;
-  document.getElementById('ai-panel').classList.remove('open');
-  document.getElementById('ai-panel-body').innerHTML='';
-  document.getElementById('ai-badge-count').classList.add('hidden');
-  document.getElementById('btn-ai-refresh').classList.add('hidden');
-  document.getElementById('ai-mobile-footer').textContent='Resumo gerado por IA — Valide com o histórico completo.';
-  const btnAi=document.getElementById('btn-ai');
-  btnAi.className='flex items-center gap-1.5 text-[0.72rem] font-semibold px-2.5 py-1 rounded-lg border border-violet-200 text-violet-600 bg-white transition-all';
 
   const [{data:cons},{data:sv}]=await Promise.all([
     supabase.from('CONSULTA').select('*').eq('ID_AGD',agd.ID_AGD).maybeSingle(),
@@ -1228,95 +1183,6 @@ function switchConsTab(t){
     document.getElementById('ctab-'+k).classList.toggle('active',k===t);
     document.getElementById('cpane-'+k).classList.toggle('hidden',k!==t);
   });
-}
-
-async function toggleAI(){
-  const panel=document.getElementById('ai-panel');
-  const btn=document.getElementById('btn-ai');
-  const open=panel.classList.contains('open');
-  panel.classList.toggle('open',!open);
-  if(!open){
-    btn.className='flex items-center gap-1.5 text-[0.72rem] font-semibold px-2.5 py-1 rounded-lg border border-violet-500 bg-violet-500 text-white transition-all';
-  } else {
-    btn.className='flex items-center gap-1.5 text-[0.72rem] font-semibold px-2.5 py-1 rounded-lg border border-violet-200 text-violet-600 bg-white transition-all';
-    return;
-  }
-
-  if(_aiLoaded) return;
-
-  const body=document.getElementById('ai-panel-body');
-  document.getElementById('ai-badge-count').classList.add('hidden');
-  body.innerHTML=`<div class="flex items-center gap-2 justify-center py-6 text-violet-500">
-    <svg class="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"/></svg>
-    <span class="text-[0.78rem] font-medium">Analisando histórico com IA…</span>
-  </div>`;
-
-  try{
-    if(!_aiPaciente && _aiPacId){
-      const [{data:pac},{data:cons},{data:sv},{data:alergs}]=await Promise.all([
-        supabase.from('PACIENTE').select('*').eq('ID_PAC',_aiPacId).single(),
-        supabase.from('CONSULTA').select('ID_CONS,DT_CONS,ID_AGD,ANAMNESE,CID_CONS,HIPOTESE_DIAG,PRESCRICAO,PROFISSIONAL!ID_PROF(NOME_PROF)').eq('ID_PAC',_aiPacId).eq('ID_PROF',profId).eq('RASCUNHO',false).order('DT_CONS',{ascending:false}),
-        supabase.from('SINAL_VITAL').select('*').eq('ID_PAC',_aiPacId).order('DT_SV',{ascending:false}),
-        supabase.from('ALERGIA').select('*').eq('ID_PAC',_aiPacId).order('DTCRI_ALERGIA',{ascending:false})
-      ]);
-      _aiPaciente=pac; _aiConsultas=cons||[]; _aiSv=sv||[]; _aiAlergias=alergs||[];
-    }
-
-    const context=VittaAI.buildContext(_aiPaciente,_aiConsultas,_aiSv,_aiAlergias);
-    const {text:summary,provider}=await VittaAI.complete(context);
-    body.innerHTML=VittaAI.renderText(summary);
-
-    const badge=document.getElementById('ai-badge-count');
-    badge.textContent=_aiConsultas.length+' consulta'+(_aiConsultas.length!==1?'s':'');
-    badge.classList.remove('hidden');
-
-    const providerName=VittaAI.PROVIDERS[provider]?.name||provider;
-    document.getElementById('ai-mobile-footer').textContent=`Gerado por ${providerName} — caráter informativo.`;
-    document.getElementById('btn-ai-refresh').classList.remove('hidden');
-    _aiLoaded=true;
-  }catch(err){
-    body.innerHTML=`<div class="flex items-center gap-2 text-red-500 py-4">
-      <svg class="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
-      <span class="text-[0.78rem]">${escHtml(err.message||'Erro desconhecido')}</span>
-    </div>`;
-  }
-}
-
-async function refreshAI(){
-  _aiLoaded=false;
-  _aiPaciente=null;
-  document.getElementById('btn-ai-refresh').classList.add('hidden');
-  document.getElementById('ai-badge-count').classList.add('hidden');
-  document.getElementById('ai-mobile-footer').textContent='Resumo gerado por IA — Valide com o histórico completo.';
-  const body=document.getElementById('ai-panel-body');
-  body.innerHTML=`<div class="flex items-center gap-2 justify-center py-6 text-violet-500">
-    <svg class="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"/></svg>
-    <span class="text-[0.78rem] font-medium">Atualizando análise…</span>
-  </div>`;
-  try{
-    const [{data:pac},{data:cons},{data:sv},{data:alergs}]=await Promise.all([
-      supabase.from('PACIENTE').select('*').eq('ID_PAC',_aiPacId).single(),
-      supabase.from('CONSULTA').select('ID_CONS,DT_CONS,ID_AGD,ANAMNESE,CID_CONS,HIPOTESE_DIAG,PRESCRICAO,PROFISSIONAL!ID_PROF(NOME_PROF)').eq('ID_PAC',_aiPacId).eq('ID_PROF',profId).eq('RASCUNHO',false).order('DT_CONS',{ascending:false}),
-      supabase.from('SINAL_VITAL').select('*').eq('ID_PAC',_aiPacId).order('DT_SV',{ascending:false}),
-      supabase.from('ALERGIA').select('*').eq('ID_PAC',_aiPacId).order('DTCRI_ALERGIA',{ascending:false})
-    ]);
-    _aiPaciente=pac; _aiConsultas=cons||[]; _aiSv=sv||[]; _aiAlergias=alergs||[];
-    const context=VittaAI.buildContext(_aiPaciente,_aiConsultas,_aiSv,_aiAlergias);
-    const {text:summary,provider}=await VittaAI.complete(context);
-    body.innerHTML=VittaAI.renderText(summary);
-    const badge=document.getElementById('ai-badge-count');
-    badge.textContent=_aiConsultas.length+' consulta'+(_aiConsultas.length!==1?'s':'');
-    badge.classList.remove('hidden');
-    const providerName=VittaAI.PROVIDERS[provider]?.name||provider;
-    document.getElementById('ai-mobile-footer').textContent=`Gerado por ${providerName} — caráter informativo.`;
-    document.getElementById('btn-ai-refresh').classList.remove('hidden');
-    _aiLoaded=true;
-  }catch(err){
-    body.innerHTML=`<div class="flex items-center gap-2 text-red-500 py-4">
-      <svg class="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
-      <span class="text-[0.78rem]">${escHtml(err.message||'Erro desconhecido')}</span>
-    </div>`;
-  }
 }
 
 async function salvarAtendimento(rascunho){

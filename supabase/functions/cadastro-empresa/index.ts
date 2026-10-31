@@ -36,6 +36,18 @@ Deno.serve(async (req: Request) => {
 
     if (empErr || !emp) return json({ erro: 'Empresa não encontrada', detalhe: empErr }, 400)
 
+    // Esta função roda no cadastro self-service, às vezes antes de existir
+    // sessão (só com a chave pública). Por isso só aceita empresa criada há
+    // menos de 1 dia e que ainda não tenha cobrança configurada no Asaas —
+    // não serve para mexer em empresas já existentes.
+    if (emp.ASAAS_CUSTOMER_ID || emp.ASAAS_SUBSCRIPTION_ID) {
+      return json({ erro: 'Empresa já possui cobrança configurada' }, 409)
+    }
+    const criadaEm = emp.DTCRI_EMP ? new Date(emp.DTCRI_EMP).getTime() : 0
+    if (!criadaEm || Date.now() - criadaEm > 24 * 60 * 60 * 1000) {
+      return json({ erro: 'Acesso negado' }, 403)
+    }
+
     // 2. Cria cliente no Asaas
     const clienteBody: Record<string, unknown> = { name: emp.NOME_EMP, notificationDisabled: true }
     if (emp.CNPJ_EMP)  clienteBody.cpfCnpj = emp.CNPJ_EMP

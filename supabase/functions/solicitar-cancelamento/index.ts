@@ -8,6 +8,18 @@ const cors = {
 const json = (data: unknown, status = 200) =>
   new Response(JSON.stringify(data), { status, headers: { ...cors, 'Content-Type': 'application/json' } })
 
+// Perfil e empresa vêm da tabela USUARIO — o user_metadata do login pode ser
+// editado pelo próprio usuário e não serve para decidir permissões.
+// deno-lint-ignore no-explicit-any
+async function vinculosAtivos(supabase: any, authId: string): Promise<{ TIPO_USU: string; ID_EMP: string | null }[]> {
+  const { data } = await supabase
+    .from('USUARIO')
+    .select('TIPO_USU, ID_EMP, ATIVO_USU')
+    .eq('AUTH_ID', authId)
+  // deno-lint-ignore no-explicit-any
+  return (data || []).filter((u: any) => u.ATIVO_USU !== false)
+}
+
 Deno.serve(async (req: Request) => {
   if (req.method === 'OPTIONS') return new Response('ok', { headers: cors })
 
@@ -29,12 +41,16 @@ Deno.serve(async (req: Request) => {
     if (authErr || !userData.user) return json({ erro: 'Token inválido' }, 401)
 
     // Apenas ADMIN_EMPRESA pode cancelar a própria assinatura
+    // Empresa selecionada no login; o vínculo de Administrador com ela é
+    // conferido na tabela USUARIO.
     const meta = userData.user.user_metadata || {}
-    const tipo = meta.tipo_usu
-    if (tipo !== 'ADMIN_EMPRESA') return json({ erro: 'Acesso negado' }, 403)
-
     const empresaId = meta.ID_EMP || meta.id_emp
     if (!empresaId) return json({ erro: 'Usuário sem empresa vinculada' }, 400)
+
+    const vinculos = await vinculosAtivos(supabase, userData.user.id)
+    if (!vinculos.some((u) => u.TIPO_USU === 'ADMIN_EMPRESA' && u.ID_EMP === empresaId)) {
+      return json({ erro: 'Acesso negado' }, 403)
+    }
 
     const { motivo } = await req.json() as { motivo: string }
 

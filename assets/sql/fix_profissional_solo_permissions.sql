@@ -114,13 +114,3 @@ CREATE POLICY "consulta_profissional_write" ON public."CONSULTA"
     )
   );
 
--- ------------------------------------------------------------
--- 6. AI_CONFIG: garante que PROFISSIONAL pode ler (já existe
---    essa policy, este DROP+CREATE é para reforçar)
--- ------------------------------------------------------------
-DROP POLICY IF EXISTS "ai_config_profissional_read" ON public."AI_CONFIG";
-CREATE POLICY "ai_config_profissional_read" ON public."AI_CONFIG"
-  FOR SELECT TO authenticated
-  USING (
-    (auth.jwt()->'user_metadata'->>'tipo_usu') IN ('PROFISSIONAL', 'ADMIN_EMPRESA', 'AUTONOMO')
-  );

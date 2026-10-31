@@ -12,11 +12,6 @@ Deno.serve(async (req: Request) => {
   if (req.method === 'OPTIONS') return new Response('ok', { headers: cors })
 
   try {
-    const { plano_id, novo_preco } = await req.json()
-
-    if (!plano_id)           return json({ erro: 'plano_id obrigatório' }, 400)
-    if (novo_preco == null)  return json({ erro: 'novo_preco obrigatório' }, 400)
-
     const ASAAS_API_KEY    = Deno.env.get('ASAAS_API_KEY')!
     const ASAAS_BASE_URL   = Deno.env.get('ASAAS_BASE_URL')!
     const SUPABASE_URL     = Deno.env.get('SUPABASE_URL')!
@@ -25,6 +20,37 @@ Deno.serve(async (req: Request) => {
     const supabase = createClient(SUPABASE_URL, SERVICE_ROLE_KEY, {
       auth: { autoRefreshToken: false, persistSession: false },
     })
+
+    // Exige um usuário logado (a chave pública do app não basta)
+    const authHeader = req.headers.get('Authorization')
+    if (!authHeader) return json({ erro: 'Autenticação necessária' }, 401)
+    const token = authHeader.replace('Bearer ', '')
+    const { data: userData, error: authErr } = await supabase.auth.getUser(token)
+    if (authErr || !userData.user) return json({ erro: 'Token inválido' }, 401)
+
+    // Só o Admin Global altera o preço de todas as assinaturas de um plano.
+    // Permissão vem da tabela USUARIO (não do user_metadata, que o próprio
+    // usuário consegue editar).
+    const { data: usuarios } = await supabase
+      .from('USUARIO')
+      .select('TIPO_USU, ATIVO_USU')
+      .eq('AUTH_ID', userData.user.id)
+    const ehAdminGlobal = (usuarios || []).some((u) => u.TIPO_USU === 'ADMIN_GLOBAL' && u.ATIVO_USU !== false)
+    if (!ehAdminGlobal) return json({ erro: 'Acesso negado' }, 403)
+
+    const { plano_id } = await req.json()
+    if (!plano_id) return json({ erro: 'plano_id obrigatório' }, 400)
+
+    // O valor aplicado é sempre o preço salvo no cadastro do plano,
+    // nunca um valor vindo da requisição.
+    const { data: plano, error: planoErr } = await supabase
+      .from('PLANO')
+      .select('PRECO_PLANO')
+      .eq('ID_PLANO', plano_id)
+      .single()
+    if (planoErr || !plano) return json({ erro: 'Plano não encontrado.' }, 404)
+    const novo_preco = Number(plano.PRECO_PLANO)
+    if (!(novo_preco > 0)) return json({ erro: 'Plano sem preço definido.' }, 400)
 
     // Busca todas as empresas com este plano que têm assinatura no Asaas
     const { data: empresas, error: empErr } = await supabase
