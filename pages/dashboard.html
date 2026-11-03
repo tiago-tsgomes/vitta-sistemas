@@ -789,7 +789,7 @@
     }).join('');
   }
 
-  /* --- Aviso de boleto a vencer / vencido (dashboard, apenas ADMIN_EMPRESA) --- */
+  /* --- Aviso de boleto a vencer / vencido (dashboard: Administrador, Secretaria e Autônomo) --- */
   function _boletoFmtBRL(v) { return new Intl.NumberFormat('pt-BR',{style:'currency',currency:'BRL'}).format(v||0); }
   function _boletoFmtData(str) { const [y,m,d] = str.split('-'); return `${d}/${m}/${y}`; }
 
@@ -967,7 +967,9 @@
         .select('ISENTO_COBRANCA').eq('ID_EMP', idEmp).maybeSingle();
       isentoCobranca = !!(empSel && empSel.ISENTO_COBRANCA);
     }
-    if (['ADMIN_EMPRESA', 'ADMIN_GLOBAL'].includes(tipo) && !isentoCobranca) checkBoletoVencimento(idEmp, session, tipo);
+    // Aviso de boleto: quem cuida do financeiro da clínica (Administrador,
+    // Secretaria e Autônomo/Solo). Profissional não recebe.
+    if (['ADMIN_EMPRESA', 'ADMIN_GLOBAL', 'SECRETARIA', 'AUTONOMO'].includes(tipo) && !isentoCobranca) checkBoletoVencimento(idEmp, session, tipo);
 
     await Promise.all([
       loadKPIs(idEmp, profId),
