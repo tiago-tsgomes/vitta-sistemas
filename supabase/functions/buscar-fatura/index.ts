@@ -61,7 +61,7 @@ Deno.serve(async (req: Request) => {
     // Fetch empresa + plano
     const { data: emp, error: empErr } = await supabase
       .from('EMPRESA')
-      .select('ASAAS_SUBSCRIPTION_ID, ASAAS_CUSTOMER_ID, STATUS_EMP, PLANO:ID_PLANO(NOME_PLANO, PRECO_PLANO)')
+      .select('ASAAS_SUBSCRIPTION_ID, ASAAS_CUSTOMER_ID, STATUS_EMP, ACESSO_ATE, PLANO:ID_PLANO(NOME_PLANO, PRECO_PLANO)')
       .eq('ID_EMP', empresaId)
       .single()
 
@@ -99,6 +99,31 @@ Deno.serve(async (req: Request) => {
     }
     allPayments.sort((a, b) => new Date(a.dueDate).getTime() - new Date(b.dueDate).getTime())
     const payment = allPayments[0] ?? null
+
+    // Auto-correção do estado de cobrança (mesma regra de computeBillingState
+    // em _shared/billing.ts, repetida aqui para esta função não depender de
+    // arquivos compartilhados). Se o webhook de vencimento do Asaas não
+    // chegou, a empresa ficava presa em 'ativo' e nunca era bloqueada.
+    // Aqui só PASSA a 'inadimplente' (ou ajusta a data de bloqueio); voltar
+    // a 'ativo' continua a cargo do webhook de pagamento e de buscar-faturas.
+    // Nunca mexe em trial, cancelado, cancelamento_agendado ou erro_asaas.
+    if (emp.STATUS_EMP === 'ativo' || emp.STATUS_EMP === 'inadimplente') {
+      const hojeRef = new Date(); hojeRef.setHours(0, 0, 0, 0)
+      const vencido = (p: { status?: unknown; dueDate: string }) =>
+        p.status === 'OVERDUE' || (p.status === 'PENDING' && new Date(p.dueDate + 'T00:00:00') < hojeRef)
+      const primeiro = allPayments[0]
+      if (primeiro && vencido(primeiro)) {
+        const segundo = allPayments[1]
+        const novoAcesso = segundo ? String(segundo.dueDate) : null
+        const acessoAtual = emp.ACESSO_ATE ? String(emp.ACESSO_ATE).slice(0, 10) : null
+        if (emp.STATUS_EMP !== 'inadimplente' || novoAcesso !== acessoAtual) {
+          await supabase
+            .from('EMPRESA')
+            .update({ STATUS_EMP: 'inadimplente', ACESSO_ATE: novoAcesso })
+            .eq('ID_EMP', empresaId)
+        }
+      }
+    }
 
     if (!payment) {
       return json({

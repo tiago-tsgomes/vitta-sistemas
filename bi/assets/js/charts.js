@@ -315,5 +315,7 @@
     });
   }
 
-  window.BICharts = { drawLineChart, drawGroupedBarChart, drawStackedBarChart, renderLegend, fmtInt, fmtBRLk };
+  // attachTooltip exposto para elementos HTML fora dos gráficos SVG (ex.: células
+  // de mapa de calor), para todos usarem o mesmo tooltip escuro e instantâneo.
+  window.BICharts = { drawLineChart, drawGroupedBarChart, drawStackedBarChart, renderLegend, fmtInt, fmtBRLk, attachTooltip };
 })();

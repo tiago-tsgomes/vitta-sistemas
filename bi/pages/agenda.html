@@ -68,6 +68,20 @@
   .heat-hour-label { font-size: 10.5px; font-weight: 500; color: #9CA3AF; text-align: center; }
   .heat-dow-label { font-size: 12.5px; font-weight: 500; color: #6B7280; text-align: right; padding-right: 6px; }
   .heat-cell { aspect-ratio: 1 / 1; min-height: 16px; border-radius: 3px; }
+
+  /* Blocos novos: tabelas de ação, KPIs gerados por JS */
+  .bi-section-note { font-size: 12px; font-weight: 500; color: #B4B1C8; text-transform: none; letter-spacing: 0; margin-left: 6px; }
+  .bi-table-wrap { overflow-x: auto; max-height: 360px; overflow-y: auto; }
+  .bi-table { width: 100%; border-collapse: collapse; font-size: 13.5px; }
+  .bi-table th { text-align: left; font-size: 11.5px; font-weight: 600; color: #9C99B8; text-transform: uppercase; letter-spacing: .04em; padding: 8px 10px; border-bottom: 1px solid #E3E1EE; position: sticky; top: 0; background: #fff; white-space: nowrap; }
+  .bi-table td { padding: 9px 10px; border-bottom: 1px solid #F1F0F7; color: #111827; vertical-align: middle; }
+  .bi-table td.num, .bi-table th.num { text-align: right; white-space: nowrap; }
+  .bi-table td.muted { color: #6B7280; }
+  .bi-wa { display: inline-flex; align-items: center; gap: 4px; color: #16A34A; text-decoration: none; font-weight: 500; white-space: nowrap; }
+  .bi-wa:hover { text-decoration: underline; }
+  .bi-tag { display: inline-block; font-size: 11.5px; font-weight: 600; padding: 2px 8px; border-radius: 999px; }
+  .bi-card-title { font-size: 15.5px; font-weight: 500; color: #111827; }
+  .bi-card-sub { font-size: 14px; color: #9CA3AF; margin-top: 3px; }
 </style>
 </head>
 <body>
@@ -154,6 +168,64 @@
           <svg id="btn-atualizar-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#6B7280" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 4v6h-6"/><path d="M1 20v-6h6"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
           Atualizar
         </button>
+      </div>
+
+      <!-- ================= Próximos dias (bi_agenda_proximos) ================= -->
+      <div class="bi-section-title">Próximos dias <span class="bi-section-note">— não depende do período selecionado</span></div>
+
+      <div id="kpis-proximos" style="display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px;"></div>
+
+      <div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:20px;flex:none;">
+        <div class="bi-card" style="padding:20px 24px;display:flex;flex-direction:column;">
+          <div style="margin-bottom:14px;">
+            <span class="bi-card-title">Agenda dos próximos 7 dias</span>
+            <div class="bi-card-sub">Confirmados x ainda não confirmados, por dia</div>
+          </div>
+          <div id="chart-proximos-legend" style="margin-bottom:12px;"></div>
+          <svg id="chart-proximos" width="100%" height="200"></svg>
+        </div>
+
+        <div class="bi-card" style="padding:20px 24px;display:flex;flex-direction:column;">
+          <div style="margin-bottom:14px;">
+            <span class="bi-card-title">Para confirmar</span>
+            <div class="bi-card-sub">Agendamentos dos próximos 7 dias ainda como "Agendado"</div>
+          </div>
+          <div id="tabela-nao-confirmados" class="bi-table-wrap">—</div>
+        </div>
+      </div>
+
+      <!-- ================= Ações recomendadas (bi_agenda_acoes) ================= -->
+      <div class="bi-section-title" style="margin-top:6px;">Ações recomendadas <span class="bi-section-note">— não depende do período selecionado</span></div>
+
+      <div id="kpis-acoes" style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;"></div>
+
+      <div style="display:grid;grid-template-columns:1fr;gap:20px;flex:none;">
+        <div class="bi-card" style="padding:20px 24px;display:flex;flex-direction:column;">
+          <div style="margin-bottom:14px;">
+            <span class="bi-card-title">Pacientes sem retorno marcado</span>
+            <div class="bi-card-sub" id="sub-sem-retorno">Atendidos recentemente e sem nenhum agendamento futuro — vale entrar em contato</div>
+          </div>
+          <div id="tabela-sem-retorno" class="bi-table-wrap">—</div>
+        </div>
+      </div>
+
+      <div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:20px;flex:none;">
+        <div class="bi-card" style="padding:20px 24px;display:flex;flex-direction:column;">
+          <div style="margin-bottom:14px;">
+            <span class="bi-card-title">Agendamentos esquecidos</span>
+            <div class="bi-card-sub">Já passaram e continuam "Agendado"/"Confirmada" (últimos 90 dias). Marque como realizada ou falta para as taxas ficarem corretas.</div>
+          </div>
+          <div id="lista-esquecidos-prof" style="display:flex;flex-direction:column;margin-bottom:12px;">—</div>
+          <div id="tabela-esquecidos" class="bi-table-wrap">—</div>
+        </div>
+
+        <div class="bi-card" style="padding:20px 24px;display:flex;flex-direction:column;">
+          <div style="margin-bottom:14px;">
+            <span class="bi-card-title">Pacotes e séries terminando</span>
+            <div class="bi-card-sub">Último horário de uma série nas próximas 2 semanas, sem nada marcado depois — hora de oferecer a renovação</div>
+          </div>
+          <div id="tabela-series" class="bi-table-wrap">—</div>
+        </div>
       </div>
 
       <!-- ================= FASE 1 — Volume e status ================= -->
@@ -362,6 +434,59 @@
         </div>
       </div>
 
+      <!-- ================= Faltas em detalhe (bi_agenda_faltas) ================= -->
+      <div class="bi-section-title" style="margin-top:6px;">Faltas em detalhe</div>
+
+      <div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:20px;flex:none;">
+        <div class="bi-card" style="padding:20px 24px;display:flex;flex-direction:column;">
+          <div style="margin-bottom:14px;">
+            <span class="bi-card-title">Pacientes que mais faltam</span>
+            <div class="bi-card-sub" id="sub-reincidentes">Pacientes com 2 ou mais faltas no período</div>
+          </div>
+          <div id="tabela-reincidentes" class="bi-table-wrap">—</div>
+        </div>
+
+        <div class="bi-card" style="padding:20px 24px;display:flex;flex-direction:column;gap:18px;">
+          <div>
+            <div style="margin-bottom:10px;">
+              <span class="bi-card-title">Falta x antecedência</span>
+              <div class="bi-card-sub">Taxa de falta conforme quanto tempo antes o horário foi marcado</div>
+            </div>
+            <div id="lista-falta-antecedencia" style="display:flex;flex-direction:column;">—</div>
+          </div>
+          <div>
+            <div style="margin-bottom:10px;">
+              <span class="bi-card-title">Falta x tipo de consulta</span>
+              <div class="bi-card-sub">Presencial x online</div>
+            </div>
+            <div id="lista-falta-tipo" style="display:flex;flex-direction:column;">—</div>
+          </div>
+        </div>
+      </div>
+
+      <div style="display:grid;grid-template-columns:1fr;gap:20px;flex:none;">
+        <div class="bi-card" style="padding:24px;display:flex;flex-direction:column;overflow-x:auto;">
+          <div style="margin-bottom:16px;">
+            <span style="display:flex;align-items:center;gap:6px;font-size:17.5px;font-weight:600;color:#111827;">
+              Horários com mais faltas
+              <span class="bi-info" tabindex="0">?<span class="bi-info-tip bi-info-tip-left" style="width:260px;">Taxa de falta (faltas ÷ agendamentos) por dia da semana e hora. Quanto mais vermelho, maior a taxa. Horários com menos de 3 agendamentos ficam claros para não distorcer.</span></span>
+            </span>
+            <div class="bi-card-sub">Dia da semana x hora do dia — passe o mouse para ver os números</div>
+          </div>
+          <div id="heatmap-faltas" style="min-width:760px;">—</div>
+        </div>
+      </div>
+
+      <div style="display:grid;grid-template-columns:1fr;gap:20px;flex:none;">
+        <div class="bi-card" style="padding:20px 24px;display:flex;flex-direction:column;">
+          <div style="margin-bottom:14px;">
+            <span class="bi-card-title">Online por profissional</span>
+            <div class="bi-card-sub">Quanto cada profissional atende online e a taxa de falta em cada tipo</div>
+          </div>
+          <div id="tabela-online-prof" class="bi-table-wrap">—</div>
+        </div>
+      </div>
+
       <!-- ================= FASE 4 — Valor ================= -->
       <div class="bi-section-title" style="margin-top:6px;">Valor (previsto x realizado)</div>
 
@@ -426,6 +551,55 @@
           </div>
           <div id="kpi-receita-perdida" style="font-size:23px;font-weight:600;color:#111827;line-height:1;">—</div>
           <div id="kpi-receita-perdida-sub" style="font-size:13px;color:#6B7280;margin-top:5px;">—</div>
+        </div>
+      </div>
+
+      <!-- ================= Bloqueios, prontuário e a receber (bi_agenda_complementos) ================= -->
+      <div class="bi-section-title" style="margin-top:6px;">Bloqueios, prontuário e a receber</div>
+
+      <div id="kpis-complementos" style="display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px;"></div>
+
+      <div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:20px;flex:none;">
+        <div class="bi-card" style="padding:20px 24px;display:flex;flex-direction:column;gap:18px;">
+          <div>
+            <div style="margin-bottom:10px;">
+              <span class="bi-card-title">Bloqueios de agenda por profissional</span>
+              <div class="bi-card-sub">Horas bloqueadas dentro do período (férias, folgas, compromissos)</div>
+            </div>
+            <div id="lista-bloqueios-prof" style="display:flex;flex-direction:column;">—</div>
+          </div>
+          <div>
+            <div style="margin-bottom:10px;">
+              <span class="bi-card-title">Principais motivos</span>
+            </div>
+            <div id="lista-bloqueios-motivo" style="display:flex;flex-direction:column;">—</div>
+          </div>
+        </div>
+
+        <div class="bi-card" style="padding:20px 24px;display:flex;flex-direction:column;">
+          <div style="margin-bottom:14px;">
+            <span class="bi-card-title">Atendimentos sem prontuário</span>
+            <div class="bi-card-sub">Atendimentos "Realizada" sem registro de consulta, por profissional</div>
+          </div>
+          <div id="tabela-prontuario-prof" class="bi-table-wrap">—</div>
+        </div>
+      </div>
+
+      <div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:20px;flex:none;">
+        <div class="bi-card" style="padding:20px 24px;display:flex;flex-direction:column;">
+          <div style="margin-bottom:14px;">
+            <span class="bi-card-title">A receber por profissional</span>
+            <div class="bi-card-sub">Atendimentos realizados, marcados para pagamento e ainda sem pagamento lançado</div>
+          </div>
+          <div id="lista-receber-prof" style="display:flex;flex-direction:column;">—</div>
+        </div>
+
+        <div class="bi-card" style="padding:20px 24px;display:flex;flex-direction:column;">
+          <div style="margin-bottom:14px;">
+            <span class="bi-card-title">Atendimentos a receber</span>
+            <div class="bi-card-sub">Os mais recentes primeiro</div>
+          </div>
+          <div id="tabela-receber" class="bi-table-wrap">—</div>
         </div>
       </div>
 
@@ -791,6 +965,15 @@
 
   const DOW_LABELS = ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'];
 
+  // Mesmo tooltip escuro e instantâneo dos gráficos (charts.js), no lugar do
+  // "title" do navegador, que é cinza e demora a aparecer.
+  function ligarTooltipsHeatmap(container) {
+    container.querySelectorAll('.heat-cell[data-tip]').forEach((cell) => {
+      cell.style.cursor = 'pointer';
+      BICharts.attachTooltip(cell, cell.dataset.tip);
+    });
+  }
+
   function renderHeatmap(heatmapData) {
     const container = document.getElementById('heatmap-container');
     const matrix = {};
@@ -811,12 +994,13 @@
       for (let h = 0; h < 24; h++) {
         const v = matrix[`${dow}-${h}`] || 0;
         const alpha = v === 0 ? 0.04 : 0.12 + 0.8 * (v / max);
-        cells += `<div class="heat-cell" style="background:rgba(109,93,246,${alpha});" title="${DOW_LABELS[dow]} ${h}h — ${v} agendamento${v === 1 ? '' : 's'}"></div>`;
+        cells += `<div class="heat-cell" style="background:rgba(109,93,246,${alpha});" data-tip="${DOW_LABELS[dow]} ${h}h — ${v} agendamento${v === 1 ? '' : 's'}"></div>`;
       }
       rows += cells;
     }
 
     container.innerHTML = `<div class="heat-grid">${headerCells.join('')}${rows}</div>`;
+    ligarTooltipsHeatmap(container);
   }
 
   function setPadroesLoading() {
@@ -866,6 +1050,353 @@
     });
   }
 
+  /* ===================== Blocos novos (1 a 9) ===================== */
+
+  // Nomes e telefones vêm do cadastro — sempre escapar antes de pôr no HTML
+  function esc(v) {
+    return String(v ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+  }
+
+  const SEM_DADOS = (msg = 'Nada por aqui no momento.') => `<div style="font-size:14px;color:#9CA3AF;padding:8px 0;">${msg}</div>`;
+  const ERRO_CARREGAR = SEM_DADOS('Erro ao carregar.');
+
+  function periodoParams() {
+    return {
+      p_id_emp: idEmp,
+      p_period: periodo,
+      p_data_ini: periodo === 'custom' ? toISODate(customIni) : null,
+      p_data_fim: periodo === 'custom' ? toISODate(customFim) : null,
+    };
+  }
+
+  function fmtDataHora(iso) {
+    if (!iso) return '—';
+    const d = new Date(iso);
+    const dd = String(d.getDate()).padStart(2, '0');
+    const mm = String(d.getMonth() + 1).padStart(2, '0');
+    const hh = String(d.getHours()).padStart(2, '0');
+    const mi = String(d.getMinutes()).padStart(2, '0');
+    return `${dd}/${mm} ${hh}:${mi}`;
+  }
+
+  function fmtData(iso) {
+    if (!iso) return '—';
+    const d = new Date(iso);
+    return String(d.getDate()).padStart(2, '0') + '/' + String(d.getMonth() + 1).padStart(2, '0') + '/' + d.getFullYear();
+  }
+
+  // Telefone com atalho para o WhatsApp (só dígitos; assume Brasil se vier sem DDI)
+  function telHTML(tel) {
+    if (!tel) return '<span style="color:#C4C1D6;">—</span>';
+    let dig = String(tel).replace(/\D/g, '');
+    if (!dig) return esc(tel);
+    if (dig.length <= 11) dig = '55' + dig;
+    return `<a class="bi-wa" href="https://wa.me/${dig}" target="_blank" rel="noopener noreferrer" title="Abrir no WhatsApp">${esc(tel)}</a>`;
+  }
+
+  // cols: [{ label, render(row) -> html, num?:bool }]
+  function renderTabela(containerId, cols, rows, vazio) {
+    const el = document.getElementById(containerId);
+    if (!rows || !rows.length) { el.innerHTML = SEM_DADOS(vazio); return; }
+    el.innerHTML = `<table class="bi-table"><thead><tr>${cols.map((c) => `<th class="${c.num ? 'num' : ''}">${c.label}</th>`).join('')}</tr></thead>
+      <tbody>${rows.map((r) => `<tr>${cols.map((c) => `<td class="${c.num ? 'num' : ''}${c.muted ? ' muted' : ''}">${c.render(r)}</td>`).join('')}</tr>`).join('')}</tbody></table>`;
+  }
+
+  // Lista com barra: itens [{ nome, ... }], valor(item) define a barra, texto(item) o lado direito
+  function renderBarras(containerId, itens, { valor, texto, sub, cor = '#6D5DF6', vazio, max } = {}) {
+    const el = document.getElementById(containerId);
+    if (!itens || !itens.length) { el.innerHTML = SEM_DADOS(vazio); return; }
+    const maxV = max ?? Math.max(...itens.map((i) => Number(valor(i)) || 0), 1);
+    el.innerHTML = itens.map((i) => {
+      const v = Number(valor(i)) || 0;
+      const pct = v <= 0 ? 0 : Math.max(2, Math.round((v / maxV) * 100));
+      const corItem = typeof cor === 'function' ? cor(i) : cor;
+      return `
+        <div style="padding:8px 0;border-bottom:1px solid #E3E1EE;">
+          <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;">
+            <span style="font-size:14.5px;font-weight:500;color:#111827;">${esc(i.nome)}</span>
+            <span style="font-size:13.5px;color:#6B7280;white-space:nowrap;">${texto(i)}</span>
+          </div>
+          <div style="height:7px;background:#F1F0F7;border-radius:999px;margin-top:5px;overflow:hidden;">
+            <div style="height:100%;width:${pct}%;background:${corItem};border-radius:999px;"></div>
+          </div>
+          ${sub ? `<div style="font-size:12.5px;color:#9CA3AF;margin-top:4px;">${sub(i)}</div>` : ''}
+        </div>`;
+    }).join('');
+  }
+
+  // KPIs gerados por JS: defs [{ id, titulo, cor, info, icon }]
+  const ICONS = {
+    cal: '<rect x="3" y="4" width="18" height="17" rx="2"/><path d="M3 9h18M8 2v4M16 2v4"/>',
+    alert: '<circle cx="12" cy="12" r="9"/><path d="M12 8v4"/><path d="M12 16h.01"/>',
+    money: '<path d="M12 1v22"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>',
+    user: '<path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>',
+    clock: '<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/>',
+    repeat: '<path d="M17 1l4 4-4 4"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/><path d="M7 23l-4-4 4-4"/><path d="M21 13v2a4 4 0 0 1-4 4H3"/>',
+    lock: '<rect x="4" y="11" width="16" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/>',
+    file: '<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/>',
+  };
+
+  function montarKpis(containerId, defs) {
+    document.getElementById(containerId).innerHTML = defs.map((d) => `
+      <div class="bi-card" style="padding:14px 16px;">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">
+          <span class="bi-kpi-title">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="${d.cor}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${ICONS[d.icon] || ICONS.cal}</svg>
+            ${d.titulo}
+          </span>
+          <span class="bi-info" tabindex="0">?<span class="bi-info-tip">${d.info}</span></span>
+        </div>
+        <div id="${d.id}" style="font-size:23px;font-weight:600;color:#111827;line-height:1;">—</div>
+        <div id="${d.id}-sub" style="font-size:13px;color:#6B7280;margin-top:5px;">—</div>
+      </div>`).join('');
+  }
+
+  function setKpi(id, valor, sub) {
+    document.getElementById(id).innerHTML = valor;
+    document.getElementById(id + '-sub').innerHTML = sub ?? '';
+  }
+
+  function kpiLoading(ids) {
+    ids.forEach((id) => setKpi(id, '<span class="bi-skeleton" style="width:64px;height:22px;"></span>', '<span class="bi-skeleton" style="width:100px;height:13px;"></span>'));
+  }
+
+  function setupKpisNovos() {
+    montarKpis('kpis-proximos', [
+      { id: 'kpi-prox7', titulo: 'Próximos 7 dias', cor: '#6D5DF6', icon: 'cal', info: 'Agendamentos a partir de agora até o fim do 7º dia (sem contar faltas).' },
+      { id: 'kpi-prox-nao-conf', titulo: 'Para confirmar (7 dias)', cor: '#F59E0B', icon: 'alert', info: 'Agendamentos dos próximos 7 dias que ainda estão como "Agendado", sem confirmação.' },
+      { id: 'kpi-prox30', titulo: 'Próximos 30 dias', cor: '#1a96ac', icon: 'cal', info: 'Agendamentos a partir de agora até o fim do 30º dia (sem contar faltas).' },
+      { id: 'kpi-prox-valor', titulo: 'Valor previsto (30 dias)', cor: '#22C55E', icon: 'money', info: 'Soma do campo "Valor da Consulta (para projeção)" dos agendamentos dos próximos 30 dias.' },
+    ]);
+    montarKpis('kpis-acoes', [
+      { id: 'kpi-sem-retorno', titulo: 'Sem retorno marcado', cor: '#C0392B', icon: 'user', info: 'Pacientes ativos com atendimento realizado nos últimos 60 dias e nenhum agendamento futuro.' },
+      { id: 'kpi-esquecidos', titulo: 'Agendamentos esquecidos', cor: '#F59E0B', icon: 'alert', info: 'Agendamentos que já passaram e continuam como "Agendado" ou "Confirmada" — ninguém marcou realizada nem falta.' },
+      { id: 'kpi-series', titulo: 'Pacotes terminando', cor: '#1a96ac', icon: 'repeat', info: 'Séries de "Repetir agendamento" cujo último horário é nas próximas 2 semanas, sem nada marcado depois.' },
+    ]);
+    montarKpis('kpis-complementos', [
+      { id: 'kpi-bloqueio-horas', titulo: 'Horas bloqueadas', cor: '#8B7FE8', icon: 'lock', info: 'Soma das horas de bloqueio de agenda dos profissionais dentro do período (bloqueios de dias inteiros contam as horas corridas).' },
+      { id: 'kpi-sem-prontuario', titulo: 'Sem prontuário', cor: '#C0392B', icon: 'file', info: 'Atendimentos "Realizada" no período sem registro de consulta (prontuário).' },
+      { id: 'kpi-tempo-registro', titulo: 'Tempo até registrar', cor: '#F0A868', icon: 'clock', info: 'Tempo médio entre o horário do atendimento e a criação do registro de consulta.' },
+      { id: 'kpi-a-receber', titulo: 'A receber', cor: '#22C55E', icon: 'money', info: 'Atendimentos "Realizada", marcados com "Enviar para Pagamento" e sem nenhum pagamento lançado (estornos não contam).' },
+    ]);
+  }
+
+  // ---- 1. Próximos dias ----
+  async function loadProximos() {
+    kpiLoading(['kpi-prox7', 'kpi-prox-nao-conf', 'kpi-prox30', 'kpi-prox-valor']);
+    document.getElementById('tabela-nao-confirmados').innerHTML = skeletonListRows(3);
+    const { data, error } = await BIAuth.client.rpc('bi_agenda_proximos', { p_id_emp: idEmp });
+    if (error) {
+      console.error('bi_agenda_proximos:', error);
+      ['kpi-prox7', 'kpi-prox-nao-conf', 'kpi-prox30', 'kpi-prox-valor'].forEach((id) => setKpi(id, '—', 'Erro ao carregar'));
+      document.getElementById('tabela-nao-confirmados').innerHTML = ERRO_CARREGAR;
+      return;
+    }
+    const p7 = data.proximos7 || {};
+    const p30 = data.proximos30 || {};
+    setKpi('kpi-prox7', p7.total ?? 0, `${p7.confirmados ?? 0} confirmado${p7.confirmados === 1 ? '' : 's'}`);
+    const pctNao = p7.total ? Math.round((p7.naoConfirmados / p7.total) * 100) : 0;
+    setKpi('kpi-prox-nao-conf', p7.naoConfirmados ?? 0, p7.total ? `${pctNao}% da semana` : 'nenhum agendamento');
+    setKpi('kpi-prox30', p30.total ?? 0, `${p30.naoConfirmados ?? 0} ainda sem confirmação`);
+    setKpi('kpi-prox-valor', fmtBRL(p30.valorPrevisto ?? 0), `7 dias: ${fmtBRL(p7.valorPrevisto ?? 0)}`);
+
+    const dias = data.porDia || [];
+    const labels = dias.map((d) => {
+      const [y, m, dd] = String(d.data).slice(0, 10).split('-').map(Number);
+      const dt = new Date(y, m - 1, dd);
+      return `${DOW_LABELS[dt.getDay()]} ${String(dd).padStart(2, '0')}`;
+    });
+    BICharts.drawGroupedBarChart(document.getElementById('chart-proximos'), {
+      labels,
+      series: [
+        { name: 'Confirmados', color: '#22C55E', values: dias.map((d) => d.confirmados) },
+        { name: 'Não confirmados', color: '#F59E0B', values: dias.map((d) => d.naoConfirmados) },
+      ],
+      height: 200,
+      yFmt: BICharts.fmtInt,
+    });
+    document.getElementById('chart-proximos-legend').innerHTML = [
+      { name: 'Confirmados', color: '#22C55E' }, { name: 'Não confirmados', color: '#F59E0B' },
+    ].map((s) => `<span style="display:inline-flex;align-items:center;gap:7px;font-size:14px;font-weight:600;color:#111827;margin-right:18px;"><span style="width:11px;height:11px;border-radius:3px;background:${s.color};display:inline-block;"></span>${s.name}</span>`).join('');
+
+    renderTabela('tabela-nao-confirmados', [
+      { label: 'Quando', render: (r) => fmtDataHora(r.dt) },
+      { label: 'Paciente', render: (r) => esc(r.paciente || '—') },
+      { label: 'Telefone', render: (r) => telHTML(r.telefone) },
+      { label: 'Profissional', render: (r) => esc(r.profissional || '—'), muted: true },
+    ], data.naoConfirmados, 'Tudo confirmado para os próximos 7 dias.');
+  }
+
+  // ---- 3, 4 e 5. Ações ----
+  async function loadAcoes() {
+    kpiLoading(['kpi-sem-retorno', 'kpi-esquecidos', 'kpi-series']);
+    ['tabela-sem-retorno', 'tabela-esquecidos', 'tabela-series'].forEach((id) => { document.getElementById(id).innerHTML = skeletonListRows(3); });
+    document.getElementById('lista-esquecidos-prof').innerHTML = '';
+    const { data, error } = await BIAuth.client.rpc('bi_agenda_acoes', { p_id_emp: idEmp, p_dias_sem_retorno: 60 });
+    if (error) {
+      console.error('bi_agenda_acoes:', error);
+      ['kpi-sem-retorno', 'kpi-esquecidos', 'kpi-series'].forEach((id) => setKpi(id, '—', 'Erro ao carregar'));
+      ['tabela-sem-retorno', 'tabela-esquecidos', 'tabela-series'].forEach((id) => { document.getElementById(id).innerHTML = ERRO_CARREGAR; });
+      return;
+    }
+
+    setKpi('kpi-sem-retorno', data.semRetornoTotal ?? 0, `atendidos nos últimos ${data.diasSemRetorno} dias`);
+    setKpi('kpi-esquecidos', data.esquecidosTotal ?? 0, `${data.esquecidos90 ?? 0} nos últimos 90 dias`);
+    setKpi('kpi-series', data.seriesTerminandoTotal ?? 0, 'nas próximas 2 semanas');
+
+    const extraSemRetorno = (data.semRetornoTotal || 0) > (data.semRetorno || []).length
+      ? ` Mostrando os ${data.semRetorno.length} mais recentes de ${data.semRetornoTotal}.` : '';
+    document.getElementById('sub-sem-retorno').textContent =
+      `Atendidos nos últimos ${data.diasSemRetorno} dias e sem nenhum agendamento futuro — vale entrar em contato.${extraSemRetorno}`;
+
+    renderTabela('tabela-sem-retorno', [
+      { label: 'Paciente', render: (r) => esc(r.paciente || '—') },
+      { label: 'Telefone', render: (r) => telHTML(r.telefone) },
+      { label: 'Último atendimento', render: (r) => fmtData(r.ultimo) },
+      { label: 'Há', render: (r) => `${r.diasDesde} dia${r.diasDesde === 1 ? '' : 's'}`, num: true },
+      { label: 'Profissional', render: (r) => esc(r.profissional || '—'), muted: true },
+    ], data.semRetorno, 'Todos os pacientes atendidos recentemente já têm retorno marcado.');
+
+    renderBarras('lista-esquecidos-prof', data.esquecidosPorProfissional, {
+      valor: (i) => i.total, texto: (i) => `${i.total}`, cor: '#F59E0B', vazio: 'Nenhum agendamento esquecido nos últimos 90 dias.',
+    });
+    renderTabela('tabela-esquecidos', [
+      { label: 'Quando', render: (r) => fmtDataHora(r.dt) },
+      { label: 'Paciente', render: (r) => esc(r.paciente || '—') },
+      { label: 'Status', render: (r) => `<span class="bi-tag" style="background:#FFF7ED;color:#C2410C;">${r.status === 'CONFIRMADA' ? 'Confirmada' : 'Agendado'}</span>` },
+      { label: 'Profissional', render: (r) => esc(r.profissional || '—'), muted: true },
+    ], data.esquecidosLista, ' ');
+
+    renderTabela('tabela-series', [
+      { label: 'Paciente', render: (r) => esc(r.paciente || '—') },
+      { label: 'Telefone', render: (r) => telHTML(r.telefone) },
+      { label: 'Último horário', render: (r) => fmtDataHora(r.ultimo) },
+      { label: 'Restam', render: (r) => `${r.restantes}`, num: true },
+      { label: 'Profissional', render: (r) => esc(r.profissional || '—'), muted: true },
+    ], data.seriesTerminando, 'Nenhum pacote terminando nas próximas 2 semanas.');
+  }
+
+  // ---- 2 e 9. Faltas e online ----
+  function corTaxaFalta(taxa) {
+    if (taxa === null || taxa === undefined) return '#C4C1D6';
+    if (taxa >= 20) return '#C0392B';
+    if (taxa >= 10) return '#F59E0B';
+    return '#22C55E';
+  }
+
+  function renderHeatmapFaltas(cells) {
+    const container = document.getElementById('heatmap-faltas');
+    const m = {};
+    let maxTaxa = 0;
+    (cells || []).forEach((c) => {
+      const taxa = c.total >= 3 ? c.faltas / c.total : null;
+      m[`${c.dow}-${c.hour}`] = { ...c, taxa };
+      if (taxa !== null && taxa > maxTaxa) maxTaxa = taxa;
+    });
+    if (!cells || !cells.length) { container.innerHTML = SEM_DADOS('Sem agendamentos no período.'); return; }
+    const head = ['<div></div>'];
+    for (let h = 0; h < 24; h++) head.push(`<div class="heat-hour-label">${(h % 3 === 0) ? h : ''}</div>`);
+    let rows = '';
+    for (let dow = 0; dow < 7; dow++) {
+      rows += `<div class="heat-dow-label">${DOW_LABELS[dow]}</div>`;
+      for (let h = 0; h < 24; h++) {
+        const c = m[`${dow}-${h}`];
+        let bg = 'rgba(192,57,43,0.04)';
+        let tip = `${DOW_LABELS[dow]} ${h}h — sem agendamentos`;
+        if (c) {
+          if (c.taxa === null) { bg = 'rgba(156,153,184,0.12)'; }
+          else { bg = `rgba(192,57,43,${maxTaxa ? 0.1 + 0.85 * (c.taxa / maxTaxa) : 0.1})`; }
+          tip = `${DOW_LABELS[dow]} ${h}h — ${c.faltas} falta${c.faltas === 1 ? '' : 's'} em ${c.total} agendamento${c.total === 1 ? '' : 's'}${c.total ? ` (${Math.round((c.faltas / c.total) * 100)}%)` : ''}`;
+        }
+        rows += `<div class="heat-cell" style="background:${bg};" data-tip="${tip}"></div>`;
+      }
+    }
+    container.innerHTML = `<div class="heat-grid">${head.join('')}${rows}</div>`;
+    ligarTooltipsHeatmap(container);
+  }
+
+  async function loadFaltas() {
+    ['tabela-reincidentes', 'lista-falta-antecedencia', 'lista-falta-tipo', 'tabela-online-prof'].forEach((id) => { document.getElementById(id).innerHTML = skeletonListRows(3); });
+    document.getElementById('heatmap-faltas').innerHTML = '<div class="bi-skeleton" style="width:100%;height:200px;"></div>';
+    const { data, error } = await BIAuth.client.rpc('bi_agenda_faltas', periodoParams());
+    if (error) {
+      console.error('bi_agenda_faltas:', error);
+      ['tabela-reincidentes', 'lista-falta-antecedencia', 'lista-falta-tipo', 'tabela-online-prof', 'heatmap-faltas'].forEach((id) => { document.getElementById(id).innerHTML = ERRO_CARREGAR; });
+      return;
+    }
+
+    document.getElementById('sub-reincidentes').textContent = data.reincidentesTotal
+      ? `${data.reincidentesTotal} paciente${data.reincidentesTotal === 1 ? '' : 's'} com 2 ou mais faltas no período${data.reincidentesTotal > 20 ? ' (mostrando os 20 que mais faltaram)' : ''}`
+      : 'Pacientes com 2 ou mais faltas no período';
+    renderTabela('tabela-reincidentes', [
+      { label: 'Paciente', render: (r) => esc(r.paciente || '—') },
+      { label: 'Telefone', render: (r) => telHTML(r.telefone) },
+      { label: 'Faltas', render: (r) => `<strong>${r.faltas}</strong> de ${r.total}`, num: true },
+      { label: 'Taxa', render: (r) => `<span style="color:${corTaxaFalta(r.taxa)};font-weight:600;">${fmtPct(r.taxa)}</span>`, num: true },
+    ], data.reincidentes, 'Nenhum paciente com 2 ou mais faltas no período.');
+
+    const optsTaxa = {
+      valor: (i) => i.taxa, max: 100,
+      texto: (i) => `<strong style="color:${corTaxaFalta(i.taxa)};">${fmtPct(i.taxa)}</strong> · ${i.faltas} de ${i.total}`,
+      cor: (i) => corTaxaFalta(i.taxa), vazio: 'Sem agendamentos no período.',
+    };
+    renderBarras('lista-falta-antecedencia', data.porAntecedencia, optsTaxa);
+    renderBarras('lista-falta-tipo', data.porTipo, optsTaxa);
+    renderHeatmapFaltas(data.heatmapFaltas);
+
+    renderTabela('tabela-online-prof', [
+      { label: 'Profissional', render: (r) => esc(r.nome) },
+      { label: 'Agendamentos', render: (r) => r.total, num: true },
+      { label: 'Online', render: (r) => `${r.online} (${fmtPct(r.pctOnline)})`, num: true },
+      { label: 'Falta online', render: (r) => `<span style="color:${corTaxaFalta(r.taxaFaltaOnline)};font-weight:600;">${fmtPct(r.taxaFaltaOnline)}</span>`, num: true },
+      { label: 'Falta presencial', render: (r) => `<span style="color:${corTaxaFalta(r.taxaFaltaPresencial)};font-weight:600;">${fmtPct(r.taxaFaltaPresencial)}</span>`, num: true },
+    ], data.onlinePorProfissional, 'Sem agendamentos no período.');
+  }
+
+  // ---- 6, 7 e 8. Bloqueios, prontuário e a receber ----
+  async function loadComplementos() {
+    kpiLoading(['kpi-bloqueio-horas', 'kpi-sem-prontuario', 'kpi-tempo-registro', 'kpi-a-receber']);
+    ['lista-bloqueios-prof', 'lista-bloqueios-motivo', 'tabela-prontuario-prof', 'lista-receber-prof', 'tabela-receber'].forEach((id) => { document.getElementById(id).innerHTML = skeletonListRows(3); });
+    const { data, error } = await BIAuth.client.rpc('bi_agenda_complementos', periodoParams());
+    if (error) {
+      console.error('bi_agenda_complementos:', error);
+      ['kpi-bloqueio-horas', 'kpi-sem-prontuario', 'kpi-tempo-registro', 'kpi-a-receber'].forEach((id) => setKpi(id, '—', 'Erro ao carregar'));
+      ['lista-bloqueios-prof', 'lista-bloqueios-motivo', 'tabela-prontuario-prof', 'lista-receber-prof', 'tabela-receber'].forEach((id) => { document.getElementById(id).innerHTML = ERRO_CARREGAR; });
+      return;
+    }
+
+    setKpi('kpi-bloqueio-horas', fmtHoras(Number(data.bloqueiosHoras || 0)), `${data.bloqueiosQtd || 0} bloqueio${data.bloqueiosQtd === 1 ? '' : 's'} no período`);
+    const pctSem = data.realizados ? Math.round((data.semProntuario / data.realizados) * 100) : null;
+    setKpi('kpi-sem-prontuario', data.semProntuario ?? 0,
+      data.realizados ? `${pctSem}% de ${data.realizados} realizados${data.prontuarioRascunho ? ` · ${data.prontuarioRascunho} em rascunho` : ''}` : 'nenhum atendimento realizado');
+    setKpi('kpi-tempo-registro', data.tempoMedioRegistroHoras === null ? '—' : fmtHoras(Number(data.tempoMedioRegistroHoras)), 'após o atendimento');
+    setKpi('kpi-a-receber', fmtBRL(data.aReceberValor ?? 0), `${data.aReceberQtd || 0} atendimento${data.aReceberQtd === 1 ? '' : 's'}`);
+
+    renderBarras('lista-bloqueios-prof', data.bloqueiosPorProfissional, {
+      valor: (i) => i.horas, texto: (i) => `${fmtHoras(Number(i.horas))} · ${i.qtd} bloqueio${i.qtd === 1 ? '' : 's'}`, cor: '#8B7FE8', vazio: 'Nenhum bloqueio de agenda no período.',
+    });
+    renderBarras('lista-bloqueios-motivo', data.bloqueiosPorMotivo, {
+      valor: (i) => i.horas, texto: (i) => `${fmtHoras(Number(i.horas))} · ${i.qtd}x`, cor: '#C4C1D6', vazio: '—',
+    });
+
+    renderTabela('tabela-prontuario-prof', [
+      { label: 'Profissional', render: (r) => esc(r.nome) },
+      { label: 'Realizados', render: (r) => r.realizados, num: true },
+      { label: 'Sem prontuário', render: (r) => `<strong>${r.semRegistro}</strong>`, num: true },
+      { label: '%', render: (r) => `<span style="color:${r.pct >= 50 ? '#C0392B' : r.pct >= 20 ? '#F59E0B' : '#22C55E'};font-weight:600;">${fmtPct(r.pct)}</span>`, num: true },
+    ], data.prontuarioPorProfissional, 'Nenhum atendimento realizado no período.');
+
+    renderBarras('lista-receber-prof', data.aReceberPorProfissional, {
+      valor: (i) => i.valor, texto: (i) => `${fmtBRL(i.valor)} · ${i.qtd}`, cor: '#22C55E', vazio: 'Nada a receber no período.',
+    });
+    renderTabela('tabela-receber', [
+      { label: 'Quando', render: (r) => fmtDataHora(r.dt) },
+      { label: 'Paciente', render: (r) => esc(r.paciente || '—') },
+      { label: 'Profissional', render: (r) => esc(r.profissional || '—'), muted: true },
+      { label: 'Valor', render: (r) => fmtBRL(r.valor), num: true },
+    ], data.aReceberLista, 'Nada a receber no período.');
+  }
+
   function applyPeriodoLabel() {
     const label = document.getElementById('filtro-periodo-label');
     if (periodo === 'custom' && customIni && customFim) {
@@ -898,7 +1429,10 @@
     const btn = document.getElementById('btn-atualizar');
     const icon = document.getElementById('btn-atualizar-icon');
     if (manual) { btn.disabled = true; icon.classList.add('bi-spin'); }
-    await Promise.all([loadResumo(), loadDistribuicao(), loadOcupacao(), loadPadroes()]);
+    await Promise.all([
+      loadResumo(), loadDistribuicao(), loadOcupacao(), loadPadroes(),
+      loadProximos(), loadAcoes(), loadFaltas(), loadComplementos(),
+    ]);
     updateUltimaAtualizacao();
     if (manual) { btn.disabled = false; icon.classList.remove('bi-spin'); }
   }
@@ -1112,7 +1646,7 @@
     BIMenu.renderBISidebar('#bi-sidebar', { active: 'agenda', empresaNome: user.empresaNome });
     BIMenu.renderBIHeader('#bi-header', {
       title: 'Agenda & Ocupação',
-      subtitle: `Volume, ocupação, padrões e valor da agenda — ${user.empresaNome}`,
+      subtitle: `Próximos dias, ações, ocupação, faltas e valor da agenda — ${user.empresaNome}`,
       userName: user.userName,
       userRole: user.userRole,
       avatarLetter: user.avatarLetter,
@@ -1123,6 +1657,7 @@
       return;
     }
 
+    setupKpisNovos();
     setupPeriodoPanel();
     setupFullscreenBackdrop();
     setupCardFullscreen({ cardId: 'card-por-profissional', btnId: 'btn-expandir-profissional' });

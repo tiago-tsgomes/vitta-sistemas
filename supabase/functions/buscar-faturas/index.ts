@@ -171,14 +171,20 @@ Deno.serve(async (req: Request) => {
 
     // Auto-corrige o estado de cobrança usando a mesma regra do webhook
     // (computeBillingState em _shared/billing.ts) — cobre casos em que o
-    // webhook do Asaas atrasou, falhou ou chegou fora de ordem. Só aplica a
-    // partir de 'inadimplente': nunca mexe em 'trial' (um boleto criado mas
-    // ainda não vencido faria computeBillingState devolver 'ativo' e
-    // encerraria o trial antes da hora — a saída do trial é feita só por um
-    // PAYMENT_CONFIRMED real, no webhook), 'cancelado', 'cancelamento_agendado'
-    // ou 'erro_asaas', que têm fluxos próprios.
-    if (emp.STATUS_EMP === 'inadimplente') {
-      const novoEstado = computeBillingState(payments)
+    // webhook do Asaas atrasou, falhou ou chegou fora de ordem. Aplica a
+    // 'inadimplente' (pode voltar a 'ativo' ou mudar a data de bloqueio) e a
+    // 'ativo' (só para PASSAR a inadimplente — se o webhook de vencimento
+    // não chegou, a empresa ficava presa em 'ativo' e nunca era bloqueada).
+    // Nunca mexe em 'trial' (um boleto criado mas ainda não vencido faria
+    // computeBillingState devolver 'ativo' e encerraria o trial antes da
+    // hora — a saída do trial é feita só por um PAYMENT_CONFIRMED real, no
+    // webhook), 'cancelado', 'cancelamento_agendado' ou 'erro_asaas', que
+    // têm fluxos próprios.
+    const novoEstadoCalc = (emp.STATUS_EMP === 'inadimplente' || emp.STATUS_EMP === 'ativo')
+      ? computeBillingState(payments)
+      : null
+    if (novoEstadoCalc && (emp.STATUS_EMP === 'inadimplente' || novoEstadoCalc.STATUS_EMP === 'inadimplente')) {
+      const novoEstado = novoEstadoCalc
       // ACESSO_ATE é timestamptz no banco (ISO completo) mas representa só
       // uma data — compara pela parte "AAAA-MM-DD" para não disparar update
       // (e o trigger de auditoria) a cada visita à tela sem mudança real.

@@ -17,9 +17,13 @@ Deno.serve(async (req: Request) => {
     return new Response('ok', { headers: corsHeaders })
   }
 
+  // O token é obrigatório: sem ele, qualquer pessoa poderia mandar um
+  // "pagamento confirmado" falso e desbloquear uma empresa. Antes, um
+  // aviso SEM o cabeçalho passava direto. Se o segredo não estiver
+  // configurado, recusa tudo (melhor falhar do que aceitar sem conferir).
   const tokenEsperado = Deno.env.get('ASAAS_WEBHOOK_TOKEN')
   const tokenRecebido = req.headers.get('asaas-access-token')
-  if (tokenEsperado && tokenRecebido && tokenRecebido !== tokenEsperado) {
+  if (!tokenEsperado || tokenRecebido !== tokenEsperado) {
     return new Response('Unauthorized', { status: 401 })
   }
 

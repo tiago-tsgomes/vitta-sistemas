@@ -19,7 +19,7 @@
     { key: 'dashboard', label: 'Dashboard', href: 'dashboard.html', ready: true },
     { key: 'financeiro', label: 'Financeiro', href: 'financeiro.html', ready: true },
     { key: 'despesas', label: 'Despesas', href: 'despesas.html', ready: true },
-    { key: 'agenda', label: 'Agenda & Ocupação', href: 'agenda.html', ready: false },
+    { key: 'agenda', label: 'Agenda & Ocupação', href: 'agenda.html', ready: true },
     { key: 'pacientes', label: 'Pacientes', href: 'pacientes.html', ready: false },
     { key: 'leads', label: 'Leads', href: 'leads.html', ready: true },
     { key: 'equipe', label: 'Equipe & Produtividade', href: 'equipe.html', ready: false },
