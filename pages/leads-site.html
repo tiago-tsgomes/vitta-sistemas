@@ -1,0 +1,824 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>Leads Site &mdash; Vitta Sistemas</title>
+  <link rel="icon" type="image/png" href="../img/favicon.png" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: { vitta: { 50:'#f0fbfd',100:'#e0f7fa',300:'#80deea',400:'#4dd9ed',500:'#2ABCD4',600:'#1a96ac',700:'#127a8c' } },
+          fontFamily: { sans: ['Montserrat','system-ui','sans-serif'] }
+        }
+      }
+    }
+  </script>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+  <script src="../assets/js/config.js?v=3"></script>
+  <script src="../assets/js/admin-empresa-context.js?v=1"></script>
+  <script src="../assets/js/access-guard.js?v=2"></script>
+  <script src="../assets/js/notifications.js?v=3"></script>
+  <style>
+    .sidebar-nav::-webkit-scrollbar { width:3px; }
+    .sidebar-nav::-webkit-scrollbar-thumb { background:rgba(255,255,255,.1); border-radius:4px; }
+    .submenu { overflow:hidden; max-height:0; opacity:0; transition:max-height .25s ease,opacity .2s ease; }
+    .submenu.open { max-height:500px; opacity:1; }
+    .chevron { transition:transform .25s ease; display:inline-block; }
+    .chevron.open { transform:rotate(180deg); }
+    .block-body { overflow:hidden; transition:max-height .3s ease, opacity .25s ease; max-height:0; opacity:0; }
+    .block-body.open { max-height:2000px; opacity:1; }
+    @keyframes fadeUp { from{opacity:0;transform:translateY(8px)} to{opacity:1;transform:translateY(0)} }
+    .fade-up { animation:fadeUp .35s ease forwards; }
+  </style>
+</head>
+
+<body class="bg-[#F0F2F5] font-sans antialiased">
+<div class="flex min-h-screen">
+
+<!-- ====== SIDEBAR ====== -->
+<aside id="sidebar" class="fixed inset-y-0 left-0 w-[220px] bg-[#111827] flex flex-col z-30 -translate-x-full lg:translate-x-0 transition-transform duration-300">
+  <div class="flex flex-col items-center justify-center gap-1 py-4 px-5 border-b border-white/10 shrink-0">
+    <img src="../img/logo.png" alt="Vitta Sistemas" class="h-12 w-auto brightness-0 invert" />
+    <p class="text-[0.6rem] text-gray-500 tracking-wide">v1.2.2</p>
+  </div>
+  <nav class="flex-1 overflow-y-auto sidebar-nav py-3">
+    <p class="block text-[0.6rem] font-bold text-gray-500 uppercase tracking-widest px-4 pb-1 pt-3">Principal</p>
+    <a href="dashboard.html" class="flex items-center gap-3 px-3 py-2.5 mx-2 rounded-xl text-[0.83rem] font-medium text-gray-400 hover:bg-white/10 hover:text-white transition-colors duration-150 mb-0.5">
+      <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>Dashboard
+    </a>
+    <a href="agendamentos.html" class="flex items-center gap-3 px-3 py-2.5 mx-2 rounded-xl text-[0.83rem] font-medium text-gray-400 hover:bg-white/10 hover:text-white transition-colors duration-150 mb-0.5">
+      <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>Agendamentos
+    </a>
+    <a href="consultas.html" class="flex items-center gap-3 px-3 py-2.5 mx-2 rounded-xl text-[0.83rem] font-medium text-gray-400 hover:bg-white/10 hover:text-white transition-colors duration-150 mb-0.5">
+      <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>Consultas
+    </a>
+
+    <div class="pt-1"></div>
+    <button onclick="toggleMenu('cadastros')" class="w-full flex items-center gap-3 px-3 py-2.5 mx-2 rounded-xl text-[0.83rem] font-medium text-gray-400 hover:bg-white/10 hover:text-white transition-colors duration-150 mb-0.5" style="width:calc(100% - 16px)">
+      <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>Cadastros
+      <svg id="chev-cadastros" class="chevron w-3.5 h-3.5 ml-auto text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+    </button>
+    <div id="sub-cadastros" class="submenu">
+      <a href="pacientes.html" class="flex items-center gap-2 pl-10 pr-3 py-2 mx-2 rounded-xl text-[0.8rem] text-gray-500 hover:bg-white/5 hover:text-gray-300 transition-colors cursor-pointer">Pacientes</a>
+      <a href="profissionais.html" class="flex items-center gap-2 pl-10 pr-3 py-2 mx-2 rounded-xl text-[0.8rem] text-gray-500 hover:bg-white/5 hover:text-gray-300 transition-colors cursor-pointer">Profissionais</a>
+      <a href="usuarios-empresa.html" class="flex items-center gap-2 pl-10 pr-3 py-2 mx-2 rounded-xl text-[0.8rem] text-gray-500 hover:bg-white/5 hover:text-gray-300 transition-colors cursor-pointer">Usu&aacute;rios</a>
+      <div class="hidden" id="menuDocumentosWrap"><a href="documentos.html" class="flex items-center gap-2 pl-10 pr-3 py-2 mx-2 rounded-xl text-[0.8rem] text-gray-500 hover:bg-white/5 hover:text-gray-300 transition-colors cursor-pointer w-full">Documentos</a></div>
+      <a href="leads.html" id="menuLeads" class="flex items-center gap-2 pl-10 pr-3 py-2 mx-2 rounded-xl text-[0.8rem] text-gray-500 hover:bg-white/5 hover:text-gray-300 transition-colors cursor-pointer">Leads</a>
+    </div>
+
+    <div class="pt-1"></div>
+    <button onclick="toggleMenu('servicos')" class="w-full flex items-center gap-3 px-3 py-2.5 mx-2 rounded-xl text-[0.83rem] font-medium text-gray-400 hover:bg-white/10 hover:text-white transition-colors duration-150 cursor-pointer mb-0.5" style="width:calc(100% - 16px)">
+      <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>Outros Cadastros
+      <svg id="chev-servicos" class="chevron w-3.5 h-3.5 ml-auto text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+    </button>
+    <div id="sub-servicos" class="submenu">
+      <a href="servicos.html" class="flex items-center gap-2 pl-10 pr-3 py-2 mx-2 rounded-xl text-[0.8rem] text-gray-500 hover:bg-white/5 hover:text-gray-300 transition-colors cursor-pointer">Servi&ccedil;os</a>
+      <a href="salas.html" class="flex items-center gap-2 pl-10 pr-3 py-2 mx-2 rounded-xl text-[0.8rem] text-gray-500 hover:bg-white/5 hover:text-gray-300 transition-colors cursor-pointer">Salas</a>
+      <a href="especialidades.html" class="flex items-center gap-2 pl-10 pr-3 py-2 mx-2 rounded-xl text-[0.8rem] text-gray-500 hover:bg-white/5 hover:text-gray-300 transition-colors cursor-pointer">Especialidades</a>
+      <a href="grupo.html" class="flex items-center gap-2 pl-10 pr-3 py-2 mx-2 rounded-xl text-[0.8rem] text-gray-500 hover:bg-white/5 hover:text-gray-300 transition-colors cursor-pointer">Grupo</a>
+      <a href="tipospagamento.html" class="flex items-center gap-2 pl-10 pr-3 py-2 mx-2 rounded-xl text-[0.8rem] text-gray-500 hover:bg-white/5 hover:text-gray-300 transition-colors cursor-pointer">Tipos de Pagamento</a>
+      <a href="tiposacompanhamento.html" class="flex items-center gap-2 pl-10 pr-3 py-2 mx-2 rounded-xl text-[0.8rem] text-gray-500 hover:bg-white/5 hover:text-gray-300 transition-colors cursor-pointer">Tipos de Acomp.</a>
+    </div>
+
+    <div class="pt-1"></div>
+    <button onclick="toggleMenu('financeiro')" class="w-full flex items-center gap-3 px-3 py-2.5 mx-2 rounded-xl text-[0.83rem] font-medium text-gray-400 hover:bg-white/10 hover:text-white transition-colors duration-150 cursor-pointer mb-0.5" style="width:calc(100% - 16px)">
+      <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>Financeiro
+      <svg id="chev-financeiro" class="chevron w-3.5 h-3.5 ml-auto text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+    </button>
+    <div id="sub-financeiro" class="submenu">
+      <a href="financeiro.html" class="flex items-center gap-2 pl-10 pr-3 py-2 mx-2 rounded-xl text-[0.8rem] text-gray-500 hover:bg-white/5 hover:text-gray-300 transition-colors cursor-pointer">Lan&ccedil;amentos</a>
+      <a href="relatorios.html" class="flex items-center gap-2 pl-10 pr-3 py-2 mx-2 rounded-xl text-[0.8rem] text-gray-500 hover:bg-white/5 hover:text-gray-300 transition-colors cursor-pointer">Relat&oacute;rios</a>
+    </div>
+
+        <div id="sectionDespesas">
+<div class="pt-1"></div>
+    <button onclick="toggleMenu('despesas')" class="w-full flex items-center gap-3 px-3 py-2.5 mx-2 rounded-xl text-[0.83rem] font-medium text-gray-400 hover:bg-white/10 hover:text-white transition-colors duration-150 cursor-pointer mb-0.5" style="width:calc(100% - 16px)">
+      <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M4 2v20l2-1 2 1 2-1 2 1 2-1 2 1 2-1 2 1V2l-2 1-2-1-2 1-2-1-2 1-2-1-2 1z"/><path d="M16 8h-6a2 2 0 1 0 0 4h4a2 2 0 1 1 0 4H8"/><path d="M12 17.5v-11"/></svg>Despesas
+      <svg id="chev-despesas" class="chevron w-3.5 h-3.5 ml-auto text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+    </button>
+    <div id="sub-despesas" class="submenu">
+      <a href="despesas.html" class="flex items-center gap-2 pl-10 pr-3 py-2 mx-2 rounded-xl text-[0.8rem] text-gray-500 hover:bg-white/5 hover:text-gray-300 transition-colors cursor-pointer">Cadastro Despesa</a>
+      <a href="categorias-despesa.html" class="flex items-center gap-2 pl-10 pr-3 py-2 mx-2 rounded-xl text-[0.8rem] text-gray-500 hover:bg-white/5 hover:text-gray-300 transition-colors cursor-pointer">Categorias</a>
+    </div>
+    </div>
+
+
+    <div id="sectionMinhaEmpresa" class="hidden">
+    <div class="pt-1"></div>
+    <button onclick="toggleMenu('minhaempresa')" class="w-full flex items-center gap-3 px-3 py-2.5 mx-2 rounded-xl text-[0.83rem] font-medium text-gray-400 hover:bg-white/10 hover:text-white transition-colors duration-150 cursor-pointer mb-0.5" style="width:calc(100% - 16px)">
+      <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>Minha Empresa
+      <svg id="chev-minhaempresa" class="chevron w-3.5 h-3.5 ml-auto text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+    </button>
+    <div id="sub-minhaempresa" class="submenu">
+      <a href="minha-empresa.html" class="flex items-center gap-2 pl-10 pr-3 py-2 mx-2 rounded-xl text-[0.8rem] text-gray-500 hover:bg-white/5 hover:text-gray-300 transition-colors cursor-pointer">Meus Dados</a>
+      <a href="faturas.html" class="flex items-center gap-2 pl-10 pr-3 py-2 mx-2 rounded-xl text-[0.8rem] text-gray-500 hover:bg-white/5 hover:text-gray-300 transition-colors cursor-pointer">Minhas Faturas</a>
+    </div>
+    </div>
+    <div id="sectionVittaBI" class="hidden">
+    <div class="pt-1"></div>
+    <a id="linkVittaBI" href="https://bi.vittasistemas.com.br" target="_blank" rel="noopener"
+       class="flex items-center gap-3 px-3 py-2.5 mx-2 rounded-xl text-[0.83rem] font-medium text-gray-400 hover:bg-white/10 hover:text-white transition-colors duration-150 cursor-pointer mb-0.5">
+      <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+        <path d="M3 3v18h18"/><path d="M18.7 8l-5.3 5.3-3-3L4 16.3"/>
+      </svg>
+      Vitta BI
+      <span class="ml-auto text-[0.55rem] font-bold text-violet-300 bg-violet-500/20 px-1.5 py-0.5 rounded">BI</span>
+    </a>
+    </div>
+
+    <div id="sectionAdmin" class="hidden">
+    <div class="pt-1"></div>
+    <button onclick="toggleMenu('admin')" class="w-full flex items-center gap-3 px-3 py-2.5 mx-2 rounded-xl text-[0.83rem] font-medium text-vitta-400 bg-vitta-500/10 transition-colors duration-150 mb-0.5" style="width:calc(100% - 16px)">
+      <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14M4.93 4.93a10 10 0 0 0 0 14.14"/></svg>Administra&ccedil;&atilde;o
+      <svg id="chev-admin" class="chevron open w-3.5 h-3.5 ml-auto text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+    </button>
+    <div id="sub-admin" class="submenu open">
+      <a href="empresas.html" class="flex items-center gap-2 pl-10 pr-3 py-2 mx-2 rounded-xl text-[0.8rem] text-gray-500 hover:bg-white/5 hover:text-gray-300 transition-colors cursor-pointer">Empresas</a>
+      <a href="usuarios.html" class="flex items-center gap-2 pl-10 pr-3 py-2 mx-2 rounded-xl text-[0.8rem] text-gray-500 hover:bg-white/5 hover:text-gray-300 transition-colors cursor-pointer">Usu&aacute;rios Admin</a>
+      <a href="planos.html" class="flex items-center gap-2 pl-10 pr-3 py-2 mx-2 rounded-xl text-[0.8rem] text-gray-500 hover:bg-white/5 hover:text-gray-300 transition-colors cursor-pointer">Planos</a>
+      <a href="dashboard-gerencial.html" class="flex items-center gap-2 pl-10 pr-3 py-2 mx-2 rounded-xl text-[0.8rem] text-gray-500 hover:bg-white/5 hover:text-gray-300 transition-colors cursor-pointer">Dashboard Gerencial</a>
+      <a href="logs.html" class="flex items-center gap-2 pl-10 pr-3 py-2 mx-2 rounded-xl text-[0.8rem] text-gray-500 hover:bg-white/5 hover:text-gray-300 transition-colors cursor-pointer">Log</a>
+      <a href="leads-site.html" class="flex items-center gap-2 pl-10 pr-3 py-2 mx-2 rounded-xl text-[0.8rem] font-semibold text-vitta-400 bg-vitta-500/10 transition-colors cursor-pointer">Leads Site</a>
+      <a href="cadastros_admin.html" class="flex items-center gap-2 pl-10 pr-3 py-2 mx-2 rounded-xl text-[0.8rem] text-gray-500 hover:bg-white/5 hover:text-gray-300 transition-colors cursor-pointer">Cadastros</a>
+    </div>
+    </div>
+    <div class="h-4"></div>
+  </nav>
+  <div class="shrink-0 border-t border-white/10 p-3">
+    <div class="group flex items-center gap-2.5 p-2.5 rounded-xl hover:bg-white/5 cursor-pointer">
+      <div id="user-avatar" class="w-8 h-8 rounded-full bg-vitta-500 flex items-center justify-center text-white text-xs font-bold shrink-0">A</div>
+      <div class="flex-1 min-w-0">
+        <p id="user-name" class="text-white text-[0.8rem] font-semibold truncate">Usu&aacute;rio</p>
+        <p id="user-role" class="text-gray-500 text-[0.7rem] truncate">Admin</p>
+      </div>
+      <button onclick="handleLogout()" title="Sair" class="text-gray-600 hover:text-red-400 transition-colors opacity-0 group-hover:opacity-100">
+        <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+      </button>
+    </div>
+  </div>
+</aside>
+
+<div id="overlay" class="fixed inset-0 bg-black/50 z-20 hidden lg:hidden" onclick="toggleSidebar()"></div>
+
+<div class="flex-1 lg:ml-[220px] flex flex-col min-h-screen">
+  <header class="sticky top-0 z-20 h-16 bg-white border-b border-gray-200 flex items-center px-5 gap-3 shadow-sm">
+    <button onclick="toggleSidebar()" class="lg:hidden p-2 rounded-lg hover:bg-gray-100 text-gray-500">
+      <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+        <line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/>
+      </svg>
+    </button>
+    <div class="flex-1">
+      <h1 class="text-[1rem] font-bold text-gray-800 leading-tight">Leads do Site</h1>
+      <p id="header-date" class="text-[0.7rem] text-gray-400 leading-tight">Contatos recebidos pelo site</p>
+    </div>
+    <div class="hidden md:flex items-center gap-2 px-3 py-2 bg-gray-50 border border-gray-200 rounded-xl">
+      <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-vitta-500 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+        <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/>
+      </svg>
+      <span id="empresa-nome" class="text-[0.78rem] font-semibold text-gray-700">Cl&iacute;nica</span>
+    </div>
+    <div class="flex items-center gap-2.5">
+      <div id="header-avatar" class="w-9 h-9 rounded-full bg-vitta-500 flex items-center justify-center text-white text-sm font-bold shrink-0">A</div>
+      <div class="hidden sm:block">
+        <p id="header-user-name" class="text-[0.8rem] font-semibold text-gray-800 leading-tight">Usu&aacute;rio</p>
+        <p id="header-user-role" class="text-[0.7rem] text-gray-400 leading-tight">Administrador</p>
+      </div>
+    </div>
+    <button onclick="handleLogout()" class="p-2.5 rounded-xl hover:bg-red-50 text-gray-400 hover:text-red-500 transition-colors" title="Sair">
+      <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+        <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/>
+      </svg>
+    </button>
+  </header>
+
+
+  <main class="flex-1 p-5 lg:p-6">
+
+    <!-- Acesso negado (não ADMIN_GLOBAL) -->
+    <div id="accessDenied" class="hidden max-w-md mx-auto mt-16 text-center fade-up">
+      <div class="w-14 h-14 rounded-2xl bg-red-50 border border-red-100 flex items-center justify-center mx-auto mb-4">
+        <svg xmlns="http://www.w3.org/2000/svg" class="w-7 h-7 text-red-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+      </div>
+      <h2 class="text-lg font-bold text-gray-800">Acesso restrito</h2>
+      <p class="text-sm text-gray-500 mt-1">Esta &aacute;rea &eacute; exclusiva do Admin Global.</p>
+    </div>
+
+    <!-- Conteúdo principal (ADMIN_GLOBAL) -->
+    <div id="mainContent" class="hidden max-w-7xl mx-auto fade-up space-y-4">
+
+      <!-- Cards de resumo -->
+      <div class="grid grid-cols-2 lg:grid-cols-5 gap-3">
+        <div class="bg-white rounded-2xl border border-gray-100 p-4">
+          <p class="text-[0.7rem] font-semibold text-gray-400 uppercase tracking-wide">Total de leads</p>
+          <p id="stat-total" class="text-2xl font-bold text-gray-800 mt-1">&mdash;</p>
+        </div>
+        <div class="bg-white rounded-2xl border border-gray-100 p-4">
+          <p class="text-[0.7rem] font-semibold text-gray-400 uppercase tracking-wide">Novos (sem contato)</p>
+          <p id="stat-novos" class="text-2xl font-bold text-amber-500 mt-1">&mdash;</p>
+        </div>
+        <div class="bg-white rounded-2xl border border-gray-100 p-4">
+          <p class="text-[0.7rem] font-semibold text-gray-400 uppercase tracking-wide">&Uacute;ltimos 7 dias</p>
+          <p id="stat-semana" class="text-2xl font-bold text-vitta-500 mt-1">&mdash;</p>
+        </div>
+        <div class="bg-white rounded-2xl border border-gray-100 p-4">
+          <p class="text-[0.7rem] font-semibold text-gray-400 uppercase tracking-wide">Convertidos</p>
+          <p id="stat-convertidos" class="text-2xl font-bold text-emerald-500 mt-1">&mdash;</p>
+        </div>
+        <div class="bg-white rounded-2xl border border-gray-100 p-4 col-span-2 lg:col-span-1">
+          <p class="text-[0.7rem] font-semibold text-gray-400 uppercase tracking-wide">Taxa de convers&atilde;o</p>
+          <p id="stat-taxa" class="text-2xl font-bold text-violet-500 mt-1">&mdash;</p>
+        </div>
+      </div>
+
+      <!-- Tabela de leads -->
+      <div class="bg-white rounded-2xl border border-gray-100 overflow-hidden">
+        <div class="flex flex-col gap-3 px-5 py-4 border-b border-gray-100">
+          <div class="flex flex-col sm:flex-row sm:items-center gap-3">
+            <div class="flex-1">
+              <h2 class="text-[0.95rem] font-bold text-gray-800">Contatos recebidos pelo site</h2>
+              <p class="text-[0.72rem] text-gray-400">Mais recentes primeiro &middot; altere o status direto na lista</p>
+            </div>
+            <div class="flex gap-2">
+              <button onclick="loadLeads()" class="flex items-center gap-1.5 px-3 py-2 text-[0.8rem] font-semibold text-gray-600 border border-gray-200 rounded-xl hover:bg-gray-50 transition-colors">
+                <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M23 4v6h-6"/><path d="M1 20v-6h6"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
+                Atualizar
+              </button>
+              <button onclick="exportarCSV()" class="flex items-center gap-1.5 px-3 py-2 text-[0.8rem] font-semibold text-white bg-vitta-500 rounded-xl hover:bg-vitta-600 transition-colors">
+                <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                Exportar
+              </button>
+            </div>
+          </div>
+
+          <!-- Filtros -->
+          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-7 gap-2">
+            <div class="relative lg:col-span-2">
+              <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+              <input id="fBusca" type="text" oninput="renderLeads()" placeholder="Buscar nome, telefone, e-mail, cl&iacute;nica ou campanha&hellip;"
+                class="w-full pl-9 pr-3 py-2 text-[0.8rem] text-gray-700 border border-gray-200 rounded-xl outline-none focus:border-vitta-400 focus:ring-2 focus:ring-vitta-100" />
+            </div>
+            <select id="fStatus" onchange="renderLeads()" class="w-full px-3 py-2 text-[0.8rem] text-gray-700 border border-gray-200 rounded-xl outline-none focus:border-vitta-400 bg-white">
+              <option value="">Todos os status</option>
+            </select>
+            <select id="fPlano" onchange="renderLeads()" class="w-full px-3 py-2 text-[0.8rem] text-gray-700 border border-gray-200 rounded-xl outline-none focus:border-vitta-400 bg-white">
+              <option value="">Todos os planos</option>
+            </select>
+            <select id="fOrigem" onchange="renderLeads()" class="w-full px-3 py-2 text-[0.8rem] text-gray-700 border border-gray-200 rounded-xl outline-none focus:border-vitta-400 bg-white">
+              <option value="">Todas as origens</option>
+            </select>
+            <div class="flex items-center gap-1.5 sm:col-span-2 lg:col-span-2">
+              <span class="text-[0.72rem] text-gray-400 shrink-0">De</span>
+              <input id="fDe" type="date" onchange="renderLeads()" title="De" class="w-full min-w-0 px-2 py-2 text-[0.78rem] text-gray-700 border border-gray-200 rounded-xl outline-none focus:border-vitta-400" />
+              <span class="text-[0.72rem] text-gray-400 shrink-0">at&eacute;</span>
+              <input id="fAte" type="date" onchange="renderLeads()" title="At&eacute;" class="w-full min-w-0 px-2 py-2 text-[0.78rem] text-gray-700 border border-gray-200 rounded-xl outline-none focus:border-vitta-400" />
+            </div>
+          </div>
+        </div>
+
+        <div class="overflow-x-auto">
+          <table class="w-full text-left">
+            <thead>
+              <tr class="text-[0.68rem] font-bold text-gray-400 uppercase tracking-wide bg-gray-50/70">
+                <th class="px-5 py-3">Recebido em</th>
+                <th class="px-5 py-3">Nome / Cl&iacute;nica</th>
+                <th class="px-5 py-3">Contato</th>
+                <th class="px-5 py-3">Plano de interesse</th>
+                <th class="px-5 py-3">Origem</th>
+                <th class="px-5 py-3">Status</th>
+                <th class="px-5 py-3 text-right">A&ccedil;&otilde;es</th>
+              </tr>
+            </thead>
+            <tbody id="leadsBody" class="divide-y divide-gray-50">
+              <tr><td colspan="7" class="px-5 py-10 text-center text-sm text-gray-400">Carregando&hellip;</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="px-5 py-3 border-t border-gray-100 text-[0.72rem] text-gray-400 flex items-center justify-between gap-3">
+          <span id="leadsCount">&mdash;</span>
+          <button id="btnLimparFiltros" onclick="limparFiltros()" class="hidden text-vitta-600 font-semibold hover:underline">Limpar filtros</button>
+        </div>
+      </div>
+
+    </div>
+
+  </main>
+
+  <!-- Modal: detalhes / anotações do lead -->
+  <div id="modalLead" class="fixed inset-0 z-50 hidden items-center justify-center bg-black/40 p-4" onclick="if(event.target===this) fecharModal()">
+    <div class="bg-white rounded-2xl shadow-xl w-full max-w-lg overflow-hidden">
+      <div class="flex items-start justify-between gap-3 px-5 py-4 border-b border-gray-100">
+        <div class="min-w-0">
+          <h3 id="mNome" class="text-[1rem] font-bold text-gray-800 truncate">Lead</h3>
+          <p id="mSub" class="text-[0.72rem] text-gray-400"></p>
+        </div>
+        <button onclick="fecharModal()" class="p-1.5 rounded-lg hover:bg-gray-100 text-gray-400" title="Fechar">
+          <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
+      </div>
+      <div class="px-5 py-4 space-y-4">
+        <div id="mInfo" class="grid grid-cols-2 gap-3 text-[0.8rem]"></div>
+        <div>
+          <label class="block text-[0.72rem] font-semibold text-gray-500 uppercase tracking-wide mb-1">Status</label>
+          <select id="mStatus" class="w-full px-3 py-2 text-[0.85rem] text-gray-700 border border-gray-200 rounded-xl outline-none focus:border-vitta-400 bg-white"></select>
+        </div>
+        <div>
+          <label class="block text-[0.72rem] font-semibold text-gray-500 uppercase tracking-wide mb-1">Anota&ccedil;&otilde;es do atendimento</label>
+          <textarea id="mObs" rows="5" maxlength="4000" placeholder="Ex.: liguei dia 25, pediu retorno na segunda; demonstra&ccedil;&atilde;o marcada para 28/11 &agrave;s 14h&hellip;"
+            class="w-full px-3 py-2 text-[0.85rem] text-gray-700 border border-gray-200 rounded-xl outline-none focus:border-vitta-400 focus:ring-2 focus:ring-vitta-100 resize-y"></textarea>
+          <p id="mAtualizado" class="text-[0.7rem] text-gray-400 mt-1"></p>
+        </div>
+      </div>
+      <div class="flex items-center justify-between gap-2 px-5 py-4 border-t border-gray-100 bg-gray-50/50">
+        <button onclick="excluirLeadAtual()" class="px-3 py-2 text-[0.8rem] font-semibold text-red-500 rounded-xl hover:bg-red-50 transition-colors">Excluir lead</button>
+        <div class="flex gap-2">
+          <button onclick="fecharModal()" class="px-4 py-2 text-[0.8rem] font-semibold text-gray-600 border border-gray-200 rounded-xl hover:bg-white transition-colors">Cancelar</button>
+          <button id="mSalvar" onclick="salvarModal()" class="px-4 py-2 text-[0.8rem] font-semibold text-white bg-vitta-500 rounded-xl hover:bg-vitta-600 transition-colors">Salvar</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal: confirmar exclusão (fica acima do modal de detalhes) -->
+  <div id="modalExcluir" class="fixed inset-0 z-[60] hidden items-center justify-center bg-black/40 p-4" onclick="if(event.target===this) responderExclusao(false)">
+    <div class="bg-white rounded-2xl shadow-xl w-full max-w-sm p-5 fade-up" onclick="event.stopPropagation()">
+      <div class="w-11 h-11 rounded-xl bg-red-50 border border-red-100 flex items-center justify-center mb-3">
+        <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>
+      </div>
+      <h3 class="text-[0.95rem] font-bold text-gray-800 mb-1.5">Excluir lead</h3>
+      <p class="text-[0.83rem] text-gray-500 mb-5">
+        Tem certeza que deseja excluir <strong id="excluirNome" class="text-gray-800 break-words"></strong>?
+        Essa a&ccedil;&atilde;o n&atilde;o pode ser desfeita.
+      </p>
+      <div class="flex gap-2.5">
+        <button onclick="responderExclusao(false)" class="flex-1 py-2 border border-gray-200 rounded-xl text-sm font-medium text-gray-600 hover:bg-gray-50 transition-colors">Cancelar</button>
+        <button id="btnExcluirConfirmar" onclick="responderExclusao(true)" class="flex-1 py-2 rounded-xl text-sm font-semibold text-white bg-red-500 hover:bg-red-600 transition-colors outline-none focus:ring-2 focus:ring-red-200">Excluir</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+</div><!-- /flex min-h-screen -->
+
+<script src="../assets/js/toast.js?v=1"></script>
+<script>
+/* ── Utilitários ── */
+// Os dados vêm de um formulário público do site: tudo é escapado antes de ir para o HTML.
+function escHtml(s) { return (s == null ? '' : String(s)).replace(/[&<>"']/g, c => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;' }[c])); }
+
+function toggleMenu(k) {
+  const s = document.getElementById('sub-' + k);
+  const c = document.getElementById('chev-' + k);
+  const o = s.classList.contains('open');
+  s.classList.toggle('open', !o);
+  if (c) c.classList.toggle('open', !o);
+}
+
+function toggleSidebar() {
+  const sb = document.getElementById('sidebar');
+  const ov = document.getElementById('overlay');
+  const o  = sb.classList.contains('-translate-x-full');
+  sb.classList.toggle('-translate-x-full', !o);
+  ov.classList.toggle('hidden', !o);
+}
+
+async function handleLogout() { await supabase.auth.signOut(); window.location.href = '../index.html'; }
+
+function aviso(msg, tipo) {
+  if (typeof showToast === 'function') showToast(msg, tipo);
+  else alert(msg);
+}
+
+const TIPO_LABELS = { ADMIN_GLOBAL:'Admin Global', ADMIN_EMPRESA:'Administrador', SECRETARIA:'Secretaria', PROFISSIONAL:'Profissional' };
+
+// Etapas do atendimento do lead (o site sempre grava como "Novo")
+const STATUS_LIST = ['Novo', 'Em contato', 'Demonstração agendada', 'Convertido', 'Perdido'];
+const STATUS_STYLE = {
+  'Novo':                  'bg-amber-50 text-amber-700 border-amber-200',
+  'Em contato':            'bg-sky-50 text-sky-700 border-sky-200',
+  'Demonstração agendada': 'bg-violet-50 text-violet-700 border-violet-200',
+  'Convertido':            'bg-emerald-50 text-emerald-700 border-emerald-200',
+  'Perdido':               'bg-gray-100 text-gray-500 border-gray-200',
+};
+
+let _leads = [];
+let _leadAtual = null;
+
+function fmtDateTime(iso) {
+  if (!iso) return '';
+  const d = new Date(iso);
+  if (isNaN(d)) return '';
+  return d.toLocaleString('pt-BR', { day:'2-digit', month:'2-digit', year:'numeric', hour:'2-digit', minute:'2-digit' });
+}
+
+function tempoRelativo(iso) {
+  if (!iso) return '';
+  const min = Math.floor((Date.now() - new Date(iso).getTime()) / 60000);
+  if (min < 1) return 'agora';
+  if (min < 60) return `há ${min} min`;
+  const h = Math.floor(min / 60);
+  if (h < 24) return `há ${h}h`;
+  const d = Math.floor(h / 24);
+  return `há ${d} dia${d === 1 ? '' : 's'}`;
+}
+
+function normalizeSearch(s) {
+  return (s || '').normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase().trim();
+}
+
+// Link do WhatsApp com mensagem pronta (assume Brasil se vier sem DDI)
+function waLink(tel, nome) {
+  let dig = String(tel || '').replace(/\D/g, '');
+  if (!dig) return null;
+  if (dig.length <= 11) dig = '55' + dig;
+  const primeiro = String(nome || '').trim().split(/\s+/)[0] || '';
+  const msg = `Olá${primeiro ? ', ' + primeiro : ''}! Aqui é da Vitta Sistemas. Recebemos seu contato pelo nosso site e gostaríamos de apresentar a plataforma. Podemos conversar?`;
+  return `https://wa.me/${dig}?text=${encodeURIComponent(msg)}`;
+}
+
+// De onde veio o lead: fonte/mídia, campanha e palavra-chave (quando vieram na URL do anúncio)
+function fonteLead(l) {
+  if (l.utm_source) return [l.utm_source, l.utm_medium].filter(Boolean).join(' / ');
+  if (l.gclid) return 'google / cpc';
+  if (l.fbclid) return 'meta / pago';
+  return '';
+}
+
+function origemHTML(l) {
+  const fonte = fonteLead(l);
+  const linhas = [`<div class="whitespace-nowrap">${escHtml(l.origem || '—')}</div>`];
+  if (fonte) linhas.push(`<div><span class="inline-block mt-0.5 px-2 py-0.5 rounded-full text-[0.68rem] font-semibold bg-indigo-50 text-indigo-600 border border-indigo-100 whitespace-nowrap">${escHtml(fonte)}</span></div>`);
+  if (l.utm_campaign) linhas.push(`<div class="text-[0.7rem] text-gray-400 truncate max-w-[200px]" title="Campanha">Campanha: ${escHtml(l.utm_campaign)}</div>`);
+  if (l.utm_term) linhas.push(`<div class="text-[0.7rem] text-gray-400 truncate max-w-[200px]" title="Palavra-chave">Palavra-chave: ${escHtml(l.utm_term)}</div>`);
+  return linhas.join('');
+}
+
+function statusBadge(st) {
+  return STATUS_STYLE[st] || 'bg-gray-50 text-gray-500 border-gray-200';
+}
+
+function statusOptions(atual) {
+  const lista = STATUS_LIST.includes(atual) || !atual ? STATUS_LIST : [atual, ...STATUS_LIST];
+  return lista.map(s => `<option value="${escHtml(s)}"${s === atual ? ' selected' : ''}>${escHtml(s)}</option>`).join('');
+}
+
+/* ── Resumo e filtros ── */
+function updateStats() {
+  const semana = Date.now() - 7 * 24 * 60 * 60 * 1000;
+  const total = _leads.length;
+  const novos = _leads.filter(l => l.status === 'Novo').length;
+  const recentes = _leads.filter(l => new Date(l.created_at).getTime() >= semana).length;
+  const convertidos = _leads.filter(l => l.status === 'Convertido').length;
+  document.getElementById('stat-total').textContent = total;
+  document.getElementById('stat-novos').textContent = novos;
+  document.getElementById('stat-semana').textContent = recentes;
+  document.getElementById('stat-convertidos').textContent = convertidos;
+  document.getElementById('stat-taxa').textContent = total ? `${Math.round((convertidos / total) * 100)}%` : '—';
+}
+
+function preencherSelect(id, valores, rotuloTodos) {
+  const sel = document.getElementById(id);
+  const atual = sel.value;
+  sel.innerHTML = `<option value="">${rotuloTodos}</option>` +
+    valores.map(v => `<option value="${escHtml(v)}">${escHtml(v)}</option>`).join('');
+  if (valores.includes(atual)) sel.value = atual;
+}
+
+function populateFiltros() {
+  const unicos = (campo) => [...new Set(_leads.map(l => l[campo]).filter(Boolean))].sort((a, b) => a.localeCompare(b, 'pt-BR'));
+  const status = [...new Set([...STATUS_LIST, ..._leads.map(l => l.status).filter(Boolean)])];
+  preencherSelect('fStatus', status, 'Todos os status');
+  preencherSelect('fPlano', unicos('plano_interesse'), 'Todos os planos');
+  preencherSelect('fOrigem', unicos('origem'), 'Todas as origens');
+}
+
+function leadsFiltrados() {
+  const q = normalizeSearch(document.getElementById('fBusca').value);
+  const st = document.getElementById('fStatus').value;
+  const pl = document.getElementById('fPlano').value;
+  const og = document.getElementById('fOrigem').value;
+  const de = document.getElementById('fDe').value;
+  const ate = document.getElementById('fAte').value;
+  const ini = de ? new Date(de + 'T00:00:00').getTime() : null;
+  const fim = ate ? new Date(ate + 'T23:59:59').getTime() : null;
+  return _leads.filter(l => {
+    if (st && l.status !== st) return false;
+    if (pl && l.plano_interesse !== pl) return false;
+    if (og && l.origem !== og) return false;
+    const t = new Date(l.created_at).getTime();
+    if (ini && t < ini) return false;
+    if (fim && t > fim) return false;
+    if (!q) return true;
+    const qDig = q.replace(/\D/g, '');
+    return [l.nome, l.email, l.clinica, l.observacao, l.utm_source, l.utm_campaign, l.utm_term, l.utm_content].some(v => normalizeSearch(v).includes(q))
+      || (qDig.length >= 3 && String(l.telefone || '').replace(/\D/g, '').includes(qDig));
+  });
+}
+
+function limparFiltros() {
+  ['fBusca', 'fStatus', 'fPlano', 'fOrigem', 'fDe', 'fAte'].forEach(id => { document.getElementById(id).value = ''; });
+  renderLeads();
+}
+
+/* ── Lista ── */
+function renderLeads() {
+  const body = document.getElementById('leadsBody');
+  const rows = leadsFiltrados();
+  const temFiltro = ['fBusca', 'fStatus', 'fPlano', 'fOrigem', 'fDe', 'fAte'].some(id => document.getElementById(id).value);
+  document.getElementById('btnLimparFiltros').classList.toggle('hidden', !temFiltro);
+
+  if (!rows.length) {
+    body.innerHTML = `<tr><td colspan="7" class="px-5 py-10 text-center text-sm text-gray-400">${_leads.length ? 'Nenhum lead com esses filtros.' : 'Nenhum lead recebido pelo site ainda.'}</td></tr>`;
+    document.getElementById('leadsCount').textContent = `0 de ${_leads.length} lead(s)`;
+    return;
+  }
+
+  body.innerHTML = rows.map(l => {
+    const wa = waLink(l.telefone, l.nome);
+    const tel = l.telefone
+      ? (wa ? `<a href="${wa}" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-1 text-emerald-600 font-semibold hover:underline whitespace-nowrap" title="Abrir conversa no WhatsApp">
+          <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>${escHtml(l.telefone)}</a>`
+        : escHtml(l.telefone))
+      : '<span class="text-gray-300">&mdash;</span>';
+    const email = l.email
+      ? `<a href="mailto:${escHtml(l.email)}" class="block text-[0.74rem] text-gray-500 hover:text-vitta-600 hover:underline truncate max-w-[220px]">${escHtml(l.email)}</a>`
+      : '';
+    const obs = l.observacao
+      ? `<span class="ml-1 inline-block w-1.5 h-1.5 rounded-full bg-vitta-500 align-middle" title="Tem anotações"></span>`
+      : '';
+    return `<tr class="hover:bg-gray-50/60 transition-colors">
+      <td class="px-5 py-3 text-[0.8rem] text-gray-700 whitespace-nowrap">
+        ${escHtml(fmtDateTime(l.created_at))}
+        <span class="block text-[0.7rem] text-gray-400">${escHtml(tempoRelativo(l.created_at))}</span>
+      </td>
+      <td class="px-5 py-3">
+        <button onclick="abrirModal(${Number(l.id)})" class="text-left text-[0.84rem] font-semibold text-gray-800 hover:text-vitta-600">${escHtml(l.nome)}${obs}</button>
+        <span class="block text-[0.74rem] text-gray-500">${l.clinica ? escHtml(l.clinica) : '<span class="text-gray-300">sem cl&iacute;nica informada</span>'}</span>
+      </td>
+      <td class="px-5 py-3 text-[0.8rem]">${tel}${email}</td>
+      <td class="px-5 py-3 text-[0.8rem] text-gray-600">${escHtml(l.plano_interesse || '—')}</td>
+      <td class="px-5 py-3 text-[0.78rem] text-gray-500">${origemHTML(l)}</td>
+      <td class="px-5 py-3">
+        <select onchange="alterarStatus(${Number(l.id)}, this.value, this)"
+          class="px-2.5 py-1 text-[0.74rem] font-semibold border rounded-full outline-none cursor-pointer ${statusBadge(l.status)}">${statusOptions(l.status)}</select>
+      </td>
+      <td class="px-5 py-3 text-right whitespace-nowrap">
+        <button onclick="abrirModal(${Number(l.id)})" class="p-1.5 rounded-lg text-gray-400 hover:text-vitta-600 hover:bg-vitta-50 transition-colors" title="Detalhes e anotações">
+          <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+        </button>
+        <button onclick="excluirLead(${Number(l.id)})" class="p-1.5 rounded-lg text-gray-400 hover:text-red-500 hover:bg-red-50 transition-colors" title="Excluir lead">
+          <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>
+        </button>
+      </td>
+    </tr>`;
+  }).join('');
+
+  document.getElementById('leadsCount').textContent = `${rows.length} de ${_leads.length} lead(s)`;
+}
+
+/* ── Dados ── */
+async function loadLeads() {
+  const body = document.getElementById('leadsBody');
+  const CAMPOS = 'id, nome, telefone, email, plano_interesse, clinica, origem, status, created_at, observacao, atualizado_em';
+  const CAMPOS_ORIGEM = ', utm_source, utm_medium, utm_campaign, utm_term, utm_content, gclid, fbclid';
+  let { data, error } = await supabase.from('LEAD_SITE').select(CAMPOS + CAMPOS_ORIGEM).order('created_at', { ascending: false });
+  // Sem os campos de origem no banco (SQL 20261125120000 ainda não rodado), carrega o básico
+  if (error && /utm_|gclid|fbclid|column/i.test(error.message || '')) {
+    ({ data, error } = await supabase.from('LEAD_SITE').select(CAMPOS).order('created_at', { ascending: false }));
+  }
+  if (error) {
+    body.innerHTML = `<tr><td colspan="7" class="px-5 py-10 text-center text-sm text-red-500 font-semibold">
+      Erro ao carregar os leads.<br>
+      <span class="text-gray-400 font-normal text-[0.75rem]">Verifique se o script <code class="font-mono">supabase/migrations/20261124120000_lead_site_admin.sql</code> foi rodado no Supabase.</span>
+    </td></tr>`;
+    return;
+  }
+  _leads = data || [];
+  populateFiltros();
+  updateStats();
+  renderLeads();
+}
+
+async function atualizarLead(id, campos) {
+  const payload = { ...campos, atualizado_em: new Date().toISOString() };
+  const { data, error } = await supabase.from('LEAD_SITE').update(payload).eq('id', id).select('id');
+  if (error || !data || !data.length) {
+    aviso('Não foi possível salvar: ' + (error?.message || 'sem permissão'), 'error');
+    return false;
+  }
+  const l = _leads.find(x => x.id === id);
+  if (l) Object.assign(l, payload);
+  return true;
+}
+
+async function alterarStatus(id, novo, el) {
+  const l = _leads.find(x => x.id === id);
+  const anterior = l ? l.status : null;
+  if (!(await atualizarLead(id, { status: novo }))) {
+    if (el && anterior) el.value = anterior;
+    return;
+  }
+  aviso(`Status alterado para "${novo}".`);
+  updateStats();
+  renderLeads();
+}
+
+/* Confirmação de exclusão no visual do sistema (no lugar do confirm() do navegador) */
+let _respostaExclusao = null;
+
+function confirmarExclusao(lead) {
+  document.getElementById('excluirNome').textContent = lead.nome || 'este lead';
+  const m = document.getElementById('modalExcluir');
+  m.classList.remove('hidden'); m.classList.add('flex');
+  setTimeout(() => document.getElementById('btnExcluirConfirmar').focus(), 0);
+  return new Promise(resolve => { _respostaExclusao = resolve; });
+}
+
+function responderExclusao(sim) {
+  const m = document.getElementById('modalExcluir');
+  m.classList.add('hidden'); m.classList.remove('flex');
+  if (_respostaExclusao) { const r = _respostaExclusao; _respostaExclusao = null; r(sim); }
+}
+
+function modalExclusaoAberto() {
+  return !document.getElementById('modalExcluir').classList.contains('hidden');
+}
+
+async function excluirLead(id) {
+  const l = _leads.find(x => x.id === id);
+  if (!l) return false;
+  if (!(await confirmarExclusao(l))) return false;
+  const { data, error } = await supabase.from('LEAD_SITE').delete().eq('id', id).select('id');
+  if (error || !data || !data.length) {
+    aviso('Não foi possível excluir: ' + (error?.message || 'sem permissão'), 'error');
+    return false;
+  }
+  _leads = _leads.filter(x => x.id !== id);
+  aviso('Lead excluído.');
+  populateFiltros();
+  updateStats();
+  renderLeads();
+  return true;
+}
+
+/* ── Modal de detalhes ── */
+function abrirModal(id) {
+  const l = _leads.find(x => x.id === id);
+  if (!l) return;
+  _leadAtual = l;
+  document.getElementById('mNome').textContent = l.nome || 'Lead';
+  document.getElementById('mSub').textContent = `Recebido em ${fmtDateTime(l.created_at)} · ${l.origem || 'Site'}`;
+  const wa = waLink(l.telefone, l.nome);
+  const info = [
+    ['Telefone', l.telefone ? (wa ? `<a href="${wa}" target="_blank" rel="noopener noreferrer" class="text-emerald-600 font-semibold hover:underline">${escHtml(l.telefone)}</a>` : escHtml(l.telefone)) : '—'],
+    ['E-mail', l.email ? `<a href="mailto:${escHtml(l.email)}" class="text-vitta-600 hover:underline break-all">${escHtml(l.email)}</a>` : '—'],
+    ['Clínica / especialidade', escHtml(l.clinica || '—')],
+    ['Plano de interesse', escHtml(l.plano_interesse || '—')],
+    ['Fonte / mídia', escHtml(fonteLead(l) || '—')],
+    ['Campanha', escHtml(l.utm_campaign || '—')],
+    ['Palavra-chave', escHtml(l.utm_term || '—')],
+    ['Anúncio', escHtml(l.utm_content || '—')],
+  ];
+  document.getElementById('mInfo').innerHTML = info.map(([k, v]) =>
+    `<div><p class="text-[0.68rem] font-semibold text-gray-400 uppercase tracking-wide">${k}</p><p class="text-gray-800 mt-0.5">${v}</p></div>`).join('');
+  document.getElementById('mStatus').innerHTML = statusOptions(l.status);
+  document.getElementById('mObs').value = l.observacao || '';
+  document.getElementById('mAtualizado').textContent = l.atualizado_em ? `Última alteração: ${fmtDateTime(l.atualizado_em)}` : '';
+  const m = document.getElementById('modalLead');
+  m.classList.remove('hidden'); m.classList.add('flex');
+}
+
+function fecharModal() {
+  const m = document.getElementById('modalLead');
+  m.classList.add('hidden'); m.classList.remove('flex');
+  _leadAtual = null;
+}
+
+async function salvarModal() {
+  if (!_leadAtual) return;
+  const btn = document.getElementById('mSalvar');
+  btn.disabled = true; btn.textContent = 'Salvando…';
+  const obs = document.getElementById('mObs').value.trim();
+  const ok = await atualizarLead(_leadAtual.id, {
+    status: document.getElementById('mStatus').value,
+    observacao: obs || null,
+  });
+  btn.disabled = false; btn.textContent = 'Salvar';
+  if (!ok) return;
+  aviso('Lead atualizado.');
+  fecharModal();
+  updateStats();
+  renderLeads();
+}
+
+async function excluirLeadAtual() {
+  if (!_leadAtual) return;
+  if (await excluirLead(_leadAtual.id)) fecharModal();
+}
+
+// Esc fecha primeiro a confirmação de exclusão; se ela não estiver aberta, fecha os detalhes
+document.addEventListener('keydown', (e) => {
+  if (e.key !== 'Escape') return;
+  if (modalExclusaoAberto()) responderExclusao(false);
+  else fecharModal();
+});
+
+/* ── Exportar (CSV abre no Excel) ── */
+function exportarCSV() {
+  const rows = leadsFiltrados();
+  if (!rows.length) { aviso('Nada para exportar com os filtros atuais.', 'error'); return; }
+  const cols = [
+    ['Recebido em', l => fmtDateTime(l.created_at)],
+    ['Nome', l => l.nome],
+    ['Telefone', l => l.telefone],
+    ['E-mail', l => l.email],
+    ['Clínica', l => l.clinica],
+    ['Plano de interesse', l => l.plano_interesse],
+    ['Origem', l => l.origem],
+    ['Fonte / mídia', l => fonteLead(l)],
+    ['Campanha', l => l.utm_campaign],
+    ['Palavra-chave', l => l.utm_term],
+    ['Anúncio (utm_content)', l => l.utm_content],
+    ['gclid', l => l.gclid],
+    ['fbclid', l => l.fbclid],
+    ['Status', l => l.status],
+    ['Anotações', l => l.observacao],
+    ['Última alteração', l => fmtDateTime(l.atualizado_em)],
+  ];
+  // ";" como separador (padrão do Excel em português) e aspas em todos os campos.
+  // Campos que começam com = + - @ ganham um apóstrofo para o Excel não tratar como fórmula.
+  const cel = (v) => {
+    let s = v == null ? '' : String(v);
+    if (/^[=+\-@]/.test(s)) s = "'" + s;
+    return '"' + s.replace(/"/g, '""') + '"';
+  };
+  const linhas = [cols.map(c => cel(c[0])).join(';'), ...rows.map(l => cols.map(c => cel(c[1](l))).join(';'))];
+  const blob = new Blob(['﻿' + linhas.join('\r\n')], { type: 'text/csv;charset=utf-8' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = `leads-site-${new Date().toISOString().slice(0, 10)}.csv`;
+  document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+}
+
+/* ── Inicialização ── */
+(async () => {
+  document.getElementById('header-date').textContent =
+    'Leads do site — ' + new Date().toLocaleDateString('pt-BR', { weekday:'long', year:'numeric', month:'long', day:'numeric' });
+
+  const { data: { session } } = await supabase.auth.getSession();
+  if (!session) { window.location.href = '../index.html'; return; }
+
+  const meta = session.user.user_metadata;
+  const label = TIPO_LABELS[meta.tipo_usu] || meta.tipo_usu;
+  const nome  = meta.nome_usu || session.user.email;
+  const ini   = nome.split(' ').map(w => w[0]).join('').slice(0, 2).toUpperCase();
+
+  ['user-name', 'header-user-name'].forEach(id => document.getElementById(id).textContent = nome);
+  ['user-role', 'header-user-role'].forEach(id => document.getElementById(id).textContent = label);
+  ['user-avatar', 'header-avatar'].forEach(id => document.getElementById(id).textContent = ini);
+
+  // Tela exclusiva do Admin Global (conferido também no banco: sem a permissão,
+  // a tabela LEAD_SITE não devolve nenhum dado).
+  const u = (typeof getUsuarioAtual === 'function') ? await getUsuarioAtual('TIPO_USU', session) : null;
+  const ehGlobal = (u && u.TIPO_USU === 'ADMIN_GLOBAL') || (!u && meta.tipo_usu === 'ADMIN_GLOBAL');
+
+  if (ehGlobal) {
+    document.getElementById('empresa-nome').textContent = 'Vitta Sistemas';
+    AdminEmpresaCtx.initSelector('ADMIN_GLOBAL', session.user.id);
+    document.getElementById('sectionAdmin').classList.remove('hidden');
+    document.getElementById('mainContent').classList.remove('hidden');
+    await loadLeads();
+  } else {
+    const { data } = await supabase.from('EMPRESA').select('NOME_EMP').eq('ID_EMP', (meta.ID_EMP || meta.id_emp)).single();
+    document.getElementById('empresa-nome').textContent = data?.NOME_EMP || '';
+    document.getElementById('accessDenied').classList.remove('hidden');
+  }
+
+  let temAcessoConsultas = meta.tipo_usu === 'PROFISSIONAL';
+  if (['ADMIN_EMPRESA','ADMIN_GLOBAL'].includes(meta.tipo_usu)) {
+    const uOwn = await getUsuarioAtual('PROF_USU', session);
+    temAcessoConsultas = !!(uOwn?.PROF_USU);
+  }
+  if (!temAcessoConsultas)
+    document.querySelector('a[href="consultas.html"]')?.classList.add('hidden');
+})();
+
+document.querySelectorAll('#sidebar nav a').forEach(function(link) {
+  link.addEventListener('click', function() {
+    const sb = document.getElementById('sidebar');
+    const ov = document.getElementById('overlay');
+    if (sb && !sb.classList.contains('-translate-x-full')) {
+      sb.classList.add('-translate-x-full');
+      if (ov) ov.classList.add('hidden');
+    }
+  });
+});
+</script>
+</body>
+</html>

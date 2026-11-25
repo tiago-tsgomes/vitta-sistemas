@@ -1,0 +1,599 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- ===== Rastreamento =====
+       1) Troque GTM-XXXXXXX abaixo pelo ID do seu contêiner do Google Tag Manager.
+          Enquanto estiver com o valor de exemplo, o GTM não é carregado.
+       2) Pixel da Meta e Google Ads são configurados DENTRO do GTM (não aqui).
+       3) Eventos enviados para o GTM (dataLayer):
+            lead_enviado     → formulário enviado (use como conversão "Lead")
+            clique_whatsapp  → clique em algum botão de WhatsApp
+            clique_cadastro  → clique em "Começar grátis" de um plano -->
+  <script>
+    window.VITTA_GTM_ID = 'GTM-K5LB44V7';
+    window.dataLayer = window.dataLayer || [];
+    (function (w, d, s, l, i) {
+      if (!/^GTM-[A-Z0-9]+$/.test(i) || i === 'GTM-XXXXXXX') return;
+      w[l].push({ 'gtm.start': new Date().getTime(), event: 'gtm.js' });
+      var f = d.getElementsByTagName(s)[0], j = d.createElement(s);
+      j.async = true; j.src = 'https://www.googletagmanager.com/gtm.js?id=' + i;
+      f.parentNode.insertBefore(j, f);
+    })(window, document, 'script', 'dataLayer', window.VITTA_GTM_ID);
+
+    // Guarda de onde o visitante veio (UTMs, gclid do Google Ads, fbclid da Meta)
+    // por 30 dias, para gravar junto com o lead mesmo se ele voltar depois.
+    (function () {
+      var CHAVES = ['utm_source', 'utm_medium', 'utm_campaign', 'utm_term', 'utm_content', 'gclid', 'fbclid'];
+      var p = new URLSearchParams(location.search), novo = {}, tem = false;
+      CHAVES.forEach(function (k) { var v = p.get(k); if (v) { novo[k] = v.slice(0, 300); tem = true; } });
+      var salvo = {};
+      try {
+        var raw = JSON.parse(localStorage.getItem('vitta_origem') || 'null');
+        if (raw && raw.t && Date.now() - raw.t < 30 * 864e5) salvo = raw.d || {};
+      } catch (e) {}
+      if (tem) {
+        salvo = novo;
+        try { localStorage.setItem('vitta_origem', JSON.stringify({ t: Date.now(), d: novo })); } catch (e) {}
+      }
+      window.VITTA_ORIGEM = salvo;
+    })();
+  </script>
+  <!-- ===== fim do rastreamento ===== -->
+
+  <title>Vitta Sistemas — Sistema de Gestão e BI para Clínicas e Consultórios</title>
+  <meta name="description" content="Agenda, prontuário eletrônico, financeiro, app iOS/Android e Vitta BI em uma plataforma completa, com usuários ilimitados, a partir de R$ 97/mês. Comece grátis." />
+  <meta property="og:title" content="Vitta Sistemas — Gestão e BI para Clínicas e Consultórios" />
+  <meta property="og:description" content="Usuários ilimitados em todos os planos. Agenda, prontuário, financeiro, app e Vitta BI. Comece grátis." />
+  <meta property="og:image" content="img/logo.png" />
+  <meta name="theme-color" content="#ffffff" />
+  <link rel="icon" type="image/png" href="img/favicon.png" />
+
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            vitta: { 50:'#effbfd',100:'#d9f5fa',200:'#b2ebf5',300:'#7fdcec',400:'#4dd0e6',500:'#2ABCD4',600:'#1a96ac',700:'#127a8c',800:'#0d5f6e',900:'#094a57',950:'#062f38' },
+            ink:   { 900:'#071a22', 800:'#0b2530', 700:'#12323f' }
+          },
+          fontFamily: {
+            sans: ['Inter','system-ui','sans-serif'],
+            display: ['"Plus Jakarta Sans"','Inter','system-ui','sans-serif'],
+          },
+        }
+      }
+    }
+  </script>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap" rel="stylesheet" />
+
+  <style>
+    html { scroll-behavior:smooth; scroll-padding-top:84px; }
+    body { background:#fff; color:#2a4452; font-family:Inter,system-ui,sans-serif; -webkit-font-smoothing:antialiased; }
+    .grid > * { min-width:0; }
+    h1,h2,h3,.font-display { font-family:'Plus Jakarta Sans',Inter,system-ui,sans-serif; letter-spacing:-0.02em; }
+
+    .bg-soft { background:linear-gradient(180deg,#f6fafc 0%,#ffffff 100%); }
+    .bg-hero-light {
+      background:
+        radial-gradient(55% 55% at 85% 0%, rgba(42,188,212,.16) 0%, transparent 65%),
+        radial-gradient(40% 40% at 0% 100%, rgba(42,188,212,.08) 0%, transparent 70%),
+        linear-gradient(180deg,#f6fafc 0%,#ffffff 100%);
+    }
+    .bg-petrol { background:linear-gradient(165deg,#0b2530 0%,#0d3a47 55%,#127a8c 130%); }
+
+    .eyebrow { display:inline-flex; align-items:center; gap:8px; font-size:12px; font-weight:700; letter-spacing:.12em; text-transform:uppercase; color:#1a96ac; background:#effbfd; border:1px solid #d9f5fa; padding:6px 14px; border-radius:999px; }
+    .eyebrow .dot { width:6px; height:6px; border-radius:50%; background:currentColor; flex-shrink:0; }
+
+    .btn-primary { background:linear-gradient(135deg,#2ABCD4 0%,#1a96ac 100%); box-shadow:0 10px 30px -10px rgba(42,188,212,.7), inset 0 1px 0 rgba(255,255,255,.25); transition:transform .25s, box-shadow .25s; color:#fff; }
+    .btn-primary:hover { transform:translateY(-2px); box-shadow:0 16px 36px -10px rgba(42,188,212,.85), inset 0 1px 0 rgba(255,255,255,.25); }
+    .btn-outline { border:1px solid #b2ebf5; color:#127a8c; background:#fff; transition:background .25s, border-color .25s; }
+    .btn-outline:hover { background:#effbfd; border-color:#4dd0e6; }
+
+    .card { background:#fff; border:1px solid #e8eff4; border-radius:22px; transition:transform .3s, box-shadow .3s, border-color .3s; }
+    .card:hover { transform:translateY(-4px); border-color:#cdeaf1; box-shadow:0 24px 48px -24px rgba(9,74,87,.28); }
+    .icon-tile { width:46px; height:46px; border-radius:14px; display:flex; align-items:center; justify-content:center; flex-shrink:0; background:#effbfd; color:#1a96ac; }
+    .icon-tile svg { width:22px; height:22px; }
+    .icon-tile.warn { background:#fff4ec; color:#e8590c; }
+
+    .mock { background:#fff; border:1px solid #e6eef3; border-radius:20px; box-shadow:0 40px 80px -30px rgba(7,26,34,.35); }
+    .mock-dark { background:#0b2530; border:1px solid rgba(255,255,255,.08); border-radius:20px; box-shadow:0 40px 80px -30px rgba(7,26,34,.55); }
+    .float-a { animation:floatY 7s ease-in-out infinite; }
+    .float-b { animation:floatY 7s ease-in-out 1.8s infinite; }
+    @keyframes floatY { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-8px)} }
+
+    .reveal { opacity:0; transform:translateY(22px); transition:opacity .8s cubic-bezier(.2,.7,.2,1), transform .8s cubic-bezier(.2,.7,.2,1); }
+    .reveal.visible { opacity:1; transform:none; }
+    @media (prefers-reduced-motion: reduce) { .reveal{opacity:1;transform:none;transition:none} .float-a,.float-b{animation:none} html{scroll-behavior:auto} }
+
+    #navbar { transition:background .3s, box-shadow .3s, border-color .3s; border-bottom:1px solid transparent; }
+    #navbar.scrolled { background:rgba(255,255,255,.9); backdrop-filter:blur(18px); -webkit-backdrop-filter:blur(18px); border-color:#e8eff4; box-shadow:0 8px 30px -18px rgba(7,26,34,.25); }
+
+    /* Planos */
+    .toggle-wrap { position:relative; width:48px; height:26px; background:#dbe6ee; border-radius:999px; cursor:pointer; transition:background .3s; border:none; flex-shrink:0; }
+    .toggle-wrap.on { background:#2ABCD4; }
+    .toggle-knob { position:absolute; top:3px; left:3px; width:20px; height:20px; border-radius:50%; background:#fff; box-shadow:0 1px 4px rgba(0,0,0,.18); transition:transform .3s; }
+    .toggle-wrap.on .toggle-knob { transform:translateX(22px); }
+    .billing-lbl { color:#7a93a3; font-weight:500; transition:color .2s; cursor:pointer; }
+    .billing-lbl.active { color:#071a22; font-weight:700; }
+    .amount-annual, .annual-note { display:none; }
+    body.annual .amount-monthly { display:none; }
+    body.annual .amount-annual { display:inline; }
+    body.annual .annual-note { display:block; }
+    .plan { position:relative; display:flex; flex-direction:column; border-radius:24px; padding:32px 28px; background:#fff; border:1px solid #e3ecf2; transition:transform .3s, box-shadow .3s; }
+    .plan:hover { transform:translateY(-4px); box-shadow:0 30px 60px -30px rgba(9,74,87,.3); }
+    .plan.featured { background:linear-gradient(165deg,#0b2530 0%,#0d3a47 55%,#127a8c 130%); border-color:rgba(42,188,212,.4); color:#fff; box-shadow:0 30px 70px -25px rgba(18,122,140,.6); }
+    .plan ul li { display:flex; gap:10px; align-items:flex-start; font-size:14px; line-height:1.45; color:#2a4452; }
+    .plan.featured ul li { color:rgba(255,255,255,.88); }
+    .plan ul li .ic { flex-shrink:0; width:18px; height:18px; border-radius:50%; display:flex; align-items:center; justify-content:center; margin-top:1px; }
+    .plan ul li .ic svg { width:10px; height:10px; }
+    .plan ul li.yes .ic { background:#e6f8ef; color:#0f9d63; }
+    .plan.featured ul li.yes .ic { background:rgba(42,188,212,.22); color:#7fdcec; }
+    .plan ul li.no { color:#98aab5; }
+    .plan ul li.no .ic { background:#f1f5f8; color:#a8b8c2; }
+
+    /* FAQ */
+    .faq-item { border:1px solid #e3ecf2; border-radius:16px; background:#fff; transition:border-color .25s, box-shadow .25s; }
+    .faq-item.open { border-color:#b2ebf5; box-shadow:0 10px 30px -18px rgba(18,122,140,.35); }
+    .faq-btn { width:100%; text-align:left; padding:20px 22px; display:flex; justify-content:space-between; align-items:center; gap:14px; font-weight:600; color:#0b2530; font-size:15.5px; }
+    .faq-icon { width:28px; height:28px; border-radius:50%; background:#f1f6f9; display:flex; align-items:center; justify-content:center; flex-shrink:0; transition:transform .35s, background .2s; color:#1a96ac; }
+    .faq-item.open .faq-icon { transform:rotate(45deg); background:#d9f5fa; }
+    .faq-body { max-height:0; overflow:hidden; transition:max-height .4s ease; }
+    .faq-item.open .faq-body { max-height:320px; }
+    .faq-body p { padding:0 22px 20px; font-size:15px; color:#4a6573; line-height:1.7; }
+
+    .input { width:100%; border:1px solid #dbe6ee; border-radius:12px; padding:13px 14px; font-size:15px; color:#0b2530; background:#fff; transition:border-color .2s, box-shadow .2s; }
+    .input::placeholder { color:#a3b4be; }
+    .input:focus { outline:none; border-color:#4dd0e6; box-shadow:0 0 0 4px rgba(42,188,212,.15); }
+    .input.invalid { border-color:#e5484d; }
+    a:focus-visible, button:focus-visible { outline:3px solid rgba(42,188,212,.5); outline-offset:2px; border-radius:10px; }
+  </style>
+</head>
+<body class="bg-white">
+
+<!-- ===================== 1. HEADER ===================== -->
+<header id="navbar" class="fixed top-0 inset-x-0 z-50">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 h-[72px] flex items-center justify-between gap-4">
+    <a href="#topo" aria-label="Vitta Sistemas" class="shrink-0"><img src="img/logo.png" alt="Vitta Sistemas" class="h-10 sm:h-11" /></a>
+    <div class="flex items-center gap-3 sm:gap-6">
+      <a href="#planos" class="text-sm font-medium text-slate-500 hover:text-vitta-700 transition-colors">Ver planos</a>
+      <a href="#planos" class="btn-primary inline-flex items-center gap-2 px-4 sm:px-5 py-2.5 rounded-xl text-sm font-semibold whitespace-nowrap">Começar grátis</a>
+    </div>
+  </div>
+</header>
+
+<main id="topo">
+
+<!-- ===================== 2. HERO ===================== -->
+<section class="bg-hero-light pt-32 md:pt-40 pb-20 md:pb-28 overflow-hidden">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 grid lg:grid-cols-[1.05fr_1fr] gap-14 items-center">
+    <div>
+      <span class="eyebrow text-left"><span class="dot"></span>Sistema de gestão e BI para clínicas e consultórios • Usuários ilimitados</span>
+      <h1 class="text-4xl sm:text-5xl lg:text-[3.4rem] leading-[1.08] font-extrabold text-ink-900 mt-6 mb-6">Sua clínica organizada, seu financeiro sob controle e decisões baseadas em dados reais.</h1>
+      <p class="text-lg text-slate-500 leading-relaxed max-w-xl mb-9">Chega de planilhas soltas, agendas confusas e sistemas caros que cobram por usuário. O Vitta Sistemas reúne agenda, prontuário eletrônico, controle financeiro, app iOS/Android e Vitta BI em uma plataforma completa a partir de R$&nbsp;97/mês.</p>
+      <div class="flex flex-col sm:flex-row gap-3">
+        <a href="#planos" class="btn-primary inline-flex items-center justify-center gap-2 px-7 py-4 rounded-xl font-semibold">
+          Começar grátis agora
+          <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+        </a>
+        <a href="#demonstracao" class="btn-outline inline-flex items-center justify-center px-7 py-4 rounded-xl font-semibold">Agendar demonstração de 15 min</a>
+      </div>
+      <p class="text-sm text-slate-400 mt-5">Usuários ilimitados em todos os planos • Sem fidelidade no mensal • 20% de economia no anual</p>
+    </div>
+
+    <!-- Mockup: agenda + Vitta BI + app -->
+    <div class="relative pb-10 sm:pb-6 lg:pl-4" aria-hidden="true">
+      <div class="mock overflow-hidden">
+        <div class="flex items-center gap-2 px-4 py-3 border-b border-slate-100 bg-slate-50/70">
+          <span class="w-2.5 h-2.5 rounded-full bg-red-300"></span><span class="w-2.5 h-2.5 rounded-full bg-amber-300"></span><span class="w-2.5 h-2.5 rounded-full bg-emerald-300"></span>
+          <span class="ml-3 text-xs text-slate-400 font-medium truncate">app.vittasistemas.com.br · Agenda</span>
+        </div>
+        <div class="p-4 sm:p-5">
+          <div class="flex items-center justify-between mb-4">
+            <div><p class="font-display font-bold text-ink-900">Agenda de hoje</p><p class="text-xs text-slate-400">6 atendimentos · 1 teleatendimento</p></div>
+            <span class="text-[11px] font-bold px-2.5 py-1 rounded-full bg-emerald-50 text-emerald-600 border border-emerald-100">Google Meet</span>
+          </div>
+          <div class="space-y-2.5">
+            <div class="flex items-center gap-3 rounded-xl border border-slate-100 p-3"><span class="text-xs font-bold text-vitta-700 w-11">08:30</span><span class="w-1 h-8 rounded bg-vitta-500"></span><div class="flex-1 min-w-0"><p class="text-sm font-semibold text-ink-900 truncate">Mariana Alves</p><p class="text-xs text-slate-400">Consulta de retorno</p></div><span class="text-[10px] font-bold px-2 py-0.5 rounded-md bg-emerald-50 text-emerald-600">Confirmado</span></div>
+            <div class="flex items-center gap-3 rounded-xl border border-slate-100 p-3"><span class="text-xs font-bold text-vitta-700 w-11">09:30</span><span class="w-1 h-8 rounded bg-indigo-400"></span><div class="flex-1 min-w-0"><p class="text-sm font-semibold text-ink-900 truncate">Carlos Menezes</p><p class="text-xs text-slate-400">Teleatendimento</p></div><span class="text-[10px] font-bold px-2 py-0.5 rounded-md bg-vitta-50 text-vitta-600">Online</span></div>
+            <div class="flex items-center gap-3 rounded-xl border border-slate-100 p-3"><span class="text-xs font-bold text-vitta-700 w-11">10:30</span><span class="w-1 h-8 rounded bg-vitta-500"></span><div class="flex-1 min-w-0"><p class="text-sm font-semibold text-ink-900 truncate">Beatriz Souza</p><p class="text-xs text-slate-400">Primeira consulta</p></div><span class="text-[10px] font-bold px-2 py-0.5 rounded-md bg-amber-50 text-amber-600">Aguardando</span></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Painel BI -->
+      <div class="mock-dark float-a absolute -bottom-2 left-0 sm:-left-6 w-[62%] sm:w-[54%] p-4">
+        <p class="text-[11px] font-semibold uppercase tracking-wider text-vitta-300 mb-1">Vitta BI · Faturamento</p>
+        <p class="font-display text-xl sm:text-2xl font-extrabold text-white">R$ 48.920 <span class="text-xs font-semibold text-emerald-400">+12%</span></p>
+        <div class="flex items-end gap-1.5 h-12 mt-2">
+          <span class="flex-1 rounded-sm bg-vitta-500/30" style="height:35%"></span><span class="flex-1 rounded-sm bg-vitta-500/40" style="height:50%"></span><span class="flex-1 rounded-sm bg-vitta-500/40" style="height:42%"></span><span class="flex-1 rounded-sm bg-vitta-500/60" style="height:68%"></span><span class="flex-1 rounded-sm bg-vitta-500/70" style="height:60%"></span><span class="flex-1 rounded-sm bg-vitta-400" style="height:85%"></span><span class="flex-1 rounded-sm bg-vitta-300" style="height:100%"></span>
+        </div>
+      </div>
+
+      <!-- App móvel -->
+      <div class="float-b absolute -bottom-4 right-0 sm:-right-2 w-[34%] sm:w-[28%] max-w-[150px] bg-ink-900 rounded-[22px] p-1.5 shadow-2xl shadow-ink-900/40 border border-white/10">
+        <div class="bg-white rounded-[17px] p-2.5">
+          <div class="flex items-center gap-1.5 mb-2"><span class="w-4 h-4 rounded-md bg-vitta-500"></span><span class="text-[9px] font-bold text-ink-900">Vitta</span></div>
+          <div class="rounded-lg bg-vitta-50 p-2 mb-1.5"><p class="text-[8px] text-vitta-700 font-bold">PRÓXIMO · 08:30</p><p class="text-[10px] font-semibold text-ink-900">Mariana Alves</p></div>
+          <div class="rounded-lg bg-slate-50 p-2 mb-1.5"><p class="text-[10px] font-semibold text-ink-900">Carlos Menezes</p></div>
+          <div class="rounded-lg bg-slate-50 p-2"><p class="text-[10px] font-semibold text-ink-900">Beatriz Souza</p></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== 3. DOR ===================== -->
+<section class="py-20 md:py-28 bg-white">
+  <div class="max-w-6xl mx-auto px-4 sm:px-6">
+    <div class="text-center max-w-3xl mx-auto mb-14 reveal">
+      <h2 class="text-3xl md:text-4xl font-extrabold text-ink-900 mb-5">Onde a sua clínica está perdendo tempo e dinheiro todos os meses?</h2>
+      <p class="text-slate-500 text-lg leading-relaxed">Administrar o atendimento de pacientes já exige atenção total. Quando a gestão fica espalhada entre agendas, blocos de anotações e planilhas manuais, o desgaste aumenta e os números somem.</p>
+    </div>
+    <div class="grid sm:grid-cols-2 gap-5">
+      <article class="card p-7 reveal">
+        <div class="icon-tile warn mb-5"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="3"/><path d="M16 2v4M8 2v4M3 10h18M10 15l4 4m0-4l-4 4"/></svg></div>
+        <h3 class="text-lg font-bold text-ink-900 mb-2">Agenda travada e faltas de última hora</h3>
+        <p class="text-slate-500 text-[15px] leading-relaxed">Dificuldade para organizar horários, encaixes, teleatendimentos e confirmações sem perder o ritmo do dia.</p>
+      </article>
+      <article class="card p-7 reveal" style="transition-delay:.06s">
+        <div class="icon-tile warn mb-5"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v20M17 6H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg></div>
+        <h3 class="text-lg font-bold text-ink-900 mb-2">Financeiro e despesas no escuro</h3>
+        <p class="text-slate-500 text-[15px] leading-relaxed">Saber quanto entrou no mês não basta — é preciso enxergar despesas operacionais e margens com clareza.</p>
+      </article>
+      <article class="card p-7 reveal" style="transition-delay:.12s">
+        <div class="icon-tile warn mb-5"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18M7 14l4-4 4 4 5-6"/></svg></div>
+        <h3 class="text-lg font-bold text-ink-900 mb-2">Falta de visão gerencial</h3>
+        <p class="text-slate-500 text-[15px] leading-relaxed">Tomar decisões importantes no "achismo" por não ter painéis consolidados e fáceis de ler.</p>
+      </article>
+      <article class="card p-7 reveal" style="transition-delay:.18s">
+        <div class="icon-tile warn mb-5"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2M9 11a4 4 0 100-8 4 4 0 000 8zM23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/></svg></div>
+        <h3 class="text-lg font-bold text-ink-900 mb-2">Sistemas pesados que cobram por usuário</h3>
+        <p class="text-slate-500 text-[15px] leading-relaxed">Plataformas complexas que encarecem cada vez que você adiciona uma secretária ou novo profissional.</p>
+      </article>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== 4. SOLUÇÃO ===================== -->
+<section class="py-20 md:py-28 bg-soft">
+  <div class="max-w-6xl mx-auto px-4 sm:px-6">
+    <div class="text-center max-w-3xl mx-auto mb-14 reveal">
+      <span class="eyebrow"><span class="dot"></span>Tudo em um só lugar</span>
+      <h2 class="text-3xl md:text-4xl font-extrabold text-ink-900 mt-5 mb-5">Da agenda ao Vitta BI: tudo o que o seu consultório precisa para crescer com previsibilidade</h2>
+      <p class="text-slate-500 text-lg leading-relaxed">O Vitta Sistemas foi desenhado para dar agilidade ao dia a dia clínico e controle real à gestão. Centralize agendamentos, prontuário eletrônico, gestão de leads, financeiro e indicadores sem precisar de planilhas paralelas.</p>
+    </div>
+    <div class="grid sm:grid-cols-2 gap-5">
+      <article class="card p-7 flex gap-5 reveal">
+        <div class="icon-tile"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="3"/><path d="M16 2v4M8 2v4M3 10h18M9 16l2 2 4-4"/></svg></div>
+        <div><h3 class="font-bold text-ink-900 mb-2">Agenda Ilimitada e Prontuário Eletrônico</h3><p class="text-slate-500 text-[15px] leading-relaxed">Organize horários, mantenha o histórico clínico seguro e gere links automáticos do Google Meet para atendimentos online.</p></div>
+      </article>
+      <article class="card p-7 flex gap-5 reveal" style="transition-delay:.06s">
+        <div class="icon-tile"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v20M17 6H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg></div>
+        <div><h3 class="font-bold text-ink-900 mb-2">Financeiro Completo e Controle de Despesas</h3><p class="text-slate-500 text-[15px] leading-relaxed">Acompanhe receitas, contas a pagar e custos da clínica em um fluxo simples e sem surpresas no fim do mês.</p></div>
+      </article>
+      <article class="card p-7 flex gap-5 reveal" style="transition-delay:.12s">
+        <div class="icon-tile"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="7" y="2" width="10" height="20" rx="2.5"/><path d="M11 18h2"/></svg></div>
+        <div><h3 class="font-bold text-ink-900 mb-2">Mobilidade com App iOS e Android</h3><p class="text-slate-500 text-[15px] leading-relaxed">Consulte a agenda, prontuários e receba notificações push direto no celular onde você estiver <span class="text-vitta-700 font-semibold">(planos Clínica e PRO)</span>.</p></div>
+      </article>
+      <article class="card p-7 flex gap-5 reveal" style="transition-delay:.18s">
+        <div class="icon-tile"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18M7 14l4-4 4 4 5-6"/></svg></div>
+        <div><h3 class="font-bold text-ink-900 mb-2">Inteligência com Vitta BI (7 Painéis de Gestão)</h3><p class="text-slate-500 text-[15px] leading-relaxed">Transforme os dados do atendimento em indicadores visuais claros, com relatórios de leads em PDF para decidir com segurança <span class="text-vitta-700 font-semibold">(plano PRO)</span>.</p></div>
+      </article>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== 5. PARA QUEM ===================== -->
+<section class="py-20 md:py-28 bg-white">
+  <div class="max-w-6xl mx-auto px-4 sm:px-6">
+    <h2 class="text-3xl md:text-4xl font-extrabold text-ink-900 text-center max-w-3xl mx-auto mb-14 reveal">Pensado para quem busca eficiência sem burocracia</h2>
+    <div class="grid md:grid-cols-2 gap-6">
+      <article class="rounded-3xl border border-slate-200 bg-white p-8 md:p-10 reveal">
+        <div class="icon-tile mb-6"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2M12 11a4 4 0 100-8 4 4 0 000 8z"/></svg></div>
+        <h3 class="text-xl font-bold text-ink-900 mb-3">Profissionais da Saúde Autônomos</h3>
+        <p class="text-slate-500 leading-relaxed">Médicos, especialistas e profissionais que atendem em consultório próprio ou sublocado e querem sair das planilhas gastando pouco, com prontuário, agenda e financeiro organizados desde o primeiro dia.</p>
+      </article>
+      <article class="bg-petrol rounded-3xl p-8 md:p-10 text-white reveal" style="transition-delay:.08s">
+        <div class="icon-tile mb-6" style="background:rgba(42,188,212,.2);color:#7fdcec"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2M9 11a4 4 0 100-8 4 4 0 000 8zM23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/></svg></div>
+        <h3 class="text-xl font-bold mb-3">Clínicas Pequenas e Equipes em Crescimento</h3>
+        <p class="text-white/70 leading-relaxed">Clínicas que precisam integrar recepção e profissionais com usuários ilimitados, acesso pelo aplicativo no celular e indicadores estratégicos no Vitta BI.</p>
+      </article>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== 6. COMO FUNCIONA ===================== -->
+<section class="py-20 md:py-28 bg-soft">
+  <div class="max-w-6xl mx-auto px-4 sm:px-6">
+    <h2 class="text-3xl md:text-4xl font-extrabold text-ink-900 text-center mb-14 reveal">Comece em 3 passos simples</h2>
+    <div class="grid md:grid-cols-3 gap-5">
+      <article class="card p-8 reveal"><span class="font-display text-5xl font-extrabold text-vitta-200">01</span><h3 class="font-bold text-ink-900 text-lg mt-3 mb-2">Crie sua conta grátis ou agende um tour</h3><p class="text-slate-500 text-[15px] leading-relaxed">Teste o ambiente na prática ou veja uma demonstração rápida de 15 minutos aplicada à sua rotina.</p></article>
+      <article class="card p-8 reveal" style="transition-delay:.08s"><span class="font-display text-5xl font-extrabold text-vitta-200">02</span><h3 class="font-bold text-ink-900 text-lg mt-3 mb-2">Configure sua clínica sem complicação</h3><p class="text-slate-500 text-[15px] leading-relaxed">Cadastre horários, equipe (sem custo extra por usuário) e organize seu fluxo financeiro.</p></article>
+      <article class="card p-8 reveal" style="transition-delay:.16s"><span class="font-display text-5xl font-extrabold text-vitta-200">03</span><h3 class="font-bold text-ink-900 text-lg mt-3 mb-2">Opere com controle e dados</h3><p class="text-slate-500 text-[15px] leading-relaxed">Atenda seus pacientes com agilidade e acompanhe os números da clínica em tempo real.</p></article>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== 7. PLANOS ===================== -->
+<section id="planos" class="py-20 md:py-28 bg-white">
+  <div class="max-w-6xl mx-auto px-4 sm:px-6">
+    <div class="text-center max-w-2xl mx-auto mb-10 reveal">
+      <h2 class="text-3xl md:text-5xl font-extrabold text-ink-900 mb-4">Planos acessíveis, transparentes e com usuários ilimitados</h2>
+      <p class="text-slate-500 text-lg">Escolha o plano ideal para o momento da sua clínica. Alterne entre cobrança Mensal ou Anual (economize 20%) a qualquer momento.</p>
+    </div>
+
+    <div class="flex flex-wrap items-center justify-center gap-3.5 mb-12 reveal">
+      <span class="billing-lbl active" id="lbl-monthly">Mensal</span>
+      <button type="button" class="toggle-wrap" id="billingToggle" aria-label="Alternar cobrança mensal ou anual" aria-pressed="false"><span class="toggle-knob"></span></button>
+      <span class="billing-lbl" id="lbl-annual">Anual</span>
+      <span class="text-xs font-bold px-2.5 py-1 rounded-full bg-emerald-50 text-emerald-600 border border-emerald-100">Economize 20%</span>
+    </div>
+
+    <div class="grid md:grid-cols-3 gap-5 items-stretch">
+      <!-- ESSENCIAL -->
+      <div class="plan reveal">
+        <p class="text-xs font-bold uppercase tracking-[.14em] text-slate-400 mb-1">Essencial</p>
+        <p class="text-slate-500 text-sm mb-6 min-h-[40px]">Para digitalizar a gestão da clínica com o sistema web completo.</p>
+        <div class="flex items-end gap-1 mb-1"><span class="text-slate-500 font-semibold pb-2">R$</span><span class="font-display text-5xl font-extrabold text-ink-900"><span class="amount-monthly">97</span><span class="amount-annual">77,60</span></span><span class="text-slate-400 text-sm pb-2">/mês</span></div>
+        <p class="annual-note text-xs font-semibold text-emerald-600">Cobrança anual · 20% de economia</p>
+        <a href="https://app.vittasistemas.com.br/pages/cadastro.html?plano=Essencial" target="_blank" rel="noopener noreferrer" class="btn-outline mt-6 mb-7 block text-center py-3.5 rounded-xl font-semibold">Começar grátis</a>
+        <ul class="space-y-3">
+          <li class="yes"><span class="ic"><svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="2,6 5,9 10,3"/></svg></span>Sistema web completo</li>
+          <li class="yes"><span class="ic"><svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="2,6 5,9 10,3"/></svg></span>Agendamentos ilimitados</li>
+          <li class="yes"><span class="ic"><svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="2,6 5,9 10,3"/></svg></span>Prontuário eletrônico</li>
+          <li class="yes"><span class="ic"><svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="2,6 5,9 10,3"/></svg></span>Financeiro completo</li>
+          <li class="yes"><span class="ic"><svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="2,6 5,9 10,3"/></svg></span>Controle de despesas</li>
+          <li class="yes"><span class="ic"><svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="2,6 5,9 10,3"/></svg></span>Gestão de leads</li>
+          <li class="yes"><span class="ic"><svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="2,6 5,9 10,3"/></svg></span>Link automático do Google Meet</li>
+          <li class="yes"><span class="ic"><svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="2,6 5,9 10,3"/></svg></span><strong class="font-semibold">Usuários ilimitados</strong></li>
+          <li class="no"><span class="ic"><svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="3" y1="3" x2="9" y2="9"/><line x1="9" y1="3" x2="3" y2="9"/></svg></span>App para profissionais</li>
+        </ul>
+      </div>
+
+      <!-- CLÍNICA -->
+      <div class="plan featured reveal" style="transition-delay:.08s">
+        <span class="absolute -top-3 left-1/2 -translate-x-1/2 text-[11px] font-bold uppercase tracking-wider px-3 py-1 rounded-full bg-vitta-500 text-white shadow-lg whitespace-nowrap">Mais escolhido</span>
+        <p class="text-xs font-bold uppercase tracking-[.14em] text-vitta-300 mb-1">Clínica</p>
+        <p class="text-white/60 text-sm mb-6 min-h-[40px]">Para equipes que precisam de mobilidade — tudo também pelo celular.</p>
+        <div class="flex items-end gap-1 mb-1"><span class="text-white/60 font-semibold pb-2">R$</span><span class="font-display text-5xl font-extrabold text-white"><span class="amount-monthly">147</span><span class="amount-annual">117,60</span></span><span class="text-white/50 text-sm pb-2">/mês</span></div>
+        <p class="annual-note text-xs font-semibold text-vitta-300">Cobrança anual · 20% de economia</p>
+        <a href="https://app.vittasistemas.com.br/pages/cadastro.html?plano=Cl%C3%ADnica" target="_blank" rel="noopener noreferrer" class="btn-primary mt-6 mb-7 block text-center py-3.5 rounded-xl font-semibold">Começar grátis</a>
+        <ul class="space-y-3">
+          <li class="yes"><span class="ic"><svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="2,6 5,9 10,3"/></svg></span>Tudo do plano Essencial</li>
+          <li class="yes"><span class="ic"><svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="2,6 5,9 10,3"/></svg></span>App iOS e Android</li>
+          <li class="yes"><span class="ic"><svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="2,6 5,9 10,3"/></svg></span>Agenda e prontuário no celular</li>
+          <li class="yes"><span class="ic"><svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="2,6 5,9 10,3"/></svg></span>Notificações push</li>
+          <li class="yes"><span class="ic"><svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="2,6 5,9 10,3"/></svg></span>Link automático do Google Meet</li>
+          <li class="yes"><span class="ic"><svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="2,6 5,9 10,3"/></svg></span><strong class="font-semibold">Usuários ilimitados</strong></li>
+        </ul>
+      </div>
+
+      <!-- PRO -->
+      <div class="plan reveal" style="transition-delay:.16s">
+        <p class="text-xs font-bold uppercase tracking-[.14em] text-indigo-500 mb-1">PRO</p>
+        <p class="text-slate-500 text-sm mb-6 min-h-[40px]">Para clínicas que querem decidir com dados, com o Vitta BI completo.</p>
+        <div class="flex items-end gap-1 mb-1"><span class="text-slate-500 font-semibold pb-2">R$</span><span class="font-display text-5xl font-extrabold text-ink-900"><span class="amount-monthly">197</span><span class="amount-annual">157,60</span></span><span class="text-slate-400 text-sm pb-2">/mês</span></div>
+        <p class="annual-note text-xs font-semibold text-emerald-600">Cobrança anual · 20% de economia</p>
+        <a href="https://app.vittasistemas.com.br/pages/cadastro.html?plano=Pro" target="_blank" rel="noopener noreferrer" class="mt-6 mb-7 block text-center py-3.5 rounded-xl font-semibold text-white bg-ink-900 hover:bg-ink-700 transition-colors">Começar grátis</a>
+        <ul class="space-y-3">
+          <li class="yes"><span class="ic"><svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="2,6 5,9 10,3"/></svg></span>Tudo do plano Clínica</li>
+          <li class="yes"><span class="ic"><svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="2,6 5,9 10,3"/></svg></span>Vitta BI — 7 painéis de gestão</li>
+          <li class="yes"><span class="ic"><svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="2,6 5,9 10,3"/></svg></span>Relatório de leads em PDF</li>
+          <li class="yes"><span class="ic"><svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="2,6 5,9 10,3"/></svg></span>Suporte prioritário</li>
+          <li class="yes"><span class="ic"><svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="2,6 5,9 10,3"/></svg></span><strong class="font-semibold">Usuários ilimitados</strong></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== 8. FORMULÁRIO ===================== -->
+<section id="demonstracao" class="py-20 md:py-28 bg-soft">
+  <div class="max-w-5xl mx-auto px-4 sm:px-6">
+    <div class="bg-petrol rounded-[28px] p-6 sm:p-10 md:p-14 grid md:grid-cols-[1fr_1.05fr] gap-10 items-start shadow-2xl shadow-vitta-900/20">
+      <div class="text-white">
+        <h2 class="text-3xl md:text-4xl font-extrabold mb-5">Prefere ver o Vitta Sistemas funcionando antes de decidir?</h2>
+        <p class="text-white/70 leading-relaxed">Preencha os dados abaixo para agendar uma demonstração objetiva de 15 minutos ou falar com nossa equipe no WhatsApp sobre o melhor plano para a sua clínica.</p>
+      </div>
+      <form id="demo-form" class="bg-white rounded-2xl p-6 sm:p-7 space-y-4" novalidate>
+        <div><label for="f-nome" class="block text-sm font-semibold text-ink-800 mb-1.5">Seu nome</label><input id="f-nome" class="input" type="text" autocomplete="name" placeholder="Seu nome" required /></div>
+        <div><label for="f-whatsapp" class="block text-sm font-semibold text-ink-800 mb-1.5">WhatsApp com DDD</label><input id="f-whatsapp" class="input" type="tel" inputmode="numeric" autocomplete="tel-national" placeholder="(00) 00000-0000" required /></div>
+        <div><label for="f-email" class="block text-sm font-semibold text-ink-800 mb-1.5">E-mail <span class="font-normal text-slate-400">(opcional)</span></label><input id="f-email" class="input" type="email" autocomplete="email" placeholder="seu@email.com" /></div>
+        <div><label for="f-clinica"class="block text-sm font-semibold text-ink-800 mb-1.5">Nome da clínica ou especialidade</label><input id="f-clinica" class="input" type="text" placeholder="Ex.: Clínica Vida / Psicologia" required /></div>
+        <div>
+          <label for="f-plano" class="block text-sm font-semibold text-ink-800 mb-1.5">Plano de interesse</label>
+          <select id="f-plano" class="input">
+            <option>Essencial R$ 97</option>
+            <option>Clínica R$ 147</option>
+            <option>PRO + Vitta BI R$ 197</option>
+            <option selected>Ainda não sei</option>
+          </select>
+        </div>
+        <p id="f-erro" class="hidden text-sm text-red-600" role="alert">Preencha seu nome, a clínica e um WhatsApp válido com DDD (e confira o e-mail, se informado).</p>
+        <button type="submit" id="f-submit" class="btn-primary w-full disabled:opacity-70 disabled:cursor-wait py-4 rounded-xl font-semibold">Agendar demonstração gratuita</button>
+        <p class="text-xs text-slate-400 leading-relaxed text-center">Seus dados são usados exclusivamente para o atendimento comercial do Vitta Sistemas. Sem spam.</p>
+      </form>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== 9. FAQ ===================== -->
+<section class="py-20 md:py-28 bg-white">
+  <div class="max-w-3xl mx-auto px-4 sm:px-6">
+    <h2 class="text-3xl md:text-4xl font-extrabold text-ink-900 text-center mb-12 reveal">Perguntas frequentes</h2>
+    <div class="space-y-3">
+      <div class="faq-item"><button class="faq-btn" type="button" aria-expanded="false">Existe cobrança adicional por usuário ou profissional cadastrado?<span class="faq-icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg></span></button><div class="faq-body"><p>Não. Todos os planos do Vitta Sistemas (Essencial, Clínica e PRO) contam com usuários ilimitados, permitindo que médicos, profissionais e recepção acessem sem custo extra por login.</p></div></div>
+      <div class="faq-item"><button class="faq-btn" type="button" aria-expanded="false">Como funciona o "Começar grátis"?<span class="faq-icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg></span></button><div class="faq-body"><p>Você cria seu acesso gratuitamente para conhecer o sistema na prática antes de escolher a assinatura mensal ou anual com 20% de desconto.</p></div></div>
+      <div class="faq-item"><button class="faq-btn" type="button" aria-expanded="false">Qual a diferença entre os planos Clínica e PRO?<span class="faq-icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg></span></button><div class="faq-body"><p>O plano Clínica (R$ 147/mês) inclui o aplicativo nativo para iOS e Android com notificações push, agenda e prontuário no celular. Já o plano PRO (R$ 197/mês) libera o Vitta BI completo com 7 painéis de gestão, relatórios de leads em PDF e suporte prioritário.</p></div></div>
+      <div class="faq-item"><button class="faq-btn" type="button" aria-expanded="false">Posso migrar de plano ou mudar do mensal para o anual depois?<span class="faq-icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg></span></button><div class="faq-body"><p>Sim. Você pode começar no plano que faz mais sentido hoje e fazer upgrade para o plano Clínica ou PRO (ou ativar o desconto de 20% do plano anual) a qualquer momento.</p></div></div>
+      <div class="faq-item"><button class="faq-btn" type="button" aria-expanded="false">Preciso de equipe de TI para implantar o sistema?<span class="faq-icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg></span></button><div class="faq-body"><p>Não. A interface foi pensada para ser intuitiva desde o primeiro acesso, e nossa equipe acompanha você caso precise de orientação inicial.</p></div></div>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<!-- ===================== 10. FOOTER ===================== -->
+<footer class="bg-[#04121a] text-white pt-14 pb-10">
+  <div class="max-w-6xl mx-auto px-4 sm:px-6 text-center md:text-left">
+    <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-8 pb-10 border-b border-white/10">
+      <div>
+        <img src="img/logo_branca.png" alt="Vitta Sistemas" class="h-10 mb-4 mx-auto md:mx-0" />
+        <p class="text-white/55 text-sm max-w-sm mx-auto md:mx-0"><strong class="text-white/80 font-semibold">Vitta Sistemas</strong> — Gestão, Mobilidade e Inteligência para Clínicas e Consultórios.</p>
+      </div>
+      <nav class="flex flex-wrap justify-center gap-x-6 gap-y-3 text-sm text-white/65" aria-label="Links do rodapé">
+        <a href="https://vittasistemas.com.br" class="hover:text-white transition-colors">vittasistemas.com.br</a>
+        <a href="https://vittasistemas.com.br/privacidade.html" class="hover:text-white transition-colors">Política de Privacidade</a>
+        <a href="https://vittasistemas.com.br/termos.html" class="hover:text-white transition-colors">Termos de Uso</a>
+      </nav>
+    </div>
+    <p class="text-white/40 text-xs pt-8">© 2026 Vitta Sistemas. Todos os direitos reservados.</p>
+  </div>
+</footer>
+
+<!-- ===================== POPUP DE CONFIRMAÇÃO ===================== -->
+<div id="success-modal" class="hidden fixed inset-0 z-[100] items-center justify-center p-4 bg-ink-900/60 backdrop-blur-sm" role="dialog" aria-modal="true" aria-labelledby="m-title">
+  <div class="bg-white rounded-3xl max-w-md w-full p-8 text-center shadow-2xl relative">
+    <button type="button" data-close class="absolute top-4 right-4 w-9 h-9 rounded-full text-slate-400 hover:bg-slate-100 hover:text-ink-900 flex items-center justify-center" aria-label="Fechar"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
+    <div class="w-16 h-16 rounded-full bg-emerald-50 text-emerald-500 flex items-center justify-center mx-auto mb-5"><svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="4,12 10,18 20,6"/></svg></div>
+    <h3 id="m-title" class="text-2xl font-extrabold text-ink-900 mb-3">Dados enviados com sucesso!</h3>
+    <p id="m-text" class="text-slate-500 leading-relaxed mb-6"></p>
+    <p class="font-semibold text-ink-800 mb-4">Quer enviar uma mensagem agora para nossa equipe?</p>
+    <a id="m-wa" href="#" target="_blank" rel="noopener noreferrer" class="flex items-center justify-center gap-2.5 w-full py-3.5 rounded-xl font-semibold text-white bg-[#25d366] hover:bg-[#1fb857] transition-colors">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+      Enviar mensagem no WhatsApp
+    </a>
+    <button type="button" data-close class="mt-3 text-sm font-medium text-slate-400 hover:text-ink-900">Agora não, aguardo o contato</button>
+  </div>
+</div>
+
+<script>
+  // Header com fundo ao rolar
+  const nav = document.getElementById('navbar');
+  const onScroll = () => nav.classList.toggle('scrolled', window.scrollY > 10);
+  window.addEventListener('scroll', onScroll, { passive: true }); onScroll();
+
+  // Reveal on scroll
+  const io = new IntersectionObserver(es => es.forEach(e => { if (e.isIntersecting) { e.target.classList.add('visible'); io.unobserve(e.target); } }), { threshold: .12 });
+  document.querySelectorAll('.reveal').forEach(el => io.observe(el));
+
+  // Seletor Mensal / Anual
+  const toggle = document.getElementById('billingToggle');
+  function setBilling(annual) {
+    document.body.classList.toggle('annual', annual);
+    toggle.classList.toggle('on', annual);
+    toggle.setAttribute('aria-pressed', annual);
+    document.getElementById('lbl-monthly').classList.toggle('active', !annual);
+    document.getElementById('lbl-annual').classList.toggle('active', annual);
+  }
+  toggle.addEventListener('click', () => setBilling(!document.body.classList.contains('annual')));
+  document.getElementById('lbl-monthly').addEventListener('click', () => setBilling(false));
+  document.getElementById('lbl-annual').addEventListener('click', () => setBilling(true));
+
+  // FAQ
+  document.querySelectorAll('.faq-btn').forEach(btn => btn.addEventListener('click', () => {
+    const item = btn.parentElement, open = item.classList.contains('open');
+    document.querySelectorAll('.faq-item.open').forEach(el => { el.classList.remove('open'); el.querySelector('.faq-btn').setAttribute('aria-expanded', 'false'); });
+    if (!open) { item.classList.add('open'); btn.setAttribute('aria-expanded', 'true'); }
+  }));
+
+  // Formulário: máscara de WhatsApp + envio via WhatsApp comercial
+  const wa = document.getElementById('f-whatsapp');
+  wa.addEventListener('input', e => {
+    const v = e.target.value.replace(/\D/g, '').slice(0, 11);
+    let m = '';
+    if (v.length > 0) m = '(' + v.slice(0, 2);
+    if (v.length >= 2) m += ') ' + v.slice(2, 7);
+    if (v.length >= 7) m += '-' + v.slice(7, 11);
+    e.target.value = m;
+  });
+  document.getElementById('demo-form').addEventListener('submit', async e => {
+    e.preventDefault();
+    const g = id => document.getElementById(id);
+    const nome = g('f-nome').value.trim(), clinica = g('f-clinica').value.trim(), tel = g('f-whatsapp').value.trim(), plano = g('f-plano').value, email = g('f-email').value.trim();
+    const valid = { 'f-nome': nome.length >= 2, 'f-clinica': !!clinica, 'f-whatsapp': tel.replace(/\D/g, '').length >= 10, 'f-email': !email || /^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email) };
+    Object.entries(valid).forEach(([id, ok]) => g(id).classList.toggle('invalid', !ok));
+    const ok = Object.values(valid).every(Boolean);
+    g('f-erro').classList.toggle('hidden', ok);
+    if (!ok) return;
+    const btn = g('f-submit');
+    btn.disabled = true; btn.textContent = 'Enviando...';
+
+    // Grava o lead no Supabase (tabela LEAD_SITE), com a origem do anúncio
+    const origem = window.VITTA_ORIGEM || {};
+    const base = { nome, telefone: tel, email: email || null, plano_interesse: plano, clinica, origem: 'Landing Page' };
+    const comOrigem = { ...base };
+    ['utm_source', 'utm_medium', 'utm_campaign', 'utm_term', 'utm_content', 'gclid', 'fbclid']
+      .forEach(k => { if (origem[k]) comOrigem[k] = origem[k]; });
+    const enviar = (corpo) => fetch('https://ccdeuabmjwgntwssjfgo.supabase.co/rest/v1/LEAD_SITE', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'apikey': 'sb_publishable_sIb6i2bltmoNWxI49Ih3HA_yjbgG3Hg',
+        'Prefer': 'return=minimal'
+      },
+      body: JSON.stringify(corpo)
+    });
+    let saved = false;
+    try {
+      let r = await enviar(comOrigem);
+      // Se os campos de origem ainda não existirem no banco, grava o lead sem eles
+      // (nunca perder o contato por causa do rastreamento).
+      if (!r.ok && r.status === 400 && Object.keys(comOrigem).length > Object.keys(base).length) r = await enviar(base);
+      saved = r.ok;
+    } catch (_) {}
+    btn.disabled = false; btn.textContent = 'Agendar demonstração gratuita';
+
+    // Conversão "Lead" para o GTM (Pixel da Meta / Google Ads) — uma vez por envio.
+    // event_id permite à Meta descartar duplicatas do mesmo envio.
+    const VALOR_PLANO = { 'Essencial R$ 97': 97, 'Clínica R$ 147': 147, 'PRO + Vitta BI R$ 197': 197 };
+    window.dataLayer.push({
+      event: 'lead_enviado',
+      event_id: (window.crypto && crypto.randomUUID) ? crypto.randomUUID() : 'lead-' + Date.now() + '-' + Math.random().toString(36).slice(2),
+      plano_interesse: plano,
+      lead_valor: VALOR_PLANO[plano] || 0,
+      moeda: 'BRL',
+      lead_salvo: saved,
+    });
+
+    // Mensagem pronta para o WhatsApp da equipe
+    const msg = `Olá! Acabei de preencher o formulário no site e quero agendar uma demonstração gratuita de 15 minutos do Vitta Sistemas.\n\n*Nome:* ${nome}\n*WhatsApp:* ${tel}${email ? `\n*E-mail:* ${email}` : ''}\n*Clínica/Especialidade:* ${clinica}\n*Plano de interesse:* ${plano}`;
+    g('m-wa').href = `https://wa.me/5548984096109?text=${encodeURIComponent(msg)}`;
+    g('m-title').textContent = saved ? 'Dados enviados com sucesso!' : 'Quase lá!';
+    g('m-text').textContent = saved
+      ? `Obrigado, ${nome.split(' ')[0]}! Recebemos seus dados e em breve nossa equipe entrará em contato.`
+      : 'Não conseguimos registrar seus dados agora, mas você pode falar direto com nossa equipe pelo WhatsApp e retornaremos em breve.';
+    openModal();
+    g('demo-form').reset();
+  });
+
+  // Cliques importantes para o GTM (não contam como "Lead": o Lead é só o formulário,
+  // para o mesmo contato não virar duas conversões ao clicar no WhatsApp depois).
+  document.addEventListener('click', e => {
+    const a = e.target.closest('a[href]');
+    if (!a) return;
+    const href = a.getAttribute('href') || '';
+    if (href.includes('wa.me/')) {
+      window.dataLayer.push({ event: 'clique_whatsapp', local: a.id === 'm-wa' ? 'pos_formulario' : 'pagina' });
+    } else if (href.includes('/pages/cadastro.html')) {
+      let planoCadastro = '';
+      try { planoCadastro = new URL(href, location.href).searchParams.get('plano') || ''; } catch (_) {}
+      window.dataLayer.push({ event: 'clique_cadastro', plano: planoCadastro });
+    }
+  });
+
+  // Popup de confirmação
+  const modal = document.getElementById('success-modal');
+  function openModal() { modal.classList.remove('hidden'); modal.classList.add('flex'); document.body.style.overflow = 'hidden'; document.getElementById('m-wa').focus(); }
+  function closeModal() { modal.classList.add('hidden'); modal.classList.remove('flex'); document.body.style.overflow = ''; }
+  modal.addEventListener('click', e => { if (e.target === modal || e.target.closest('[data-close]')) closeModal(); });
+  document.addEventListener('keydown', e => { if (e.key === 'Escape' && !modal.classList.contains('hidden')) closeModal(); });
+</script>
+</body>
+</html>
